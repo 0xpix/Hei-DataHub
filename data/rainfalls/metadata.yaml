@@ -1,0 +1,6 @@
+id: rainfalls
+dataset_name: Rainfalls
+description: This dataset is for rainfall 2020 - 2025
+source: rainfall.com/download
+date_created: '2025-10-03'
+storage_location: local/path
