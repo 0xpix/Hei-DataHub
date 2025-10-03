@@ -44,9 +44,11 @@ class HomeScreen(Screen):
 
     BINDINGS = [
         Binding("a", "add_dataset", "Add Dataset", key_display="A"),
+        Binding("s", "settings", "Settings", key_display="S"),
+        Binding("o", "open_details", "Open", show=False),
+        Binding("p", "outbox", "Outbox", key_display="P"),
         Binding("q", "quit", "Quit"),
         Binding("enter", "open_details", "View Details"),
-        Binding("o", "open_details", "Open", show=False),
         Binding("j", "move_down", "Down", show=False),
         Binding("k", "move_up", "Up", show=False),
         Binding("g", "jump_top", "Top", key_display="gg", show=False),
@@ -249,6 +251,16 @@ class HomeScreen(Screen):
         """Show help overlay."""
         self.app.push_screen(HelpScreen())
 
+    def action_settings(self) -> None:
+        """Open settings screen (S key)."""
+        from mini_datahub.screens import SettingsScreen
+        self.app.push_screen(SettingsScreen())
+
+    def action_outbox(self) -> None:
+        """Open outbox screen (P key)."""
+        from mini_datahub.screens import OutboxScreen
+        self.app.push_screen(OutboxScreen())
+
 
 class HelpScreen(Screen):
     """Help screen showing keybindings."""
@@ -271,6 +283,8 @@ class HelpScreen(Screen):
   [cyan]G[/cyan]           Jump to last dataset
   [cyan]o / Enter[/cyan]   Open selected dataset details
   [cyan]A[/cyan]           Add new dataset
+  [cyan]S[/cyan]           Settings (GitHub config)
+  [cyan]P[/cyan]           Outbox (retry failed PRs)
   [cyan]Esc[/cyan]         Exit Insert mode / Clear search
   [cyan]q[/cyan]           Quit application
   [cyan]?[/cyan]           Show this help
@@ -684,10 +698,46 @@ class AddDataScreen(Screen):
         except Exception as e:
             self.app.notify(f"Warning: Failed to index dataset: {str(e)}", severity="warning", timeout=5)
 
-        # Success! Navigate to details
-        self.app.notify(f"Dataset '{dataset_id}' saved successfully!", timeout=3)
+        # Try PR workflow if GitHub is configured
+        from mini_datahub.config import get_github_config
+        from mini_datahub.pr_workflow import PRWorkflow
+
+        config = get_github_config()
+        if config.is_configured() and config.catalog_repo_path:
+            # Execute Save → PR workflow
+            self.create_pr(dataset_id, metadata)
+        else:
+            # Just save locally and show success
+            self.app.notify(f"Dataset '{dataset_id}' saved successfully!", timeout=3)
+            # Show one-time nudge about GitHub integration
+            if not hasattr(self.app, '_github_nudge_shown'):
+                self.app.notify(
+                    "💡 Tip: Connect GitHub in Settings (S) to auto-create PRs",
+                    severity="information",
+                    timeout=5,
+                )
+                self.app._github_nudge_shown = True
+
         self.app.pop_screen()
         self.app.push_screen(DetailsScreen(dataset_id))
+
+    @work(exclusive=True)
+    async def create_pr(self, dataset_id: str, metadata: dict) -> None:
+        """Create PR in background."""
+        from mini_datahub.pr_workflow import PRWorkflow
+
+        self.app.notify("Creating PR...", timeout=2)
+
+        workflow = PRWorkflow()
+        success, message, pr_url, pr_number = workflow.execute(metadata, dataset_id)
+
+        if success and pr_url:
+            self.app.notify(f"✓ PR #{pr_number} created!", timeout=5)
+        elif success and message == "github_not_configured":
+            # Fallback case (shouldn't reach here)
+            pass
+        else:
+            self.app.notify(f"⚠ PR failed (saved to outbox): {message}", severity="warning", timeout=5)
 
 
 class DataHubApp(App):
@@ -778,6 +828,48 @@ class DataHubApp(App):
 
     #help-content {
         padding: 2;
+    }
+
+    #settings-container {
+        padding: 2;
+        height: auto;
+    }
+
+    #settings-container Label {
+        margin-top: 1;
+    }
+
+    #settings-container Input {
+        margin-bottom: 1;
+    }
+
+    #settings-container Button {
+        margin: 1 1 1 0;
+    }
+
+    #status-message {
+        margin-top: 2;
+        padding: 1;
+    }
+
+    #outbox-container {
+        height: 100%;
+        padding: 1;
+    }
+
+    #outbox-label {
+        padding: 1 0;
+        text-style: bold;
+    }
+
+    #outbox-table {
+        height: 1fr;
+        margin: 1 0;
+    }
+
+    #outbox-status {
+        margin-top: 1;
+        padding: 1;
     }
     """
 

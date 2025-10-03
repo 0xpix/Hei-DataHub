@@ -4,10 +4,10 @@
 
 ## Overview
 
-**Hei-DataHub** is a tiny private "GitHub-for-data" that lets small teams:
+**Hei-DataHub** is a inventory that lets us:
 - **Search** existing datasets with fast full-text search (SQLite FTS5)
 - **Add** new datasets with validated, consistent metadata
-- Work entirely locally with YAML files and SQLite—no network required
+- Work entirely locally with YAML files and SQLite—no network required (network required only at first when cloning)
 
 Think of it as a lightweight data catalog for teams who want to organize datasets without complex infrastructure.
 
@@ -16,9 +16,10 @@ Think of it as a lightweight data catalog for teams who want to organize dataset
 - 🏠 **Local-First**: Everything stored in YAML files + SQLite database
 - 🔍 **Fast Search**: Full-text search powered by SQLite FTS5 with BM25 ranking
 - ✅ **Validated Metadata**: JSON Schema + Pydantic validation
-- 🖥️ **Clean TUI**: Terminal interface built with Textual
+- 🖥️ **Clean TUI**: Terminal interface built with Textual with Neovim-style keybindings
 - 📦 **Simple Storage**: One folder per dataset with `metadata.yaml`
 - 🚀 **Easy Setup**: Install and run immediately
+- 🔄 **Automated PRs**: Save → PR workflow with GitHub integration (optional)
 
 ## Quick Start
 
@@ -130,6 +131,8 @@ The TUI features **Neovim-style keybindings** with Normal and Insert modes for e
 - `G` - Jump to last dataset
 - `o` or `Enter` - Open details for selected dataset
 - `A` - Add new dataset
+- `S` - Settings (configure GitHub integration)
+- `P` - Outbox (retry failed PRs)
 - `?` - Show help with all keybindings
 - `q` - Quit application
 
@@ -191,6 +194,62 @@ mini-datahub reindex
 # Show version
 mini-datahub --version
 ```
+
+## GitHub PR Workflow (Optional)
+
+**New in v3.0:** Automatically create Pull Requests when saving datasets!
+
+### Quick Setup
+
+1. **Create a catalog repository** on GitHub (e.g., `your-org/mini-datahub-catalog`)
+2. **Clone it locally**: `git clone https://github.com/your-org/mini-datahub-catalog.git`
+3. **Generate a GitHub PAT** with `Contents: R/W`, `Pull requests: R/W` permissions
+4. **Configure the app**:
+   - Launch: `mini-datahub`
+   - Press `S` for Settings
+   - Fill in GitHub host, owner, repo, username, token
+   - Set catalog repository path (absolute path to local clone)
+   - Test connection, then Save
+
+5. **Save a dataset** (press `A`, fill form, press `Ctrl+S`)
+   - ✨ PR created automatically!
+   - 🎉 Success toast with PR URL
+
+### What Happens Automatically
+
+When you save a dataset with GitHub configured:
+
+1. **Writes** `data/<id>/metadata.yaml` to your local catalog repo
+2. **Creates** a git branch: `add/<dataset-id>-<timestamp>`
+3. **Commits** with message: `feat(dataset): add <id> — <name>`
+4. **Pushes** to GitHub (central repo if you have push access, or your fork)
+5. **Opens** a Pull Request with formatted description
+6. **Adds** labels and reviewers (configurable)
+7. **Shows** success notification with PR link
+
+### Offline Handling
+
+If offline or PR creation fails:
+- Dataset **saved locally** ✅
+- PR task **queued in Outbox** 📮
+- Press `P` to view outbox
+- Press `R` to retry when back online
+
+### For Teams
+
+**Contributors:**
+- Clone catalog repo once
+- Configure GitHub settings once
+- Add datasets through TUI
+- PRs created automatically
+
+**Maintainers:**
+- Review PRs on GitHub
+- Check metadata accuracy, source URLs
+- Approve and merge
+- Changes sync to all team members
+
+**See [GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md) for detailed setup guide and troubleshooting.**
 
 ## Development
 
