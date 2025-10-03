@@ -31,6 +31,7 @@ dependencies = [
     "jsonschema>=4.20.0",
     "requests>=2.31.0",
     "pyperclip>=1.8.2",
+    "keyring>=24.0.0",
 ]
 
 [project.optional-dependencies]
