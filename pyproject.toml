@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mini-datahub"
-version = "0.1.0"
+version = "0.55.0"
 description = "A local-first TUI for managing datasets with consistent metadata"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["data", "catalog", "tui", "metadata", "search"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -45,15 +45,19 @@ dev = [
 ]
 
 [project.scripts]
-mini-datahub = "mini_datahub.cli:main"
+mini-datahub = "mini_datahub.cli.main:main"
+hei-datahub = "mini_datahub.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/0xpix/Hei-DataHub"
 Repository = "https://github.com/0xpix/Hei-DataHub"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["mini_datahub*"]
+
+[tool.setuptools.package-data]
+mini_datahub = ["infra/sql/*.sql"]
 
 [tool.black]
 line-length = 100
