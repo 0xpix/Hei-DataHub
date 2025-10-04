@@ -39,10 +39,10 @@ clean-db:  ## Remove database (will be recreated on next run)
 	rm -f db.sqlite db.sqlite-journal
 
 run:  ## Launch the TUI
-	mini-datahub
+	hei-datahub
 
 reindex:  ## Rebuild search index from YAML files
-	mini-datahub reindex
+	hei-datahub reindex
 
 verify:  ## Verify installation
 	./scripts/verify_installation.sh

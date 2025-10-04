@@ -90,6 +90,30 @@ data/**/*.gdb
 # DataHub - outbox for failed PRs
 .outbox/
 
+# DataHub - ignore data files but keep metadata
+# Keep the directory structure and metadata files, ignore actual data files
+data/**/*.csv
+data/**/*.parquet
+data/**/*.json
+data/**/*.jsonl
+data/**/*.nc
+data/**/*.tif
+data/**/*.tiff
+data/**/*.geotiff
+data/**/*.hdf
+data/**/*.hdf5
+data/**/*.zarr
+data/**/*.shp
+data/**/*.gpkg
+data/**/*.gdb
+# Add more data file extensions as needed, but metadata.yaml and README.md are tracked
+
+# DataHub - local config (use ~/.mini-datahub instead)
+.datahub_config.json
+
+# DataHub - outbox for failed PRs
+.outbox/
+
 # Flask stuff:
 instance/
 .webassets-cache

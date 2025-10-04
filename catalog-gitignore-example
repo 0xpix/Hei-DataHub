@@ -1,43 +1,94 @@
-# Database files - never commit these
-db.sqlite
-db.sqlite-*
+# Database files - never commit these# Database files - never commit these
 
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+db.sqlitedb.sqlite
 
-# Virtual environments
-venv/
-.venv/
-ENV/
-env/
+db.sqlite-*db.sqlite-*
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
 
-# OS
-.DS_Store
-Thumbs.db
 
-# Ignore all data directory contents EXCEPT metadata and specific files
-data/**
+# Python cache# Python cache
 
-# But explicitly include metadata.yaml files
-!data/**/metadata.yaml
+__pycache__/__pycache__/
 
-# Include optional README files for datasets
-!data/**/README.md
+*.py[cod]*.py[cod]
 
-# Include optional images directories for datasets
-!data/**/images/
-!data/**/images/**
+*$py.class*$py.class
+
+*.so*.so
+
+.Python.Python
+
+
+
+# Virtual environments# Virtual environments
+
+venv/venv/
+
+.venv/.venv/
+
+ENV/ENV/
+
+env/env/
+
+
+
+# IDE# IDE
+
+.vscode/.vscode/
+
+.idea/.idea/
+
+*.swp*.swp
+
+*.swo*.swo
+
+*~*~
+
+
+
+# OS# OS
+
+.DS_Store.DS_Store
+
+Thumbs.dbThumbs.db
+
+
+
+# Ignore data files but keep metadata and structure# Ignore all data directory contents EXCEPT metadata and specific files
+
+# Keep the directory structure and metadata files, ignore actual data filesdata/**
+
+data/**/*.csv
+
+data/**/*.parquet# But explicitly include metadata.yaml files
+
+data/**/*.json!data/**/metadata.yaml
+
+data/**/*.jsonl
+
+data/**/*.nc# Include optional README files for datasets
+
+data/**/*.tif!data/**/README.md
+
+data/**/*.tiff
+
+data/**/*.geotiff# Include optional images directories for datasets
+
+data/**/*.hdf!data/**/images/
+
+data/**/*.hdf5!data/**/images/**
+
+data/**/*.zarr
+
+data/**/*.shp# Application config (contains sensitive info)
+
+data/**/*.gpkg.datahub_config.json
+
+data/**/*.gdb
+
+# Add more data file extensions as needed, but metadata.yaml and README.md are tracked# Outbox (contains failed PR tasks)
+
+.outbox/
 
 # Application config (contains sensitive info)
 .datahub_config.json

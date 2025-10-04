@@ -1,5 +1,103 @@
 # Changelog
 
+## v0.40.0 - Clean Architecture Restructure (2024-10-04)
+
+### 🏗️ **Major: Clean Architecture & src/ Layout**
+
+Complete restructuring into a layered, maintainable architecture with clear separation of concerns.
+
+#### **Architecture Changes**
+
+1. **New `src/` Layout**
+   - All code moved to `src/mini_datahub/`
+   - Layered architecture: `app`, `ui`, `core`, `services`, `infra`, `cli`, `utils`
+   - Enforced dependency rules (UI → Services → Infra)
+   - No cyclic dependencies
+
+2. **Core Domain (Pure Logic)**
+   - `core/models.py` - Pydantic models
+   - `core/rules.py` - Business rules (slugify, ID generation)
+   - `core/errors.py` - Domain exceptions
+
+3. **Infrastructure Layer**
+   - `infra/paths.py` - Centralized path management
+   - `infra/db.py` - SQLite connection & schema
+   - `infra/index.py` - FTS5 operations
+   - `infra/store.py` - YAML I/O
+   - `infra/git.py` - Git operations
+   - `infra/github_api.py` - GitHub API
+   - `infra/auth.py` - Keyring authentication
+   - `infra/sql/schema.sql` - Packaged SQL schema
+
+4. **Services Layer**
+   - `services/search.py` - Query policy
+   - `services/catalog.py` - Dataset orchestration
+   - `services/sync.py` - Auto-pull & reindex
+   - `services/publish.py` - PR workflow
+   - `services/autocomplete.py` - Suggestions
+   - `services/outbox.py` - Failed PR queue
+   - `services/update_check.py` - Release checking
+
+5. **UI Layer**
+   - `ui/views/` - Textual screens (home, details, add, settings)
+   - `ui/widgets/` - Reusable components (tables, forms, console, toasts)
+
+6. **Application Layer**
+   - `app/runtime.py` - Startup & logging
+   - `app/settings.py` - Configuration management
+
+#### **Build & Distribution**
+
+- Version bumped to **0.40.0** (Beta status)
+- SQL schema now ships with package
+- `pyproject.toml` updated for `src/` layout
+- Package data includes `infra/sql/*.sql`
+- Entry point: `mini_datahub.cli.main:main`
+
+#### **Data Tracking**
+
+- `.gitignore` updated for single-repo mode
+- Only tracks `data/**/metadata.yaml` and optional docs
+- Ignores `db.sqlite`, `.cache/`, `.outbox/`
+- Ready for future catalog repo split
+
+#### **CI/CD**
+
+- New `ci.yaml` workflow with two jobs:
+  - App tests (lint, format, pytest, mypy)
+  - Catalog metadata validation
+- Validates all `data/**/metadata.yaml` against schema
+- Checks for duplicate dataset IDs
+- Build artifacts on tags
+- Automated GitHub releases
+
+#### **Documentation**
+
+- `MIGRATION_v0.40.md` - Complete migration guide
+- File-by-file mapping
+- Dependency rules explained
+- Step-by-step migration checklist
+- Rollback instructions
+
+#### **Breaking Changes**
+
+- Package structure changed (all imports need updating)
+- CLI entry point changed to `mini_datahub.cli.main:main`
+- SQL schema path moved to `infra/sql/schema.sql`
+- Path constants centralized in `infra/paths.py`
+
+#### **Migration Required**
+
+Existing installations must:
+1. Update imports in any custom code
+2. Reinstall: `uv sync --dev`
+3. Verify: `mini-datahub --version` shows `0.40.0`
+4. Test all features (search, add, PR, sync)
+
+See `MIGRATION_v0.40.md` for full details.
+
+---
+
 ## v3.0.0 - Automated PR Workflow (2024-10-03)
 
 ### 🚀 **Major Feature: Save → PR Automation**
