@@ -114,6 +114,10 @@ extra:
 # Additional CSS
 extra_css:
   - assets/overrides.css
+markdown_extensions:
+  - attr_list
+  - toc:
+      permalink: true
 
 # Additional JavaScript
 extra_javascript: []
