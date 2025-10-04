@@ -33,6 +33,12 @@ class GitHubConfig:
         self.pr_labels: list[str] = ["dataset:add", "needs-review"]
         self.catalog_repo_path: Optional[str] = None  # Local path to catalog repo
 
+        # New feature settings
+        self.auto_check_updates: bool = True  # Weekly update check
+        self.suggest_from_catalog_values: bool = True  # Autocomplete suggestions
+        self.background_fetch_interval_minutes: int = 0  # 0 = disabled
+        self.debug_logging: bool = False  # Enable debug logs
+
         # Load config from file
         self._load_config()
 
@@ -53,6 +59,12 @@ class GitHubConfig:
             self.auto_assign_reviewers = data.get("auto_assign_reviewers", [])
             self.pr_labels = data.get("pr_labels", ["dataset:add", "needs-review"])
             self.catalog_repo_path = data.get("catalog_repo_path")
+
+            # Load new feature settings
+            self.auto_check_updates = data.get("auto_check_updates", True)
+            self.suggest_from_catalog_values = data.get("suggest_from_catalog_values", True)
+            self.background_fetch_interval_minutes = data.get("background_fetch_interval_minutes", 0)
+            self.debug_logging = data.get("debug_logging", False)
 
             # Try to load token from keyring
             if KEYRING_AVAILABLE and self.username:
@@ -79,6 +91,10 @@ class GitHubConfig:
             "auto_assign_reviewers": self.auto_assign_reviewers,
             "pr_labels": self.pr_labels,
             "catalog_repo_path": self.catalog_repo_path,
+            "auto_check_updates": self.auto_check_updates,
+            "suggest_from_catalog_values": self.suggest_from_catalog_values,
+            "background_fetch_interval_minutes": self.background_fetch_interval_minutes,
+            "debug_logging": self.debug_logging,
         }
 
         with open(CONFIG_FILE, "w") as f:
@@ -109,7 +125,18 @@ class GitHubConfig:
                 pass
 
     def is_configured(self) -> bool:
-        """Check if GitHub is configured."""
+        """Check if GitHub is configured with all required fields."""
+        return bool(
+            self.host
+            and self.owner
+            and self.repo
+            and self.username
+            and self._token
+            and self.catalog_repo_path
+        )
+
+    def has_credentials(self) -> bool:
+        """Check if GitHub credentials are present (without catalog path)."""
         return bool(
             self.host
             and self.owner
@@ -142,6 +169,10 @@ class GitHubConfig:
             "pr_labels": self.pr_labels,
             "catalog_repo_path": self.catalog_repo_path,
             "has_token": bool(self._token),
+            "auto_check_updates": self.auto_check_updates,
+            "suggest_from_catalog_values": self.suggest_from_catalog_values,
+            "background_fetch_interval_minutes": self.background_fetch_interval_minutes,
+            "debug_logging": self.debug_logging,
         }
 
 
@@ -162,3 +193,8 @@ def reload_config() -> GitHubConfig:
     global _config_instance
     _config_instance = GitHubConfig()
     return _config_instance
+
+
+def load_config() -> GitHubConfig:
+    """Convenience function to load config."""
+    return get_github_config()

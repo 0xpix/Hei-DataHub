@@ -285,3 +285,71 @@ def delete_dataset(dataset_id: str) -> None:
         conn.commit()
     finally:
         conn.close()
+
+
+def get_vocabulary(field: str) -> List[str]:
+    """
+    Get unique values for a field across all datasets.
+    Used for autocomplete suggestions.
+
+    Args:
+        field: Field name (e.g., 'projects', 'data_types', 'file_format')
+
+    Returns:
+        List of unique values
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Query the JSON field
+        if field == 'projects':
+            cursor.execute(
+                """
+                SELECT DISTINCT json_extract(data, '$.used_in_projects')
+                FROM datasets_store
+                WHERE json_extract(data, '$.used_in_projects') IS NOT NULL
+                """
+            )
+        elif field == 'data_types':
+            cursor.execute(
+                """
+                SELECT DISTINCT json_extract(data, '$.data_types')
+                FROM datasets_store
+                WHERE json_extract(data, '$.data_types') IS NOT NULL
+                """
+            )
+        elif field == 'file_format':
+            cursor.execute(
+                """
+                SELECT DISTINCT json_extract(data, '$.file_format')
+                FROM datasets_store
+                WHERE json_extract(data, '$.file_format') IS NOT NULL
+                """
+            )
+        else:
+            return []
+
+        results = set()
+        for row in cursor.fetchall():
+            value = row[0]
+            if not value:
+                continue
+
+            # Parse JSON arrays
+            import json
+            try:
+                if isinstance(value, str) and value.startswith('['):
+                    items = json.loads(value)
+                    if isinstance(items, list):
+                        results.update(str(item) for item in items if item)
+                    else:
+                        results.add(str(value))
+                else:
+                    results.add(str(value))
+            except Exception:
+                results.add(str(value))
+
+        return sorted(results)
+    finally:
+        conn.close()

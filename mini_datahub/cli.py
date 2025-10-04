@@ -4,7 +4,7 @@ CLI entrypoint for Hei-DataHub.
 import argparse
 import sys
 
-from mini_datahub import __version__
+from mini_datahub.version import __version__, __app_name__
 
 
 def handle_reindex(args):

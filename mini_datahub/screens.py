@@ -197,6 +197,9 @@ class SettingsScreen(Screen):
             # Save configuration (writes to file and keyring)
             config.save_config(save_token=True)
 
+            # Refresh GitHub connection status in the app
+            self.app.refresh_github_status()
+
             status_label.update("[green]✓ Settings saved![/green]")
             self.app.notify("Settings saved successfully!", timeout=3)
 

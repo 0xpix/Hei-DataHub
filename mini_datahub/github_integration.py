@@ -198,6 +198,33 @@ class GitHubIntegration:
         except Exception:
             return False
 
+    def check_file_exists_remote(self, path: str) -> Tuple[bool, str]:
+        """
+        Check if a file exists in the remote repository.
+
+        Args:
+            path: Path to check (e.g., "data/my-dataset/metadata.yaml")
+
+        Returns:
+            Tuple of (exists, message)
+        """
+        try:
+            url = f"{self.base_url}/repos/{self.config.get_repo_fullname()}/contents/{path}"
+            params = {"ref": self.config.default_branch}
+            response = self.session.get(url, params=params, timeout=10)
+
+            if response.status_code == 404:
+                return False, "File does not exist"
+            elif response.status_code == 200:
+                return True, "File exists"
+            else:
+                # Unknown state - assume doesn't exist to allow PR creation
+                return False, f"Could not verify (status {response.status_code})"
+
+        except Exception as e:
+            # On error, assume doesn't exist to allow PR creation
+            return False, f"Could not verify: {str(e)}"
+
     def check_id_uniqueness(self, dataset_id: str) -> Tuple[bool, str]:
         """
         Check if dataset ID is unique in the repository.
@@ -208,23 +235,11 @@ class GitHubIntegration:
         Returns:
             Tuple of (is_unique, message)
         """
-        try:
-            # Check if directory exists in default branch
-            path = f"data/{dataset_id}/metadata.yaml"
-            url = f"{self.base_url}/repos/{self.config.get_repo_fullname()}/contents/{path}"
-
-            params = {"ref": self.config.default_branch}
-            response = self.session.get(url, params=params, timeout=10)
-
-            if response.status_code == 404:
-                return True, "ID is unique"
-            elif response.status_code == 200:
-                return False, f"Dataset ID '{dataset_id}' already exists in repository"
-            else:
-                return True, "Could not verify uniqueness (assuming unique)"
-
-        except Exception:
-            return True, "Could not verify uniqueness (assuming unique)"
+        exists, msg = self.check_file_exists_remote(f"data/{dataset_id}/metadata.yaml")
+        if exists:
+            return False, f"Dataset ID '{dataset_id}' already exists in repository"
+        else:
+            return True, "ID is unique"
 
 
 def format_pr_body(metadata: Dict[str, Any]) -> str:
@@ -286,3 +301,27 @@ def format_pr_body(metadata: Dict[str, Any]) -> str:
 """
 
     return body
+
+    def get_latest_release(self, repo: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """
+        Get the latest release for a repository.
+
+        Args:
+            repo: Repository in owner/repo format (defaults to configured repo)
+
+        Returns:
+            Release data dict or None
+        """
+        if repo is None:
+            repo = self.config.get_repo_fullname()
+
+        try:
+            url = f"{self.base_url}/repos/{repo}/releases/latest"
+            response = self.session.get(url, timeout=10)
+
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return None
+        except Exception:
+            return None
