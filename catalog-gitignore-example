@@ -1,0 +1,46 @@
+# Database files - never commit these
+db.sqlite
+db.sqlite-*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ignore all data directory contents EXCEPT metadata and specific files
+data/**
+
+# But explicitly include metadata.yaml files
+!data/**/metadata.yaml
+
+# Include optional README files for datasets
+!data/**/README.md
+
+# Include optional images directories for datasets
+!data/**/images/
+!data/**/images/**
+
+# Application config (contains sensitive info)
+.datahub_config.json
+
+# Outbox (contains failed PR tasks)
+.outbox/
