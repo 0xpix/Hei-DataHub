@@ -13,41 +13,31 @@ edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 
 # Configuration
-theme: simple-blog
-  # palette:
-  #   # Palette toggle for light mode
-  #   - scheme: default
-  #     primary: cyan
-  #     accent: blue
-  #     toggle:
-  #       icon: material/brightness-7
-  #       name: Switch to dark mode
-  #   # Palette toggle for dark mode
-  #   - scheme: slate
-  #     primary: cyan
-  #     accent: blue
-  #     toggle:
-  #       icon: material/brightness-4
-  #       name: Switch to light mode
-  features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.tabs
-    - navigation.sections
-    - navigation.expand
-    - navigation.top
-    - navigation.footer
-    - search.suggest
-    - search.highlight
-    - search.share
-    - content.code.copy
-    - content.action.edit
-    - content.action.view
-    - toc.follow
-  icon:
-    repo: fontawesome/brands/github
-    edit: material/pencil
-    view: material/eye
+theme:
+  name: simple-blog
+  
+  # Simple blog theme customization options
+  # Note: Features below are Material-specific and may not work with simple-blog
+  # Kept commented for reference when switching back to Material theme
+  # features:
+  #   - navigation.instant
+  #   - navigation.tracking
+  #   - navigation.tabs
+  #   - navigation.sections
+  #   - navigation.expand
+  #   - navigation.top
+  #   - navigation.footer
+  #   - search.suggest
+  #   - search.highlight
+  #   - search.share
+  #   - content.code.copy
+  #   - content.action.edit
+  #   - content.action.view
+  #   - toc.follow
+  # icon:
+  #   repo: fontawesome/brands/github
+  #   edit: material/pencil
+  #   view: material/eye
 
 # Plugins
 plugins:
