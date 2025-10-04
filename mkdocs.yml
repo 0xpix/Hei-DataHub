@@ -15,21 +15,21 @@ copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 # Configuration
 theme:
   name: simple-blog
-  palette:
-    # Palette toggle for light mode
-    - scheme: default
-      primary: cyan
-      accent: blue
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Palette toggle for dark mode
-    - scheme: slate
-      primary: cyan
-      accent: blue
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+  # palette:
+  #   # Palette toggle for light mode
+  #   - scheme: default
+  #     primary: cyan
+  #     accent: blue
+  #     toggle:
+  #       icon: material/brightness-7
+  #       name: Switch to dark mode
+  #   # Palette toggle for dark mode
+  #   - scheme: slate
+  #     primary: cyan
+  #     accent: blue
+  #     toggle:
+  #       icon: material/brightness-4
+  #       name: Switch to light mode
   features:
     - navigation.instant
     - navigation.tracking
