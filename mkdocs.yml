@@ -112,7 +112,8 @@ extra:
   generator: false
 
 # Additional CSS
-extra_css: []
+extra_css:
+  - assets/overrides.css
 
 # Additional JavaScript
 extra_javascript: []
