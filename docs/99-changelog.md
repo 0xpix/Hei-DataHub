@@ -4,206 +4,354 @@ All notable changes to Hei-DataHub will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
----
+## 📝 Version History
 
-## [0.55.5-beta] - 2025-10-04
+### ✅ Current Features (v0.55.6-beta — "Persistence")
 
-### 🔧 Maintenance Release: "Fjord"
+**Bug Fix Release: GitHub PAT Persistence**
 
-This release focuses on centralizing version management and improving documentation infrastructure.
+**Fixed:**
+- **Critical: GitHub PAT not persisting after PC restart**
+  - Fixed keyring storage issue where Personal Access Token was not being saved permanently
+  - GitHub credentials now persist correctly across system reboots
+  - Users no longer need to re-enter PAT after restarting their computer
+  - Improved error handling and logging for keyring operations
+  - Enhanced Settings screen feedback when PAT is successfully saved
 
-### Added
+**Improved:**
+- Keyring integration reliability in Linux (haven't tested windows/MacOS)
+- Better error messages when keyring backend is unavailable
+- Settings screen now shows confirmation when credentials are stored
 
-- **Centralized Version Management:** Single source of truth via `version.yaml`
-    - Auto-generates Python module (`src/mini_datahub/_version.py`)
-    - Auto-generates docs version banner (`docs/_includes/version.md`)
-    - Auto-generates build metadata (`build/version.json`)
-    - Auto-updates `pyproject.toml` version field
-- **Version Sync Script:** `scripts/sync_version.py` with `--dry-run` support
-- **Pre-commit Hooks:** Automatically syncs version files when `version.yaml` changes
-- **GitHub Actions:** CI workflow validates version sync on PRs
-- **Documentation Banner:** Dynamic version notice on homepage using mkdocs-macros-plugin
-
-### Changed
-
-- **Version Module:** `src/mini_datahub/version.py` now imports from auto-generated `_version.py`
-- **MkDocs Configuration:** Added macros plugin for Jinja2 template includes
-- **Dependency Management:** Added `mkdocs-macros-plugin>=1.0.0` to dev dependencies
-
-### Improved
-
-- **Developer Experience:** Version bumps now require editing only `version.yaml`
-- **Consistency:** Eliminates hardcoded version strings across codebase
-- **Release Process:** Pre-commit hooks enforce version sync before commits
-
-### Documentation
-
-- **Version Banner:** Auto-generated version notice includes codename, release date, and compatibility notes
-- **Versioning Policy:** Updated to reference centralized system
+**Technical Details:**
+- Ensured proper keyring service name consistency
+- Fixed credential storage lifecycle to persist beyond application sessions
+- Added fallback mechanisms for systems without native keyring support
 
 ---
 
-## [0.55.0-beta] - 2025-01-04
+### [0.55.5-beta] - 2025-10-04 — "Fjord"
 
-### 🎉 Major Release: "Clean Architecture"
+**Maintenance Release: Centralized Version Management**
 
-This release represents a significant refactoring of Hei-DataHub's internal architecture, along with new features for improved PR workflows and developer experience.
+**Added:**
+- Centralized version management via `version.yaml`
+- Auto-generation of version files (`_version.py`, `version.md`, `version.json`)
+- Version sync script with dry-run support
+- Pre-commit hooks for version consistency
+- GitHub Actions CI validation for version sync
+- Dynamic documentation banner with version info
 
-### Added
+**Changed:**
+- Version module now imports from auto-generated `_version.py`
+- MkDocs configuration includes macros plugin
+- Added `mkdocs-macros-plugin>=1.0.0` to dependencies
 
-- **Dual Command Support:** Both `hei-datahub` and `mini-datahub` commands now work interchangeably
-- **Auto-Stash for PR Workflow:** Automatically stashes uncommitted changes before creating PRs, then restores them afterward
-- **Improved Gitignore Handling:** Better detection and respect for `.gitignore` patterns during PR creation
-- **Enhanced Version Information:** New `--version-info` flag shows detailed system and build information
-- **Documentation System:** Comprehensive manual (this site!) with MkDocs + Material theme
-- **Clean Architecture:** Layered design with clear separation:
-    - **UI Layer:** Textual-based TUI screens and widgets
-    - **Services Layer:** Business logic orchestration (search, catalog, publish, sync)
-    - **Core Domain:** Pure models and validation rules (no I/O)
-    - **Infrastructure Layer:** Adapters for SQLite, YAML, Git, GitHub API
-
-### Changed
-
-- **Repository Structure:** Moved from flat layout to `src/mini_datahub/` package structure
-- **Settings Management:** Unified configuration via `GitHubConfig` class with keyring integration
-- **Error Handling:** Custom exception hierarchy for better error messages
-- **Logging:** Centralized logging configuration with debug mode support
-
-### Fixed
-
-- **Search Ranking:** BM25 scoring now correctly prioritizes name matches over description matches
-- **Date Validation:** ISO 8601 date format enforced consistently across add/edit forms
-- **Database Initialization:** More robust schema creation with proper error handling
-- **Git Operations:** Better handling of edge cases (detached HEAD, merge conflicts, stale branches)
-
-### Documentation
-
-- **New Manual:** Complete documentation site with:
-    - Getting Started guide
-    - Keyboard shortcuts reference
-    - Data & SQL deep dive
-    - Configuration guide
-    - 3 hands-on tutorials
-    - FAQ & troubleshooting
-    - Versioning policy
-- **GitHub Pages:** Docs auto-deployed via GitHub Actions on merge to `main`
-
-### Internal
-
-- **Test Coverage:** Expanded test suite for core services
-- **Type Hints:** Improved type annotations across codebase
-- **Code Quality:** Linting with Ruff, formatting with Black
-- **Dependency Management:** Migrated to `uv` for faster installs
+**Improved:**
+- Developer experience: single file to edit for version bumps
+- Consistency: eliminates hardcoded version strings
+- Release process: pre-commit hooks enforce version sync
 
 ---
 
-## [0.54.0-beta] - 2025-10-03
+### [0.55.0-beta] - 2025-01-04 — "Clean Architecture"
 
-### Added
+**Major Release: Architectural Refactoring**
 
-- **Outbox System:** Failed PR tasks stored in `.outbox/` for manual retry
-- **Update Check:** Weekly check for new releases (configurable)
-- **GitHub Status Indicator:** Visual indicator of GitHub connection status in TUI
+**Added:**
+- Dual command support: `hei-datahub` and `mini-datahub`
+- Auto-stash for PR workflow (saves uncommitted changes)
+- Improved gitignore handling during PR creation
+- `--version-info` flag for detailed system information
+- Comprehensive documentation site (MkDocs + Material theme)
+- Clean layered architecture (UI → Services → Core → Infrastructure)
 
-### Changed
+**Changed:**
+- Migrated to `src/mini_datahub/` package structure
+- Unified settings management via `GitHubConfig` class
+- Centralized logging configuration with debug mode
+- Custom exception hierarchy for better error messages
 
-- **Search Debounce:** Reduced from 200ms to 150ms for snappier response
-- **Table Rendering:** Improved column width allocation for better readability
+**Fixed:**
+- BM25 search ranking (name matches prioritized)
+- ISO 8601 date validation consistency
+- Database initialization error handling
+- Git operations edge cases (detached HEAD, merge conflicts)
 
-### Fixed
-
-- **Keyring Integration:** Fixed PAT storage on Linux systems without GNOME Keyring
-- **YAML Parsing:** Better handling of multi-line strings and special characters
-
----
-
-## [0.53.0-beta] - 2025-10-03
-
-### Added
-
-- **Pull Updates Command:** Press `u` to pull latest changes from remote repo
-- **Refresh Command:** Press `r` to reload dataset list without reindexing
-
-### Fixed
-
-- **Search Query Escaping:** Fixed crash when searching with special FTS5 operators
-- **Dataset ID Validation:** Auto-generated IDs now handle edge cases (leading/trailing dashes)
+**Documentation:**
+- Complete manual with tutorials, API reference, and FAQ
+- GitHub Pages auto-deployment
+- Versioning policy document
 
 ---
 
-## [0.52.0-beta] - 2025-10-03
+### [0.54.0-beta] - 2025-10-03
 
-### Added
+**Added:**
+- Outbox system for failed PR tasks (`.outbox/` directory)
+- Weekly update check for new releases
+- GitHub status indicator in TUI
 
-- **Vim-style Navigation:** Added `j/k` for up/down, `gg/G` for top/bottom
-- **Copy Source Shortcut:** Press `c` on Details Screen to copy source to clipboard
-- **Open URL Shortcut:** Press `o` on Details Screen to open source URL in browser
+**Changed:**
+- Search debounce reduced to 150ms (faster response)
+- Improved table column width allocation
 
-### Changed
-
-- **Footer Shortcuts:** More compact display of keyboard shortcuts
-
----
-
-## [0.51.0-beta] - 2025-10-03
-
-### Added
-
-- **GitHub PR Integration:** Automated PR creation from TUI
-- **Settings Screen:** Configure GitHub credentials and preferences
-
-### Fixed
-
-- **Database Locking:** Fixed concurrent access issues on multi-core systems
+**Fixed:**
+- Keyring integration on Linux without GNOME Keyring
+- YAML parsing for multi-line strings and special characters
 
 ---
 
-## [0.50.0-beta] - 2025-10-02
+### [0.53.0-beta] - 2025-10-03
 
-### Added
+**Added:**
+- Pull updates command (`u` keybinding)
+- Refresh command (`r` keybinding) without reindexing
 
-- **Initial Beta Release**
-- **Full-Text Search:** SQLite FTS5 with BM25 ranking
-- **Add Dataset Form:** TUI-based dataset creation with validation
-- **Details Screen:** View complete dataset metadata
-- **Reindex Command:** `hei-datahub reindex` to rebuild search index
+**Fixed:**
+- Search query escaping for FTS5 special operators
+- Dataset ID validation for auto-generated IDs
 
 ---
 
-## [0.40.0-alpha] - 2025-10-02
+### [0.52.0-beta] - 2025-10-03
 
-### Added
+**Added:**
+- Vim-style navigation (`j`/`k`, `gg`/`G`)
+- Copy source shortcut (`c` on Details Screen)
+- Open URL shortcut (`o` on Details Screen)
 
-- **Alpha Release**
+**Changed:**
+- More compact footer shortcuts display
+
+---
+
+### [0.51.0-beta] - 2025-10-03
+
+**Added:**
+- GitHub PR integration with automated workflow
+- Settings screen for GitHub credentials
+
+**Fixed:**
+- Database locking issues on multi-core systems
+
+---
+
+### [0.50.0-beta] - 2025-10-02
+
+**Initial Beta Release**
+
+**Added:**
+- Full-text search with SQLite FTS5 and BM25 ranking
+- Add Dataset form with TUI validation
+- Details screen for complete metadata view
+- Reindex command: `hei-datahub reindex`
+
+---
+
+### [0.40.0-alpha] - 2025-10-02
+
+**Alpha Release**
+
+**Added:**
 - Basic TUI with search functionality
 - YAML-based metadata storage
 
 ---
+## 🚧 Unreleased — Upcoming Features
+### 🧭 0.57.0-beta — "Navigator"
 
-## Unreleased
+**Theme:** Discovery & Navigation
 
-Features planned for future releases:
+#### Proposed Features
 
-### 0.56.0-beta (Next Minor)
+- **🏷️ Tags System**
+  - Tag datasets with custom labels (e.g., "climate", "high-priority", "archived")
+  - Tag-based filtering and search
+  - Tag management screen
+  - Color-coded tags in table view
+  - Tag autocomplete during dataset creation
 
-- **Inline Editing:** Edit datasets directly from Details Screen
-- **Bulk Operations:** Add/edit multiple datasets at once
-- **Field-Specific Search:** `source:github.com`, `format:CSV`, etc.
-- **Export/Import:** Bulk export to JSON/CSV
+- **📂 Collections/Groups**
+  - Organize datasets into logical collections
+  - Hierarchical groups (projects → datasets)
+  - Collection-specific views
+  - Drag-and-drop dataset organization
 
-### 0.60.0-beta (Future)
+- **🔗 Dataset Relationships**
+  - Link related datasets (derived-from, supplements, replaces)
+  - Relationship graph visualization
+  - Navigate between related datasets
+  - Dependency tracking
 
-- **Dataset History:** Track changes to metadata over time
-- **Tags System:** Tag datasets with custom labels
-- **Advanced Filters:** Date ranges, size ranges, custom queries
+- **🌍 Spatial Search**
+  - Geographic bounding box search for raster/vector datasets
+  - Map-based dataset discovery (optional)
+  - Coordinate-based filtering
 
-### 1.0.0 (Stable)
+- **📊 Advanced Filters**
+  - Date range filters (created, modified)
+  - Size range filters
+  - Multi-criteria filter builder
+  - Save filter presets
 
-- **Stable API:** No more breaking changes in MINOR releases
-- **Comprehensive Docs:** Complete API reference
-- **Plugin System:** Extend Hei-DataHub with custom plugins
-- **Cloud Sync:** Optional sync with cloud storage (S3, GCS)
+---
 
+### 📜 0.58.0-beta — "Archivist"
+
+**Theme:** History & Versioning
+
+#### Proposed Features
+
+- **🕰️ Dataset History Tracking**
+  - Track all changes to dataset metadata over time
+  - Git-backed history log per dataset
+  - View diff between versions
+  - Restore previous metadata versions
+  - Audit trail with timestamps and authors
+
+- **📝 Change Annotations**
+  - Add comments/notes when editing datasets
+  - Change reason tracking
+  - Review history in TUI
+
+- **🔄 Version Comparison**
+  - Side-by-side diff view for metadata changes
+  - Highlight added/removed/modified fields
+  - Export change history to Markdown
+
+- **🗂️ Archive/Unarchive Datasets**
+  - Mark datasets as archived (hidden from default view)
+  - Archived datasets remain searchable
+  - Restore archived datasets
+  - Bulk archive operations
+
+- **🔔 Change Notifications**
+  - Subscribe to dataset updates
+  - Email or webhook notifications (optional)
+  - RSS feed for catalog changes
+
+---
+
+### 🤖 0.59.0-beta — "AutoPilot"
+
+**Theme:** Automation & Intelligence
+
+#### Proposed Features
+
+- **🧠 Smart Metadata Suggestions**
+  - AI-powered metadata field suggestions based on source URLs
+  - Auto-detect data format from file extensions
+  - Suggest tags based on description content
+  - Pre-fill common fields (date_created, storage_location)
+
+- **🔗 External Catalog Integration**
+  - Import datasets from CKAN, Socrata, or other catalogs
+  - Sync with remote catalogs (one-way or bi-directional)
+  - Convert external metadata schemas to Hei-DataHub format
+
+- **📊 Bulk Operations**
+  - Select multiple datasets in table view
+  - Bulk edit common fields
+  - Batch tag assignment
+  - Bulk export and delete
+
+- **🕷️ Automated Discovery**
+  - Crawl directories for dataset files
+  - Auto-generate metadata from file headers (CSV, Parquet, etc.)
+  - Schedule periodic scans
+
+- **📈 Usage Analytics**
+  - Track dataset access frequency
+  - Popular datasets dashboard
+  - Search query analytics
+  - Export usage reports
+
+---
+
+### 🔌 0.60.0-beta — "Nexus"
+
+**Theme:** Integration & Extension
+
+#### Proposed Features
+
+- **🔌 Plugin System**
+  - Extensible architecture for custom features
+  - Plugin API for adding data sources
+  - Custom validators and formatters
+  - Community plugin registry
+
+- **🌐 RESTful API**
+  - HTTP API for programmatic access
+  - JSON responses for dataset queries
+  - Authentication via API keys
+  - OpenAPI/Swagger documentation
+
+- **💾 Cloud Sync (Optional)**
+  - Optional sync with S3, GCS, or Azure Blob Storage
+  - Encrypt metadata before upload
+  - Multi-device sync for teams
+  - Conflict resolution strategies
+
+- **🔗 Webhook Support**
+  - Trigger webhooks on dataset events (add, edit, delete)
+  - Integrate with Slack, Discord, or custom endpoints
+  - Configurable webhook payloads
+
+- **📦 Data Preview**
+  - Preview CSV, JSON, Parquet files directly in TUI
+  - Sample rows display
+  - Column statistics (min, max, mean for numeric data)
+  - Integration with DuckDB for large file previews
+
+- **🐍 Python API**
+  - Programmatic dataset management via Python library
+  - Jupyter notebook integration
+  - Pandas DataFrame export
+  - Example notebooks for common workflows
+
+---
+
+### 🎯 1.0.0-stable — "Foundation"
+
+**Theme:** Stability & Maturity
+
+#### Proposed Features
+
+- **🔒 Stable API**
+  - No breaking changes in MINOR releases (1.x.y)
+  - Long-term support (LTS) for 1.0.x line
+  - Comprehensive API reference documentation
+
+- **📚 Complete Documentation**
+  - API reference for all modules
+  - Architecture decision records (ADRs)
+  - Contribution guidelines
+  - Developer handbook
+
+- **🧪 Comprehensive Testing**
+  - 90%+ test coverage
+  - Integration tests for all workflows
+  - Performance benchmarks
+  - End-to-end TUI testing
+
+- **🌍 Internationalization (i18n)**
+  - Multi-language UI support (English, French, Spanish, etc.)
+  - Localized documentation
+  - Configurable locale in Settings
+
+- **♿ Accessibility Improvements**
+  - Screen reader support
+  - High-contrast themes
+  - Keyboard-only navigation enhancements
+  - WCAG compliance
+
+- **📦 Distribution**
+  - PyPI package distribution
+  - Docker container images
+  - Homebrew formula (macOS)
+  - APT/RPM packages (Linux)
+  - Windows installer
 ---
 
 ## Version Naming
