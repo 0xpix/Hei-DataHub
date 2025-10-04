@@ -66,11 +66,23 @@ db.sqlite
 db.sqlite-*
 .cache/
 
-# DataHub - ignore all data except metadata and docs
-data/**
-!data/**/metadata.yaml
-!data/**/README.md
-!data/**/images/**
+# DataHub - ignore data files but keep metadata
+# Keep the directory structure and metadata files, ignore actual data files
+data/**/*.csv
+data/**/*.parquet
+data/**/*.json
+data/**/*.jsonl
+data/**/*.nc
+data/**/*.tif
+data/**/*.tiff
+data/**/*.geotiff
+data/**/*.hdf
+data/**/*.hdf5
+data/**/*.zarr
+data/**/*.shp
+data/**/*.gpkg
+data/**/*.gdb
+# Add more data file extensions as needed, but keep metadata.yaml
 
 # DataHub - local config (use ~/.mini-datahub instead)
 .datahub_config.json
