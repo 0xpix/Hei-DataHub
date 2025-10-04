@@ -5,7 +5,7 @@ This guide will help you get Hei-DataHub up and running in minutes.
 ## Prerequisites
 
 - Python 3.9 or later
-- pip (Python package installer)
+- UV (Python package installer)
 - Terminal/Command line access
 
 ## Installation Steps
@@ -23,7 +23,7 @@ cd Hei-DataHub
 source .venv/bin/activate
 
 # Launch the TUI
-mini-datahub
+hei-datahub
 ```
 
 ### Option 2: Manual Setup
@@ -45,12 +45,12 @@ source .venv/bin/activate
 pip install -e .
 
 # Launch the TUI
-mini-datahub
+hei-datahub
 ```
 
 ## First Run
 
-When you first launch `mini-datahub`, the application will:
+When you first launch `hei-datahub`, the application will:
 
 1. Initialize the SQLite database (`db.sqlite`)
 2. Create the necessary tables (FTS5 search index)
@@ -88,13 +88,13 @@ When you first launch `mini-datahub`, the application will:
 
 ```bash
 # Launch TUI (default)
-mini-datahub
+hei-datahub
 
 # Rebuild search index from YAML files
-mini-datahub reindex
+hei-datahub reindex
 
 # Show version
-mini-datahub --version
+hei-datahub --version
 ```
 
 ## Verify Installation
@@ -126,7 +126,7 @@ Expected output: All tests should pass ✓
 
 ### 1. Search for the example dataset
 ```bash
-mini-datahub
+hei-datahub
 # Type "weather" in the search box
 # Press Enter on the result
 ```
@@ -152,22 +152,22 @@ mini-datahub
 ### 4. Reindex if needed
 ```bash
 # Exit the TUI (press 'q')
-mini-datahub reindex
+hei-datahub reindex
 # Should show: "✓ Successfully indexed N dataset(s)"
 ```
 
 ## Troubleshooting
 
-### "Command not found: mini-datahub"
+### "Command not found: hei-datahub"
 - Make sure you activated the virtual environment
 - Run: `source .venv/bin/activate`
 
 ### Database errors on startup
 - Delete the database: `rm db.sqlite`
-- Reindex: `mini-datahub reindex`
+- Reindex: `hei-datahub reindex`
 
 ### Search returns no results
-- Reindex: `mini-datahub reindex`
+- Reindex: `hei-datahub reindex`
 - Check that datasets exist: `ls data/*/metadata.yaml`
 
 ### Import errors (pydantic, textual, etc.)
@@ -183,7 +183,7 @@ mini-datahub reindex
 1. **Explore the example dataset**: Search for "weather" and view its details
 2. **Add your own datasets**: Press `a` and fill in the form
 3. **Edit metadata manually**: Open `data/<id>/metadata.yaml` in your editor
-4. **Reindex after manual edits**: Run `mini-datahub reindex`
+4. **Reindex after manual edits**: Run `hei-datahub reindex`
 5. **Customize**: Modify the JSON schema to add custom fields
 6. **Run tests**: Use `pytest tests/ -v` to verify functionality
 

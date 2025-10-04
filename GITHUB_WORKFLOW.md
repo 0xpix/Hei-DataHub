@@ -2,7 +2,7 @@
 
 ## Overview
 
-Mini Hei-DataHub now features **automated Pull Request creation** when saving datasets. When properly configured, the app will:
+Hei-DataHub now features **automated Pull Request creation** when saving datasets. When properly configured, the app will:
 
 1. Save `data/<id>/metadata.yaml` to your local **catalog repository**
 2. Create a git branch, commit the changes
@@ -14,25 +14,23 @@ Mini Hei-DataHub now features **automated Pull Request creation** when saving da
 
 ## Catalog Repository Model
 
-The workflow assumes a **separate GitHub repository** that serves as your dataset catalog:
+TODO: We will add a **separate GitHub repository** that serves as your dataset catalog:
 
 ```
-mini-datahub-catalog/          # Separate repo from the app
+hei-datahub-catalog/          # Separate repo from the app
 ├── .gitignore                 # See catalog-gitignore-example
 ├── schema.json                # Validation schema
 ├── README.md                  # Catalog documentation
 └── data/
     ├── dataset-1/
     │   ├── metadata.yaml      # ✅ Tracked
-    │   ├── README.md          # ✅ Tracked (optional)
-    │   └── images/            # ✅ Tracked (optional)
     └── dataset-2/
         └── metadata.yaml
 ```
 
 **Important:**
 - `db.sqlite` is **never committed** (in .gitignore)
-- Only `metadata.yaml` (and optional README/images) are tracked
+- Only `metadata.yaml` is tracked
 - Each contributor clones this repo locally
 - The TUI writes directly into this local clone
 
