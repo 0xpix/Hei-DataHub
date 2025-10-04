@@ -9,7 +9,7 @@ repos:
         files: version\.yaml
         pass_filenames: false
         always_run: false
-      
+
       - id: mkdocs-build-check
         name: Check MkDocs builds without errors
         entry: mkdocs build --strict
