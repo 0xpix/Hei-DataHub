@@ -1189,15 +1189,7 @@ class DataHubApp(App):
                 self.notify("No network connection", severity="warning", timeout=5)
                 return
 
-            # Check for local changes
-            has_changes, status = pull_manager.has_local_changes()
-            if has_changes:
-                self.notify(
-                    "Cannot pull: You have uncommitted local changes",
-                    severity="warning",
-                    timeout=7
-                )
-                return
+            # Note: Local changes check removed - pull_updates() now handles via auto-stash
 
             # Check divergence
             is_diverged, ahead, behind = pull_manager.is_diverged()
@@ -1221,7 +1213,12 @@ class DataHubApp(App):
 
             # Pull
             self.notify("Pulling updates...", timeout=3)
-            success, message, old_commit, new_commit = pull_manager.pull_updates()
+            success, message, old_commit, new_commit = pull_manager.pull_updates(
+                branch="main",
+                from_remote=False,  # Pull from LOCAL main (not origin/main)
+                allow_merge=True,   # Allow merge commits (handles divergence)
+                auto_stash=True     # Auto-stash uncommitted changes
+            )
 
             if not success:
                 self.notify(f"Pull failed: {message}", severity="error", timeout=7)
