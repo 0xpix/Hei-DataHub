@@ -15,7 +15,7 @@ copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 # Configuration
 theme:
   name: simple-blog
-  
+
   # Simple blog theme customization options
   # Note: Features below are Material-specific and may not work with simple-blog
   # Kept commented for reference when switching back to Material theme
