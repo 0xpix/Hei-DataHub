@@ -1156,7 +1156,8 @@ class DataHubApp(App):
             # Fetch to check if behind
             pull_manager.git_ops.fetch()
 
-            if pull_manager.is_behind_remote():
+            is_behind, commits_behind = pull_manager.is_behind_remote()
+            if is_behind:
                 # Show prompt
                 self.notify(
                     "Catalog has updates. Press [bold]U[/bold] to pull, or dismiss to skip this session.",
@@ -1189,7 +1190,8 @@ class DataHubApp(App):
                 return
 
             # Check for local changes
-            if pull_manager.has_local_changes():
+            has_changes, status = pull_manager.has_local_changes()
+            if has_changes:
                 self.notify(
                     "Cannot pull: You have uncommitted local changes",
                     severity="warning",
@@ -1198,7 +1200,8 @@ class DataHubApp(App):
                 return
 
             # Check divergence
-            if pull_manager.is_diverged():
+            is_diverged, ahead, behind = pull_manager.is_diverged()
+            if is_diverged:
                 self.notify(
                     "Cannot pull: Local branch has diverged from remote",
                     severity="error",
@@ -1211,42 +1214,48 @@ class DataHubApp(App):
             pull_manager.git_ops.fetch()
 
             # Check if actually behind
-            if not pull_manager.is_behind_remote():
+            is_behind, commits_behind = pull_manager.is_behind_remote()
+            if not is_behind:
                 self.notify("Already up to date", timeout=3)
                 return
 
             # Pull
             self.notify("Pulling updates...", timeout=3)
-            success = pull_manager.pull_updates()
+            success, message, old_commit, new_commit = pull_manager.pull_updates()
 
             if not success:
-                self.notify("Pull failed", severity="error", timeout=5)
-                log_pull_update(success=False, error="Pull operation failed")
+                self.notify(f"Pull failed: {message}", severity="error", timeout=7)
+                log_pull_update(success=False, error=message)
                 return
 
             # Check for metadata changes
-            if pull_manager.has_metadata_changes():
-                self.notify("Reindexing datasets...", timeout=3)
-                count, errors = reindex_all()
+            if old_commit and new_commit and old_commit != new_commit:
+                has_metadata, metadata_count = pull_manager.has_metadata_changes(old_commit, new_commit)
+                if has_metadata:
+                    self.notify("Reindexing datasets...", timeout=3)
+                    dataset_count, errors = reindex_all()
 
-                if errors:
-                    self.notify(
-                        f"Pull complete. Reindexed {count} datasets with {len(errors)} errors",
-                        severity="warning",
-                        timeout=7
-                    )
-                    log_reindex(success=False, datasets_count=count, error=f"{len(errors)} errors")
+                    if errors:
+                        self.notify(
+                            f"Pull complete. Reindexed {dataset_count} datasets with {len(errors)} errors",
+                            severity="warning",
+                            timeout=7
+                        )
+                        log_reindex(success=False, datasets_count=dataset_count, error=f"{len(errors)} errors")
+                    else:
+                        self.notify(
+                            f"Pull complete. Reindexed {dataset_count} datasets",
+                            severity="information",
+                            timeout=5
+                        )
+                        log_reindex(success=True, datasets_count=dataset_count)
+
+                    log_pull_update(success=True, files_changed=metadata_count)
                 else:
-                    self.notify(
-                        f"Pull complete. Reindexed {count} datasets",
-                        severity="information",
-                        timeout=5
-                    )
-                    log_reindex(success=True, datasets_count=count)
-
-                log_pull_update(success=True, files_changed=count)
+                    self.notify("Pull complete (no metadata changes)", timeout=5)
+                    log_pull_update(success=True, files_changed=0)
             else:
-                self.notify("Pull complete (no metadata changes)", timeout=5)
+                self.notify("Pull complete (already up to date)", timeout=5)
                 log_pull_update(success=True, files_changed=0)
 
         except Exception as e:
