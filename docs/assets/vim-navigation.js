@@ -118,6 +118,11 @@
    * Main keyboard handler
    */
   function handleKeyPress(e) {
+    // Debug: log key presses (remove in production if needed)
+    if (['j', 'k', 'h', 'l', 'g', 'G', 'd', 'u', '/'].includes(e.key)) {
+      console.log('[Vim Navigation] Key pressed:', e.key, '| URL:', location.pathname);
+    }
+    
     // Allow normal behavior in input fields (unless explicitly enabled)
     if (!config.enableInInputs && isTyping()) {
       // Still allow Escape to blur
@@ -265,17 +270,66 @@
   }
 
   /**
+   * Initialize keyboard listener
+   */
+  function initKeyboardListener() {
+    // Remove any existing listener first (in case of re-initialization)
+    document.removeEventListener('keydown', handleKeyPress);
+    
+    // Attach keyboard listener to document
+    document.addEventListener('keydown', handleKeyPress, { capture: false, passive: false });
+    
+    console.log('[Vim Navigation] Keyboard listener attached');
+  }
+
+  /**
    * Initialize
    */
   function init() {
+    console.log('[Vim Navigation] Initializing on page:', location.pathname);
+    
     // Attach keyboard listener
-    document.addEventListener('keydown', handleKeyPress);
+    initKeyboardListener();
 
-    // Add visual indicator
-    addStatusIndicator();
+    // Add visual indicator (only once)
+    if (!document.querySelector('.vim-nav-indicator')) {
+      addStatusIndicator();
+    }
 
     // Log initialization
     console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search)');
+    
+    // Listen for instant navigation / history changes (for MkDocs instant loading)
+    // This ensures vim navigation works after client-side page transitions
+    if (window.navigation) {
+      // Modern Navigation API
+      window.navigation.addEventListener('navigate', () => {
+        console.log('[Vim Navigation] Page navigated (Navigation API)');
+      });
+    }
+    
+    // Listen for popstate (back/forward button)
+    window.addEventListener('popstate', () => {
+      console.log('[Vim Navigation] Page navigated (popstate)');
+    });
+    
+    // Listen for MkDocs instant loading (Material theme)
+    document.addEventListener('DOMContentSwitch', () => {
+      console.log('[Vim Navigation] Page navigated (DOMContentSwitch)');
+    });
+    
+    // Watch for URL changes (for instant navigation)
+    let lastUrl = location.href;
+    new MutationObserver(() => {
+      const url = location.href;
+      if (url !== lastUrl) {
+        lastUrl = url;
+        console.log('[Vim Navigation] Page navigated (URL change detected)');
+        // Reset gg buffer on page change
+        ggBuffer = false;
+        clearTimeout(ggTimeout);
+      }
+    }).observe(document, { subtree: true, childList: true });
   }
 
   // Initialize when DOM is ready
@@ -284,5 +338,10 @@
   } else {
     init();
   }
+  
+  // Also reinitialize on instant.js page loads (if present)
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[Vim Navigation] DOMContentLoaded event fired');
+  });
 
 })();
