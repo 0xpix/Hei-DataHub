@@ -1,0 +1,129 @@
+# MkDocs Configuration for Hei-DataHub Manual
+site_name: Hei-DataHub Manual
+site_description: 'Official documentation for Hei-DataHub v0.55.x (beta) - A local-first TUI for managing datasets with consistent metadata'
+site_author: Hei-DataHub Team
+site_url: https://0xpix.github.io/Hei-DataHub
+
+# Repository
+repo_name: 0xpix/Hei-DataHub
+repo_url: https://github.com/0xpix/Hei-DataHub
+edit_uri: edit/main/docs/
+
+# Copyright
+copyright: Copyright &copy; 2025 Hei-DataHub Contributors
+
+# Configuration
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: cyan
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: cyan
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+    - content.action.view
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+# Plugins
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - macros:
+      include_dir: docs/_includes
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Page tree / Navigation
+nav:
+  - Home: index.md
+  - Welcome: 00-welcome.md
+  - Getting Started: 01-getting-started.md
+  - Navigation: 02-navigation.md
+  - The Basics: 03-the-basics.md
+  - Reference:
+    - UI Guide: 10-ui.md
+    - Data & SQL: 11-data-and-sql.md
+    - Configuration: 12-config.md
+  - Tutorials:
+    - Installation: 20-tutorials/01-installation.md
+    - Your First Dataset: 20-tutorials/02-first-dataset.md
+    - Search & Filters: 20-tutorials/03-search-and-filters.md
+  - Help:
+    - FAQ & Troubleshooting: 90-faq.md
+    - Versioning: 98-versioning.md
+    - Changelog: 99-changelog.md
+
+# Extra
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/0xpix/Hei-DataHub
+  generator: false
+
+# Additional CSS
+extra_css: []
+
+# Additional JavaScript
+extra_javascript: []
