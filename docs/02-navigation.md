@@ -1,4 +1,3 @@
-# Navigation
 
 Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with Vim/Neovim, you'll feel right at home.
 
