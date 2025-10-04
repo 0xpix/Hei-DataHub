@@ -150,6 +150,7 @@ The TUI features **Neovim-style keybindings** with Normal and Insert modes for e
 
 #### Details Screen
 
+- **`P`** - **Publish as PR** (create PR for this dataset) 🆕
 - `y` - Copy source to clipboard ("yank")
 - `o` - Open source URL in browser (if valid URL)
 - `q` / `Esc` - Back to search
@@ -198,6 +199,19 @@ mini-datahub --version
 ## GitHub PR Workflow (Optional)
 
 **New in v3.0:** Automatically create Pull Requests when saving datasets!
+
+### ✨ New: Publish from Details (`P` key)
+
+You can now create PRs for any dataset directly from its Details view:
+
+1. **Browse datasets** in Home screen
+2. **Open Details** (press `Enter`)
+3. **Press `P`** to publish as PR
+   - Checks if dataset already exists remotely
+   - Creates PR only if not published
+   - Shows "Already published" if exists
+
+See [PUBLISH_FROM_DETAILS.md](PUBLISH_FROM_DETAILS.md) for complete documentation.
 
 ### Quick Setup
 
