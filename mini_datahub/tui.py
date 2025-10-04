@@ -48,6 +48,7 @@ class HomeScreen(Screen):
         Binding("o", "open_details", "Open", show=False),
         Binding("p", "outbox", "Outbox", key_display="P"),
         Binding("u", "pull_updates", "Pull", key_display="U"),
+        Binding("r", "refresh_data", "Refresh", key_display="R"),
         Binding("q", "quit", "Quit"),
         Binding("enter", "open_details", "View Details"),
         Binding("j", "move_down", "Down", show=False),
@@ -73,6 +74,7 @@ class HomeScreen(Screen):
 |  _  | |___ | |    | |_| / ___ \\| |/ ___ \\|  _  | |_| | |_) |
 |_| |_|_____|___|   |____/_/   \\_\\_/_/   \\_\\_| |_|\\___/|____/
 [/bold cyan]""", id="banner"),
+            Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
             Static(id="github-status"),
             Input(placeholder="Type / to search, j/k to navigate, Enter to open...", id="search-input"),
@@ -289,8 +291,14 @@ class HomeScreen(Screen):
         self.app.push_screen(OutboxScreen())
 
     def action_pull_updates(self) -> None:
-        """Pull updates from catalog (U key)."""
+        """Start pull updates task."""
         self.app.pull_updates()
+
+    def action_refresh_data(self) -> None:
+        """Refresh/reload all datasets."""
+        self.notify("Refreshing datasets...", timeout=2)
+        self.load_all_datasets()
+        self.notify("✓ Datasets refreshed", timeout=3)
 
     def action_debug_console(self) -> None:
         """Open debug console (: key)."""
@@ -894,6 +902,19 @@ class DataHubApp(App):
         background: $panel;
     }
 
+    #update-status {
+        text-align: center;
+        padding: 1;
+        background: #dbeafe;
+        color: #1e40af;
+        border-left: solid #2563eb;
+        border-right: solid #2563eb;
+    }
+
+    #update-status.hidden {
+        display: none;
+    }
+
     #mode-indicator {
         text-align: center;
         padding: 1 0;
@@ -1072,15 +1093,15 @@ class DataHubApp(App):
             from mini_datahub.autocomplete import refresh_autocomplete
             refresh_autocomplete()
 
-        # Check for updates (async)
+        # Push home screen first
+        self.push_screen(HomeScreen())
+
+        # Check for updates (async) - after screen is mounted
         if config.auto_check_updates:
             self.check_for_updates_async()
 
-        # Startup pull prompt (async)
+        # Startup pull prompt (async) - after screen is mounted
         self.startup_pull_check()
-
-        # Push home screen
-        self.push_screen(HomeScreen())
 
     def check_github_connection(self) -> None:
         """Check GitHub connection status on startup."""
@@ -1135,6 +1156,10 @@ class DataHubApp(App):
         from mini_datahub.state_manager import get_state_manager
         from mini_datahub.config import get_github_config
         from pathlib import Path
+        import asyncio
+
+        # Wait a bit for screen to be fully mounted
+        await asyncio.sleep(0.5)
 
         state = get_state_manager()
 
@@ -1157,12 +1182,32 @@ class DataHubApp(App):
             pull_manager.git_ops.fetch()
 
             is_behind, commits_behind = pull_manager.is_behind_remote()
+
             if is_behind:
-                # Show prompt
+                plural = "s" if commits_behind > 1 else ""
+
+                # Find the HomeScreen and update its widgets
+                try:
+                    # Get the active screen (should be HomeScreen)
+                    for screen in self.screen_stack:
+                        if isinstance(screen, HomeScreen):
+                            # Show status indicator below main banner
+                            try:
+                                update_status = screen.query_one("#update-status", Static)
+                                update_status.update(
+                                    f"[bold]⬇ {commits_behind} Update{plural} Available[/bold]  •  Press [bold]U[/bold] to pull updates"
+                                )
+                                update_status.remove_class("hidden")
+                            except Exception:
+                                pass
+                            break
+                except Exception:
+                    pass
+
+                # Show persistent notification (no timeout)
                 self.notify(
-                    "Catalog has updates. Press [bold]U[/bold] to pull, or dismiss to skip this session.",
-                    severity="information",
-                    timeout=15
+                    f"⬇ {commits_behind} update{plural} available. Press [bold]U[/bold] to pull.",
+                    severity="information"
                 )
         except Exception:
             pass
@@ -1215,7 +1260,7 @@ class DataHubApp(App):
             self.notify("Pulling updates...", timeout=3)
             success, message, old_commit, new_commit = pull_manager.pull_updates(
                 branch="main",
-                from_remote=False,  # Pull from LOCAL main (not origin/main)
+                from_remote=True,   # Pull from REMOTE origin/main
                 allow_merge=True,   # Allow merge commits (handles divergence)
                 auto_stash=True     # Auto-stash uncommitted changes
             )
@@ -1224,6 +1269,19 @@ class DataHubApp(App):
                 self.notify(f"Pull failed: {message}", severity="error", timeout=7)
                 log_pull_update(success=False, error=message)
                 return
+
+            # Hide update status after successful pull
+            try:
+                for screen in self.screen_stack:
+                    if isinstance(screen, HomeScreen):
+                        try:
+                            update_status = screen.query_one("#update-status", Static)
+                            update_status.add_class("hidden")
+                        except Exception:
+                            pass
+                        break
+            except Exception:
+                pass
 
             # Check for metadata changes
             if old_commit and new_commit and old_commit != new_commit:
