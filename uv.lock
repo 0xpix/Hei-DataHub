@@ -537,8 +537,8 @@ wheels = [
 ]
 
 [[package]]
-name = "mini-datahub"
-version = "0.55.0"
+name = "hei-datahub"
+version = "0.55.0b"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
