@@ -47,6 +47,7 @@ class HomeScreen(Screen):
         Binding("s", "settings", "Settings", key_display="S"),
         Binding("o", "open_details", "Open", show=False),
         Binding("p", "outbox", "Outbox", key_display="P"),
+        Binding("u", "pull_updates", "Pull", key_display="U"),
         Binding("q", "quit", "Quit"),
         Binding("enter", "open_details", "View Details"),
         Binding("j", "move_down", "Down", show=False),
@@ -55,6 +56,7 @@ class HomeScreen(Screen):
         Binding("G", "jump_bottom", "Bottom", show=False),
         Binding("/", "focus_search", "Search", show=False),
         Binding("escape", "clear_search", "Clear", show=False),
+        Binding(":", "debug_console", "Debug", show=False),
         Binding("?", "show_help", "Help"),
     ]
 
@@ -64,7 +66,15 @@ class HomeScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Container(
+            Static("""[bold cyan]
+ _   _ _____ ___     ____    _  _____  _    _   _ _   _ ____
+| | | | ____|_ _|   |  _ \\  / \\|_   _|/ \\  | | | | | | | __ )
+| |_| |  _|  | |    | | | |/ _ \\ | | / _ \\ | |_| | | | |  _ \\
+|  _  | |___ | |    | |_| / ___ \\| |/ ___ \\|  _  | |_| | |_) |
+|_| |_|_____|___|   |____/_/   \\_\\_/_/   \\_\\_| |_|\\___/|____/
+[/bold cyan]""", id="banner"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
+            Static(id="github-status"),
             Input(placeholder="Type / to search, j/k to navigate, Enter to open...", id="search-input"),
             Label("All Datasets", id="results-label"),
             DataTable(id="results-table", cursor_type="row"),
@@ -80,8 +90,25 @@ class HomeScreen(Screen):
         # Start with table focused, but don't refocus it during searches
         table.focus()
 
+        # Update GitHub status indicator
+        self.update_github_status()
+
         # Load all datasets initially
         self.load_all_datasets()
+
+    def update_github_status(self) -> None:
+        """Update GitHub connection status display."""
+        from mini_datahub.config import get_github_config
+
+        status_widget = self.query_one("#github-status", Static)
+        config = get_github_config()
+
+        if config.has_credentials() and self.app.github_connected:
+            status_widget.update(f"[green]● GitHub Connected[/green] ({config.username}@{config.owner}/{config.repo})")
+        elif config.has_credentials():
+            status_widget.update("[yellow]⚠ GitHub Configured (connection failed)[/yellow] [dim]Press S for Settings[/dim]")
+        else:
+            status_widget.update("[dim]○ GitHub Not Connected[/dim] [dim]Press S to configure[/dim]")
 
     def load_all_datasets(self) -> None:
         """Load and display all available datasets."""
@@ -261,6 +288,15 @@ class HomeScreen(Screen):
         from mini_datahub.screens import OutboxScreen
         self.app.push_screen(OutboxScreen())
 
+    def action_pull_updates(self) -> None:
+        """Pull updates from catalog (U key)."""
+        self.app.pull_updates()
+
+    def action_debug_console(self) -> None:
+        """Open debug console (: key)."""
+        from mini_datahub.debug_console import DebugConsoleScreen
+        self.app.push_screen(DebugConsoleScreen())
+
 
 class HelpScreen(Screen):
     """Help screen showing keybindings."""
@@ -327,18 +363,21 @@ class DetailsScreen(Screen):
         Binding("b", "back", "Back", show=False),
         ("y", "copy_source", "Copy Source"),
         ("o", "open_url", "Open URL"),
+        Binding("P", "publish_pr", "Publish as PR", key_display="P"),
     ]
 
     def __init__(self, dataset_id: str):
         super().__init__()
         self.dataset_id = dataset_id
         self.metadata = None
+        self._exists_remotely = None  # Cache for remote existence check
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
             Label(f"Dataset: {self.dataset_id}", classes="title"),
             Static(id="details-content"),
+            Static(id="pr-status", classes="pr-status"),
             id="details-container",
         )
         yield Footer()
@@ -393,8 +432,37 @@ class DetailsScreen(Screen):
             content = self.query_one("#details-content", Static)
             content.update("\n".join(lines))
 
+            # Check remote status asynchronously
+            self.check_remote_status()
+
         except Exception as e:
             self.app.notify(f"Error loading details: {str(e)}", severity="error", timeout=5)
+
+    @work(exclusive=True)
+    async def check_remote_status(self) -> None:
+        """Check if dataset exists in remote repository."""
+        from mini_datahub.config import get_github_config
+        from mini_datahub.github_integration import GitHubIntegration
+
+        config = get_github_config()
+        pr_status = self.query_one("#pr-status", Static)
+
+        if not config.has_credentials():
+            pr_status.update("[dim]💡 Configure GitHub in Settings (S) to publish PRs[/dim]")
+            return
+
+        try:
+            github = GitHubIntegration(config)
+            exists, msg = github.check_file_exists_remote(f"data/{self.dataset_id}/metadata.yaml")
+            self._exists_remotely = exists
+
+            if exists:
+                pr_status.update("[green]✓ Already published to catalog repo[/green]  [dim]Press P to view (disabled)[/dim]")
+            else:
+                pr_status.update("[yellow]📤 Not yet in catalog repo[/yellow]  [bold cyan]Press P to Publish as PR![/bold cyan]")
+
+        except Exception as e:
+            pr_status.update(f"[dim]⚠ Could not check remote status: {str(e)}[/dim]")
 
     def action_back(self) -> None:
         """Return to previous screen."""
@@ -421,6 +489,79 @@ class DetailsScreen(Screen):
                     self.app.notify(f"Failed to open URL: {str(e)}", severity="error", timeout=3)
             else:
                 self.app.notify("Source is not a URL", severity="warning", timeout=2)
+
+    def action_publish_pr(self) -> None:
+        """Publish dataset as PR (P key)."""
+        if self._exists_remotely:
+            self.app.notify("Dataset already exists in catalog repo", severity="warning", timeout=3)
+            return
+
+        if not self.metadata:
+            self.app.notify("No metadata loaded", severity="error", timeout=3)
+            return
+
+        # Start async PR creation
+        self.create_pr()
+
+    @work(exclusive=True)
+    async def create_pr(self) -> None:
+        """Create PR for this dataset."""
+        from mini_datahub.config import get_github_config
+        from mini_datahub.pr_workflow import PRWorkflow
+        from pathlib import Path
+
+        config = get_github_config()
+        pr_status = self.query_one("#pr-status", Static)
+
+        # Validate configuration
+        if not config.has_credentials():
+            pr_status.update("[red]✗ GitHub not configured. Press S to open Settings.[/red]")
+            self.app.notify("GitHub not configured. Open Settings (S) to connect.", severity="error", timeout=5)
+            return
+
+        if not config.catalog_repo_path:
+            pr_status.update("[red]✗ Catalog repository path not set. Update in Settings (S).[/red]")
+            self.app.notify("Catalog path not configured. Update in Settings (S).", severity="error", timeout=5)
+            return
+
+        catalog_path = Path(config.catalog_repo_path).expanduser().resolve()
+        if not catalog_path.exists():
+            pr_status.update(f"[red]✗ Catalog path does not exist: {catalog_path}[/red]")
+            self.app.notify(f"Catalog path not found: {catalog_path}", severity="error", timeout=5)
+            return
+
+        pr_status.update("[yellow]📤 Creating PR...[/yellow]")
+        self.app.notify("Creating pull request...", timeout=3)
+
+        try:
+            # Execute PR workflow
+            workflow = PRWorkflow()
+            success, message, pr_url, pr_number = workflow.execute(
+                metadata=self.metadata,
+                dataset_id=self.dataset_id,
+            )
+
+            if success:
+                pr_status.update(f"[green]✓ PR #{pr_number} created successfully![/green]")
+                self.app.notify(f"✓ PR created: #{pr_number}", timeout=5)
+
+                # Offer to open PR in browser
+                if pr_url:
+                    try:
+                        webbrowser.open(pr_url)
+                    except Exception:
+                        pass  # Silently fail if browser opening doesn't work
+
+                # Update remote existence flag
+                self._exists_remotely = True
+
+            else:
+                pr_status.update(f"[red]✗ PR creation failed[/red]")
+                self.app.notify(f"✗ {message}", severity="error", timeout=10)
+
+        except Exception as e:
+            pr_status.update(f"[red]✗ Error: {str(e)}[/red]")
+            self.app.notify(f"Error creating PR: {str(e)}", severity="error", timeout=10)
 
 
 class AddDataScreen(Screen):
@@ -743,7 +884,16 @@ class AddDataScreen(Screen):
 class DataHubApp(App):
     """Main TUI application with Neovim-style keybindings."""
 
+    # Track GitHub connection status
+    github_connected = reactive(False)
+
     CSS = """
+    #banner {
+        text-align: center;
+        padding: 1 0;
+        background: $panel;
+    }
+
     #mode-indicator {
         text-align: center;
         padding: 1 0;
@@ -755,6 +905,19 @@ class DataHubApp(App):
         text-style: bold;
         padding: 1;
         background: $primary;
+    }
+
+    #github-status {
+        text-align: right;
+        padding: 0 1;
+        background: $panel;
+    }
+
+    .pr-status {
+        margin-top: 2;
+        padding: 1;
+        text-align: center;
+        background: $panel;
     }
 
     #search-container {
@@ -875,6 +1038,15 @@ class DataHubApp(App):
 
     def on_mount(self) -> None:
         """Initialize the app."""
+        # Initialize logging
+        from mini_datahub.logging_setup import setup_logging, log_startup
+        from mini_datahub.version import __version__
+        from mini_datahub.config import get_github_config
+
+        config = get_github_config()
+        setup_logging(debug=config.debug_logging)
+        log_startup(__version__)
+
         # Ensure database is set up
         try:
             ensure_database()
@@ -892,8 +1064,194 @@ class DataHubApp(App):
         except Exception as e:
             self.notify(f"Database initialization error: {str(e)}", severity="error", timeout=10)
 
+        # Check GitHub connection status
+        self.check_github_connection()
+
+        # Initialize autocomplete from catalog
+        if config.suggest_from_catalog_values:
+            from mini_datahub.autocomplete import refresh_autocomplete
+            refresh_autocomplete()
+
+        # Check for updates (async)
+        if config.auto_check_updates:
+            self.check_for_updates_async()
+
+        # Startup pull prompt (async)
+        self.startup_pull_check()
+
         # Push home screen
         self.push_screen(HomeScreen())
+
+    def check_github_connection(self) -> None:
+        """Check GitHub connection status on startup."""
+        from mini_datahub.config import get_github_config
+        from mini_datahub.github_integration import GitHubIntegration
+
+        try:
+            config = get_github_config()
+
+            if not config.has_credentials():
+                self.github_connected = False
+                return
+
+            # Test connection quickly
+            github = GitHubIntegration(config)
+            success, message = github.test_connection()
+            self.github_connected = success
+
+            if not success:
+                # Subtle notification about disconnected state
+                self.notify(f"GitHub: {message} (configure in Settings)", severity="warning", timeout=5)
+
+        except Exception:
+            self.github_connected = False
+
+    def refresh_github_status(self) -> None:
+        """Refresh GitHub connection status (called after settings save)."""
+        self.check_github_connection()
+
+        # Update home screen if it exists
+        try:
+            for screen in self.screen_stack:
+                if isinstance(screen, HomeScreen):
+                    screen.update_github_status()
+        except Exception:
+            pass
+
+    @work(exclusive=True, thread=True)
+    async def check_for_updates_async(self) -> None:
+        """Check for updates asynchronously (background)."""
+        from mini_datahub.update_checker import check_for_updates, format_update_message
+
+        update_info = check_for_updates(force=False)
+        if update_info and update_info.get("has_update"):
+            message = format_update_message(update_info)
+            self.notify(message, severity="information", timeout=10)
+
+    @work(exclusive=True, thread=True)
+    async def startup_pull_check(self) -> None:
+        """Check if we should prompt for pull on startup."""
+        from mini_datahub.auto_pull import get_auto_pull_manager
+        from mini_datahub.state_manager import get_state_manager
+        from mini_datahub.config import get_github_config
+        from pathlib import Path
+
+        state = get_state_manager()
+
+        # Skip if user doesn't want prompts this session
+        if not state.should_prompt_pull():
+            return
+
+        try:
+            config = get_github_config()
+            if not config.catalog_repo_path:
+                return
+
+            pull_manager = get_auto_pull_manager(Path(config.catalog_repo_path))
+
+            # Quick network check
+            if not pull_manager.check_network_available():
+                return
+
+            # Fetch to check if behind
+            pull_manager.git_ops.fetch()
+
+            if pull_manager.is_behind_remote():
+                # Show prompt
+                self.notify(
+                    "Catalog has updates. Press [bold]U[/bold] to pull, or dismiss to skip this session.",
+                    severity="information",
+                    timeout=15
+                )
+        except Exception:
+            pass
+
+    @work(exclusive=True, thread=True)
+    async def pull_updates(self) -> None:
+        """Pull updates from catalog repository."""
+        from mini_datahub.auto_pull import get_auto_pull_manager
+        from mini_datahub.logging_setup import log_pull_update, log_reindex
+        from mini_datahub.index import reindex_all
+        from mini_datahub.config import get_github_config
+        from pathlib import Path
+
+        try:
+            config = get_github_config()
+            if not config.catalog_repo_path:
+                self.notify("Catalog path not configured", severity="error", timeout=5)
+                return
+
+            pull_manager = get_auto_pull_manager(Path(config.catalog_repo_path))
+
+            # Check network
+            if not pull_manager.check_network_available():
+                self.notify("No network connection", severity="warning", timeout=5)
+                return
+
+            # Check for local changes
+            if pull_manager.has_local_changes():
+                self.notify(
+                    "Cannot pull: You have uncommitted local changes",
+                    severity="warning",
+                    timeout=7
+                )
+                return
+
+            # Check divergence
+            if pull_manager.is_diverged():
+                self.notify(
+                    "Cannot pull: Local branch has diverged from remote",
+                    severity="error",
+                    timeout=7
+                )
+                return
+
+            # Fetch first
+            self.notify("Fetching updates...", timeout=3)
+            pull_manager.git_ops.fetch()
+
+            # Check if actually behind
+            if not pull_manager.is_behind_remote():
+                self.notify("Already up to date", timeout=3)
+                return
+
+            # Pull
+            self.notify("Pulling updates...", timeout=3)
+            success = pull_manager.pull_updates()
+
+            if not success:
+                self.notify("Pull failed", severity="error", timeout=5)
+                log_pull_update(success=False, error="Pull operation failed")
+                return
+
+            # Check for metadata changes
+            if pull_manager.has_metadata_changes():
+                self.notify("Reindexing datasets...", timeout=3)
+                count, errors = reindex_all()
+
+                if errors:
+                    self.notify(
+                        f"Pull complete. Reindexed {count} datasets with {len(errors)} errors",
+                        severity="warning",
+                        timeout=7
+                    )
+                    log_reindex(success=False, datasets_count=count, error=f"{len(errors)} errors")
+                else:
+                    self.notify(
+                        f"Pull complete. Reindexed {count} datasets",
+                        severity="information",
+                        timeout=5
+                    )
+                    log_reindex(success=True, datasets_count=count)
+
+                log_pull_update(success=True, files_changed=count)
+            else:
+                self.notify("Pull complete (no metadata changes)", timeout=5)
+                log_pull_update(success=True, files_changed=0)
+
+        except Exception as e:
+            self.notify(f"Pull failed: {str(e)}", severity="error", timeout=7)
+            log_pull_update(success=False, error=str(e))
 
 
 def run_tui():
