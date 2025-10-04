@@ -13,8 +13,7 @@ edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 
 # Configuration
-theme:
-  name: simple-blog
+theme: simple-blog
   # palette:
   #   # Palette toggle for light mode
   #   - scheme: default
