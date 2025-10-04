@@ -27,6 +27,9 @@ class StateManager:
         # In-memory state
         self._state = self._load_state()
 
+        # Reset session-only flags on startup
+        self.reset_session_flags()
+
     def _load_state(self) -> dict:
         """
         Load state from disk.
@@ -44,10 +47,14 @@ class StateManager:
             return {}
 
     def _save_state(self) -> None:
-        """Save state to disk."""
+        """Save state to disk, excluding session-only flags."""
         try:
+            # Filter out session-only keys before saving
+            session_only_keys = {"dont_prompt_pull_this_session"}
+            state_to_save = {k: v for k, v in self._state.items() if k not in session_only_keys}
+
             with open(self.state_file, 'w') as f:
-                json.dump(self._state, f, indent=2)
+                json.dump(state_to_save, f, indent=2)
         except Exception:
             pass
 
