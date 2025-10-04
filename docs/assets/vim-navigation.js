@@ -122,7 +122,7 @@
     if (['j', 'k', 'h', 'l', 'g', 'G', 'd', 'u', '/'].includes(e.key)) {
       console.log('[Vim Navigation] Key pressed:', e.key, '| URL:', location.pathname);
     }
-    
+
     // Allow normal behavior in input fields (unless explicitly enabled)
     if (!config.enableInInputs && isTyping()) {
       // Still allow Escape to blur
@@ -275,10 +275,10 @@
   function initKeyboardListener() {
     // Remove any existing listener first (in case of re-initialization)
     document.removeEventListener('keydown', handleKeyPress);
-    
+
     // Attach keyboard listener to document
     document.addEventListener('keydown', handleKeyPress, { capture: false, passive: false });
-    
+
     console.log('[Vim Navigation] Keyboard listener attached');
   }
 
@@ -287,7 +287,7 @@
    */
   function init() {
     console.log('[Vim Navigation] Initializing on page:', location.pathname);
-    
+
     // Attach keyboard listener
     initKeyboardListener();
 
@@ -298,7 +298,7 @@
 
     // Log initialization
     console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search)');
-    
+
     // Listen for instant navigation / history changes (for MkDocs instant loading)
     // This ensures vim navigation works after client-side page transitions
     if (window.navigation) {
@@ -307,17 +307,17 @@
         console.log('[Vim Navigation] Page navigated (Navigation API)');
       });
     }
-    
+
     // Listen for popstate (back/forward button)
     window.addEventListener('popstate', () => {
       console.log('[Vim Navigation] Page navigated (popstate)');
     });
-    
+
     // Listen for MkDocs instant loading (Material theme)
     document.addEventListener('DOMContentSwitch', () => {
       console.log('[Vim Navigation] Page navigated (DOMContentSwitch)');
     });
-    
+
     // Watch for URL changes (for instant navigation)
     let lastUrl = location.href;
     new MutationObserver(() => {
@@ -338,7 +338,7 @@
   } else {
     init();
   }
-  
+
   // Also reinitialize on instant.js page loads (if present)
   document.addEventListener('DOMContentLoaded', () => {
     console.log('[Vim Navigation] DOMContentLoaded event fired');
