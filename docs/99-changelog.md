@@ -97,15 +97,7 @@ This release represents a significant refactoring of Hei-DataHub's internal arch
 
 ---
 
-## [0.55.1-beta] - TBD
-
-### Fixed
-
-- _(Placeholder for next patch release)_
-
----
-
-## [0.54.0-beta] - 2024-12-15
+## [0.54.0-beta] - 2025-10-03
 
 ### Added
 
@@ -125,7 +117,7 @@ This release represents a significant refactoring of Hei-DataHub's internal arch
 
 ---
 
-## [0.53.0-beta] - 2024-11-20
+## [0.53.0-beta] - 2025-10-03
 
 ### Added
 
@@ -139,7 +131,7 @@ This release represents a significant refactoring of Hei-DataHub's internal arch
 
 ---
 
-## [0.52.0-beta] - 2024-10-30
+## [0.52.0-beta] - 2025-10-03
 
 ### Added
 
@@ -153,7 +145,7 @@ This release represents a significant refactoring of Hei-DataHub's internal arch
 
 ---
 
-## [0.51.0-beta] - 2024-10-10
+## [0.51.0-beta] - 2025-10-03
 
 ### Added
 
@@ -166,7 +158,7 @@ This release represents a significant refactoring of Hei-DataHub's internal arch
 
 ---
 
-## [0.50.0-beta] - 2024-09-20
+## [0.50.0-beta] - 2025-10-02
 
 ### Added
 
@@ -178,7 +170,7 @@ This release represents a significant refactoring of Hei-DataHub's internal arch
 
 ---
 
-## [0.40.0-alpha] - 2024-08-15
+## [0.40.0-alpha] - 2025-10-02
 
 ### Added
 
