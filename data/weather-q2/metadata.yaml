@@ -1,0 +1,14 @@
+id: weather-q2
+dataset_name: weather data q2
+description: "Yearly global land cover classification derived from MODIS Terra and\n\
+  \  Aqua reflectance data, using multiple classification schemes (IGBP, UMD, LAI,\
+  \ BGC,\n  PFT). Includes additional land cover property assessments and QC layers."
+source: ee.ImageCollection("MODIS/061/MCD12Q1")
+date_created: '2025-10-03'
+storage_location: local
+file_format: GeoTIFF (via GEE), HDF (original LP DAAC format)
+size: Varies by year
+data_types:
+- Raster; categorical integer values representing land cover classes
+used_in_projects:
+- Gideon
