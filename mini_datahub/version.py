@@ -2,7 +2,7 @@
 Version information for Mini Hei-DataHub.
 """
 
-__version__ = "3.0.0"
+__version__ = "0.40.0"
 __app_name__ = "Mini Hei-DataHub"
 
 # GitHub repository for update checking
