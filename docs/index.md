@@ -11,40 +11,6 @@
 
 Everything runs locally—YAML files + SQLite database—no network required except for optional GitHub integration.
 
----
-
-## Quick Links
-
-<div class="grid cards" markdown>
-
-- **[Getting Started](01-getting-started.md)**
-
-    ---
-
-    Prerequisites, installation, first launch, and smoke tests.
-
-- **[Navigation](02-navigation.md)**
-
-    ---
-
-    Keyboard-first workflow, Neovim-style shortcuts, and panel navigation.
-
-- **[Data & SQL](11-data-and-sql.md)**
-
-    ---
-
-    Data layout, schemas, field conventions, and performance tips.
-
-- **[Configuration](12-config.md)**
-
-    ---
-
-    Config keys, environment variables, and example scenarios.
-
-</div>
-
----
-
 ## What's in the Box (v0.55.x beta)
 
 - **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
@@ -63,7 +29,6 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 ```bash
 # Launch the TUI (use either command)
 hei-datahub
-mini-datahub
 
 # Reindex from YAML files
 hei-datahub reindex
