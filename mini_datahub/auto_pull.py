@@ -183,14 +183,14 @@ class AutoPullManager:
     def pull_updates(self, branch: str = "main", auto_stash: bool = True, from_remote: bool = False, allow_merge: bool = False) -> Tuple[bool, str, Optional[str], Optional[str]]:
         """
         Pull updates from a branch into current branch.
-        
+
         This merges the specified branch into your current local branch.
         By default, it merges from your LOCAL branch (e.g., local main).
         Set from_remote=True to merge from the remote branch (e.g., origin/main).
-        
+
         You don't need to be on the same branch - it will pull from the specified branch
         into whatever branch you're currently on.
-        
+
         If you have uncommitted changes and auto_stash=True, they will be automatically
         stashed before pulling and re-applied after.
 
@@ -204,7 +204,7 @@ class AutoPullManager:
             Tuple of (success, message, old_commit, new_commit)
         """
         stashed = False
-        
+
         # Check for local changes
         has_changes, status = self.has_local_changes()
         if has_changes:
@@ -299,7 +299,7 @@ class AutoPullManager:
             new_commit = self.get_current_commit()
 
             branch_info = f" into {current_branch}" if current_branch != branch else ""
-            
+
             # Re-apply stashed changes if we stashed them
             stash_msg = ""
             if stashed:
@@ -308,7 +308,7 @@ class AutoPullManager:
                     stash_msg = " Your uncommitted changes have been restored."
                 except Exception as e:
                     stash_msg = f"\n⚠️  Warning: Failed to restore stashed changes: {e}\nRun 'git stash pop' manually to restore them."
-            
+
             return (
                 True,
                 f"Pulled {commits} commit(s) from {source_branch}{branch_info}.{stash_msg}",
@@ -323,7 +323,7 @@ class AutoPullManager:
                     self.git_ops.stash_pop()
                 except:
                     pass  # Will mention in error message
-            
+
             stash_note = "\n⚠️  Your changes were stashed. Run 'git stash pop' to restore them." if stashed else ""
             return (
                 False,
@@ -338,7 +338,7 @@ class AutoPullManager:
                     self.git_ops.stash_pop()
                 except:
                     pass  # Will mention in error message
-            
+
             stash_note = "\n⚠️  Your changes were stashed. Run 'git stash pop' to restore them." if stashed else ""
             return (
                 False,
