@@ -3,6 +3,7 @@ Configuration management with secure credential storage.
 Uses keyring for secure token storage (OS keychain).
 """
 import json
+import logging
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -13,6 +14,8 @@ except ImportError:
     KEYRING_AVAILABLE = False
 
 from mini_datahub.infra.paths import PROJECT_ROOT
+
+logger = logging.getLogger(__name__)
 
 CONFIG_FILE = PROJECT_ROOT / ".datahub_config.json"
 KEYRING_SERVICE = "mini-datahub"
@@ -66,14 +69,19 @@ class GitHubConfig:
             self.background_fetch_interval_minutes = data.get("background_fetch_interval_minutes", 0)
             self.debug_logging = data.get("debug_logging", False)
 
-            # Try to load token from keyring
-            if KEYRING_AVAILABLE and self.username:
+            # Try to load token from keyring (always attempt if keyring is available)
+            if KEYRING_AVAILABLE:
                 try:
                     self._token = keyring.get_password(KEYRING_SERVICE, KEYRING_USERNAME)
-                except Exception:
-                    pass
-        except Exception:
-            pass
+                    if self._token:
+                        logger.debug(f"Token loaded from keyring for service '{KEYRING_SERVICE}'")
+                    else:
+                        logger.debug(f"No token found in keyring for service '{KEYRING_SERVICE}'")
+                except Exception as e:
+                    logger.warning(f"Failed to load token from keyring: {e}")
+                    self._token = None
+        except Exception as e:
+            logger.error(f"Failed to load config from {CONFIG_FILE}: {e}")
 
     def save_config(self, save_token: bool = True) -> None:
         """
@@ -101,11 +109,22 @@ class GitHubConfig:
             json.dump(data, f, indent=2)
 
         # Save token to keyring
-        if save_token and KEYRING_AVAILABLE and self._token:
+        if save_token and self._token:
+            if not KEYRING_AVAILABLE:
+                logger.warning("Keyring not available - token will not persist across sessions")
+                raise RuntimeError(
+                    "System keyring is not available. Token cannot be saved securely. "
+                    "Please install keyring support for your OS:\n"
+                    "- Linux: install gnome-keyring or kde-wallet\n"
+                    "- macOS: Keychain should work by default\n"
+                    "- Windows: Windows Credential Manager should work by default"
+                )
             try:
                 keyring.set_password(KEYRING_SERVICE, KEYRING_USERNAME, self._token)
-            except Exception:
-                pass
+                logger.info(f"Token successfully saved to keyring service '{KEYRING_SERVICE}'")
+            except Exception as e:
+                logger.error(f"Failed to save token to keyring: {e}")
+                raise RuntimeError(f"Could not save token to system keyring: {e}. Please check your keyring backend.")
 
     def set_token(self, token: str) -> None:
         """Set the GitHub token."""
@@ -121,8 +140,10 @@ class GitHubConfig:
         if KEYRING_AVAILABLE:
             try:
                 keyring.delete_password(KEYRING_SERVICE, KEYRING_USERNAME)
-            except Exception:
-                pass
+                logger.info(f"Token deleted from keyring service '{KEYRING_SERVICE}'")
+            except Exception as e:
+                # It's okay if token doesn't exist
+                logger.debug(f"Could not delete token from keyring (may not exist): {e}")
 
     def is_configured(self) -> bool:
         """Check if GitHub is configured with all required fields."""
