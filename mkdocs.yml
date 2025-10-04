@@ -14,7 +14,7 @@ copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 
 # Configuration
 theme:
-  name: readthedocs
+  name: simple-blog
   palette:
     # Palette toggle for light mode
     - scheme: default
