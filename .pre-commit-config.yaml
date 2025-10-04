@@ -9,6 +9,14 @@ repos:
         files: version\.yaml
         pass_filenames: false
         always_run: false
+      
+      - id: mkdocs-build-check
+        name: Check MkDocs builds without errors
+        entry: mkdocs build --strict
+        language: system
+        files: ^(mkdocs\.yml|docs/)
+        pass_filenames: false
+        always_run: false
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
