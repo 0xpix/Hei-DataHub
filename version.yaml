@@ -1,0 +1,15 @@
+# Hei-DataHub Version Configuration
+# Single source of truth for all version metadata
+# Edit this file and run `scripts/sync_version.py` to propagate changes
+
+version: "0.55.5-beta"
+codename: "Fjord"
+release_date: "2025-10-04"
+compatibility: "Hei-DataHub v0.55.x (beta)"
+notes: "Enhanced versioning system with centralized configuration"
+
+# Additional metadata
+app_name: "Hei-DataHub"
+github_repo: "0xpix/Hei-DataHub"
+python_requires: ">=3.9"
+license: "MIT"
