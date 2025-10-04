@@ -196,8 +196,13 @@ class SettingsScreen(Screen):
             # Refresh GitHub connection status in the app
             self.app.refresh_github_status()
 
-            status_label.update("[green]✓ Settings saved![/green]")
-            self.app.notify("Settings saved successfully!", timeout=3)
+            # Provide detailed feedback about what was saved
+            if config.get_token():
+                status_label.update("[green]✓ Settings saved! Token securely stored in system keyring.[/green]")
+                self.app.notify("Settings saved successfully! GitHub credentials will persist across reboots.", timeout=5)
+            else:
+                status_label.update("[green]✓ Settings saved![/green]")
+                self.app.notify("Settings saved successfully!", timeout=3)
 
         except Exception as e:
             status_label.update(f"[red]Error saving: {str(e)}[/red]")
