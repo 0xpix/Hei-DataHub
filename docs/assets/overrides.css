@@ -1,0 +1,81 @@
+/* ==========================================================================
+   Hei-DataHub Documentation - Simple Blog Theme Overrides
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Image & SVG Constraints
+   Prevent images and SVGs from overflowing the content width
+   -------------------------------------------------------------------------- */
+
+/* Constrain images/SVGs to the content width */
+article img,
+article svg,
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Pleasant spacing around figures */
+article img,
+article svg {
+  margin: 1rem 0;
+}
+
+/* Center images by default for better presentation */
+article img,
+article svg {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Table of Contents Permalink Styling
+   Make the heading permalink symbol (¶) subtle and less intrusive
+   -------------------------------------------------------------------------- */
+
+a.headerlink {
+  opacity: 0.35;
+  font-size: 0.8em;
+  margin-left: 0.25rem;
+  text-decoration: none;
+}
+
+/* Show permalink on hover for better discoverability */
+a.headerlink:hover {
+  opacity: 0.7;
+}
+
+/* Uncomment below to hide permalink symbols completely */
+/*
+a.headerlink {
+  display: none;
+}
+*/
+
+/* --------------------------------------------------------------------------
+   Responsive Adjustments
+   Ensure images scale properly on mobile devices
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  article img,
+  article svg {
+    margin: 0.75rem 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Code Block Improvements (optional)
+   Ensure code blocks don't overflow on narrow screens
+   -------------------------------------------------------------------------- */
+
+pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+code {
+  word-wrap: break-word;
+}
