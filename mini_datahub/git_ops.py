@@ -94,6 +94,94 @@ class GitOperations:
             # If fast-forward fails, it's okay - we'll work from current state
             pass
 
+    def merge_remote_branch(self, remote_branch: str, strategy: str = "ff-only") -> None:
+        """
+        Merge a remote branch into current branch.
+
+        Args:
+            remote_branch: Remote branch to merge (e.g., "main")
+            strategy: Merge strategy ("ff-only" for fast-forward only, "merge" for regular merge)
+
+        Raises:
+            GitOperationError: If merge fails
+        """
+        if strategy == "ff-only":
+            self._run_command(["git", "merge", "--ff-only", f"origin/{remote_branch}"])
+        else:
+            self._run_command(["git", "merge", f"origin/{remote_branch}"])
+
+    def merge_local_branch(self, local_branch: str, strategy: str = "ff-only") -> None:
+        """
+        Merge a local branch into current branch.
+
+        Args:
+            local_branch: Local branch to merge (e.g., "main")
+            strategy: Merge strategy ("ff-only" for fast-forward only, "merge" for regular merge)
+
+        Raises:
+            GitOperationError: If merge fails
+        """
+        if strategy == "ff-only":
+            self._run_command(["git", "merge", "--ff-only", local_branch])
+        else:
+            self._run_command(["git", "merge", local_branch])
+
+    def stash_push(self, message: str = "Auto-stash before pull") -> bool:
+        """
+        Stash uncommitted changes.
+
+        Args:
+            message: Stash description message
+
+        Returns:
+            True if changes were stashed, False if nothing to stash
+
+        Raises:
+            GitOperationError: If stash operation fails
+        """
+        code, stdout, stderr = self._run_command(
+            ["git", "stash", "push", "-m", message],
+            check=False
+        )
+        if code == 0:
+            # Check if anything was actually stashed
+            return "No local changes to save" not in stdout
+        raise GitOperationError(f"Failed to stash changes: {stderr}")
+
+    def stash_pop(self) -> bool:
+        """
+        Apply and remove most recent stash.
+
+        Returns:
+            True if stash was applied successfully, False if no stash to pop
+
+        Raises:
+            GitOperationError: If stash pop fails (e.g., conflicts)
+        """
+        code, stdout, stderr = self._run_command(
+            ["git", "stash", "pop"],
+            check=False
+        )
+        if code == 0:
+            return True
+        elif "No stash entries found" in stderr:
+            return False
+        else:
+            raise GitOperationError(f"Failed to pop stash: {stderr}")
+
+    def has_stash(self) -> bool:
+        """
+        Check if there are any stashes.
+
+        Returns:
+            True if stash list is not empty
+        """
+        code, stdout, _ = self._run_command(
+            ["git", "stash", "list"],
+            check=False
+        )
+        return code == 0 and len(stdout.strip()) > 0
+
     def create_branch(self, branch_name: str, base_branch: str = "main") -> None:
         """
         Create a new branch from base.

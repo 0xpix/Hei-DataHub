@@ -180,27 +180,59 @@ class AutoPullManager:
         except Exception:
             return None
 
-    def pull_updates(self, branch: str = "main") -> Tuple[bool, str, Optional[str], Optional[str]]:
+    def pull_updates(self, branch: str = "main", auto_stash: bool = True, from_remote: bool = False, allow_merge: bool = False) -> Tuple[bool, str, Optional[str], Optional[str]]:
         """
-        Pull updates from remote repository.
+        Pull updates from a branch into current branch.
+
+        This merges the specified branch into your current local branch.
+        By default, it merges from your LOCAL branch (e.g., local main).
+        Set from_remote=True to merge from the remote branch (e.g., origin/main).
+
+        You don't need to be on the same branch - it will pull from the specified branch
+        into whatever branch you're currently on.
+
+        If you have uncommitted changes and auto_stash=True, they will be automatically
+        stashed before pulling and re-applied after.
 
         Args:
-            branch: Branch to pull
+            branch: Branch to pull from (default: "main")
+            auto_stash: Automatically stash/unstash uncommitted changes (default: True)
+            from_remote: Pull from remote branch (origin/<branch>) instead of local branch (default: False)
+            allow_merge: Allow merge commits when branches diverge (default: False = fast-forward only)
 
         Returns:
             Tuple of (success, message, old_commit, new_commit)
         """
-        # Check for local changes first
+        stashed = False
+
+        # Check for local changes
         has_changes, status = self.has_local_changes()
         if has_changes:
-            return (
-                False,
-                f"Local changes detected in catalog repo. Please commit/stash or discard.\nPath: {self.catalog_path}",
-                None,
-                None
-            )
-
-        # Check if diverged
+            if auto_stash:
+                try:
+                    # Stash uncommitted changes
+                    stashed = self.git_ops.stash_push("Auto-stash before pull")
+                    if not stashed:
+                        return (
+                            False,
+                            f"Failed to stash changes. Please commit or stash manually.\nPath: {self.catalog_path}",
+                            None,
+                            None
+                        )
+                except Exception as e:
+                    return (
+                        False,
+                        f"Failed to stash changes: {e}\nPath: {self.catalog_path}",
+                        None,
+                        None
+                    )
+            else:
+                return (
+                    False,
+                    f"Local changes detected in catalog repo. Please commit/stash or discard.\nPath: {self.catalog_path}",
+                    None,
+                    None
+                )        # Check if diverged
         is_diverged, ahead, behind = self.is_diverged(branch)
         if is_diverged:
             return (
@@ -214,46 +246,103 @@ class AutoPullManager:
         old_commit = self.get_current_commit()
 
         try:
-            # Fetch latest
-            self.git_ops.fetch()
+            # Get current branch
+            current_branch = self.git_ops.get_current_branch()
 
-            # Check if behind
-            is_behind, commits = self.is_behind_remote(branch)
-            if not is_behind:
-                return (
-                    True,
-                    "Already up to date with remote.",
-                    old_commit,
-                    old_commit
+            # Determine source branch name for messages
+            source_branch = f"origin/{branch}" if from_remote else branch
+
+            if from_remote:
+                # Fetch latest from remote
+                self.git_ops.fetch()
+
+                # Check if behind remote
+                is_behind, commits = self.is_behind_remote(branch)
+                if not is_behind:
+                    return (
+                        True,
+                        f"Already up to date with {source_branch}.",
+                        old_commit,
+                        old_commit
+                    )
+            else:
+                # Check if behind local branch
+                code, stdout, _ = self.git_ops._run_command(
+                    ["git", "rev-list", "--count", f"HEAD..{branch}"],
+                    check=False
                 )
+                if code == 0:
+                    commits = int(stdout.strip())
+                    if commits == 0:
+                        return (
+                            True,
+                            f"Already up to date with {source_branch}.",
+                            old_commit,
+                            old_commit
+                        )
+                else:
+                    return (
+                        False,
+                        f"Unable to compare with {source_branch}. Branch may not exist.",
+                        old_commit,
+                        None
+                    )
 
-            # Checkout branch
-            self.git_ops.checkout_branch(branch)
-
-            # Fast-forward pull
-            self.git_ops.fast_forward(branch)
+            # Merge branch into current branch
+            strategy = "merge" if allow_merge else "ff-only"
+            if from_remote:
+                self.git_ops.merge_remote_branch(branch, strategy=strategy)
+            else:
+                self.git_ops.merge_local_branch(branch, strategy=strategy)
 
             # Get new commit
             new_commit = self.get_current_commit()
 
+            branch_info = f" into {current_branch}" if current_branch != branch else ""
+
+            # Re-apply stashed changes if we stashed them
+            stash_msg = ""
+            if stashed:
+                try:
+                    self.git_ops.stash_pop()
+                    stash_msg = " Your uncommitted changes have been restored."
+                except Exception as e:
+                    stash_msg = f"\n⚠️  Warning: Failed to restore stashed changes: {e}\nRun 'git stash pop' manually to restore them."
+
             return (
                 True,
-                f"Pulled {commits} commit(s) from {branch}.",
+                f"Pulled {commits} commit(s) from {source_branch}{branch_info}.{stash_msg}",
                 old_commit,
                 new_commit
             )
 
         except GitOperationError as e:
+            # If pull failed but we stashed, try to restore
+            if stashed:
+                try:
+                    self.git_ops.stash_pop()
+                except:
+                    pass  # Will mention in error message
+
+            stash_note = "\n⚠️  Your changes were stashed. Run 'git stash pop' to restore them." if stashed else ""
             return (
                 False,
-                f"Pull failed: {str(e)}",
+                f"Pull failed: {str(e)}{stash_note}",
                 old_commit,
                 None
             )
         except Exception as e:
+            # If pull failed but we stashed, try to restore
+            if stashed:
+                try:
+                    self.git_ops.stash_pop()
+                except:
+                    pass  # Will mention in error message
+
+            stash_note = "\n⚠️  Your changes were stashed. Run 'git stash pop' to restore them." if stashed else ""
             return (
                 False,
-                f"Unexpected error during pull: {str(e)}",
+                f"Unexpected error during pull: {str(e)}{stash_note}",
                 old_commit,
                 None
             )
