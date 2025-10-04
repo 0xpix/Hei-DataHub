@@ -1,4 +1,3 @@
-# Tutorial: Your First Dataset
 
 This hands-on tutorial will walk you through adding your first dataset to Hei-DataHub, from launching the TUI to verifying it appears in search results.
 

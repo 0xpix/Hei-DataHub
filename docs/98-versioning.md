@@ -1,4 +1,3 @@
-# Versioning & Release Policy
 
 Understanding Semantic Versioning (SemVer) and how Hei-DataHub applies it.
 

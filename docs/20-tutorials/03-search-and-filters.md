@@ -1,4 +1,3 @@
-# Tutorial: Search & Filters
 
 Master Hei-DataHub's search capabilities with this hands-on tutorial covering basic search, advanced techniques, and search best practices.
 

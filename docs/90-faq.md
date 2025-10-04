@@ -1,4 +1,3 @@
-# FAQ & Troubleshooting
 
 Common questions, issues, and solutions for Hei-DataHub.
 

@@ -1,4 +1,3 @@
-# Changelog
 
 All notable changes to Hei-DataHub will be documented in this file.
 

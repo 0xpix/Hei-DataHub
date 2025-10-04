@@ -1,4 +1,3 @@
-# Tutorial: Installation
 
 This step-by-step tutorial will guide you through installing Hei-DataHub and verifying that everything works correctly.
 
