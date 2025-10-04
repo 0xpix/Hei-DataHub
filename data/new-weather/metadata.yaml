@@ -1,6 +1,0 @@
-id: new-weather
-dataset_name: New weather
-description: just a test
-source: new.weather
-date_created: '2025-10-04'
-storage_location: local
