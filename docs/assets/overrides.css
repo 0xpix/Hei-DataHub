@@ -1,81 +1,66 @@
 /* ==========================================================================
-   Hei-DataHub Documentation - Simple Blog Theme Overrides
+   Hei-DataHub Docs — Simple Blog Theme Overrides (scoped + safe)
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   Image & SVG Constraints
-   Prevent images and SVGs from overflowing the content width
-   -------------------------------------------------------------------------- */
+/* ---- Scope: only affect main content area ---- */
+:root { --hdh-muted: #666; }
 
-/* Constrain images/SVGs to the content width */
+main img,
+main svg,
 article img,
 article svg,
-img,
-svg {
+.content img,
+.content svg {
   max-width: 100%;
   height: auto;
   display: block;
+  margin: 1rem auto;          /* single, centered spacing */
 }
 
-/* Pleasant spacing around figures */
-article img,
-article svg {
-  margin: 1rem 0;
-}
+/* Don't touch logos/icons in header/nav */
+header img, nav img, header svg, nav svg { max-width: none; height: auto; }
 
-/* Center images by default for better presentation */
-article img,
-article svg {
-  margin-left: auto;
-  margin-right: auto;
-}
+/* Linked images should still be blocks so margins apply */
+a > img, a > svg { display: block; }
 
-/* --------------------------------------------------------------------------
-   Table of Contents Permalink Styling
-   Make the heading permalink symbol (¶) subtle and less intrusive
-   -------------------------------------------------------------------------- */
+/* Respect intrinsic ratios when width/height attributes exist */
+img[width][height] { height: auto; }
 
+/* Figures + captions */
+figure { margin: 1.25rem auto; text-align: center; }
+figure > img, figure > svg { display: inline-block; margin: 0.5rem auto; }
+figcaption { color: var(--hdh-muted); font-size: 0.95rem; margin-top: 0.35rem; }
+
+/* Optional utilities for alignment in Markdown (with attr_list) */
+/* e.g., ![img](x.png){ .align-left width=320 } */
+.align-left  { margin-right: auto; margin-left: 0; }
+.align-right { margin-left: auto; margin-right: 0; }
+
+/* Heading permalink symbol (¶) */
 a.headerlink {
   opacity: 0.35;
   font-size: 0.8em;
   margin-left: 0.25rem;
   text-decoration: none;
 }
-
-/* Show permalink on hover for better discoverability */
-a.headerlink:hover {
-  opacity: 0.7;
-}
-
-/* Uncomment below to hide permalink symbols completely */
-/*
-a.headerlink {
-  display: none;
-}
+a.headerlink:hover { opacity: 0.7; }
+/* To hide completely, uncomment:
+a.headerlink { display: none; }
 */
 
-/* --------------------------------------------------------------------------
-   Responsive Adjustments
-   Ensure images scale properly on mobile devices
-   -------------------------------------------------------------------------- */
-
+/* Responsive tweaks */
 @media (max-width: 768px) {
-  article img,
-  article svg {
-    margin: 0.75rem 0;
+  main img, main svg,
+  article img, article svg,
+  .content img, .content svg {
+    margin: 0.75rem auto;
   }
 }
 
-/* --------------------------------------------------------------------------
-   Code Block Improvements (optional)
-   Ensure code blocks don't overflow on narrow screens
-   -------------------------------------------------------------------------- */
+/* Code blocks: prevent horizontal spill */
+pre { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+pre code { white-space: pre; }
+code { word-break: break-word; }
 
-pre {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-code {
-  word-wrap: break-word;
-}
+/* Tables: make them scroll on narrow screens */
+table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; }
