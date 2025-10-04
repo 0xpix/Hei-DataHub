@@ -174,11 +174,12 @@ Press [bold]Escape[/bold] or [bold]Ctrl+C[/bold] to close."""
             git_ops.fetch()
 
             # Check if behind
-            if not pull_manager.is_behind_remote():
+            is_behind, commits_behind = pull_manager.is_behind_remote()
+            if not is_behind:
                 return "[green]✓[/green] Already up to date"
 
             # Pull
-            success = pull_manager.pull_updates()
+            success, message, old_commit, new_commit = pull_manager.pull_updates()
 
             if success:
                 return "[green]✓[/green] Sync complete - please reindex"
