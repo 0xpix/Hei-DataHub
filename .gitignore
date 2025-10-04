@@ -61,9 +61,22 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Hei-DataHub specific
+# Hei-DataHub specific - database and cache
 db.sqlite
-db.sqlite-journal
+db.sqlite-*
+.cache/
+
+# DataHub - ignore all data except metadata and docs
+data/**
+!data/**/metadata.yaml
+!data/**/README.md
+!data/**/images/**
+
+# DataHub - local config (use ~/.mini-datahub instead)
+.datahub_config.json
+
+# DataHub - outbox for failed PRs
+.outbox/
 
 # Flask stuff:
 instance/
