@@ -17,25 +17,25 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 <div class="grid cards" markdown>
 
-- :material-clock-fast: **[Getting Started](01-getting-started.md)**
+- **[Getting Started](01-getting-started.md)**
 
     ---
 
     Prerequisites, installation, first launch, and smoke tests.
 
-- :material-navigation: **[Navigation](02-navigation.md)**
+- **[Navigation](02-navigation.md)**
 
     ---
 
     Keyboard-first workflow, Neovim-style shortcuts, and panel navigation.
 
-- :material-database: **[Data & SQL](11-data-and-sql.md)**
+- **[Data & SQL](11-data-and-sql.md)**
 
     ---
 
     Data layout, schemas, field conventions, and performance tips.
 
-- :material-cog: **[Configuration](12-config.md)**
+- **[Configuration](12-config.md)**
 
     ---
 
