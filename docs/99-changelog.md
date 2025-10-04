@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 📝 Version History
 
-### ✅ Current Features (v0.55.6-beta — "Persistence")
+### ✅ Current (v0.55.6-beta — "Persistence")
 
 **Bug Fix Release: GitHub PAT Persistence**
 
