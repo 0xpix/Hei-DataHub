@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mini-datahub"
-version = "0.55.0-beta"
+version = "0.55.5-beta"
 description = "A local-first TUI for managing datasets with consistent metadata"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "you@example.com"}
+    {name = "Aness Chelfat", email = "ns.chlfat@gmail.com"}
 ]
 keywords = ["data", "catalog", "tui", "metadata", "search"]
 classifiers = [
@@ -32,6 +32,8 @@ dependencies = [
     "requests>=2.31.0",
     "pyperclip>=1.8.2",
     "keyring>=24.0.0",
+    "mkdocs-material>=9.6.21",
+    "mkdocs-macros-plugin>=1.0.0",
 ]
 
 [project.optional-dependencies]

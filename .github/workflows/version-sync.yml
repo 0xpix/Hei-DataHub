@@ -1,0 +1,52 @@
+name: Version Sync Check
+
+on:
+  pull_request:
+    paths:
+      - 'version.yaml'
+      - 'src/mini_datahub/_version.py'
+      - 'src/mini_datahub/version.py'
+      - 'pyproject.toml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'version.yaml'
+
+jobs:
+  check-version-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+
+      - name: Run version sync
+        run: |
+          python scripts/sync_version.py
+
+      - name: Check for uncommitted changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "❌ Version files are out of sync!"
+            echo ""
+            echo "The following files have uncommitted changes:"
+            git status --porcelain
+            echo ""
+            echo "Please run 'python scripts/sync_version.py' locally and commit the changes."
+            exit 1
+          else
+            echo "✅ All version files are in sync!"
+          fi
+
+      - name: Display current version
+        run: |
+          python -c "from src.mini_datahub._version import __version__, CODENAME, RELEASE_DATE; print(f'Version: {__version__}'); print(f'Codename: {CODENAME}'); print(f'Release Date: {RELEASE_DATE}')"
