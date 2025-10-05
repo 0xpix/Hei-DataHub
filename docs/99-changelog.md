@@ -4,6 +4,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## 📝 Version History
+### [0.55.2-beta] - 2025-01-05 - "Console Fix"
+
+**Bug Fix Release - Debug Console Import Error**
+
+- **Changed:**
+    - Default theme to `gruvbox`
+
+- **Fixed:**
+    - **Critical:** Fixed `ModuleNotFoundError` when opening debug console (`:` key)
+
+---
+
 ### [0.55.1-beta] - 2025-01-04 - "Persistence"
 
 **Bug Fix Release - Reliable GitHub Token Storage**
