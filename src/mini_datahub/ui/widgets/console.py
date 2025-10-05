@@ -12,7 +12,7 @@ from rich.text import Text
 
 from mini_datahub import __version__, __app_name__, GITHUB_REPO
 from mini_datahub.infra.git import GitOperations
-from mini_datahub.infra.auth import load_config
+from mini_datahub.app.settings import load_config
 from mini_datahub.services.sync import get_auto_pull_manager
 from pathlib import Path
 import subprocess
