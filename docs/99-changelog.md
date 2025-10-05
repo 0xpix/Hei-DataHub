@@ -23,47 +23,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### [0.55.0-beta] - 2025-01-04 — "Clean Architecture"
+### [0.55.0-beta] - 2025-01-04 — “Clean Architecture”
 
-**Major Release: Architectural Refactoring**
+**Major Release — Complete Architectural Refactoring**
+
+**Highlights:**
+- Introduced **layered architecture** (UI → Services → Core → Infrastructure)
+- Added **dual CLI commands:** `hei-datahub` and `mini-datahub`
+- New **version management system** (`version.yaml` + auto-generated files)
+- Integrated **GitHub Actions CI**, **pre-commit hooks**, and **MkDocs** documentation site
 
 **Added:**
-- Dual command support: `hei-datahub` and `mini-datahub`
-- Auto-stash for PR workflow (saves uncommitted changes)
-- Improved gitignore handling during PR creation
-- `--version-info` flag for detailed system information
-- Comprehensive documentation site (MkDocs + Material theme)
-- Clean layered architecture (UI → Services → Core → Infrastructure)
-- Centralized version management via `version.yaml`
-- Auto-generation of version files (`_version.py`, `version.md`, `version.json`)
-- Version sync script with dry-run support
-- Pre-commit hooks for version consistency
-- GitHub Actions CI validation for version sync
-- Dynamic documentation banner with version info
+- Auto-stash workflow for safe PR creation
+- Centralized logging with debug mode
+- `--version-info` flag for detailed build/system info
+- Dynamic documentation banner and macros plugin
 
 **Changed:**
 - Migrated to `src/mini_datahub/` package structure
-- Unified settings management via `GitHubConfig` class
-- Centralized logging configuration with debug mode
-- Custom exception hierarchy for better error messages
-- Version module now imports from auto-generated `_version.py`
-- MkDocs configuration includes macros plugin
-
-**Improved:**
-- Developer experience: single file to edit for version bumps
-- Consistency: eliminates hardcoded version strings
-- Release process: pre-commit hooks enforce version sync
+- Unified settings via `GitHubConfig`
+- Refactored exception hierarchy for clearer error handling
 
 **Fixed:**
-- BM25 search ranking (name matches prioritized)
-- ISO 8601 date validation consistency
-- Database initialization error handling
-- Git operations edge cases (detached HEAD, merge conflicts)
+- BM25 ranking (prioritizes name matches)
+- ISO 8601 date validation
+- Database initialization and Git edge cases
 
 **Documentation:**
-- Complete manual with tutorials, API reference, and FAQ
-- GitHub Pages auto-deployment
-- Versioning policy document
+- Comprehensive manual (tutorials, API reference, FAQ)
+- Automatic deployment to GitHub Pages
+- Defined versioning and release policy
 
 ---
 
