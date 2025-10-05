@@ -4,6 +4,6 @@
     **Release:** 0.56.0-beta (2025-10-05)
     **Codename:** Precision
 
-    Speed, responsiveness, and power-user ergonomics
+    Structured Search and Inline Editing
 
     **Compatibility note:** Features and shortcuts may differ slightly from other versions.
