@@ -269,4 +269,4 @@ site/
 # User configuration (may contain sensitive data)
 .hei-datahub/
 # Benchmark results
-bench/results/*.csv
+bench/
