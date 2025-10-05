@@ -130,7 +130,7 @@ def handle_keymap_import(args):
         config.update_user_config({"keybindings": data["keybindings"]})
 
         print(f"✓ Imported keybindings from: {input_path}")
-        print("ℹ️  Restart the application for changes to take effect")
+        print("ℹ️  Changes will take effect immediately in running app or on next start")
         sys.exit(0)
     except Exception as e:
         print(f"❌ Failed to import keybindings: {e}", file=sys.stderr)
