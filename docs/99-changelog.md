@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Bug Fix Release - Reliable GitHub Token Storage**
 
-**Fixed:**
+- **Fixed:**
     - **Critical:** Personal Access Token (PAT) now persists after system reboot
     - Resolved keyring issue preventing permanent credential storage
 
-**Improved:**
+- **Improved:**
     - Keyring reliability on Linux systems
     - Clearer error messages when keyring backend is unavailable
     - Settings screen now confirms successful credential storage
@@ -24,29 +24,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Major Release - Complete Architectural Refactoring**
 
-**Highlights:**
+- **Highlights:**
     - Introduced **layered architecture** (UI → Services → Core → Infrastructure)
     - Added **dual CLI commands:** `hei-datahub` and `mini-datahub`
     - New **version management system** (`version.yaml` + auto-generated files)
     - Integrated **GitHub Actions CI**, **pre-commit hooks**, and **MkDocs** documentation site
 
-**Added:**
+- **Added:**
     - Auto-stash workflow for safe PR creation
     - Centralized logging with debug mode
     - `--version-info` flag for detailed build/system info
     - Dynamic documentation banner and macros plugin
 
-**Changed:**
+- **Changed:**
     - Migrated to `src/mini_datahub/` package structure
     - Unified settings via `GitHubConfig`
     - Refactored exception hierarchy for clearer error handling
 
-**Fixed:**
+- **Fixed:**
     - BM25 ranking (prioritizes name matches)
     - ISO 8601 date validation
     - Database initialization and Git edge cases
 
-**Documentation:**
+- **Documentation:**
     - Comprehensive manual (tutorials, API reference, FAQ)
     - Automatic deployment to GitHub Pages
     - Defined versioning and release policy
@@ -55,16 +55,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [0.54.0-beta] - 2025-01-03 - "Connector"
 
-**Added:**
+- **Added:**
     - Outbox system for failed PR tasks (`.outbox/` directory)
     - Weekly update check for new releases
     - GitHub status indicator in TUI
 
-**Changed:**
+- **Changed:**
     - Search debounce reduced to 150ms (faster response)
     - Improved table column width allocation
 
-**Fixed:**
+- **Fixed:**
     - Keyring integration on Linux without GNOME Keyring
     - YAML parsing for multi-line strings and special characters
 
@@ -72,11 +72,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [0.53.0-beta] - 2025-01-03 - "Synchronizer"
 
-**Added:**
+- **Added:**
     - Pull updates command (`u` keybinding)
     - Refresh command (`r` keybinding) without reindexing
 
-**Fixed:**
+- **Fixed:**
     - Search query escaping for FTS5 special operators
     - Dataset ID validation for auto-generated IDs
 
@@ -84,23 +84,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [0.52.0-beta] - 2025-01-03 - "Navigator"
 
-**Added:**
+- **Added:**
     - Vim-style navigation (`j`/`k`, `gg`/`G`)
     - Copy source shortcut (`c` on Details Screen)
     - Open URL shortcut (`o` on Details Screen)
 
-**Changed:**
+- **Changed:**
     - More compact footer shortcuts display
 
 ---
 
 ### [0.51.0-beta] - 2025-01-03 - "Integrator"
 
-**Added:**
+- **Added:**
     - GitHub PR integration with automated workflow
     - Settings screen for GitHub credentials
 
-**Fixed:**
+- **Fixed:**
     - Database locking issues on multi-core systems
 
 ---
@@ -109,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Initial Beta Release**
 
-**Added:**
+- **Added:**
     - Full-text search with SQLite FTS5 and BM25 ranking
     - Add Dataset form with TUI validation
     - Details screen for complete metadata view
@@ -121,7 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Alpha Release**
 
-**Added:**
+- **Added:**
     - Basic TUI with search functionality
     - YAML-based metadata storage
 
