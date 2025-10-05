@@ -1,6 +1,7 @@
-"""
+""" 
 Main workflow orchestrator for Save → PR automation.
 """
+import logging
 from pathlib import Path
 from typing import Tuple, Optional, Dict, Any
 
@@ -18,6 +19,8 @@ from mini_datahub.infra.github_api import (
 )
 from mini_datahub.services.outbox import get_outbox
 from mini_datahub.infra.store import write_dataset
+
+logger = logging.getLogger(__name__)
 
 
 class PRWorkflowError(Exception):
@@ -79,6 +82,8 @@ class PRWorkflow:
 
         # Track if we stashed changes (for restoration later)
         stashed = False
+        # Track original branch to restore later (fix for issue #9)
+        original_branch = None
 
         try:
             # Pre-flight checks
@@ -89,6 +94,13 @@ class PRWorkflow:
                     None,
                     None,
                 )
+            
+            # Save current branch for restoration later
+            try:
+                original_branch = git_ops.get_current_branch()
+            except Exception:
+                # If we can't get branch, default to config's default branch
+                original_branch = self.config.default_branch
 
             # Auto-stash uncommitted changes if present
             if not git_ops.is_working_tree_clean():
@@ -126,6 +138,15 @@ class PRWorkflow:
             has_push = github.has_push_access()
 
             if has_push:
+                # Clean up remote branch if it exists from a previous failed attempt
+                # This prevents "non-fast-forward" errors when branch diverged
+                if git_ops.remote_branch_exists("origin", branch_name):
+                    try:
+                        git_ops.delete_remote_branch("origin", branch_name)
+                        logger.info(f"Deleted stale remote branch origin/{branch_name}")
+                    except Exception as e:
+                        logger.warning(f"Could not delete remote branch: {e}")
+                
                 # Push directly to central repo
                 git_ops.push(remote="origin", branch=branch_name)
                 head = branch_name
@@ -138,6 +159,14 @@ class PRWorkflow:
                 # Ensure fork remote exists
                 fork_url = f"https://{self.config.host}/{fork_name}.git"
                 git_ops.ensure_remote("fork", fork_url)
+
+                # Clean up remote branch if it exists from a previous failed attempt
+                if git_ops.remote_branch_exists("fork", branch_name):
+                    try:
+                        git_ops.delete_remote_branch("fork", branch_name)
+                        logger.info(f"Deleted stale remote branch fork/{branch_name}")
+                    except Exception as e:
+                        logger.warning(f"Could not delete remote branch: {e}")
 
                 # Push to fork
                 git_ops.push(remote="fork", branch=branch_name)
@@ -155,8 +184,10 @@ class PRWorkflow:
                 base=self.config.default_branch,
             )
 
-            if not success:
-                # Save to outbox for retry
+            # Fix for issue #6: If PR was created (pr_url exists), consider it success
+            # even if the API returned success=False (could be due to subsequent operations)
+            if not success and not pr_url:
+                # Only fail if PR truly wasn't created
                 self.outbox.add_task(
                     dataset_id=dataset_id,
                     metadata=metadata,
@@ -166,13 +197,21 @@ class PRWorkflow:
                 )
                 return False, f"PR creation failed (saved to outbox): {msg}", None, None
 
-            # Step 5: Add labels and reviewers
+            # Step 5: Add labels and reviewers (non-critical, log failures but don't fail workflow)
             if pr_number:
-                if self.config.pr_labels:
-                    github.add_labels_to_pr(pr_number, self.config.pr_labels)
+                try:
+                    if self.config.pr_labels:
+                        github.add_labels_to_pr(pr_number, self.config.pr_labels)
+                except Exception as e:
+                    # Log but don't fail workflow
+                    logger.warning(f"Failed to add labels to PR #{pr_number}: {e}")
 
-                if self.config.auto_assign_reviewers:
-                    github.request_reviewers(pr_number, self.config.auto_assign_reviewers)
+                try:
+                    if self.config.auto_assign_reviewers:
+                        github.request_reviewers(pr_number, self.config.auto_assign_reviewers)
+                except Exception as e:
+                    # Log but don't fail workflow
+                    logger.warning(f"Failed to assign reviewers to PR #{pr_number}: {e}")
 
             return True, "PR created successfully!", pr_url, pr_number
 
@@ -206,7 +245,17 @@ class PRWorkflow:
                 except Exception as e:
                     # If stash pop fails, log it but don't fail the workflow
                     # The stash is still in the stash list and can be manually recovered
-                    pass
+                    logger.warning(f"Failed to restore stash: {e}. Run 'git stash pop' manually in catalog repo.")
+            
+            # Restore original branch (fix for issue #9)
+            if original_branch:
+                try:
+                    current = git_ops.get_current_branch()
+                    if current != original_branch:
+                        git_ops.checkout_branch(original_branch)
+                except Exception as e:
+                    # Log but don't fail - user can manually checkout
+                    logger.warning(f"Failed to restore branch to '{original_branch}': {e}")
 
     def _save_local_only(
         self,
