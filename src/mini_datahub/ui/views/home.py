@@ -1,12 +1,15 @@
 """
 TUI application using Textual framework with Neovim-style keybindings.
 """
+import logging
 import webbrowser
 from datetime import date
-from typing import Optional
+from typing import Any, Optional
 
 import pyperclip
 import requests
+
+logger = logging.getLogger(__name__)
 from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -31,29 +34,81 @@ from mini_datahub.services.search import search_datasets
 from mini_datahub.infra.index import list_all_datasets
 from mini_datahub.infra.store import validate_metadata
 from mini_datahub.services.catalog import save_dataset, generate_id as generate_unique_id
+from mini_datahub.services.config import get_config
+
+
+def _build_bindings_from_config() -> list[Binding]:
+    """Build keybindings list from config file."""
+    try:
+        config = get_config()
+        keybindings = config.get_keybindings()
+
+        # Map action names to display names and visibility
+        action_display = {
+            "add_dataset": ("Add Dataset", "a", True),
+            "settings": ("Settings", "s", True),
+            "open_details": ("Open", "o", False),
+            "outbox": ("Outbox", "p", True),
+            "pull_updates": ("Pull", "u", True),
+            "refresh_data": ("Refresh", "r", True),
+            "quit": ("Quit", "q", True),
+            "move_down": ("Down", "j", False),
+            "move_up": ("Up", "k", False),
+            "jump_top": ("Top", "gg", False),
+            "jump_bottom": ("Bottom", "G", False),
+            "focus_search": ("Search", "/", True),
+            "clear_search": ("Clear", "esc", False),
+            "debug_console": ("Debug", ":", False),
+            "show_help": ("Help", "?", True),
+        }
+
+        bindings = []
+        for action, (display_name, key_display, show) in action_display.items():
+            keys = keybindings.get(action, [])
+            if keys:
+                # Use first key as primary, add all keys as bindings
+                for i, key in enumerate(keys):
+                    bindings.append(
+                        Binding(
+                            key,
+                            action,
+                            display_name if i == 0 else "",
+                            key_display=key_display if i == 0 else key,
+                            show=show if i == 0 else False
+                        )
+                    )
+
+        return bindings
+    except Exception as e:
+        logger.warning(f"Failed to load keybindings from config: {e}, using defaults")
+        # Fallback to hardcoded defaults if config fails
+        return [
+            Binding("a", "add_dataset", "Add Dataset", key_display="a"),
+            Binding("s", "settings", "Settings", key_display="s"),
+            Binding("o", "open_details", "Open", show=False),
+            Binding("enter", "open_details", "View Details", show=False),
+            Binding("p", "outbox", "Outbox", key_display="p"),
+            Binding("u", "pull_updates", "Pull", key_display="u"),
+            Binding("r", "refresh_data", "Refresh", key_display="r"),
+            Binding("q", "quit", "Quit", key_display="^q"),
+            Binding("j", "move_down", "Down", show=False),
+            Binding("k", "move_up", "Up", show=False),
+            Binding("down", "move_down", "", show=False),
+            Binding("up", "move_up", "", show=False),
+            Binding("gg", "jump_top", "Top", key_display="gg", show=False),
+            Binding("G", "jump_bottom", "Bottom", show=False),
+            Binding("/", "focus_search", "Search", key_display="/"),
+            Binding("escape", "clear_search", "Clear", show=False),
+            Binding(":", "debug_console", "Debug", show=False),
+            Binding("?", "show_help", "Help", key_display="?"),
+        ]
 
 
 class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
 
-    BINDINGS = [
-        Binding("a", "add_dataset", "Add Dataset", key_display="a"),
-        Binding("s", "settings", "Settings", key_display="s"),
-        Binding("o", "open_details", "Open", show=False),
-        Binding("p", "outbox", "Outbox", key_display="p"),
-        Binding("u", "pull_updates", "Pull", key_display="u"),
-        Binding("r", "refresh_data", "Refresh", key_display="r"),
-        Binding("q", "quit", "Quit", key_display="^q"),
-        Binding("enter", "open_details", "View Details"),
-        Binding("j", "move_down", "Down", show=False),
-        Binding("k", "move_up", "Up", show=False),
-        Binding("g", "jump_top", "Top", key_display="gg", show=False),
-        Binding("G", "jump_bottom", "Bottom", show=False),
-        Binding("/", "focus_search", "Search", key_display="/"),
-        Binding("escape", "clear_search", "Clear", show=False),
-        Binding(":", "debug_console", "Debug", show=False),
-        Binding("?", "show_help", "Help"),
-    ]
+    # Load bindings from config file
+    BINDINGS = _build_bindings_from_config()
 
     search_mode = reactive(False)
     _debounce_timer: Optional[Timer] = None
@@ -67,11 +122,13 @@ class HomeScreen(Screen):
 | |_| |  _|  | |    | | | |/ _ \\ | | / _ \\ | |_| | | | |  _ \\
 |  _  | |___ | |    | |_| / ___ \\| |/ ___ \\|  _  | |_| | |_) |
 |_| |_|_____|___|   |____/_/   \\_\\_/_/   \\_\\_| |_|\\___/|____/
+
 [/bold cyan]""", id="banner"),
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
             Static(id="github-status"),
             Input(placeholder="Type / to search, j/k to navigate, Enter to open...", id="search-input"),
+            Horizontal(id="filter-badges-container", classes="filter-badges"),
             Label("All Datasets", id="results-label"),
             DataTable(id="results-table", cursor_type="row"),
             id="search-container",
@@ -117,9 +174,16 @@ class HomeScreen(Screen):
             label.update(f"All Datasets ({len(results)} total)")
 
             for result in results:
-                # Clean snippet of HTML tags for display
-                snippet = result["snippet"].replace("<b>", "").replace("</b>", "")
-                snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+                # Get description from metadata or use snippet
+                snippet = result.get("snippet", "")
+                if not snippet or snippet.strip() == "":
+                    # Use description from metadata if snippet is empty
+                    description = result.get("metadata", {}).get("description", "No description")
+                    snippet = description[:80] + "..." if len(description) > 80 else description
+                else:
+                    # Clean snippet of HTML tags for display
+                    snippet = snippet.replace("<b>", "").replace("</b>", "")
+                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
                 table.add_row(
                     result["id"],
@@ -148,8 +212,13 @@ class HomeScreen(Screen):
         if self._debounce_timer:
             self._debounce_timer.stop()
 
+        # Get debounce from config or use default
+        debounce_ms = 150  # default
+        if hasattr(self.app, 'config') and self.app.config:
+            debounce_ms = self.app.config.get("search.debounce_ms", 150)
+
         # Set new timer for debounced search
-        self._debounce_timer = self.set_timer(0.15, lambda: self.perform_search(event.value))
+        self._debounce_timer = self.set_timer(debounce_ms / 1000.0, lambda: self.perform_search(event.value))
 
     def perform_search(self, query: str) -> None:
         """Execute search and update results table."""
@@ -158,10 +227,14 @@ class HomeScreen(Screen):
 
         # If query is empty or very short, show all datasets
         if not query.strip() or len(query.strip()) < 2:
+            self._update_filter_badges("")
             self.load_all_datasets()
             return
 
         try:
+            # Update filter badges
+            self._update_filter_badges(query)
+
             results = search_datasets(query)
             label = self.query_one("#results-label", Label)
             label.update(f"Search Results ({len(results)} found)")
@@ -171,9 +244,16 @@ class HomeScreen(Screen):
                 return
 
             for result in results:
-                # Clean snippet of HTML tags for display
-                snippet = result["snippet"].replace("<b>", "").replace("</b>", "")
-                snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+                # Get description from metadata or use snippet
+                snippet = result.get("snippet", "")
+                if not snippet or snippet.strip() == "":
+                    # Use description from metadata if snippet is empty
+                    description = result.get("metadata", {}).get("description", "No description")
+                    snippet = description[:80] + "..." if len(description) > 80 else description
+                else:
+                    # Clean snippet of HTML tags for display
+                    snippet = snippet.replace("<b>", "").replace("</b>", "")
+                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
                 table.add_row(
                     result["id"],
@@ -186,6 +266,43 @@ class HomeScreen(Screen):
 
         except Exception as e:
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
+
+    def _update_filter_badges(self, query: str) -> None:
+        """Update visual badges showing active search filters."""
+        from mini_datahub.core.queries import QueryParser
+
+        badges_container = self.query_one("#filter-badges-container", Horizontal)
+        badges_container.remove_children()
+
+        if not query.strip():
+            return
+
+        try:
+            parser = QueryParser()
+            parsed = parser.parse(query)
+
+            # Show badges for field filters
+            for term in parsed.terms:
+                if not term.is_free_text:
+                    operator_symbols = {
+                        'CONTAINS': ':',
+                        'GT': '>',
+                        'LT': '<',
+                        'GTE': '>=',
+                        'LTE': '<=',
+                        'EQ': '='
+                    }
+                    op_symbol = operator_symbols.get(term.operator.name, ':')
+                    badge_text = f"{term.field}{op_symbol}{term.value}"
+                    badges_container.mount(Static(f"[bold cyan]🏷 {badge_text}[/bold cyan]", classes="filter-badge"))
+
+            # Show badge for free text query if present
+            if parsed.free_text_query:
+                badges_container.mount(Static(f"[dim]📝 \"{parsed.free_text_query}\"[/dim]", classes="filter-badge"))
+
+        except Exception as e:
+            # If parsing fails, just show the raw query
+            badges_container.mount(Static(f"[dim]🔍 {query}[/dim]", classes="filter-badge"))
 
     def action_focus_search(self) -> None:
         """Focus search input and enter insert mode."""
@@ -271,8 +388,10 @@ class HomeScreen(Screen):
             self.app.notify(f"Error: {str(e)}", severity="error", timeout=3)
 
     def action_show_help(self) -> None:
-        """Show help overlay."""
-        self.app.push_screen(HelpScreen())
+        """Show help overlay with keybindings (? key)."""
+        from mini_datahub.ui.widgets.help_overlay import HelpOverlay
+        from mini_datahub.services.actions import ActionContext
+        self.app.push_screen(HelpOverlay(ActionContext.HOME))
 
     def action_settings(self) -> None:
         """Open settings screen (S key)."""
@@ -363,6 +482,7 @@ class DetailsScreen(Screen):
         ("escape", "back", "Back"),
         ("q", "back", "Back"),
         Binding("b", "back", "Back", show=False),
+        ("e", "enter_edit_mode", "Edit"),
         ("y", "copy_source", "Copy Source"),
         ("o", "open_url", "Open URL"),
         Binding("P", "publish_pr", "Publish as PR", key_display="P"),
@@ -440,6 +560,59 @@ class DetailsScreen(Screen):
         except Exception as e:
             self.app.notify(f"Error loading details: {str(e)}", severity="error", timeout=5)
 
+    def _rebuild_details_display(self) -> None:
+        """Rebuild the details display using current metadata without reloading from disk."""
+        if not self.metadata:
+            return
+
+        try:
+            # Format metadata for display
+            lines = []
+            lines.append(f"[bold]ID:[/bold] {self.metadata.get('id', 'N/A')}")
+            lines.append(f"[bold]Name:[/bold] {self.metadata.get('dataset_name', 'N/A')}")
+            lines.append(f"[bold]Description:[/bold] {self.metadata.get('description', 'N/A')}")
+            lines.append(f"[bold]Source:[/bold] {self.metadata.get('source', 'N/A')}")
+            lines.append(f"[bold]Date Created:[/bold] {self.metadata.get('date_created', 'N/A')}")
+            lines.append(f"[bold]Storage Location:[/bold] {self.metadata.get('storage_location', 'N/A')}")
+
+            if self.metadata.get('file_format'):
+                lines.append(f"[bold]File Format:[/bold] {self.metadata['file_format']}")
+            if self.metadata.get('size'):
+                lines.append(f"[bold]Size:[/bold] {self.metadata['size']}")
+            if self.metadata.get('data_types'):
+                lines.append(f"[bold]Data Types:[/bold] {', '.join(self.metadata['data_types'])}")
+            if self.metadata.get('used_in_projects'):
+                lines.append(f"[bold]Used In Projects:[/bold] {', '.join(self.metadata['used_in_projects'])}")
+            if self.metadata.get('last_updated'):
+                lines.append(f"[bold]Last Updated:[/bold] {self.metadata['last_updated']}")
+            if self.metadata.get('dependencies'):
+                lines.append(f"[bold]Dependencies:[/bold] {self.metadata['dependencies']}")
+            if self.metadata.get('preprocessing_steps'):
+                lines.append(f"[bold]Preprocessing:[/bold] {self.metadata['preprocessing_steps']}")
+            if self.metadata.get('temporal_coverage'):
+                lines.append(f"[bold]Temporal Coverage:[/bold] {self.metadata['temporal_coverage']}")
+            if self.metadata.get('spatial_coverage'):
+                lines.append(f"[bold]Spatial Coverage:[/bold] {self.metadata['spatial_coverage']}")
+
+            if self.metadata.get('schema_fields'):
+                lines.append("\n[bold]Schema Fields:[/bold]")
+                for field in self.metadata['schema_fields']:
+                    lines.append(f"  • {field['name']} ({field['type']}): {field.get('description', '')}")
+
+            if self.metadata.get('linked_documentation'):
+                lines.append("\n[bold]Documentation:[/bold]")
+                for doc in self.metadata['linked_documentation']:
+                    lines.append(f"  • {doc}")
+
+            content = self.query_one("#details-content", Static)
+            content.update("\n".join(lines))
+
+            # Check remote status asynchronously to update PR button
+            self.check_remote_status()
+
+        except Exception as e:
+            logger.warning(f"Error rebuilding details display: {e}")
+
     @work(exclusive=True)
     async def check_remote_status(self) -> None:
         """Check if dataset exists in remote repository."""
@@ -459,7 +632,7 @@ class DetailsScreen(Screen):
             self._exists_remotely = exists
 
             if exists:
-                pr_status.update("[green]✓ Already published to catalog repo[/green]  [dim]Press P to view (disabled)[/dim]")
+                pr_status.update("[green]✓ Already in catalog repo[/green]  [bold cyan]Press P to create Update PR![/bold cyan]")
             else:
                 pr_status.update("[yellow]📤 Not yet in catalog repo[/yellow]  [bold cyan]Press P to Publish as PR![/bold cyan]")
 
@@ -492,22 +665,34 @@ class DetailsScreen(Screen):
             else:
                 self.app.notify("Source is not a URL", severity="warning", timeout=2)
 
-    def action_publish_pr(self) -> None:
-        """Publish dataset as PR (P key)."""
-        if self._exists_remotely:
-            self.app.notify("Dataset already exists in catalog repo", severity="warning", timeout=3)
-            return
-
+    def action_enter_edit_mode(self) -> None:
+        """Enter edit mode (e key)."""
         if not self.metadata:
             self.app.notify("No metadata loaded", severity="error", timeout=3)
             return
 
+        # Push the edit screen
+        self.app.push_screen(EditDetailsScreen(self.dataset_id, self.metadata.copy()))
+
+    def action_publish_pr(self) -> None:
+        """Publish dataset as PR (P key)."""
+        if not self.metadata:
+            self.app.notify("No metadata loaded", severity="error", timeout=3)
+            return
+
+        # Determine if this is an update or new dataset
+        is_update = self._exists_remotely is True
+
         # Start async PR creation
-        self.create_pr()
+        self.create_pr(is_update=is_update)
 
     @work(exclusive=True)
-    async def create_pr(self) -> None:
-        """Create PR for this dataset."""
+    async def create_pr(self, is_update: bool = False) -> None:
+        """Create PR for this dataset.
+
+        Args:
+            is_update: True if updating existing dataset, False if new dataset
+        """
         from mini_datahub.app.settings import get_github_config
         from mini_datahub.services.publish import PRWorkflow
         from pathlib import Path
@@ -532,8 +717,9 @@ class DetailsScreen(Screen):
             self.app.notify(f"Catalog path not found: {catalog_path}", severity="error", timeout=5)
             return
 
-        pr_status.update("[yellow]📤 Creating PR...[/yellow]")
-        self.app.notify("Creating pull request...", timeout=3)
+        action_verb = "Updating" if is_update else "Creating"
+        pr_status.update(f"[yellow]📤 {action_verb} PR...[/yellow]")
+        self.app.notify(f"{action_verb} pull request...", timeout=3)
 
         try:
             # Execute PR workflow
@@ -541,6 +727,7 @@ class DetailsScreen(Screen):
             success, message, pr_url, pr_number = workflow.execute(
                 metadata=self.metadata,
                 dataset_id=self.dataset_id,
+                is_update=is_update,
             )
 
             if success:
@@ -564,6 +751,457 @@ class DetailsScreen(Screen):
         except Exception as e:
             pr_status.update(f"[red]✗ Error: {str(e)}[/red]")
             self.app.notify(f"Error creating PR: {str(e)}", severity="error", timeout=10)
+
+
+class ConfirmCancelDialog(Screen):
+    """Modal dialog to confirm canceling edits with unsaved changes."""
+
+    CSS = """
+    #dialog-overlay {
+        align: center middle;
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .dialog-box {
+        width: 60;
+        height: auto;
+        background: $surface;
+        border: thick $primary;
+        padding: 2;
+    }
+
+    .dialog-title {
+        text-align: center;
+        width: 100%;
+    }
+
+    .dialog-text {
+        text-align: center;
+        width: 100%;
+        padding: 1;
+    }
+    """
+
+    BINDINGS = [
+        ("y", "confirm", "Yes"),
+        ("n", "cancel", "No"),
+        ("escape", "cancel", "No"),
+    ]
+
+    def __init__(self, dataset_id: str, dirty_count: int):
+        super().__init__()
+        self.dataset_id = dataset_id
+        self.dirty_count = dirty_count
+
+    def compose(self) -> ComposeResult:
+        from textual.containers import Container, Vertical
+        yield Container(
+            Vertical(
+                Static(f"[bold yellow]Discard Changes?[/bold yellow]", classes="dialog-title"),
+                Static(f"\nYou have {self.dirty_count} unsaved change(s) to [cyan]{self.dataset_id}[/cyan].\n", classes="dialog-text"),
+                Static("Press [bold]Y[/bold] to discard changes or [bold]N[/bold] to keep editing.", classes="dialog-text"),
+                id="confirm-dialog",
+                classes="dialog-box",
+            ),
+            id="dialog-overlay",
+        )
+
+    def action_confirm(self) -> None:
+        """User confirmed - discard changes."""
+        self.dismiss(True)
+
+    def action_cancel(self) -> None:
+        """User canceled - keep editing."""
+        self.dismiss(False)
+
+
+class EditDetailsScreen(Screen):
+    """Screen for inline editing of dataset metadata with undo/redo support."""
+
+    BINDINGS = [
+        ("ctrl+s", "save_edits", "Save"),
+        ("escape", "cancel_edits", "Cancel"),
+        ("ctrl+z", "undo_edit", "Undo"),
+        ("ctrl+shift+z", "redo_edit", "Redo"),
+    ]
+
+    def __init__(self, dataset_id: str, metadata: dict):
+        super().__init__()
+        self.dataset_id = dataset_id
+        self.original_metadata = metadata.copy()
+        self.metadata = metadata.copy()
+
+        # Undo/redo stacks
+        self._undo_stack = []  # List of (field, old_value, new_value)
+        self._redo_stack = []
+        self._max_undo = 50
+
+        # Track dirty fields
+        self._dirty_fields = set()
+
+        # Field validation errors
+        self._field_errors = {}
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield VerticalScroll(
+            Label(f"✏️ Editing: {self.dataset_id}  |  [italic]Ctrl+S to save, Esc to cancel[/italic]", classes="title"),
+            Container(
+                Label("Dataset Name:"),
+                Input(value=self.metadata.get('dataset_name', ''), id="edit-name"),
+                Static(id="error-name", classes="field-error"),
+
+                Label("Description:"),
+                TextArea(id="edit-description"),
+                Static(id="error-description", classes="field-error"),
+
+                Label("Source:"),
+                Input(value=self.metadata.get('source', ''), id="edit-source"),
+                Static(id="error-source", classes="field-error"),
+
+                Label("Storage Location:"),
+                Input(value=self.metadata.get('storage_location', ''), id="edit-storage"),
+                Static(id="error-storage", classes="field-error"),
+
+                Label("Date Created (YYYY-MM-DD):"),
+                Input(value=str(self.metadata.get('date_created', '')), id="edit-date"),
+                Static(id="error-date", classes="field-error"),
+
+                Label("File Format:"),
+                Input(value=self.metadata.get('file_format', ''), id="edit-format"),
+                Static(id="error-format", classes="field-error"),
+
+                Label("Size:"),
+                Input(value=self.metadata.get('size', ''), id="edit-size"),
+                Static(id="error-size", classes="field-error"),
+
+                Label("Data Types (comma-separated):"),
+                Input(value=', '.join(self.metadata.get('data_types', [])), id="edit-types"),
+                Static(id="error-types", classes="field-error"),
+
+                Label("Used In Projects (comma-separated):"),
+                Input(value=', '.join(self.metadata.get('used_in_projects', [])), id="edit-projects"),
+                Static(id="error-projects", classes="field-error"),
+
+                Static(id="edit-status", classes="edit-status"),
+
+                id="edit-form-container",
+            ),
+            id="edit-scroll",
+        )
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Initialize field values after mounting."""
+        # Set TextArea value (can't be done in compose)
+        desc_area = self.query_one("#edit-description", TextArea)
+        desc_area.text = self.metadata.get('description', '')
+
+        # Focus first field
+        self.query_one("#edit-name", Input).focus()
+
+        self._update_status()
+
+    @on(Input.Changed)
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Track field changes, mark as dirty, and validate on blur."""
+        if not event.input.id or not event.input.id.startswith('edit-'):
+            return
+
+        field_name = event.input.id.replace('edit-', '')
+        old_value = self._get_field_value(field_name)
+        new_value = event.value
+
+        # Track in undo stack
+        if old_value != new_value:
+            self._push_undo(field_name, old_value, new_value)
+            self._mark_dirty(field_name)
+            self._update_metadata_from_field(field_name, new_value)
+            self._update_status()
+
+    @on(TextArea.Changed, "#edit-description")
+    def on_textarea_changed(self, event: TextArea.Changed) -> None:
+        """Track TextArea changes."""
+        field_name = 'description'
+        old_value = self.metadata.get(field_name, '')
+        new_value = event.text_area.text
+
+        if old_value != new_value:
+            self._push_undo(field_name, old_value, new_value)
+            self._mark_dirty(field_name)
+            self.metadata[field_name] = new_value
+            self._update_status()
+
+    @on(Input.Submitted)
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        """Validate field on Enter key or blur."""
+        if not event.input.id or not event.input.id.startswith('edit-'):
+            return
+
+        field_name = event.input.id.replace('edit-', '')
+        self._validate_field(field_name)
+
+    def _get_field_value(self, field_name: str) -> Any:
+        """Get current field value from metadata."""
+        field_map = {
+            'name': 'dataset_name',
+            'description': 'description',
+            'source': 'source',
+            'storage': 'storage_location',
+            'date': 'date_created',
+            'format': 'file_format',
+            'size': 'size',
+            'types': 'data_types',
+            'projects': 'used_in_projects',
+        }
+
+        meta_field = field_map.get(field_name, field_name)
+        value = self.metadata.get(meta_field, '')
+
+        # Convert lists to strings for display
+        if isinstance(value, list):
+            return ', '.join(value)
+        return str(value) if value else ''
+
+    def _update_metadata_from_field(self, field_name: str, value: str) -> None:
+        """Update metadata dict from field value."""
+        field_map = {
+            'name': 'dataset_name',
+            'description': 'description',
+            'source': 'source',
+            'storage': 'storage_location',
+            'date': 'date_created',
+            'format': 'file_format',
+            'size': 'size',
+            'types': 'data_types',
+            'projects': 'used_in_projects',
+        }
+
+        meta_field = field_map.get(field_name, field_name)
+
+        # Handle list fields
+        if field_name in ('types', 'projects'):
+            if value.strip():
+                self.metadata[meta_field] = [v.strip() for v in value.split(',') if v.strip()]
+            else:
+                self.metadata[meta_field] = []
+        else:
+            self.metadata[meta_field] = value
+
+    def _validate_field(self, field_name: str) -> bool:
+        """Validate a single field and show error."""
+        from mini_datahub.services.storage import validate_field
+
+        field_map = {
+            'name': 'dataset_name',
+            'description': 'description',
+            'source': 'source',
+            'storage': 'storage_location',
+            'date': 'date_created',
+            'format': 'file_format',
+            'size': 'size',
+            'types': 'data_types',
+            'projects': 'used_in_projects',
+        }
+
+        meta_field = field_map.get(field_name, field_name)
+        field_value = self.metadata.get(meta_field)
+
+        # Validate
+        is_valid, error_msg = validate_field(meta_field, field_value, self.metadata)
+
+        # Update error display
+        error_widget_id = f"error-{field_name}"
+        try:
+            error_widget = self.query_one(f"#{error_widget_id}", Static)
+            if is_valid:
+                error_widget.update("")
+                self._field_errors.pop(field_name, None)
+            else:
+                error_widget.update(f"[red]⚠ {error_msg}[/red]")
+                self._field_errors[field_name] = error_msg
+        except Exception:
+            pass
+
+        return is_valid
+
+    def _mark_dirty(self, field_name: str) -> None:
+        """Mark a field as modified."""
+        self._dirty_fields.add(field_name)
+
+    def _push_undo(self, field: str, old_value: Any, new_value: Any) -> None:
+        """Push change to undo stack."""
+        self._undo_stack.append((field, old_value, new_value))
+
+        # Trim stack if too large
+        if len(self._undo_stack) > self._max_undo:
+            self._undo_stack.pop(0)
+
+        # Clear redo stack on new change
+        self._redo_stack.clear()
+
+    def _update_status(self) -> None:
+        """Update status bar with dirty field count and undo/redo availability."""
+        status = self.query_one("#edit-status", Static)
+
+        dirty_count = len(self._dirty_fields)
+        error_count = len(self._field_errors)
+        undo_available = len(self._undo_stack) > 0
+        redo_available = len(self._redo_stack) > 0
+
+        parts = []
+        if dirty_count > 0:
+            parts.append(f"[yellow]• {dirty_count} field(s) modified[/yellow]")
+        if error_count > 0:
+            parts.append(f"[red]⚠ {error_count} error(s)[/red]")
+        if undo_available:
+            parts.append("[dim]Ctrl+Z: Undo[/dim]")
+        if redo_available:
+            parts.append("[dim]Ctrl+Shift+Z: Redo[/dim]")
+
+        if not parts:
+            parts.append("[dim]No changes[/dim]")
+
+        status.update("  |  ".join(parts))
+
+    def action_save_edits(self) -> None:
+        """Save changes (Ctrl+S)."""
+        from mini_datahub.services.storage import save_dataset_atomic
+
+        # Validate all fields first
+        has_errors = False
+        for field_name in ['name', 'description', 'source', 'storage']:
+            if not self._validate_field(field_name):
+                has_errors = True
+
+        if has_errors:
+            self.app.notify("Please fix validation errors before saving", severity="error", timeout=5)
+            return
+
+        # Attempt atomic save
+        self.app.notify("Saving changes...", timeout=2)
+        success, error_msg = save_dataset_atomic(self.dataset_id, self.metadata)
+
+        if success:
+            self.app.notify("✓ Dataset saved successfully!", timeout=3)
+
+            # Refresh the parent DetailsScreen if it exists
+            parent_screen = None
+            try:
+                # Find parent DetailsScreen and refresh it with the updated metadata
+                for screen in self.app.screen_stack:
+                    if isinstance(screen, DetailsScreen) and screen.dataset_id == self.dataset_id:
+                        # Directly set the updated metadata
+                        screen.metadata = self.metadata.copy()
+                        # Rebuild the display with the new metadata
+                        screen._rebuild_details_display()
+                        parent_screen = screen
+                        break
+            except Exception as e:
+                logger.warning(f"Could not refresh parent DetailsScreen: {e}")
+
+            self.app.pop_screen()
+
+            # Automatically trigger PR publishing (works for both new and updates)
+            # Note: We call this via app.call_later to ensure the screen transition completes first
+            if parent_screen:
+                def trigger_auto_publish():
+                    is_update = parent_screen._exists_remotely is True
+                    action = "update" if is_update else "publish"
+                    logger.info(f"Auto-{action} check: _exists_remotely={parent_screen._exists_remotely}")
+                    logger.info(f"Triggering automatic PR {action}...")
+                    self.app.notify(f"📤 Creating {action} pull request to catalog...", timeout=3)
+                    parent_screen.action_publish_pr()
+
+                # Delay the publish trigger slightly to let the screen pop complete
+                self.app.call_later(trigger_auto_publish)
+        else:
+            self.app.notify(f"✗ Save failed: {error_msg}", severity="error", timeout=10)
+            status = self.query_one("#edit-status", Static)
+            status.update(f"[red]✗ Save failed: {error_msg}[/red]")
+
+    def action_cancel_edits(self) -> None:
+        """Cancel editing and discard changes (Esc)."""
+        if len(self._dirty_fields) > 0:
+            # Show confirmation dialog
+            self.app.push_screen(
+                ConfirmCancelDialog(self.dataset_id, len(self._dirty_fields)),
+                self._handle_cancel_confirmation
+            )
+        else:
+            self.app.pop_screen()
+
+    def _handle_cancel_confirmation(self, confirmed: bool) -> None:
+        """Handle confirmation dialog response."""
+        if confirmed:
+            self.app.notify("Changes discarded", timeout=2)
+            self.app.pop_screen()
+
+    def action_undo_edit(self) -> None:
+        """Undo last edit (Ctrl+Z)."""
+        if not self._undo_stack:
+            self.app.notify("Nothing to undo", timeout=2)
+            return
+
+        # Pop from undo stack
+        field, old_value, new_value = self._undo_stack.pop()
+
+        # Push to redo stack
+        self._redo_stack.append((field, old_value, new_value))
+
+        # Restore old value
+        self._restore_field_value(field, old_value)
+        self._update_status()
+        self.app.notify(f"Undid change to {field}", timeout=2)
+
+    def action_redo_edit(self) -> None:
+        """Redo last undone edit (Ctrl+Shift+Z)."""
+        if not self._redo_stack:
+            self.app.notify("Nothing to redo", timeout=2)
+            return
+
+        # Pop from redo stack
+        field, old_value, new_value = self._redo_stack.pop()
+
+        # Push back to undo stack
+        self._undo_stack.append((field, old_value, new_value))
+
+        # Restore new value
+        self._restore_field_value(field, new_value)
+        self._update_status()
+        self.app.notify(f"Redid change to {field}", timeout=2)
+
+    def _restore_field_value(self, field_name: str, value: Any) -> None:
+        """Restore a field's value in the UI and metadata."""
+        field_id_map = {
+            'name': 'edit-name',
+            'description': 'edit-description',
+            'source': 'edit-source',
+            'storage': 'edit-storage',
+            'date': 'edit-date',
+            'format': 'edit-format',
+            'size': 'edit-size',
+            'types': 'edit-types',
+            'projects': 'edit-projects',
+        }
+
+        widget_id = field_id_map.get(field_name)
+        if not widget_id:
+            return
+
+        # Update widget
+        try:
+            if widget_id == 'edit-description':
+                widget = self.query_one(f"#{widget_id}", TextArea)
+                widget.text = str(value)
+            else:
+                widget = self.query_one(f"#{widget_id}", Input)
+                widget.value = str(value)
+        except Exception:
+            pass
+
+        # Update metadata
+        self._update_metadata_from_field(field_name, str(value))
 
 
 class AddDataScreen(Screen):
@@ -934,6 +1572,19 @@ class DataHubApp(App):
         padding: 1;
     }
 
+    #filter-badges-container {
+        height: auto;
+        margin: 0 0 1 0;
+        padding: 0;
+    }
+
+    .filter-badge {
+        margin: 0 1 0 0;
+        padding: 0 1;
+        background: $accent;
+        border: solid $accent-darken-2;
+    }
+
     #results-label {
         padding: 1 0;
         text-style: bold;
@@ -1056,6 +1707,8 @@ class DataHubApp(App):
         setup_logging(debug=config.debug_logging)
         log_startup(__version__)
 
+        # Load user configuration
+        self._load_config()
 
         # Ensure database is set up
         try:
@@ -1077,8 +1730,9 @@ class DataHubApp(App):
         # Check GitHub connection status
         self.check_github_connection()
 
-        # Change the default theme
-        self.theme = 'gruvbox'
+        # Apply theme from config
+        theme_name = self.config.get("theme.name", "gruvbox")
+        self.theme = theme_name
 
         # Initialize autocomplete from catalog
         if config.suggest_from_catalog_values:
@@ -1203,6 +1857,17 @@ class DataHubApp(App):
                 )
         except Exception:
             pass
+
+    def _load_config(self) -> None:
+        """Load and apply configuration settings."""
+        try:
+            self.config = get_config()
+            # Config is now available for use throughout the app
+            # Keybindings are already loaded when HomeScreen class is defined
+            # Settings like search debounce, auto_sync, etc. can be accessed via self.config.get()
+        except Exception as e:
+            # Config system optional - app works without it
+            self.config = None
 
     @work(exclusive=True, thread=True)
     async def pull_updates(self) -> None:
