@@ -394,9 +394,9 @@ class HomeScreen(Screen):
         self.app.push_screen(HelpOverlay(ActionContext.HOME))
 
     def action_settings(self) -> None:
-        """Open settings screen (S key)."""
-        from mini_datahub.ui.views.settings import SettingsScreen
-        self.app.push_screen(SettingsScreen())
+        """Open settings menu (S key)."""
+        from mini_datahub.ui.views.settings_menu import SettingsMenuScreen
+        self.app.push_screen(SettingsMenuScreen())
 
     def action_outbox(self) -> None:
         """Open outbox screen (P key)."""
@@ -818,6 +818,42 @@ class ConfirmCancelDialog(Screen):
 class EditDetailsScreen(Screen):
     """Screen for inline editing of dataset metadata with undo/redo support."""
 
+    CSS = """
+    #edit-scroll {
+        height: 1fr;
+        overflow-y: auto;
+    }
+
+    #edit-form-container {
+        height: auto;
+        padding: 1 2;
+    }
+
+    #edit-form-container Label {
+        margin-top: 1;
+    }
+
+    #edit-form-container Input, #edit-form-container TextArea {
+        margin-bottom: 0;
+    }
+
+    .field-error {
+        color: $error;
+        margin-bottom: 1;
+    }
+
+    .edit-status {
+        margin-top: 2;
+        padding: 1;
+        background: $surface;
+        text-align: center;
+    }
+
+    #edit-description {
+        height: 8;
+    }
+    """
+
     BINDINGS = [
         ("ctrl+s", "save_edits", "Save"),
         ("escape", "cancel_edits", "Cancel"),
@@ -1078,11 +1114,27 @@ class EditDetailsScreen(Screen):
             self.app.notify("Please fix validation errors before saving", severity="error", timeout=5)
             return
 
-        # Attempt atomic save
+        # Ensure metadata has 'id' field (critical for persistence)
+        if 'id' not in self.metadata:
+            self.metadata['id'] = self.dataset_id
+
+        # Convert date objects to strings if needed for serialization
+        from datetime import date
+        metadata_to_save = self.metadata.copy()
+        if isinstance(metadata_to_save.get('date_created'), date):
+            metadata_to_save['date_created'] = metadata_to_save['date_created'].isoformat()
+        if isinstance(metadata_to_save.get('last_updated'), date):
+            metadata_to_save['last_updated'] = metadata_to_save['last_updated'].isoformat()
+
+        # Attempt atomic save to LOCAL data/ directory
         self.app.notify("Saving changes...", timeout=2)
-        success, error_msg = save_dataset_atomic(self.dataset_id, self.metadata)
+        logger.info(f"Saving edits for {self.dataset_id} to local data/ directory")
+        success, error_msg = save_dataset_atomic(self.dataset_id, metadata_to_save)
 
         if success:
+            # Update our in-memory copy to match what was saved
+            self.metadata = metadata_to_save.copy()
+            logger.info(f"✓ Successfully saved {self.dataset_id} to data/{self.dataset_id}/metadata.yaml")
             self.app.notify("✓ Dataset saved successfully!", timeout=3)
 
             # Refresh the parent DetailsScreen if it exists
@@ -1206,6 +1258,43 @@ class EditDetailsScreen(Screen):
 
 class AddDataScreen(Screen):
     """Screen to add a new dataset with scrolling support and Neovim keys."""
+
+    CSS = """
+    #add-data-scroll {
+        height: 1fr;
+        overflow-y: auto;
+    }
+
+    #form-container {
+        height: auto;
+        padding: 1 2;
+    }
+
+    #form-container Label {
+        margin-top: 1;
+    }
+
+    #form-container Input, #form-container TextArea {
+        margin-bottom: 0;
+    }
+
+    #form-container Button {
+        margin: 1 1 0 0;
+    }
+
+    #error-message {
+        color: $error;
+        margin-top: 1;
+    }
+
+    #probe-status {
+        margin-left: 1;
+    }
+
+    #input-description {
+        height: 8;
+    }
+    """
 
     BINDINGS = [
         ("escape", "cancel", "Cancel"),
@@ -1467,13 +1556,14 @@ class AddDataScreen(Screen):
             error_label.update(f"[red]Validation Error:\n{error_msg}[/red]")
             return
 
-        # Save to disk (save_dataset now handles both writing and indexing)
+        # Fix for issue #7: ALWAYS save to local data/ directory first
+        # This ensures changes persist even if PR workflow fails
         success, msg = save_dataset(dataset_id, metadata)
         if not success:
             error_label.update(f"[red]{msg}[/red]")
             return
 
-        # Try PR workflow if GitHub is configured
+        # Try PR workflow if GitHub is configured (catalog repo is separate)
         from mini_datahub.app.settings import get_github_config
         from mini_datahub.services.publish import PRWorkflow
 
@@ -1868,6 +1958,85 @@ class DataHubApp(App):
         except Exception as e:
             # Config system optional - app works without it
             self.config = None
+
+    def apply_theme(self, theme_name: str) -> None:
+        """
+        Apply a theme dynamically without restart.
+
+        Args:
+            theme_name: Name of the theme to apply
+        """
+        try:
+            # Reload config to pick up the latest changes
+            from mini_datahub.services.config import reload_config
+            self.config = reload_config()
+
+            # Update the app's theme attribute (Textual built-in)
+            self.theme = theme_name
+
+            # Reload the theme manager to pick up new theme
+            from mini_datahub.ui.theme import reload_theme
+            reload_theme()
+
+            # Refresh all screens to apply new theme
+            self.refresh()
+
+            # Force refresh of CSS variables if needed
+            for screen in self.screen_stack:
+                screen.refresh()
+
+            self.notify(f"Theme '{theme_name}' applied successfully!", timeout=3)
+
+        except Exception as e:
+            self.notify(f"Failed to apply theme: {str(e)}", severity="error", timeout=5)
+
+    def reload_keybindings(self) -> None:
+        """
+        Reload keybindings dynamically without restart.
+
+        This recreates the HomeScreen with new bindings from the config file.
+        """
+        try:
+            # Reload config to pick up the latest changes
+            from mini_datahub.services.config import reload_config
+            self.config = reload_config()
+
+            # Check if we're currently on the HomeScreen
+            is_on_home = isinstance(self.screen, HomeScreen)
+
+            if is_on_home:
+                # Pop the current HomeScreen and push a new one with updated bindings
+                # This is necessary because BINDINGS is a class attribute set at definition time
+
+                # First, we need to reload the HomeScreen class with new bindings
+                # Since Python doesn't easily allow class redefinition, we'll use a workaround:
+                # Create a new HomeScreen instance which will pick up the updated bindings
+
+                # Store current state if needed (search text, etc.)
+                old_screen = self.screen
+
+                # Pop current home screen
+                self.pop_screen()
+
+                # Reload the module to pick up new bindings
+                import importlib
+                import mini_datahub.ui.views.home as home_module
+                importlib.reload(home_module)
+
+                # Push new home screen with updated bindings
+                from mini_datahub.ui.views.home import HomeScreen as NewHomeScreen
+                self.push_screen(NewHomeScreen())
+
+                self.notify("Keybindings reloaded successfully!", timeout=3)
+            else:
+                # Not on home screen, just notify that changes will apply on next visit
+                self.notify(
+                    "Keybindings updated! Changes will apply when you return to home screen.",
+                    timeout=5
+                )
+
+        except Exception as e:
+            self.notify(f"Failed to reload keybindings: {str(e)}", severity="error", timeout=5)
 
     @work(exclusive=True, thread=True)
     async def pull_updates(self) -> None:
