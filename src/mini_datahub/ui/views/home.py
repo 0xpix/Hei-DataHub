@@ -37,19 +37,19 @@ class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
 
     BINDINGS = [
-        Binding("a", "add_dataset", "Add Dataset", key_display="A"),
-        Binding("s", "settings", "Settings", key_display="S"),
+        Binding("a", "add_dataset", "Add Dataset", key_display="a"),
+        Binding("s", "settings", "Settings", key_display="s"),
         Binding("o", "open_details", "Open", show=False),
-        Binding("p", "outbox", "Outbox", key_display="P"),
-        Binding("u", "pull_updates", "Pull", key_display="U"),
-        Binding("r", "refresh_data", "Refresh", key_display="R"),
-        Binding("q", "quit", "Quit"),
+        Binding("p", "outbox", "Outbox", key_display="p"),
+        Binding("u", "pull_updates", "Pull", key_display="u"),
+        Binding("r", "refresh_data", "Refresh", key_display="r"),
+        Binding("q", "quit", "Quit", key_display="^q"),
         Binding("enter", "open_details", "View Details"),
         Binding("j", "move_down", "Down", show=False),
         Binding("k", "move_up", "Up", show=False),
         Binding("g", "jump_top", "Top", key_display="gg", show=False),
         Binding("G", "jump_bottom", "Bottom", show=False),
-        Binding("/", "focus_search", "Search", show=False),
+        Binding("/", "focus_search", "Search", key_display="/"),
         Binding("escape", "clear_search", "Clear", show=False),
         Binding(":", "debug_console", "Debug", show=False),
         Binding("?", "show_help", "Help"),
@@ -1056,6 +1056,7 @@ class DataHubApp(App):
         setup_logging(debug=config.debug_logging)
         log_startup(__version__)
 
+
         # Ensure database is set up
         try:
             ensure_database()
@@ -1075,6 +1076,9 @@ class DataHubApp(App):
 
         # Check GitHub connection status
         self.check_github_connection()
+
+        # Change the default theme
+        self.theme = 'gruvbox'
 
         # Initialize autocomplete from catalog
         if config.suggest_from_catalog_values:
