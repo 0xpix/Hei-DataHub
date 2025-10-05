@@ -1,10 +1,13 @@
 """
 Git operations for automated branching, committing, and pushing.
 """
+import logging
 import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 class GitOperationError(Exception):
@@ -302,6 +305,39 @@ class GitOperations:
                 self.set_remote_url(remote, url)
         else:
             self.add_remote(remote, url)
+
+    def remote_branch_exists(self, remote: str, branch: str) -> bool:
+        """
+        Check if a branch exists on the remote.
+
+        Args:
+            remote: Remote name (e.g., "origin")
+            branch: Branch name
+
+        Returns:
+            True if branch exists on remote
+        """
+        code, stdout, _ = self._run_command(
+            ["git", "ls-remote", "--heads", remote, branch],
+            check=False
+        )
+        return bool(stdout.strip())
+
+    def delete_remote_branch(self, remote: str, branch: str) -> None:
+        """
+        Delete a branch from the remote.
+
+        Args:
+            remote: Remote name (e.g., "origin")
+            branch: Branch name to delete
+        """
+        try:
+            self._run_command(["git", "push", remote, "--delete", branch])
+            logger.info(f"Deleted remote branch {remote}/{branch}")
+        except GitOperationError as e:
+            # Ignore error if branch doesn't exist
+            if "unable to delete" not in str(e).lower():
+                raise
 
 
 def generate_branch_name(dataset_id: str) -> str:
