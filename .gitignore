@@ -270,4 +270,4 @@ site/
 .hei-datahub/
 # Benchmark results
 bench/
-test/
+tests/
