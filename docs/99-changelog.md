@@ -392,7 +392,7 @@ pip install -e .
     - **Security:** Vulnerability fixes
 3. Link to relevant GitHub issues/PRs where applicable
 
-**Patch releases** update the same docs line (e.g., v0.55.x).
+**Patch releases** update the same docs line (e.g., 0.55.x).
 
 **Minor releases** may introduce new docs or major updates.
 
@@ -414,4 +414,4 @@ pip install -e .
 
 ---
 
-_Last updated: 2025-01-04 for v0.55.0-beta_
+_Last updated: 2025-01-04 for 0.55.0-beta_
