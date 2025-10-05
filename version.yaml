@@ -6,7 +6,7 @@ version: "0.56.0-beta"
 codename: "Precision"
 release_date: "2025-10-05"
 compatibility: "Hei-DataHub v0.56.x (beta)"
-notes: "Speed, responsiveness, and power-user ergonomics"
+notes: "Structured Search and Inline Editing"
 
 # Additional metadata
 app_name: "Hei-DataHub"
