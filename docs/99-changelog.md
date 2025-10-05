@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 📝 Version History
 
-### ✅ Current (0.55.6-beta — "Persistence")
+### ✅ Current (0.55.1-beta — "Persistence")
 
 **Bug Fix Release: GitHub PAT Persistence**
 
@@ -23,30 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### [0.55.5-beta] - 2025-10-04 — "Fjord"
-
-**Maintenance Release: Centralized Version Management**
-
-**Added:**
-- Centralized version management via `version.yaml`
-- Auto-generation of version files (`_version.py`, `version.md`, `version.json`)
-- Version sync script with dry-run support
-- Pre-commit hooks for version consistency
-- GitHub Actions CI validation for version sync
-- Dynamic documentation banner with version info
-
-**Changed:**
-- Version module now imports from auto-generated `_version.py`
-- MkDocs configuration includes macros plugin
-- Added `mkdocs-macros-plugin>=1.0.0` to dependencies
-
-**Improved:**
-- Developer experience: single file to edit for version bumps
-- Consistency: eliminates hardcoded version strings
-- Release process: pre-commit hooks enforce version sync
-
----
-
 ### [0.55.0-beta] - 2025-01-04 — "Clean Architecture"
 
 **Major Release: Architectural Refactoring**
@@ -58,12 +34,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--version-info` flag for detailed system information
 - Comprehensive documentation site (MkDocs + Material theme)
 - Clean layered architecture (UI → Services → Core → Infrastructure)
+- Centralized version management via `version.yaml`
+- Auto-generation of version files (`_version.py`, `version.md`, `version.json`)
+- Version sync script with dry-run support
+- Pre-commit hooks for version consistency
+- GitHub Actions CI validation for version sync
+- Dynamic documentation banner with version info
 
 **Changed:**
 - Migrated to `src/mini_datahub/` package structure
 - Unified settings management via `GitHubConfig` class
 - Centralized logging configuration with debug mode
 - Custom exception hierarchy for better error messages
+- Version module now imports from auto-generated `_version.py`
+- MkDocs configuration includes macros plugin
+
+**Improved:**
+- Developer experience: single file to edit for version bumps
+- Consistency: eliminates hardcoded version strings
+- Release process: pre-commit hooks enforce version sync
 
 **Fixed:**
 - BM25 search ranking (name matches prioritized)
