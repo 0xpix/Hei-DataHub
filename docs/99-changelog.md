@@ -10,23 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Bug Fix Release: GitHub PAT Persistence**
 
-**Fixed:**
+**Changed:**
 - **Critical: GitHub PAT not persisting after PC restart**
   - Fixed keyring storage issue where Personal Access Token was not being saved permanently
   - GitHub credentials now persist correctly across system reboots
   - Users no longer need to re-enter PAT after restarting their computer
-  - Improved error handling and logging for keyring operations
-  - Enhanced Settings screen feedback when PAT is successfully saved
 
 **Improved:**
 - Keyring integration reliability in Linux (haven't tested windows/MacOS)
 - Better error messages when keyring backend is unavailable
 - Settings screen now shows confirmation when credentials are stored
-
-**Technical Details:**
-- Ensured proper keyring service name consistency
-- Fixed credential storage lifecycle to persist beyond application sessions
-- Added fallback mechanisms for systems without native keyring support
 
 ---
 
