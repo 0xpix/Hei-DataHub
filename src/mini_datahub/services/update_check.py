@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import requests
 
 from mini_datahub import __version__, UPDATE_CHECK_URL
-from mini_datahub.state_manager import get_state_manager
+from mini_datahub.state_manager import get_state_manager # type: ignore
 
 
 def parse_version(version_str: str) -> Tuple[int, ...]:
