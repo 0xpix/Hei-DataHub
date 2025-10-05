@@ -136,39 +136,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Proposed Features
 
 - **⚡ Inline Editing**
-  - Edit dataset metadata directly in the Details screen
-  - Field-level validation and instant save
-  - Undo/redo support for recent edits
+    - Edit dataset metadata directly in the Details screen
+    - Field-level validation and instant save
+    - Undo/redo support for recent edits
 
 - **🔍 Field-Specific Search**
-  - Advanced queries: `source:github`, `format:csv`, `date:>2025-01`
-  - Search builder UI for filtering by tags, size, and type
-  - Autocomplete for common search fields
+    - Advanced queries: `source:github`, `format:csv`, `date:>2025-01`
+    - Search builder UI for filtering by tags, size, and type
+    - Autocomplete for common search fields
 
 - **⌨️ Custom Keybindings**
-  - User-defined shortcuts in `config.yaml`
-  - Import/export keymap profiles
-  - Reset to default bindings option
+    - User-defined shortcuts in `config.yaml`
+    - Import/export keymap profiles
+    - Reset to default bindings option
 
 - **🎨 Theme Support**
-  - Light, Dark, and Solarized TUI themes
-  - Switch theme in Settings or via command flag
-  - Support for custom color overrides
+    - Light, Dark, and Solarized TUI themes
+    - Switch theme in Settings or via command flag
+    - Support for custom color overrides
 
 - **🚀 Performance Improvements**
-  - Faster startup and reindexing (async tasks)
-  - Optimized SQLite FTS queries
-  - Reduced TUI redraw latency for large dataset lists
+    - Faster startup and reindexing (async tasks)
+    - Optimized SQLite FTS queries
+    - Reduced TUI redraw latency for large dataset lists
 
 - **🧰 Config Enhancements**
-  - Persistent `config.yaml` in user directory
-  - CLI flag for temporary overrides (`--set key=value`)
-  - Default values auto-documented in help screen
+    - Persistent `config.yaml` in user directory
+    - CLI flag for temporary overrides (`--set key=value`)
+    - Default values auto-documented in help screen
 
 - **🪄 Command Palette**
-  - Quick actions menu (`Ctrl+P`) for navigation and operations
-  - Type to jump to screens or commands
-  - Context-aware suggestions
+    - Quick actions menu (`Ctrl+P`) for navigation and operations
+    - Type to jump to screens or commands
+    - Context-aware suggestions
 
 ---
 
@@ -179,34 +179,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Proposed Features
 
 - **🏷️ Tags System**
-  - Tag datasets with custom labels (e.g., "climate", "high-priority", "archived")
-  - Tag-based filtering and search
-  - Tag management screen
-  - Color-coded tags in table view
-  - Tag autocomplete during dataset creation
+    - Tag datasets with custom labels (e.g., "climate", "high-priority", "archived")
+    - Tag-based filtering and search
+    - Tag management screen
+    - Color-coded tags in table view
+    - Tag autocomplete during dataset creation
 
 - **📂 Collections/Groups**
-  - Organize datasets into logical collections
-  - Hierarchical groups (projects → datasets)
-  - Collection-specific views
-  - Drag-and-drop dataset organization
+    - Organize datasets into logical collections
+    - Hierarchical groups (projects → datasets)
+    - Collection-specific views
+    - Drag-and-drop dataset organization
 
 - **🔗 Dataset Relationships**
-  - Link related datasets (derived-from, supplements, replaces)
-  - Relationship graph visualization
-  - Navigate between related datasets
-  - Dependency tracking
+    - Link related datasets (derived-from, supplements, replaces)
+    - Relationship graph visualization
+    - Navigate between related datasets
+    - Dependency tracking
 
 - **🌍 Spatial Search**
-  - Geographic bounding box search for raster/vector datasets
-  - Map-based dataset discovery (optional)
-  - Coordinate-based filtering
+    - Geographic bounding box search for raster/vector datasets
+    - Map-based dataset discovery (optional)
+    - Coordinate-based filtering
 
 - **📊 Advanced Filters**
-  - Date range filters (created, modified)
-  - Size range filters
-  - Multi-criteria filter builder
-  - Save filter presets
+    - Date range filters (created, modified)
+    - Size range filters
+    - Multi-criteria filter builder
+    - Save filter presets
 
 ---
 
@@ -217,32 +217,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Proposed Features
 
 - **🕰️ Dataset History Tracking**
-  - Track all changes to dataset metadata over time
-  - Git-backed history log per dataset
-  - View diff between versions
-  - Restore previous metadata versions
-  - Audit trail with timestamps and authors
+    - Track all changes to dataset metadata over time
+    - Git-backed history log per dataset
+    - View diff between versions
+    - Restore previous metadata versions
+    - Audit trail with timestamps and authors
 
 - **📝 Change Annotations**
-  - Add comments/notes when editing datasets
-  - Change reason tracking
-  - Review history in TUI
+    - Add comments/notes when editing datasets
+    - Change reason tracking
+    - Review history in TUI
 
 - **🔄 Version Comparison**
-  - Side-by-side diff view for metadata changes
-  - Highlight added/removed/modified fields
-  - Export change history to Markdown
+    - Side-by-side diff view for metadata changes
+    - Highlight added/removed/modified fields
+    - Export change history to Markdown
 
 - **🗂️ Archive/Unarchive Datasets**
-  - Mark datasets as archived (hidden from default view)
-  - Archived datasets remain searchable
-  - Restore archived datasets
-  - Bulk archive operations
+    - Mark datasets as archived (hidden from default view)
+    - Archived datasets remain searchable
+    - Restore archived datasets
+    - Bulk archive operations
 
 - **🔔 Change Notifications**
-  - Subscribe to dataset updates
-  - Email or webhook notifications (optional)
-  - RSS feed for catalog changes
+    - Subscribe to dataset updates
+    - Email or webhook notifications (optional)
+    - RSS feed for catalog changes
 
 ---
 
@@ -253,32 +253,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Proposed Features
 
 - **🧠 Smart Metadata Suggestions**
-  - AI-powered metadata field suggestions based on source URLs
-  - Auto-detect data format from file extensions
-  - Suggest tags based on description content
-  - Pre-fill common fields (date_created, storage_location)
+    - AI-powered metadata field suggestions based on source URLs
+    - Auto-detect data format from file extensions
+    - Suggest tags based on description content
+    - Pre-fill common fields (date_created, storage_location)
 
 - **🔗 External Catalog Integration**
-  - Import datasets from CKAN, Socrata, or other catalogs
-  - Sync with remote catalogs (one-way or bi-directional)
-  - Convert external metadata schemas to Hei-DataHub format
+    - Import datasets from CKAN, Socrata, or other catalogs
+    - Sync with remote catalogs (one-way or bi-directional)
+    - Convert external metadata schemas to Hei-DataHub format
 
 - **📊 Bulk Operations**
-  - Select multiple datasets in table view
-  - Bulk edit common fields
-  - Batch tag assignment
-  - Bulk export and delete
+    - Select multiple datasets in table view
+    - Bulk edit common fields
+    - Batch tag assignment
+    - Bulk export and delete
 
 - **🕷️ Automated Discovery**
-  - Crawl directories for dataset files
-  - Auto-generate metadata from file headers (CSV, Parquet, etc.)
-  - Schedule periodic scans
+    - Crawl directories for dataset files
+    - Auto-generate metadata from file headers (CSV, Parquet, etc.)
+    - Schedule periodic scans
 
 - **📈 Usage Analytics**
-  - Track dataset access frequency
-  - Popular datasets dashboard
-  - Search query analytics
-  - Export usage reports
+    - Track dataset access frequency
+    - Popular datasets dashboard
+    - Search query analytics
+    - Export usage reports
 
 ---
 
@@ -289,39 +289,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Proposed Features
 
 - **🔌 Plugin System**
-  - Extensible architecture for custom features
-  - Plugin API for adding data sources
-  - Custom validators and formatters
-  - Community plugin registry
+    - Extensible architecture for custom features
+    - Plugin API for adding data sources
+    - Custom validators and formatters
+    - Community plugin registry
 
 - **🌐 RESTful API**
-  - HTTP API for programmatic access
-  - JSON responses for dataset queries
-  - Authentication via API keys
-  - OpenAPI/Swagger documentation
+    - HTTP API for programmatic access
+    - JSON responses for dataset queries
+    - Authentication via API keys
+    - OpenAPI/Swagger documentation
 
 - **💾 Cloud Sync (Optional)**
-  - Optional sync with S3, GCS, or Azure Blob Storage
-  - Encrypt metadata before upload
-  - Multi-device sync for teams
-  - Conflict resolution strategies
+    - Optional sync with S3, GCS, or Azure Blob Storage
+    - Encrypt metadata before upload
+    - Multi-device sync for teams
+    - Conflict resolution strategies
 
 - **🔗 Webhook Support**
-  - Trigger webhooks on dataset events (add, edit, delete)
-  - Integrate with Slack, Discord, or custom endpoints
-  - Configurable webhook payloads
+    - Trigger webhooks on dataset events (add, edit, delete)
+    - Integrate with Slack, Discord, or custom endpoints
+    - Configurable webhook payloads
 
 - **📦 Data Preview**
-  - Preview CSV, JSON, Parquet files directly in TUI
-  - Sample rows display
-  - Column statistics (min, max, mean for numeric data)
-  - Integration with DuckDB for large file previews
+    - Preview CSV, JSON, Parquet files directly in TUI
+    - Sample rows display
+    - Column statistics (min, max, mean for numeric data)
+    - Integration with DuckDB for large file previews
 
 - **🐍 Python API**
-  - Programmatic dataset management via Python library
-  - Jupyter notebook integration
-  - Pandas DataFrame export
-  - Example notebooks for common workflows
+    - Programmatic dataset management via Python library
+    - Jupyter notebook integration
+    - Pandas DataFrame export
+    - Example notebooks for common workflows
 
 ---
 
@@ -329,43 +329,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Theme:** Stability & Maturity
 
+!!NOTE: This stable version may not include exactly all of these features, and I will be removing features from other versions (Beta versions), but it will be a stable and a complete version.
+
 #### Proposed Features
 
 - **🔒 Stable API**
-  - No breaking changes in MINOR releases (1.x.y)
-  - Long-term support (LTS) for 1.0.x line
-  - Comprehensive API reference documentation
+    - No breaking changes in MINOR releases (1.x.y)
+    - Long-term support (LTS) for 1.0.x line
+    - Comprehensive API reference documentation
 
 - **📚 Complete Documentation**
-  - API reference for all modules
-  - Architecture decision records (ADRs)
-  - Contribution guidelines
-  - Developer handbook
+    - API reference for all modules
+    - Architecture decision records (ADRs)
+    - Contribution guidelines
+    - Developer handbook
 
 - **🧪 Comprehensive Testing**
-  - 90%+ test coverage
-  - Integration tests for all workflows
-  - Performance benchmarks
-  - End-to-end TUI testing
+    - 90%+ test coverage
+    - Integration tests for all workflows
+    - Performance benchmarks
+    - End-to-end TUI testing
 
 - **🌍 Internationalization (i18n)**
-  - Multi-language UI support (English, French, Spanish, etc.)
-  - Localized documentation
-  - Configurable locale in Settings
+    - Multi-language UI support (English, French, Spanish, etc.)
+    - Localized documentation
+    - Configurable locale in Settings
 
 - **♿ Accessibility Improvements**
-  - Screen reader support
-  - High-contrast themes
-  - Keyboard-only navigation enhancements
-  - WCAG compliance
+    - Screen reader support
+    - High-contrast themes
+    - Keyboard-only navigation enhancements
+    - WCAG compliance
 
 - **📦 Distribution**
-  - PyPI package distribution
-  - Docker container images
-  - Homebrew formula (macOS)
-  - APT/RPM packages (Linux)
-  - Windows installer
-
+    - PyPI package distribution
+    - Docker container images
+    - Homebrew formula (macOS)
+    - APT/RPM packages (Linux)
+    - Windows installer
 
 ## Version Naming
 
