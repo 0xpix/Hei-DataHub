@@ -1,12 +1,12 @@
 # Hei-DataHub
 
-[![Version](https://img.shields.io/badge/version-0.55.0--beta-blue.svg)](SUMMARY_v0.55.md)
+![Version](https://img.shields.io/badge/version-0.55.2--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 
 > A local-first TUI for managing datasets with consistent metadata, fast full-text search, and automated PR workflows.
 
-**📦 Latest Release:** [v0.55.0-beta "Auto-Stash & Clean Architecture"](SUMMARY_v0.55.md) - Enhanced PR workflow with automatic stashing, improved gitignore handling, dual command support
+**📦 Latest Release:** [v0.55.2-beta "Auto-Stash & Clean Architecture"]
 
 ## Overview
 
@@ -17,18 +17,6 @@
 - Work entirely locally with YAML files and SQLite—no network required (network required only at first when cloning)
 
 Think of it as a lightweight data catalog for teams who want to organize datasets without complex infrastructure.
-
-## Features
-
-- 🏠 **Local-First**: Everything stored in YAML files + SQLite database
-- 🔍 **Fast Search**: Full-text search powered by SQLite FTS5 with BM25 ranking
-- ✅ **Validated Metadata**: JSON Schema + Pydantic validation
-- 🖥️ **Clean TUI**: Terminal interface built with Textual with Neovim-style keybindings
-- 📦 **Simple Storage**: One folder per dataset with `metadata.yaml`
-- 🚀 **Easy Setup**: Install and run immediately
-- 🔄 **Automated PRs**: Save → PR workflow with GitHub integration (optional)
-- 🎯 **Auto-Stash**: Automatically handles uncommitted changes during PR workflow
-- 🏗️ **Clean Architecture**: Layered design with clear separation of concerns
 
 ## Quick Start
 
