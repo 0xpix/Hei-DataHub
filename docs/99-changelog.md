@@ -324,11 +324,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### 🧱 [0.61.0-beta] — "Renovation"
+
+**Theme:** Documentation & Infrastructure Overhaul
+
+#### Proposed Features
+
+- **📚 Complete Documentation Rebuild**
+    - Reorganized structure for clarity and navigation
+    - New sidebar and search system
+    - Improved typography and layout consistency
+    - Versioned docs directories (v0.55.x, v0.60.x, etc.)
+
+- **🎨 Theme & Branding**
+    - Updated MkDocs Material theme palette
+    - Consistent heading hierarchy and spacing
+    - Custom “Hei-DataHub” logo in header
+
+- **⚙️ Developer Experience**
+    - Auto-generated changelog and version banners
+    - Docstring extraction integrated with mkdocstrings
+    - New contribution guide and internal reference pages
+
+- **🧰 Tooling & CI**
+    - GitHub Action to rebuild docs on every tagged release
+    - Spell-check and link validation on PRs
+    - Preview deployment to GitHub Pages (staging branch)
+
+**!!Note: Before The release (1.0.0) I may add more beta versions depends on what features I want to implement, maybe a last beta version called "Cleaning" to remove unwanted features**
+---
+
 ### [1.0.0-stable] - "Cornerstone"
 
 **Theme:** Stability & Maturity
 
-!!NOTE: This stable version may not include exactly all of these features, and I will be removing features from other versions (Beta versions), but it will be a stable and a complete version.
+**!!NOTE: This stable version may not include exactly all of these features, and I will be removing features from other versions (Beta versions), but it will be a stable and a complete version.**
 
 #### Proposed Features
 
@@ -350,7 +380,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - End-to-end TUI testing
 
 - **🌍 Internationalization (i18n)**
-    - Multi-language UI support (English, French, Spanish, etc.)
+    - Multi-language UI support (English, German, French, Spanish, etc.)
     - Localized documentation
     - Configurable locale in Settings
 
