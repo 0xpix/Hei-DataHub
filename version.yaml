@@ -2,7 +2,7 @@
 # Single source of truth for all version metadata
 # Edit this file and run `scripts/sync_version.py` to propagate changes
 
-version: "0.55.1-beta"
+version: "0.55.2-beta"
 codename: "Fjord"
 release_date: "2025-10-04"
 compatibility: "Hei-DataHub v0.55.x (beta)"
