@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added **auto-publish** and **update PR** workflows for dataset submissions
     - Added **field-specific search** with structured queries and operators
     - Enhanced **query parser** and integrated it with the search engine
+    - Custom **config** for keybinds, themes, and more
 
 - **Added:**
     - **Inline Editing:** Edit dataset metadata directly in the Details screen
@@ -24,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         - Automatic SQLite reindex after save
         - Field-level validation on save and on blur
         - Confirmation dialog when canceling with unsaved changes
-
     - **Field-Specific Search Integration:** Structured query syntax with mixed search support
         - Filters: `source:github`, `format:csv`, `tag:climate`
         - Operators: `>`, `<`, `>=`, `<=` for numeric and date fields
@@ -70,6 +70,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Search field autocomplete planned for future release
     - Edit form scrolling limited for very large datasets
     - Nested array fields (`schema_fields`) not editable yet
+    - When pressing `P` to publish it goes to the PR in github, i can merge it but in the app it's saying PR creation failed and moved to the outbox.
+    - The edited dataset will be back to the previous state after closing the app and reopening it.
+    - When editting a dataset, if the screen is small there is no scralling and some fields are not visible.
+    - After PR publishing it doesn't switch to the previous branch or the main, it will stay at the branch created to puiblish the PR
 
 - **Documentation:**
     - Updated search syntax and query examples
