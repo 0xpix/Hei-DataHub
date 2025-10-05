@@ -1,4 +1,3 @@
-
 All notable changes to Hei-DataHub will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -6,129 +5,174 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 📝 Version History
 
-### ✅ Current (0.55.1-beta — "Persistence")
+### [0.55.1-beta] - 2025-01-05 - "Persistence"
 
-**Bug Fix Release — Reliable GitHub Token Storage**
+**Bug Fix Release - Reliable GitHub Token Storage**
 
 **Fixed:**
-- **Critical:** Personal Access Token (PAT) now persists after system reboot
-- Resolved keyring issue preventing permanent credential storage
+    - **Critical:** Personal Access Token (PAT) now persists after system reboot
+    - Resolved keyring issue preventing permanent credential storage
 
 **Improved:**
-- Keyring reliability on Linux systems
-- Clearer error messages when keyring backend is unavailable
-- Settings screen now confirms successful credential storage
+    - Keyring reliability on Linux systems
+    - Clearer error messages when keyring backend is unavailable
+    - Settings screen now confirms successful credential storage
 
 ---
 
-### [0.55.0-beta] - 2025-01-04 — “Clean Architecture”
+### [0.55.0-beta] - 2025-01-04 - "Clean Architecture"
 
-**Major Release — Complete Architectural Refactoring**
+**Major Release - Complete Architectural Refactoring**
 
 **Highlights:**
-- Introduced **layered architecture** (UI → Services → Core → Infrastructure)
-- Added **dual CLI commands:** `hei-datahub` and `mini-datahub`
-- New **version management system** (`version.yaml` + auto-generated files)
-- Integrated **GitHub Actions CI**, **pre-commit hooks**, and **MkDocs** documentation site
+    - Introduced **layered architecture** (UI → Services → Core → Infrastructure)
+    - Added **dual CLI commands:** `hei-datahub` and `mini-datahub`
+    - New **version management system** (`version.yaml` + auto-generated files)
+    - Integrated **GitHub Actions CI**, **pre-commit hooks**, and **MkDocs** documentation site
 
 **Added:**
-- Auto-stash workflow for safe PR creation
-- Centralized logging with debug mode
-- `--version-info` flag for detailed build/system info
-- Dynamic documentation banner and macros plugin
+    - Auto-stash workflow for safe PR creation
+    - Centralized logging with debug mode
+    - `--version-info` flag for detailed build/system info
+    - Dynamic documentation banner and macros plugin
 
 **Changed:**
-- Migrated to `src/mini_datahub/` package structure
-- Unified settings via `GitHubConfig`
-- Refactored exception hierarchy for clearer error handling
+    - Migrated to `src/mini_datahub/` package structure
+    - Unified settings via `GitHubConfig`
+    - Refactored exception hierarchy for clearer error handling
 
 **Fixed:**
-- BM25 ranking (prioritizes name matches)
-- ISO 8601 date validation
-- Database initialization and Git edge cases
+    - BM25 ranking (prioritizes name matches)
+    - ISO 8601 date validation
+    - Database initialization and Git edge cases
 
 **Documentation:**
-- Comprehensive manual (tutorials, API reference, FAQ)
-- Automatic deployment to GitHub Pages
-- Defined versioning and release policy
+    - Comprehensive manual (tutorials, API reference, FAQ)
+    - Automatic deployment to GitHub Pages
+    - Defined versioning and release policy
 
 ---
 
-### [0.54.0-beta] - 2025-10-03
+### [0.54.0-beta] - 2025-01-03 - "Connector"
 
 **Added:**
-- Outbox system for failed PR tasks (`.outbox/` directory)
-- Weekly update check for new releases
-- GitHub status indicator in TUI
+    - Outbox system for failed PR tasks (`.outbox/` directory)
+    - Weekly update check for new releases
+    - GitHub status indicator in TUI
 
 **Changed:**
-- Search debounce reduced to 150ms (faster response)
-- Improved table column width allocation
+    - Search debounce reduced to 150ms (faster response)
+    - Improved table column width allocation
 
 **Fixed:**
-- Keyring integration on Linux without GNOME Keyring
-- YAML parsing for multi-line strings and special characters
+    - Keyring integration on Linux without GNOME Keyring
+    - YAML parsing for multi-line strings and special characters
 
 ---
 
-### [0.53.0-beta] - 2025-10-03
+### [0.53.0-beta] - 2025-01-03 - "Synchronizer"
 
 **Added:**
-- Pull updates command (`u` keybinding)
-- Refresh command (`r` keybinding) without reindexing
+    - Pull updates command (`u` keybinding)
+    - Refresh command (`r` keybinding) without reindexing
 
 **Fixed:**
-- Search query escaping for FTS5 special operators
-- Dataset ID validation for auto-generated IDs
+    - Search query escaping for FTS5 special operators
+    - Dataset ID validation for auto-generated IDs
 
 ---
 
-### [0.52.0-beta] - 2025-10-03
+### [0.52.0-beta] - 2025-01-03 - "Navigator"
 
 **Added:**
-- Vim-style navigation (`j`/`k`, `gg`/`G`)
-- Copy source shortcut (`c` on Details Screen)
-- Open URL shortcut (`o` on Details Screen)
+    - Vim-style navigation (`j`/`k`, `gg`/`G`)
+    - Copy source shortcut (`c` on Details Screen)
+    - Open URL shortcut (`o` on Details Screen)
 
 **Changed:**
-- More compact footer shortcuts display
+    - More compact footer shortcuts display
 
 ---
 
-### [0.51.0-beta] - 2025-10-03
+### [0.51.0-beta] - 2025-01-03 - "Integrator"
 
 **Added:**
-- GitHub PR integration with automated workflow
-- Settings screen for GitHub credentials
+    - GitHub PR integration with automated workflow
+    - Settings screen for GitHub credentials
 
 **Fixed:**
-- Database locking issues on multi-core systems
+    - Database locking issues on multi-core systems
 
 ---
 
-### [0.50.0-beta] - 2025-10-02
+### [0.50.0-beta] - 2025-01-02 - "Foundation"
 
 **Initial Beta Release**
 
 **Added:**
-- Full-text search with SQLite FTS5 and BM25 ranking
-- Add Dataset form with TUI validation
-- Details screen for complete metadata view
-- Reindex command: `hei-datahub reindex`
+    - Full-text search with SQLite FTS5 and BM25 ranking
+    - Add Dataset form with TUI validation
+    - Details screen for complete metadata view
+    - Reindex command: `hei-datahub reindex`
 
 ---
 
-### [0.40.0-alpha] - 2025-10-02
+### [0.40.0-alpha] - 2025-01-02 - "Genesis"
 
 **Alpha Release**
 
 **Added:**
-- Basic TUI with search functionality
-- YAML-based metadata storage
+    - Basic TUI with search functionality
+    - YAML-based metadata storage
 
 ---
-## 🚧 Unreleased — Upcoming Features
-### 🧭 0.57.0-beta — "Navigator"
+
+## 🚧 Unreleased - Upcoming Features
+
+### [0.56.0-beta] - "Flash"
+
+**Theme:** Speed & Responsiveness
+
+#### Proposed Features
+
+- **⚡ Inline Editing**
+  - Edit dataset metadata directly in the Details screen
+  - Field-level validation and instant save
+  - Undo/redo support for recent edits
+
+- **🔍 Field-Specific Search**
+  - Advanced queries: `source:github`, `format:csv`, `date:>2025-01`
+  - Search builder UI for filtering by tags, size, and type
+  - Autocomplete for common search fields
+
+- **⌨️ Custom Keybindings**
+  - User-defined shortcuts in `config.yaml`
+  - Import/export keymap profiles
+  - Reset to default bindings option
+
+- **🎨 Theme Support**
+  - Light, Dark, and Solarized TUI themes
+  - Switch theme in Settings or via command flag
+  - Support for custom color overrides
+
+- **🚀 Performance Improvements**
+  - Faster startup and reindexing (async tasks)
+  - Optimized SQLite FTS queries
+  - Reduced TUI redraw latency for large dataset lists
+
+- **🧰 Config Enhancements**
+  - Persistent `config.yaml` in user directory
+  - CLI flag for temporary overrides (`--set key=value`)
+  - Default values auto-documented in help screen
+
+- **🪄 Command Palette**
+  - Quick actions menu (`Ctrl+P`) for navigation and operations
+  - Type to jump to screens or commands
+  - Context-aware suggestions
+
+---
+
+### [0.57.0-beta] - "Discovery"
 
 **Theme:** Discovery & Navigation
 
@@ -166,7 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### 📜 0.58.0-beta — "Archivist"
+### [0.58.0-beta] - "Archivist"
 
 **Theme:** History & Versioning
 
@@ -202,7 +246,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### 🤖 0.59.0-beta — "AutoPilot"
+### [0.59.0-beta] - "AutoPilot"
 
 **Theme:** Automation & Intelligence
 
@@ -238,7 +282,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### 🔌 0.60.0-beta — "Nexus"
+### [0.60.0-beta] - "Nexus"
 
 **Theme:** Integration & Extension
 
@@ -281,7 +325,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-### 🎯 1.0.0-stable — "Foundation"
+### [1.0.0-stable] - "Cornerstone"
 
 **Theme:** Stability & Maturity
 
@@ -321,7 +365,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Homebrew formula (macOS)
   - APT/RPM packages (Linux)
   - Windows installer
----
+
 
 ## Version Naming
 
@@ -331,7 +375,7 @@ Hei-DataHub follows [Semantic Versioning](https://semver.org/):
 - **MINOR:** New features, may include breaking changes during beta (0.x.y)
 - **PATCH:** Backward-compatible bug fixes
 
-**Prerelease Labels:**
+**Prerelease labels:**
 
 - **-alpha:** Early testing, unstable
 - **-beta:** Feature-complete, testing for bugs
@@ -360,12 +404,12 @@ pip install -e .
 
 1. Update this file with a new version entry
 2. List all user-visible changes under categories:
-    - **Added:** New features
-    - **Changed:** Changes to existing functionality
-    - **Deprecated:** Soon-to-be-removed features
-    - **Removed:** Removed features
-    - **Fixed:** Bug fixes
-    - **Security:** Vulnerability fixes
+   - **Added:** New features
+   - **Changed:** Changes to existing functionality
+   - **Deprecated:** Soon-to-be-removed features
+   - **Removed:** Removed features
+   - **Fixed:** Bug fixes
+   - **Security:** Vulnerability fixes
 3. Link to relevant GitHub issues/PRs where applicable
 
 **Patch releases** update the same docs line (e.g., 0.55.x).
@@ -376,9 +420,9 @@ pip install -e .
 
 ## Related Links
 
-- **[Versioning Policy](98-versioning.md)** — Understanding SemVer and Hei-DataHub's approach
-- **[GitHub Releases](https://github.com/0xpix/Hei-DataHub/releases)** — Download releases
-- **[Milestones](https://github.com/0xpix/Hei-DataHub/milestones)** — Upcoming features
+- **[Versioning Policy](98-versioning.md)** - Understanding SemVer and Hei-DataHub's approach
+- **[GitHub Releases](https://github.com/0xpix/Hei-DataHub/releases)** - Download releases
+- **[Milestones](https://github.com/0xpix/Hei-DataHub/milestones)** - Upcoming features
 
 ---
 
@@ -390,4 +434,4 @@ pip install -e .
 
 ---
 
-_Last updated: 2025-01-04 for 0.55.0-beta_
+_Auto-corrected by Hei-DataHub Changelog Consistency Agent • Last updated: 2025-10-05_
