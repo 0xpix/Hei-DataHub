@@ -19,7 +19,7 @@ BUILD_NUMBER = "005600"
 RELEASE_DATE = "2025-10-05"
 CODENAME = "Precision"
 COMPATIBILITY = "Hei-DataHub v0.56.x (beta)"
-RELEASE_NOTES = "Speed, responsiveness, and power-user ergonomics"
+RELEASE_NOTES = "Structured Search and Inline Editing"
 
 # Repository Information
 GITHUB_REPO = "0xpix/Hei-DataHub"
