@@ -37,6 +37,7 @@ class PRWorkflow:
         self,
         metadata: Dict[str, Any],
         dataset_id: str,
+        is_update: bool = False,
     ) -> Tuple[bool, str, Optional[str], Optional[int]]:
         """
         Execute the complete Save → PR workflow.
@@ -44,6 +45,7 @@ class PRWorkflow:
         Args:
             metadata: Dataset metadata dictionary
             dataset_id: Dataset ID
+            is_update: True if updating existing dataset, False if new dataset
 
         Returns:
             Tuple of (success, message, pr_url, pr_number)
@@ -103,10 +105,11 @@ class PRWorkflow:
                         None,
                     )
 
-            # Check ID uniqueness remotely
-            is_unique, uniqueness_msg = github.check_id_uniqueness(dataset_id)
-            if not is_unique:
-                return False, uniqueness_msg, None, None
+            # Check ID uniqueness remotely (only for new datasets)
+            if not is_update:
+                is_unique, uniqueness_msg = github.check_id_uniqueness(dataset_id)
+                if not is_unique:
+                    return False, uniqueness_msg, None, None
 
             # Step 1: Write metadata to catalog repo
             self._write_metadata_to_catalog(catalog_path, dataset_id, metadata)
@@ -141,7 +144,8 @@ class PRWorkflow:
                 head = f"{self.config.username}:{branch_name}"
 
             # Step 4: Create PR
-            pr_title = f"Add dataset: {dataset_name} ({dataset_id})"
+            action = "Update" if is_update else "Add"
+            pr_title = f"{action} dataset: {dataset_name} ({dataset_id})"
             pr_body = format_pr_body(metadata)
 
             success, pr_number, pr_url, msg = github.create_pull_request(
