@@ -316,6 +316,17 @@ class ConfigManager:
         # Save to file
         self._save_user_config(self._user_config)
 
+    def reload_config(self) -> None:
+        """
+        Reload configuration from file.
+
+        This is useful when config file has been modified externally
+        or when you want to pick up changes after updating config.
+        """
+        self._user_config = self._load_user_config()
+        # Clear CLI overrides as they should only apply to current session
+        # (don't clear them - they persist for the session)
+
 
 # Global config instance
 _config_manager: Optional[ConfigManager] = None
@@ -326,6 +337,21 @@ def get_config() -> ConfigManager:
     global _config_manager
     if _config_manager is None:
         _config_manager = ConfigManager()
+    return _config_manager
+
+
+def reload_config() -> ConfigManager:
+    """
+    Reload the global config manager from file.
+
+    This forces a complete reload of the configuration,
+    picking up any changes made to the config file.
+
+    Returns:
+        The reloaded config manager instance
+    """
+    global _config_manager
+    _config_manager = ConfigManager()
     return _config_manager
 
 
