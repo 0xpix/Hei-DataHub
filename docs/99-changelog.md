@@ -9,82 +9,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Major Release – Structured Search and Inline Editing**
 
-* **Highlights:**
+- **Highlights:**
+    - Introduced **inline editing** for direct dataset modification in the TUI
+    - Implemented **atomic save and reindex workflow** with rollback safety
+    - Added **auto-publish** and **update PR** workflows for dataset submissions
+    - Added **field-specific search** with structured queries and operators
+    - Enhanced **query parser** and integrated it with the search engine
 
-  * Introduced **inline editing** for direct dataset modification in the TUI
-  * Added **field-specific search** with structured queries and operators
-  * Implemented **atomic save and reindex workflow** with rollback safety
-  * Enhanced **query parser** and integrated it with the search engine
-  * Added **auto-publish** and **update PR** workflows for dataset submissions
+- **Added:**
+    - **Inline Editing:** Edit dataset metadata directly in the Details screen
+        - Editable fields: name, description, source, storage, format, size, type, project, dates
+        - Save with `Ctrl+S`, cancel with `Esc`, undo/redo with `Ctrl+Z` / `Ctrl+Shift+Z`
+        - Atomic YAML writes with fsync and rollback on error
+        - Automatic SQLite reindex after save
+        - Field-level validation on save and on blur
+        - Confirmation dialog when canceling with unsaved changes
 
-* **Added:**
+    - **Field-Specific Search Integration:** Structured query syntax with mixed search support
+        - Filters: `source:github`, `format:csv`, `tag:climate`
+        - Operators: `>`, `<`, `>=`, `<=` for numeric and date fields
+        - Quoted phrases for exact matches (`"climate data"`)
+        - Unknown fields gracefully fall back to free-text search
+    - **Search Filter Badges:** Real-time visual indicators for active field filters and phrases
+    - **Auto-Publish Workflow:** Automatically creates and opens Pull Requests on save
+        - Detects new vs. update datasets
+        - Generates appropriate PR titles and workflow actions
+    - **Update PR Support:** Allows modifications to existing datasets without errors
+    - **Query Syntax Help:** Added examples and syntax guide to the Help overlay (`?`)
+    - **Custom Keybindings:** Configurable shortcuts through `~/.config/hei-datahub/config.yaml`
+    - **Theme Support:** 12 built-in Textual themes including Gruvbox, Monokai, Nord, and Dracula
+    - **Config System:** Persistent XDG-compliant configuration with inline documentation
+    - **Action Registry:** Centralized system for managing and documenting all key actions
 
-  * **Inline Editing:** Edit dataset metadata directly in the Details screen
+- **Changed:**
+    - Search engine rebuilt to use structured query parsing with FTS5 integration
+    - FTS5 phrase matching improved with exact-phrase support
+    - Numeric and date filters properly type-cast in SQL queries
+    - Inline editing refreshes metadata in real time without full reload
+    - Storage system uses atomic write with backup and rollback
+    - Auto-publish system distinguishes between new and update PRs
+    - Help overlay now context-aware and displays query syntax examples
 
-    * Editable fields: name, description, source, storage, format, size, type, project, dates
-    * Save with `Ctrl+S`, cancel with `Esc`, undo/redo with `Ctrl+Z` / `Ctrl+Shift+Z`
-    * Atomic YAML writes with fsync and rollback on error
-    * Automatic SQLite reindex after save
-    * Field-level validation on save and on blur
-    * Confirmation dialog when canceling with unsaved changes
-  * **Field-Specific Search Integration:** Structured query syntax with mixed search support
+- **Fixed:**
+    - FTS5 “no such column” error resolved with schema auto-migration
+    - PR publishing works for existing datasets (update PRs supported)
+    - Search crash on unknown field names resolved
+    - Empty and quoted query handling corrected
+    - Duplicate SQL executions removed
+    - Display refresh after save now correctly updates view
+    - Type-casting and numeric filter issues resolved
 
-    * Filters: `source:github`, `format:csv`, `tag:climate`
-    * Operators: `>`, `<`, `>=`, `<=` for numeric and date fields
-    * Quoted phrases for exact matches (`"climate data"`)
-    * Unknown fields gracefully fall back to free-text search
-  * **Search Filter Badges:** Real-time visual indicators for active field filters and phrases
-  * **Auto-Publish Workflow:** Automatically creates and opens Pull Requests on save
+- **Performance:**
+    - Search latency improved (P50: 15–20 ms on small datasets)
+    - Target performance: P50 < 120 ms on 2k datasets
+    - Atomic writes optimized for small YAML files (<10 ms average)
 
-    * Detects new vs. update datasets
-    * Generates appropriate PR titles and workflow actions
-  * **Update PR Support:** Allows modifications to existing datasets without errors
-  * **Query Syntax Help:** Added examples and syntax guide to the Help overlay (`?`)
-  * **Custom Keybindings:** Configurable shortcuts through `~/.config/hei-datahub/config.yaml`
-  * **Theme Support:** 12 built-in Textual themes including Gruvbox, Monokai, Nord, and Dracula
-  * **Config System:** Persistent XDG-compliant configuration with inline documentation
-  * **Action Registry:** Centralized system for managing and documenting all key actions
+- **Known Issues:**
+    - Keybinding and theme changes require restart
+    - Keybinding conflict detection not yet implemented
+    - Search field autocomplete planned for future release
+    - Edit form scrolling limited for very large datasets
+    - Nested array fields (`schema_fields`) not editable yet
 
-* **Changed:**
-
-  * Search engine rebuilt to use structured query parsing with FTS5 integration
-  * FTS5 phrase matching improved with exact-phrase support
-  * Numeric and date filters properly type-cast in SQL queries
-  * Inline editing refreshes metadata in real time without full reload
-  * Storage system uses atomic write with backup and rollback
-  * Auto-publish system distinguishes between new and update PRs
-  * Help overlay now context-aware and displays query syntax examples
-
-* **Fixed:**
-
-  * FTS5 “no such column” error resolved with schema auto-migration
-  * PR publishing works for existing datasets (update PRs supported)
-  * Search crash on unknown field names resolved
-  * Empty and quoted query handling corrected
-  * Duplicate SQL executions removed
-  * Display refresh after save now correctly updates view
-  * Type-casting and numeric filter issues resolved
-
-* **Performance:**
-
-  * Search latency improved (P50: 15–20 ms on small datasets)
-  * Target performance: P50 < 120 ms on 2k datasets
-  * Atomic writes optimized for small YAML files (<10 ms average)
-
-* **Known Issues:**
-
-  * Keybinding and theme changes require restart
-  * Keybinding conflict detection not yet implemented
-  * Search field autocomplete planned for future release
-  * Edit form scrolling limited for very large datasets
-  * Nested array fields (`schema_fields`) not editable yet
-
-* **Documentation:**
-
-  * Updated search syntax and query examples
-  * Added inline editing usage guide
-  * Expanded configuration and keybinding reference
-  * Added theme customization documentation
+- **Documentation:**
+    - Updated search syntax and query examples
+    - Added inline editing usage guide
+    - Expanded configuration and keybinding reference
+    - Added theme customization documentation
 
 ---
 
