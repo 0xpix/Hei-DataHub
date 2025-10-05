@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Convenience script to run hei-datahub from anywhere
-# Usage: ./hei-datahub.sh [args]
+# Usage: hei-datahub [args]
 #
 
 # Get the directory where this script is located
