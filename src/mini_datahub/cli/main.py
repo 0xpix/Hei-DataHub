@@ -85,6 +85,58 @@ def handle_tui(args):
         sys.exit(1)
 
 
+def handle_keymap_export(args):
+    """Handle keymap export command."""
+    import yaml
+    from mini_datahub.services.config import get_config
+    from mini_datahub.infra.config_paths import get_keybindings_export_path
+
+    config = get_config()
+    keybindings = config.get_keybindings()
+
+    output_path = get_keybindings_export_path(args.output)
+
+    try:
+        with open(output_path, 'w', encoding='utf-8') as f:
+            yaml.dump({"keybindings": keybindings}, f, default_flow_style=False)
+        print(f"✓ Exported keybindings to: {output_path}")
+        sys.exit(0)
+    except Exception as e:
+        print(f"❌ Failed to export keybindings: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def handle_keymap_import(args):
+    """Handle keymap import command."""
+    import yaml
+    from mini_datahub.services.config import get_config
+    from pathlib import Path
+
+    input_path = Path(args.input)
+
+    if not input_path.exists():
+        print(f"❌ File not found: {input_path}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        with open(input_path, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+
+        if "keybindings" not in data:
+            print("❌ Invalid keymap file: missing 'keybindings' key", file=sys.stderr)
+            sys.exit(1)
+
+        config = get_config()
+        config.update_user_config({"keybindings": data["keybindings"]})
+
+        print(f"✓ Imported keybindings from: {input_path}")
+        print("ℹ️  Restart the application for changes to take effect")
+        sys.exit(0)
+    except Exception as e:
+        print(f"❌ Failed to import keybindings: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     """Main CLI entrypoint."""
     parser = argparse.ArgumentParser(
@@ -104,6 +156,13 @@ def main():
         help="Show detailed version and system information",
     )
 
+    parser.add_argument(
+        "--set",
+        action="append",
+        metavar="KEY=VALUE",
+        help="Set config override for this session (e.g., --set search.debounce_ms=200)",
+    )
+
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Reindex command
@@ -113,6 +172,35 @@ def main():
     )
     parser_reindex.set_defaults(func=handle_reindex)
 
+    # Keymap commands
+    parser_keymap = subparsers.add_parser(
+        "keymap",
+        help="Manage custom keybindings"
+    )
+    keymap_subparsers = parser_keymap.add_subparsers(dest="keymap_command")
+
+    parser_keymap_export = keymap_subparsers.add_parser(
+        "export",
+        help="Export current keybindings to a file"
+    )
+    parser_keymap_export.add_argument(
+        "output",
+        nargs="?",
+        default=None,
+        help="Output file path (default: ~/.hei-datahub/keybindings.yaml)"
+    )
+    parser_keymap_export.set_defaults(func=handle_keymap_export)
+
+    parser_keymap_import = keymap_subparsers.add_parser(
+        "import",
+        help="Import keybindings from a file"
+    )
+    parser_keymap_import.add_argument(
+        "input",
+        help="Input file path"
+    )
+    parser_keymap_import.set_defaults(func=handle_keymap_import)
+
     # Parse arguments
     args = parser.parse_args()
 
@@ -121,8 +209,21 @@ def main():
         print_version_info(verbose=True)
         sys.exit(0)
 
+    # Apply CLI config overrides
+    if hasattr(args, 'set') and args.set:
+        from mini_datahub.services.config import get_config
+        config = get_config()
+        config.parse_cli_overrides(args.set)
+
+    # Handle keymap subcommands
+    if args.command == "keymap":
+        if hasattr(args, 'func'):
+            args.func(args)
+        else:
+            parser.print_help()
+            sys.exit(1)
     # If no command specified, launch TUI
-    if args.command is None:
+    elif args.command is None:
         handle_tui(args)
     else:
         args.func(args)

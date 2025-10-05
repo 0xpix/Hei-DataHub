@@ -1,3 +1,6 @@
+# Development tracking (internal notes, not for public)
+devs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -261,3 +264,10 @@ __marimo__/
 
 # MkDocs
 site/
+
+# Hei-DataHub specific
+# User configuration (may contain sensitive data)
+.hei-datahub/
+# Benchmark results
+bench/
+tests/

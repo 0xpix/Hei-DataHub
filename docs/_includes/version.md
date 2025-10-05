@@ -1,9 +1,9 @@
-!!! info "Version Notice — Fjord"
-    **This manual tracks Hei-DataHub v0.55.x (beta).**
+!!! info "Version Notice — Precision"
+    **This manual tracks Hei-DataHub v0.56.x (beta).**
 
-    **Release:** 0.55.2-beta (2025-10-04)
-    **Codename:** Fjord
+    **Release:** 0.56.0-beta (2025-10-05)
+    **Codename:** Precision
 
-    Enhanced versioning system with centralized configuration
+    Speed, responsiveness, and power-user ergonomics
 
     **Compatibility note:** Features and shortcuts may differ slightly from other versions.
