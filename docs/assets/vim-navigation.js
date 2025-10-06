@@ -133,31 +133,34 @@
       bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
-      background: #1e1e1e !important;
-      color: #d4d4d4 !important;
-      padding: 0.75rem 1rem !important;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
-      font-size: 16px !important;
-      border-top: 3px solid #007acc !important;
+      background: #f8f9fa !important;
+      color: #212529 !important;
+      padding: 0.875rem 1.25rem !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+      font-size: 15px !important;
+      border-top: 2px solid #dee2e6 !important;
       z-index: 999999 !important;
       display: flex !important;
       align-items: center !important;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5) !important;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1) !important;
       width: 100% !important;
       box-sizing: border-box !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
     `;
 
-    // Create prompt
+    // Create prompt with simple-blog accent color
     const prompt = document.createElement('span');
     prompt.textContent = ':';
     prompt.style.cssText = `
-      color: #007acc !important;
-      font-weight: bold !important;
+      color: #0066cc !important;
+      font-weight: 600 !important;
       margin-right: 0.5rem !important;
       font-size: 18px !important;
+      line-height: 1 !important;
     `;
 
-    // Create input
+    // Create input with clean styling
     const input = document.createElement('input');
     input.id = 'vim-command-input';
     input.type = 'text';
@@ -167,12 +170,13 @@
       background: transparent !important;
       border: none !important;
       outline: none !important;
-      color: #d4d4d4 !important;
+      color: #212529 !important;
       font-family: inherit !important;
       font-size: inherit !important;
       flex: 1 !important;
       padding: 0 !important;
       margin: 0 !important;
+      font-weight: 400 !important;
     `;
     input.placeholder = 'Type "dev" to go to Developer Docs';
 
