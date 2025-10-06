@@ -1,8 +1,8 @@
 /**
  * Vim-like Keyboard Navigation for Developer Docs
- * 
+ *
  * This is a simplified version for developer documentation.
- * 
+ *
  * Keybindings:
  *   j/k        - Scroll down/up (smooth)
  *   d/u        - Scroll down/up by half page
@@ -417,7 +417,7 @@
           opacity: 1;
         }
       }
-      
+
       @keyframes slideOut {
         from {
           transform: translateX(0);
