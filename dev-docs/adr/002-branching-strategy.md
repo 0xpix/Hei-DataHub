@@ -80,14 +80,14 @@ Considered options:
 ## Consequences
 
 ### Positive
-✅ Clean separation of concerns  
-✅ No accidental merges  
-✅ Independent publishing pipelines  
+✅ Clean separation of concerns
+✅ No accidental merges
+✅ Independent publishing pipelines
 ✅ Clear ownership (main = release team, docs/devs = developers)
 
 ### Negative
-⚠️ Code changes don't automatically flow to dev docs  
-⚠️ Must remember to switch branches when editing docs  
+⚠️ Code changes don't automatically flow to dev docs
+⚠️ Must remember to switch branches when editing docs
 ⚠️ Two separate git histories
 
 **Mitigation:** Clear documentation, branch protection rules.

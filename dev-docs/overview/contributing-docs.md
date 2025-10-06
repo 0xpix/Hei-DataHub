@@ -107,8 +107,8 @@ Use this template:
 ```markdown
 # module.function_name
 
-**Module:** `mini_datahub.services.search`  
-**Added in:** v0.56.0  
+**Module:** `mini_datahub.services.search`
+**Added in:** v0.56.0
 **Status:** ✅ Stable
 
 ---
@@ -123,15 +123,15 @@ def search_datasets(
 ) -> List[Dataset]:
     """
     Search datasets using FTS5 full-text search.
-    
+
     Args:
         query: Search query string (FTS5 syntax)
         filters: Optional filters (tags, date range, etc.)
         limit: Maximum number of results
-    
+
     Returns:
         List of matching datasets, sorted by relevance
-        
+
     Raises:
         SearchError: If query syntax is invalid
         DatabaseError: If database connection fails
@@ -318,8 +318,8 @@ Full working example.
 
 ### Issue 1
 
-**Symptom:**  
-**Cause:**  
+**Symptom:**
+**Cause:**
 **Solution:**
 
 ## Next Steps

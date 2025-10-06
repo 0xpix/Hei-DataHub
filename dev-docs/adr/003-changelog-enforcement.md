@@ -57,12 +57,12 @@ Without enforcement, changelogs become stale and lose value.
 ## Consequences
 
 ### Positive
-✅ Always up-to-date changelogs  
-✅ Clear communication of changes  
+✅ Always up-to-date changelogs
+✅ Clear communication of changes
 ✅ Better versioning and compatibility tracking
 
 ### Negative
-⚠️ Extra overhead for contributors  
+⚠️ Extra overhead for contributors
 ⚠️ CI complexity
 
 **Mitigation:** Templates and clear guidelines.
