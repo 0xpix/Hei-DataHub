@@ -112,8 +112,6 @@ nav:
   - Help:
     - FAQ: 90-faq.md
     - Troubleshooting: troubleshooting.md
-    - Versioning & Release Policy: 98-versioning.md
-    - Changelog: 99-changelog.md
 
 # Extra
 extra:
