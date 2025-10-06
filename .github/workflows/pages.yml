@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Both User and Developer Documentation
+    name: Build User and Developer Documentation
     runs-on: ubuntu-latest
     steps:
       # Checkout main branch for user docs
@@ -26,9 +26,10 @@ jobs:
           ref: main
           path: main
 
-      # Checkout docs/devs branch for developer docs
+      # Checkout docs/devs branch for developer docs (if exists)
       - name: Checkout docs/devs branch
         uses: actions/checkout@v4
+        continue-on-error: true
         with:
           ref: docs/devs
           path: docs-devs
@@ -60,29 +61,30 @@ jobs:
         working-directory: main
         run: mkdocs build --site-dir ../combined-site
 
-      # Build developer docs from docs/devs branch
+      # Build developer docs from docs/devs branch to obfuscated path
       - name: Install developer docs dependencies
+        if: hashFiles('docs-devs/dev-docs/requirements.txt') != ''
         working-directory: docs-devs
         run: pip install -r dev-docs/requirements.txt
 
-      - name: Build developer documentation site
+      - name: Build developer documentation site (obfuscated path)
+        if: hashFiles('docs-devs/mkdocs-dev.yml') != ''
         working-directory: docs-devs
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/dev
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1/dev
 
       - name: Verify combined build output
         run: |
           echo "Checking combined build output..."
           ls -la combined-site/
-          ls -la combined-site/dev/
           if [ ! -f "combined-site/index.html" ]; then
             echo "Error: User docs index.html not found"
             exit 1
           fi
-          if [ ! -f "combined-site/dev/index.html" ]; then
-            echo "Error: Developer docs index.html not found"
-            exit 1
+          if [ -d "combined-site/x9k2m7n4p8q1/dev" ]; then
+            echo "✓ Developer docs built to obfuscated path"
+            ls -la combined-site/x9k2m7n4p8q1/dev/
           fi
-          echo "Build verification passed - both sites built successfully!"
+          echo "Build verification passed!"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
