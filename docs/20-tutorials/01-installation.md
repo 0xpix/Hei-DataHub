@@ -113,7 +113,7 @@ pip install -e .
 **Expected output:**
 
 ```
-Successfully installed mini-datahub-0.55.0-beta ...
+Successfully installed mini-datahub-0.57.0-beta ...
 ```
 
 ---
@@ -165,7 +165,7 @@ Run the verification script:
 ```
 ✓ Python version: 3.11.x
 ✓ Virtual environment: active
-✓ Package installed: hei-datahub 0.55.0-beta
+✓ Package installed: hei-datahub 0.57.0-beta
 ✓ Database: initialized
 ✓ Datasets indexed: 12 total
 All checks passed!
