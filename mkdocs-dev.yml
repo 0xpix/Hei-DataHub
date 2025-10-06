@@ -22,43 +22,8 @@ site_dir: dev-site
 # Configuration
 theme:
   name: simple-blog
-  # palette:
-  #   # Developer docs use a distinct color scheme
-  #   - scheme: slate
-  #     primary: deep purple
-  #     accent: purple
-  #     toggle:
-  #       icon: material/brightness-4
-  #       name: Switch to light mode
-  #   - scheme: default
-  #     primary: deep purple
-  #     accent: purple
-  #     toggle:
-  #       icon: material/brightness-7
-  #       name: Switch to dark mode
-  # features:
-  #   - navigation.instant
-  #   - navigation.tracking
-  #   - navigation.tabs
-  #   - navigation.tabs.sticky
-  #   - navigation.sections
-  #   - navigation.expand
-  #   - navigation.indexes
-  #   - navigation.top
-  #   - navigation.footer
-  #   - search.suggest
-  #   - search.highlight
-  #   - search.share
-  #   - content.code.copy
-  #   - content.code.annotate
-  #   - content.action.edit
-  #   - content.action.view
-  #   - toc.follow
-  #   - toc.integrate
-  # icon:
-  #   repo: fontawesome/brands/github
-  #   edit: material/pencil
-  #   view: material/eye
+  components:
+    title: false
   logo: assets/dev-logo.png
   favicon: assets/dev-favicon.png
 
