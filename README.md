@@ -1,6 +1,8 @@
 
 <p align="center">
+  <img src="assets/4.png" alt="Hei-DataHub Logo" width="180"/>
   <img src="assets/5.png" alt="Hei-DataHub Logo" width="180"/>
+  <img src="assets/6.png" alt="Hei-DataHub Logo" width="180"/>
 </p>
 
 # Hei-DataHub
