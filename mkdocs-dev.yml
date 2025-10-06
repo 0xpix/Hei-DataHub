@@ -169,7 +169,7 @@ nav:
       - Data Flow: architecture/data-flow.md
       - Component Diagrams: architecture/diagrams.md
       - Design Principles: architecture/design-principles.md
-    
+
     - Codebase Tour:
       - Overview: codebase/overview.md
       - Root Files Explained: codebase/root-files.md
@@ -181,20 +181,20 @@ nav:
       - CLI Module (commands, main): codebase/cli-module.md
       - Utils Module (helpers, utilities): codebase/utils-module.md
       - Tests Structure: codebase/tests.md
-    
+
     - Configuration:
       - Overview: config/overview.md
       - Environment Variables: config/environment.md
       - Config Files: config/files.md
       - Adding New Config: config/adding-config.md
-    
+
     - Data Layer:
       - Storage Architecture: data/storage.md
       - Schema Definition: data/schema.md
       - Adding Datasets: data/adding-datasets.md
       - Indexing Strategy: data/indexing.md
       - Migrations: data/migrations.md
-    
+
     - UI/TUI Layer:
       - Architecture: ui/architecture.md
       - Views & Screens: ui/views.md
@@ -203,13 +203,13 @@ nav:
       - Keybindings: ui/keybindings.md
       - Theming: ui/theming.md
       - Adding New Views: ui/adding-views.md
-    
+
     - Build & Release:
       - Build Pipeline: build/pipeline.md
       - CI/CD Jobs: build/ci-cd.md
       - Release Process: build/releases.md
       - Changelog Policy: build/changelog.md
-    
+
     - Performance:
       - Overview: performance/overview.md
       - Profiling Guide: performance/profiling.md
