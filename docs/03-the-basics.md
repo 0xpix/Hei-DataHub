@@ -1,3 +1,4 @@
+# The basics
 
 This guide covers the core concepts of Hei-DataHub: projects, datasets, fields, search, and metadata management.
 
