@@ -8,10 +8,10 @@ This developer documentation is **versioned alongside the application code**. Ea
 
 ## Current Version
 
-**Developer Docs Version:** `0.56.0-beta "Precision"`  
-**Compatible With:** App releases `v0.56.x`  
-**Branch:** `docs/devs`  
-**Release Date:** October 5, 2025  
+**Developer Docs Version:** `0.56.0-beta "Precision"`
+**Compatible With:** App releases `v0.56.x`
+**Branch:** `docs/devs`
+**Release Date:** October 5, 2025
 **Status:** ✅ Active
 
 ---
@@ -163,7 +163,7 @@ When we deprecate an API or feature:
 !!! warning "Deprecated in v0.58.0"
     `old_search_function()` is deprecated and will be removed in v1.0.0.
     Use `new_search_service.search()` instead.
-    
+
     Migration guide: [Migrating from old_search_function](...)
 ```
 
@@ -222,7 +222,7 @@ git pull
 
 ### Q: Do I need to update docs for every code change?
 
-**A:** 
+**A:**
 - ✅ **Yes** if you change public APIs, add modules, or alter architecture
 - ❌ **No** if you fix bugs without changing interfaces
 

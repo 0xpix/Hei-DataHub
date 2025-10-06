@@ -146,13 +146,13 @@ graph LR
 
 This documentation is **NOT** for:
 
-- ❌ **End users** wanting to learn how to use Hei-DataHub  
+- ❌ **End users** wanting to learn how to use Hei-DataHub
   → See [User Manual](https://0xpix.github.io/Hei-DataHub) instead
 
-- ❌ **Data analysts** looking for dataset tutorials  
+- ❌ **Data analysts** looking for dataset tutorials
   → See [User Tutorials](https://0xpix.github.io/Hei-DataHub/tutorials)
 
-- ❌ **System admins** deploying Hei-DataHub  
+- ❌ **System admins** deploying Hei-DataHub
   → See [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation)
 
 ---
@@ -213,14 +213,14 @@ We **don't** assume:
 
 **Ask yourself:**
 
-1. **Am I trying to *use* Hei-DataHub?**  
-   → No? Good, you're in the right place.  
+1. **Am I trying to *use* Hei-DataHub?**
+   → No? Good, you're in the right place.
    → Yes? Go to [User Manual](https://0xpix.github.io/Hei-DataHub)
 
-2. **Am I trying to *change* or *understand* the code?**  
+2. **Am I trying to *change* or *understand* the code?**
    → Yes? Perfect, stay here.
 
-3. **Am I looking for user-facing features?**  
+3. **Am I looking for user-facing features?**
    → You're in the wrong place. Switch to user docs.
 
 ---

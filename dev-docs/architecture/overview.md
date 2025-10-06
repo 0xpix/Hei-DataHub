@@ -18,24 +18,24 @@ graph TD
     subgraph "Presentation Layer"
         UI[UI/TUI<br/>Textual Views & Widgets]
     end
-    
+
     subgraph "Application Layer"
         CLI[CLI Entry Point]
         Services[Services<br/>Search, Catalog, Publish, Sync]
     end
-    
+
     subgraph "Domain Layer"
         Core[Core<br/>Models, Rules, Errors]
     end
-    
+
     subgraph "Infrastructure Layer"
         Infra[Infrastructure<br/>DB, Git, GitHub API, Storage]
     end
-    
+
     subgraph "Data Layer"
         Data[Data Files<br/>YAML metadata, SQLite DB]
     end
-    
+
     UI --> Services
     CLI --> Services
     Services --> Core
@@ -115,7 +115,7 @@ graph TD
 **Flow:**
 
 ```
-User runs `hei-datahub` 
+User runs `hei-datahub`
   ↓
 CLI parses args
   ↓
@@ -150,7 +150,7 @@ class Dataset(BaseModel):
     title: str
     description: str
     tags: List[str] = []
-    
+
     @validator('name')
     def validate_name(cls, v):
         if not re.match(r'^[a-z0-9-]+$', v):
@@ -290,7 +290,7 @@ sequenceDiagram
     participant SearchService
     participant Index
     participant DB
-    
+
     User->>UI: Types query "precipitation"
     UI->>SearchService: search(query)
     SearchService->>SearchService: Parse query DSL
@@ -313,7 +313,7 @@ sequenceDiagram
     participant Store
     participant Git
     participant GitHub
-    
+
     User->>UI: Save + Publish
     UI->>PublishService: publish_dataset(dataset)
     PublishService->>Store: save_yaml(dataset)
@@ -326,7 +326,7 @@ sequenceDiagram
     GitHub-->>PublishService: PR URL
     PublishService-->>UI: Success(pr_url)
     UI-->>User: Show PR link
-    
+
     Note over PublishService,Git: On failure: auto-rollback via stash
 ```
 
@@ -339,7 +339,7 @@ sequenceDiagram
     participant Store
     participant Index
     participant DB
-    
+
     CLI->>SyncService: reindex()
     SyncService->>Store: list_all_yaml()
     Store-->>SyncService: [yaml_paths]
@@ -366,19 +366,19 @@ graph TB
         Views[Views]
         Widgets[Widgets]
     end
-    
+
     subgraph Services
         Search[Search Service]
         Catalog[Catalog Service]
         Publish[Publish Service]
         Sync[Sync Service]
     end
-    
+
     subgraph Core
         Models[Domain Models]
         Rules[Business Rules]
     end
-    
+
     subgraph Infra
         DB[Database]
         Index[FTS Index]
@@ -386,12 +386,12 @@ graph TB
         Git[Git Ops]
         GitHub[GitHub API]
     end
-    
+
     Views --> Search
     Views --> Catalog
     Views --> Publish
     Widgets --> Search
-    
+
     Search --> Models
     Catalog --> Models
     Catalog --> Rules
@@ -400,7 +400,7 @@ graph TB
     Publish --> GitHub
     Sync --> Store
     Sync --> Index
-    
+
     Index --> DB
     Store --> Models
 ```
