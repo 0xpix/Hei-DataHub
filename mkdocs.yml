@@ -82,25 +82,23 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-# Page tree / Navigation
+# Page tree / Navigation - Simplified structure
 nav:
   - Home: index.md
-  - Welcome: 00-welcome.md
-  - Getting Started: 01-getting-started.md
-  - Navigation: 02-navigation.md
-  - The Basics: 03-the-basics.md
-  - Reference:
+  - Getting Started:
+    - Welcome: 00-welcome.md
+    - Installation: 20-tutorials/01-installation.md
+    - Quick Start: 01-getting-started.md
+    - Navigation Basics: 02-navigation.md
+  - User Guide:
+    - The Basics: 03-the-basics.md
     - UI Guide: 10-ui.md
     - Data & SQL: 11-data-and-sql.md
     - Configuration: 12-config.md
   - Tutorials:
-    - Installation: 20-tutorials/01-installation.md
     - Your First Dataset: 20-tutorials/02-first-dataset.md
     - Search & Filters: 20-tutorials/03-search-and-filters.md
-  - Help:
-    - FAQ & Troubleshooting: 90-faq.md
-    - Versioning & Release Policy: 98-versioning.md
-    - Changelog: 99-changelog.md
+  - FAQ: 90-faq.md
 
 # Extra
 extra:
