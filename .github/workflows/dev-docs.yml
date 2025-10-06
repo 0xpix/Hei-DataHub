@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build developer documentation site
         run: mkdocs build --strict --config-file mkdocs-dev.yml --site-dir dev-site
-        
+
       - name: Verify build output
         run: |
           echo "Checking build output..."
@@ -69,7 +69,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
+
       - name: Summary
         run: |
           echo "## Developer Docs Deployed Successfully! 🚀" >> $GITHUB_STEP_SUMMARY
