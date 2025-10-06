@@ -1,0 +1,79 @@
+name: Deploy Developer Docs to GitHub Pages
+
+on:
+  push:
+    branches: [ docs/devs ]  # Only publish from dev-docs branch
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "dev-pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Developer Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs/devs branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/devs
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('dev-docs/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r dev-docs/requirements.txt
+
+      - name: Build developer documentation site
+        run: mkdocs build --strict --config-file mkdocs-dev.yml --site-dir dev-site
+        
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la dev-site/
+          if [ ! -f "dev-site/index.html" ]; then
+            echo "Error: index.html not found in build output"
+            exit 1
+          fi
+          echo "Build verification passed"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dev-site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+      - name: Summary
+        run: |
+          echo "## Developer Docs Deployed Successfully! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Site URL:** ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** docs/devs" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
