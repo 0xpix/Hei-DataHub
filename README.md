@@ -1,3 +1,8 @@
+
+<p align="center">
+  <img src="assets/1.png" alt="Hei-DataHub Logo" width="180"/>
+</p>
+
 # Hei-DataHub
 
 ![Version](https://img.shields.io/badge/version-0.55.2--beta-blue.svg)
