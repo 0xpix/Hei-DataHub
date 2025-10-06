@@ -85,7 +85,7 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-# Page tree / Navigation
+# Page tree / Navigation - Simplified structure
 nav:
   - Home: index.md
   - Getting Started:
@@ -101,7 +101,6 @@ nav:
     - Customize Keybindings: how-to/customize-keybindings.md
     - Change Theme: how-to/change-theme.md
   - Tutorials:
-    - Installation: 20-tutorials/01-installation.md
     - Your First Dataset: 20-tutorials/02-first-dataset.md
     - Search & Filters: 20-tutorials/03-search-and-filters.md
   - Reference:
