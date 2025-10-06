@@ -79,11 +79,7 @@ jobs:
             exit 1
           fi
           if [ ! -f "combined-site/x9k2m7n4p8q1/index.html" ]; then
-            echo "Error: Developer docs index.html not found"
-            exit 1
-          fi
-          if [ ! -f "combined-site/dev/index.html" ]; then
-            echo "Error: Developer docs index.html not found"
+            echo "Error: Developer docs index.html not found at obfuscated path"
             exit 1
           fi
           echo "Build verification passed - both sites built successfully!"

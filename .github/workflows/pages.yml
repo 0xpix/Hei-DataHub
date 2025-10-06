@@ -70,7 +70,7 @@ jobs:
       - name: Build developer documentation site (obfuscated path)
         if: hashFiles('docs-devs/mkdocs-dev.yml') != ''
         working-directory: docs-devs
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1/dev
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
 
       - name: Verify combined build output
         run: |
@@ -80,9 +80,13 @@ jobs:
             echo "Error: User docs index.html not found"
             exit 1
           fi
-          if [ -d "combined-site/x9k2m7n4p8q1/dev" ]; then
+          if [ -d "combined-site/x9k2m7n4p8q1" ]; then
             echo "✓ Developer docs built to obfuscated path"
-            ls -la combined-site/x9k2m7n4p8q1/dev/
+            ls -la combined-site/x9k2m7n4p8q1/
+            if [ ! -f "combined-site/x9k2m7n4p8q1/index.html" ]; then
+              echo "Error: Developer docs index.html not found at obfuscated path"
+              exit 1
+            fi
           fi
           echo "Build verification passed!"
 
