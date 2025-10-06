@@ -23,7 +23,7 @@
     };
 
     // Detect current site
-    const currentSite = window.location.pathname.includes('/x9k2m7n4p8q1') ? 'dev' : 'user';
+    const currentSite = window.location.pathname.includes('/dev') ? 'dev' : 'user';
     const otherSite = currentSite === 'dev' ? 'user' : 'dev';
 
     /**
