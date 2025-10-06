@@ -264,8 +264,8 @@ Done! 🎉
 ## Next Steps
 
 - **[Search for your updated dataset](search-advanced.md)** using field filters
-- **[Publish changes to GitHub](publish-datasets.md)** with automatic PR
 - **[Customize keyboard shortcuts](customize-keybindings.md)** (change `E` to something else)
+- **[Learn about themes](change-theme.md)** for visual customization
 
 ---
 
