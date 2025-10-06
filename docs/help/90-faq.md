@@ -2,7 +2,27 @@
 
 Common questions, issues, and solutions for Hei-DataHub v0.57.x beta.
 
----## Q: How do I edit a dataset without manually editing YAML?
+---
+
+##2. If YAML is correct but app shows old data:
+   ```bash
+   hei-datahub reindex
+   ```
+
+**Status:** Fix in progress for v0.57.1.
+
+---
+
+### Q: The app says "PR creation failed" but the PR was actually created. What's happening?
+
+**A:** This is a known issue in v0.57.0-beta. The PR is created successfully on GitHub, but the app doesn't detect it.
+
+**Workaround:**
+1. Check GitHub: `https://github.com/YOUR_ORG/YOUR_REPO/pulls`
+2. If PR exists, merge it normally
+3. Ignore the error message in the app
+
+**Status:** Fix in progress for v0.57.1.## Q: How do I edit a dataset without manually editing YAML?
 
 **A:** Use **inline editing** (added in v0.56):
 
@@ -12,7 +32,7 @@ Common questions, issues, and solutions for Hei-DataHub v0.57.x beta.
 3. Edit fields with Tab/Shift+Tab to navigate
 4. Press `Ctrl+S` to save
 
-👉 [Full editing guide](../how-to/06-edit-datasets.md)
+👉 [Full editing guide](how-to/edit-datasets.md)
 
 ---
 
@@ -29,7 +49,7 @@ format:csv
 - `size:>1000000` - Find files larger than 1 MB
 - `project:climate` - Find datasets in "climate" project
 
-👉 [Advanced search guide](../how-to/07-search-advanced.md)
+👉 [Advanced search guide](how-to/search-advanced.md)
 
 ---
 
@@ -61,7 +81,7 @@ Available themes: gruvbox, nord, dracula, monokai, catppuccin-mocha, solarized-d
 
 Then restart the app.
 
-👉 [Theme customization guide](../how-to/09-change-theme.md)
+👉 [Theme customization guide](how-to/change-theme.md)
 
 ---
 
@@ -82,45 +102,49 @@ keybindings:
 
 Then restart the app.
 
-👉 [Keybinding customization guide](../how-to/08-customize-keybindings.md)
+👉 [Keybinding customization guide](how-to/customize-keybindings.md)
 
 ---
 
 ### Q: My edited dataset reverts after restarting the app. Why?
 
-**A:** ✅ **Fixed in v{{ project_version }}** – This issue has been resolved. Edits now persist correctly across app restarts.
+**A:** This is a known issue in v0.57.0-beta.
 
-**If you're still experiencing this:**
-1. Verify you're running v0.57.1 or later: `hei-datahub --version`
-2. Check YAML file was updated:
+**Workarounds:
+1. After editing, verify the YAML file was updated:
    ```bash
    cat data/my-dataset/metadata.yaml
    ```
-3. If issue persists, file a bug report with reproduction steps.
+2. If YAML is correct but app shows old data:
+   ```bash
+   hei-datahub reindex
+   ```
+
+**Status:** Fix in progress for v0.57.1.
 
 ---
 
 ### Q: The app says "PR creation failed" but the PR was actually created. What's happening?
 
-**A:** This is a known issue in v{{ project_version }}. The PR is created successfully on GitHub, but the app doesn't detect it.
+**A:** This is a known issue in v0.57.0-beta. The PR is created successfully on GitHub, but the app doesn't detect it.
 
-**Workaround:**
+**Workaround:
 1. Check GitHub: `https://github.com/YOUR_ORG/YOUR_REPO/pulls`
 2. If PR exists, merge it normally
 3. Ignore the error message in the app
 
-**Status:** Fix in progress for future release.
+**Status:** Fix in progress for v0.57.1.
 
 ---
 
 ### Q: Theme/keybinding changes don't work until I restart. Can I reload config?
 
-**A:** ✅ **Fixed in v{{ project_version }}** – Config changes now apply automatically without restart.
+**A:** Not yet. Config hot-reload is planned for v0.57-beta.
 
-**If you're still experiencing this:**
-1. Verify you're running v0.57.1 or later: `hei-datahub --version`
-2. Check that your config file is valid YAML
-3. If issue persists, file a bug report
+**Workaround:** Restart the app after changing config:
+```bash
+hei-datahub
+```
 
 ---
 
@@ -679,7 +703,7 @@ Press ++s++ → Set "Debug Logging" → ++ctrl+s++
 - **No conflict detection:** Duplicate keybindings not detected (planned for v0.58)
 - **No hot-reload:** Theme/keybinding changes require restart (planned for v0.58)
 
-**Planned for future releases.**
+**Planned for future releases. See [Changelog](99-changelog.md#unreleased) for roadmap.**
 
 ---
 
