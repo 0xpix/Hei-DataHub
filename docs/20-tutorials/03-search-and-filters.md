@@ -1,16 +1,20 @@
 
-Master Hei-DataHub's search capabilities with this hands-on tutorial covering basic search, advanced techniques, and search best practices.
+# Tutorial: Search & Filters
+
+Master Hei-DataHub's search capabilities with this hands-on tutorial covering basic search, field-specific filters, and advanced techniques.
 
 ---
 
 ## What You'll Learn
 
 - How full-text search works in Hei-DataHub
+- **Available since v0.56:** Field-specific search with filters
+- **Available since v0.56:** Numeric and date operators
 - Search syntax and operators
 - Tips for finding datasets quickly
 - Understanding search results and ranking
 
-**Time:** ~15 minutes
+**Time:** ~20 minutes
 
 ---
 
@@ -82,7 +86,123 @@ modis
 
 ---
 
-## Step 3: Multi-Word Search
+## Step 3: Field-Specific Search (Available since v0.56)
+
+### Search by Format: "format:csv"
+
+Clear search and type:
+
+```
+format:csv
+```
+
+**How it works:**
+- Searches **only** the `format` field
+- Shows all CSV datasets
+- Look for colored badge: **🏷 format:csv**
+
+**Try also:**
+```
+format:parquet
+format:geojson
+```
+
+---
+
+### Search by Source: "source:github"
+
+Type:
+
+```
+source:github
+```
+
+**Expected results:**
+- Datasets where `source` contains "github"
+- E.g., `https://github.com/...`
+
+**Try also:**
+```
+source:s3
+source:https
+```
+
+---
+
+### Combine Multiple Filters
+
+Type:
+
+```
+format:csv source:github
+```
+
+**What this finds:**
+- Datasets that are **both** CSV files **and** from GitHub
+- Multiple badges appear: **🏷 format:csv** **🏷 source:github**
+
+---
+
+### Numeric Filter: "size:>1000000"
+
+Type:
+
+```
+size:>1000000
+```
+
+**What this finds:**
+- Datasets larger than 1 MB (1,000,000 bytes)
+
+**Try other operators:**
+```
+size:<500000        # Smaller than 500 KB
+size:>=1048576      # At least 1 MB
+size:<=2097152      # At most 2 MB
+```
+
+---
+
+### Date Filter: "date_created:>=2025-01-01"
+
+Type:
+
+```
+date_created:>=2025-01-01
+```
+
+**What this finds:**
+- Datasets created in 2025 or later
+
+**Try also:**
+```
+date_modified:<2024-12-31    # Modified before 2024
+date_created:=2025-10-05     # Created on specific date
+```
+
+---
+
+### Exact Phrase: "climate change"
+
+Type with quotes:
+
+```
+"climate change"
+```
+
+**What this finds:**
+- Exact phrase "climate change" (not just "climate" OR "change")
+- Badge shows: **📝 "climate change"**
+
+**Without quotes:**
+```
+climate change
+```
+Finds datasets with **both** words (but not necessarily together).
+
+---
+
+## Step 4: Multi-Word Search
 
 ### Search: "burned area"
 
