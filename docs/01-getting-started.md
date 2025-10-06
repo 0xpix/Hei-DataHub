@@ -60,24 +60,6 @@ hei-datahub
 
 ---
 
-## Verify Installation
-
-Run the verification script:
-
-```bash
-./scripts/verify_installation.sh
-```
-
-This checks:
-
-- ✅ Python version
-- ✅ Virtual environment
-- ✅ Package installation
-- ✅ Database initialization
-- ✅ Dataset indexing
-
----
-
 ## Command Reference
 
 ```bash
