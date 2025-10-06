@@ -66,18 +66,18 @@ jobs:
 
       - name: Build developer documentation site (obfuscated path)
         working-directory: docs-devs
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1/dev
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
 
       - name: Verify combined build output
         run: |
           echo "Checking combined build output..."
           ls -la combined-site/
-          ls -la combined-site/x9k2m7n4p8q1/dev/
+          ls -la combined-site/x9k2m7n4p8q1/
           if [ ! -f "combined-site/index.html" ]; then
             echo "Error: User docs index.html not found"
             exit 1
           fi
-          if [ ! -f "combined-site/x9k2m7n4p8q1/dev/index.html" ]; then
+          if [ ! -f "combined-site/x9k2m7n4p8q1/index.html" ]; then
             echo "Error: Developer docs index.html not found"
             exit 1
           fi
