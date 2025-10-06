@@ -11,22 +11,14 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"  # Use same group as main docs to prevent conflicts
-  cancel-in-progress: false
+  group: "dev-pages"
+  cancel-in-progress: true
 
 jobs:
   build:
-    name: Build Both User and Developer Documentation
+    name: Build Developer Documentation
     runs-on: ubuntu-latest
     steps:
-      # Checkout main branch for user docs
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          path: main
-
-      # Checkout docs/devs branch for developer docs
       - name: Checkout docs/devs branch
         uses: actions/checkout@v4
         with:
@@ -37,57 +29,34 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-mkdocs
+          key: ${{ runner.os }}-pip-${{ hashFiles('dev-docs/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # Build user docs from main branch
-      - name: Install user docs dependencies
-        working-directory: main
-        run: |
-          if [ -f docs/requirements.txt ]; then
-            pip install -r docs/requirements.txt
-          else
-            pip install mkdocs mkdocs-material pymdown-extensions mkdocs-macros-plugin
-          fi
-
-      - name: Build user documentation site
-        working-directory: main
-        run: mkdocs build --site-dir ../combined-site
-
-      # Build developer docs from docs/devs branch to obfuscated path
-      - name: Install developer docs dependencies
-        working-directory: docs-devs
+      - name: Install dependencies
         run: pip install -r dev-docs/requirements.txt
 
-      - name: Build developer documentation site (obfuscated path)
-        working-directory: docs-devs
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
+      - name: Build developer documentation site
+        run: mkdocs build --strict --config-file mkdocs-dev.yml --site-dir dev-site
 
-      - name: Verify combined build output
+      - name: Verify build output
         run: |
-          echo "Checking combined build output..."
-          ls -la combined-site/
-          ls -la combined-site/x9k2m7n4p8q1/
-          if [ ! -f "combined-site/index.html" ]; then
-            echo "Error: User docs index.html not found"
+          echo "Checking build output..."
+          ls -la dev-site/
+          if [ ! -f "dev-site/index.html" ]; then
+            echo "Error: index.html not found in build output"
             exit 1
           fi
-          if [ ! -f "combined-site/x9k2m7n4p8q1/index.html" ]; then
-            echo "Error: Developer docs index.html not found at obfuscated path"
-            exit 1
-          fi
-          echo "Build verification passed - both sites built successfully!"
+          echo "Build verification passed"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: combined-site
+          path: dev-site
 
   deploy:
     name: Deploy to GitHub Pages
@@ -100,7 +69,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
       - name: Summary
         run: |
           echo "## Developer Docs Deployed Successfully! 🚀" >> $GITHUB_STEP_SUMMARY
