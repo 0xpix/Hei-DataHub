@@ -1,5 +1,150 @@
+# FAQ & Quick Answers
 
-Common questions, issues, and solutions for Hei-DataHub.
+Common questions, issues, and solutions for Hei-DataHub v0.57.x beta.
+
+---
+
+##2. If YAML is correct but app shows old data:
+   ```bash
+   hei-datahub reindex
+   ```
+
+**Status:** Fix in progress for v0.57.1.
+
+---
+
+### Q: The app says "PR creation failed" but the PR was actually created. What's happening?
+
+**A:** This is a known issue in v0.57.0-beta. The PR is created successfully on GitHub, but the app doesn't detect it.
+
+**Workaround:**
+1. Check GitHub: `https://github.com/YOUR_ORG/YOUR_REPO/pulls`
+2. If PR exists, merge it normally
+3. Ignore the error message in the app
+
+**Status:** Fix in progress for v0.57.1.## Q: How do I edit a dataset without manually editing YAML?
+
+**A:** Use **inline editing** (added in v0.56):
+
+**Steps:**
+1. Open a dataset (press `Enter` on it)
+2. Press `E` to enter edit mode
+3. Edit fields with Tab/Shift+Tab to navigate
+4. Press `Ctrl+S` to save
+
+👉 [Full editing guide](how-to/edit-datasets.md)
+
+---
+
+### Q: How do I search for CSV files only?
+
+**A:** Use **field-specific search** (added in v0.56):
+
+```
+format:csv
+```
+
+**More examples:**
+- `source:github` - Find GitHub datasets
+- `size:>1000000` - Find files larger than 1 MB
+- `project:climate` - Find datasets in "climate" project
+
+👉 [Advanced search guide](how-to/search-advanced.md)
+
+---
+
+### Q: What are those colored badges below the search box?
+
+**A:** Those are **filter badges** showing your active search filters in real time:
+
+- **🏷 source:github** - Field filter active
+- **📝 "exact phrase"** - Phrase search active
+
+They help you see what you're searching for at a glance.
+
+---
+
+### Q: How do I change the theme?
+
+**A:** Edit your config file:
+
+```bash
+vim ~/.config/hei-datahub/config.yaml
+```
+
+Add:
+```yaml
+theme: "gruvbox"  # or nord, dracula, monokai, etc.
+```
+
+Available themes: gruvbox, nord, dracula, monokai, catppuccin-mocha, solarized-dark, solarized-light, forest, ocean, tokyo-night, material, textual-dark
+
+Then restart the app.
+
+👉 [Theme customization guide](how-to/change-theme.md)
+
+---
+
+### Q: How do I remap keybindings?
+
+**A:** Edit your config file:
+
+```bash
+vim ~/.config/hei-datahub/config.yaml
+```
+
+Add:
+```yaml
+keybindings:
+  edit_dataset: "ctrl+e"  # Change from 'e' to Ctrl+E
+  search: "ctrl+f"         # Change from '/' to Ctrl+F
+```
+
+Then restart the app.
+
+👉 [Keybinding customization guide](how-to/customize-keybindings.md)
+
+---
+
+### Q: My edited dataset reverts after restarting the app. Why?
+
+**A:** This is a known issue in v0.57.0-beta.
+
+**Workarounds:
+1. After editing, verify the YAML file was updated:
+   ```bash
+   cat data/my-dataset/metadata.yaml
+   ```
+2. If YAML is correct but app shows old data:
+   ```bash
+   hei-datahub reindex
+   ```
+
+**Status:** Fix in progress for v0.57.1.
+
+---
+
+### Q: The app says "PR creation failed" but the PR was actually created. What's happening?
+
+**A:** This is a known issue in v0.57.0-beta. The PR is created successfully on GitHub, but the app doesn't detect it.
+
+**Workaround:
+1. Check GitHub: `https://github.com/YOUR_ORG/YOUR_REPO/pulls`
+2. If PR exists, merge it normally
+3. Ignore the error message in the app
+
+**Status:** Fix in progress for v0.57.1.
+
+---
+
+### Q: Theme/keybinding changes don't work until I restart. Can I reload config?
+
+**A:** Not yet. Config hot-reload is planned for v0.57-beta.
+
+**Workaround:** Restart the app after changing config:
+```bash
+hei-datahub
+```
 
 ---
 
@@ -140,17 +285,6 @@ sqlite3 db.sqlite "INSERT INTO datasets_fts(datasets_fts) VALUES('optimize')"
 ---
 
 ## Dataset Management
-
-### Q: How do I edit a dataset?
-
-**A:** v0.55.x beta doesn't support inline editing. Edit YAML manually:
-
-```bash
-vim data/<dataset-id>/metadata.yaml
-hei-datahub reindex
-```
-
----
 
 ### Q: How do I delete a dataset?
 
@@ -554,15 +688,16 @@ Press ++s++ → Set "Debug Logging" → ++ctrl+s++
 
 ---
 
-## Known Limitations (v0.55.x beta)
+## Known Limitations (v0.57.x beta)
 
-- **No inline editing:** Must edit YAML files manually
-- **No deletion from TUI:** Must remove dataset directory manually
-- **No bulk operations:** Add/edit one dataset at a time
-- **No field-specific search:** Can't filter by specific metadata fields (e.g., `format:CSV`)
-- **No export/import:** Can't bulk export to JSON/CSV
+- **No deletion from TUI:** Must remove dataset directory manually (planned for v0.58)
+- **No bulk operations:** Add/edit one dataset at a time (planned for v0.60)
+- **No export/import:** Can't bulk export to JSON/CSV (planned for v0.60)
+- **No array field editing:** Can't edit `schema_fields` or arrays in edit mode (planned for v0.58)
+- **No conflict detection:** Duplicate keybindings not detected (planned for v0.58)
+- **No hot-reload:** Theme/keybinding changes require restart (planned for v0.58)
 
-**Planned for future releases.**
+**Planned for future releases. See [Changelog](99-changelog.md#unreleased) for roadmap.**
 
 ---
 
