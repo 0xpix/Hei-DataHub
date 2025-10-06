@@ -1,7 +1,7 @@
 !!! info "Version Notice — Precision"
-    **This manual tracks Hei-DataHub v0.56.x (beta).**
+    **This manual tracks Hei-DataHub v0.57.x (beta).**
 
-    **Release:** 0.56.0-beta (2025-10-05)
+    **Release:** 0.57.0-beta (2025-10-06)
     **Codename:** Precision
 
     Structured Search and Inline Editing
