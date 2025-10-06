@@ -1,6 +1,6 @@
 # MkDocs Configuration for Hei-DataHub Manual
 site_name: Hei-DataHub Manual
-site_description: 'Official documentation for Hei-DataHub v0.55.x (beta) - A local-first TUI for managing datasets with consistent metadata'
+site_description: 'Official documentation for Hei-DataHub v0.57.x (beta) - A local-first TUI for managing datasets with inline editing and structured search'
 site_author: Hei-DataHub Team
 site_url: https://0xpix.github.io/Hei-DataHub
 
@@ -85,20 +85,31 @@ markdown_extensions:
 # Page tree / Navigation
 nav:
   - Home: index.md
-  - Welcome: 00-welcome.md
-  - Getting Started: 01-getting-started.md
-  - Navigation: 02-navigation.md
-  - The Basics: 03-the-basics.md
-  - Reference:
-    - UI Guide: 10-ui.md
-    - Data & SQL: 11-data-and-sql.md
-    - Configuration: 12-config.md
+  - Getting Started:
+    - Welcome: 00-welcome.md
+    - Installation: 01-getting-started.md
+    - Navigation: 02-navigation.md
+    - The Basics: 03-the-basics.md
+  - What's New:
+    - 0.57-beta "Renovation": whats-new/0.57-beta.md
+  - How-to Guides:
+    - Edit Datasets: how-to/edit-datasets.md
+    - Advanced Search: how-to/search-advanced.md
+    - Customize Keybindings: how-to/customize-keybindings.md
+    - Change Theme: how-to/change-theme.md
   - Tutorials:
     - Installation: 20-tutorials/01-installation.md
     - Your First Dataset: 20-tutorials/02-first-dataset.md
     - Search & Filters: 20-tutorials/03-search-and-filters.md
+  - Reference:
+    - UI Guide: 10-ui.md
+    - Data & SQL: 11-data-and-sql.md
+    - Configuration: 12-config.md
+    - Search Syntax: reference/search-syntax.md
+    - Keyboard Shortcuts: reference/keybindings.md
   - Help:
-    - FAQ & Troubleshooting: 90-faq.md
+    - FAQ: 90-faq.md
+    - Troubleshooting: troubleshooting.md
     - Versioning & Release Policy: 98-versioning.md
     - Changelog: 99-changelog.md
 
