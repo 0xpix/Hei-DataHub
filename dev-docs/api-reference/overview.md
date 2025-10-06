@@ -145,5 +145,5 @@ Every public function should have:
 
 ---
 
-**Status:** 🔴 Work in Progress (~5% complete)  
+**Status:** 🔴 Work in Progress (~5% complete)
 **Goal:** 100% API coverage by Q1 2026

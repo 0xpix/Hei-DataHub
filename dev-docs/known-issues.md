@@ -9,8 +9,8 @@ For application-level known issues, see:
 
 ## Current Status
 
-**Last Updated:** 2025-10-06  
-**Developer Docs Version:** 0.56.0-beta  
+**Last Updated:** 2025-10-06
+**Developer Docs Version:** 0.56.0-beta
 **Coverage:** 🟡 In Progress (~40% complete)
 
 ---

@@ -159,14 +159,14 @@ Before coding:
 def search_datasets(query: str, filters: Optional[Dict[str, Any]] = None) -> List[Dataset]:
     """
     Search datasets using FTS5 full-text search.
-    
+
     Args:
         query: Search query string (FTS5 syntax)
         filters: Optional filters (tags, date range, etc.)
-    
+
     Returns:
         List of matching datasets, sorted by relevance
-        
+
     Raises:
         SearchError: If query syntax is invalid
         DatabaseError: If database connection fails
@@ -215,10 +215,10 @@ def test_search_with_query_returns_matching_datasets():
     """Test that search returns datasets matching the query."""
     # Arrange
     query = "precipitation"
-    
+
     # Act
     results = search.search_datasets(query)
-    
+
     # Assert
     assert len(results) > 0
     assert all("precipitation" in d.title.lower() for d in results)
