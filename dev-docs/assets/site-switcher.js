@@ -23,7 +23,7 @@
     };
 
     // Detect current site
-    const currentSite = window.location.pathname.includes('/dev') ? 'dev' : 'user';
+    const currentSite = window.location.pathname.includes('/x9k2m7n4p8q1') ? 'dev' : 'user';
     const otherSite = currentSite === 'dev' ? 'user' : 'dev';
 
     /**
@@ -78,7 +78,7 @@
         indicator.style.cssText = `
             padding: 1rem;
             margin: 0.5rem;
-            background: ${currentSite === 'x9k2m7n4p8q1' ? '#6366f1' : '#059669'};
+            background: ${currentSite === 'dev' ? '#6366f1' : '#059669'};
             color: white;
             border-radius: 8px;
             text-align: center;
