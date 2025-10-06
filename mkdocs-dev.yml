@@ -15,6 +15,10 @@ edit_uri: edit/docs/devs/dev-docs/
 # Copyright
 copyright: Copyright &copy; 2025 Hei-DataHub Contributors | Developer Documentation Site
 
+# Directory Configuration
+docs_dir: dev-docs
+site_dir: dev-site
+
 # Configuration
 theme:
   name: simple-blog
