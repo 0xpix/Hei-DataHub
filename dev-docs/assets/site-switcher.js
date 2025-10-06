@@ -23,8 +23,8 @@
     };
 
     // Detect current site
-    const currentSite = window.location.pathname.includes('/x9k2m7n4p8q1') ? 'x9k2m7n4p8q1' : 'user';
-    const otherSite = currentSite === 'x9k2m7n4p8q1' ? 'user' : 'x9k2m7n4p8q1';
+    const currentSite = window.location.pathname.includes('/x9k2m7n4p8q1') ? 'dev' : 'user';
+    const otherSite = currentSite === 'dev' ? 'user' : 'dev';
 
     /**
      * Create site switcher banner
