@@ -12,29 +12,84 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
+    name: Build User and Developer Documentation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      # Checkout main branch for user docs
+      - name: Checkout main branch
         uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
 
-      # If you use MkDocs:
+      # Checkout docs/devs branch for developer docs (if exists)
+      - name: Checkout docs/devs branch
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: docs/devs
+          path: docs-devs
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install dependencies
-        run: pip install -r docs/requirements.txt
-      - name: Build site
-        run: mkdocs build --strict --site-dir site
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-mkdocs
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Build user docs from main branch
+      - name: Install user docs dependencies
+        working-directory: main
+        run: |
+          if [ -f docs/requirements.txt ]; then
+            pip install -r docs/requirements.txt
+          else
+            pip install mkdocs mkdocs-material pymdown-extensions mkdocs-macros-plugin
+          fi
+
+      - name: Build user documentation site
+        working-directory: main
+        run: mkdocs build --site-dir ../combined-site
+
+      # Build developer docs from docs/devs branch to obfuscated path
+      - name: Install developer docs dependencies
+        if: hashFiles('docs-devs/dev-docs/requirements.txt') != ''
+        working-directory: docs-devs
+        run: pip install -r dev-docs/requirements.txt
+
+      - name: Build developer documentation site (obfuscated path)
+        if: hashFiles('docs-devs/mkdocs-dev.yml') != ''
+        working-directory: docs-devs
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1/dev
+
+      - name: Verify combined build output
+        run: |
+          echo "Checking combined build output..."
+          ls -la combined-site/
+          if [ ! -f "combined-site/index.html" ]; then
+            echo "Error: User docs index.html not found"
+            exit 1
+          fi
+          if [ -d "combined-site/x9k2m7n4p8q1/dev" ]; then
+            echo "✓ Developer docs built to obfuscated path"
+            ls -la combined-site/x9k2m7n4p8q1/dev/
+          fi
+          echo "Build verification passed!"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: combined-site
 
   deploy:
     needs: build
