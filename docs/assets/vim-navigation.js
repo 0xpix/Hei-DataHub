@@ -20,7 +20,8 @@
     scrollStep: 60,              // pixels for j/k
     scrollSmooth: true,          // enable smooth scrolling
     enableInInputs: false,       // allow vim keys while typing (usually false)
-    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/dev/',
+    // Obfuscated path to developer docs (not meant to be guessed)
+    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/',
   };
 
   // State
