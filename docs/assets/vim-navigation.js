@@ -124,7 +124,7 @@
    */
   function createCommandInput() {
     console.log('[Vim Navigation] Creating command input overlay');
-    
+
     // Create overlay with simple-blog theme styling
     const overlay = document.createElement('div');
     overlay.id = 'vim-command-overlay';
@@ -179,7 +179,7 @@
       font-weight: 400 !important;
     `;
     input.placeholder = 'Type "dev" to go to Developer Docs';
-    
+
     // Style placeholder text
     const style = document.createElement('style');
     style.textContent = `
@@ -187,7 +187,7 @@
         color: #6c757d !important;
         opacity: 0.8 !important;
       }
-      
+
       /* Dark mode support */
       @media (prefers-color-scheme: dark) {
         #vim-command-overlay {
@@ -219,7 +219,7 @@
    */
   function executeCommand(cmd) {
     const trimmed = cmd.trim().toLowerCase();
-    
+
     console.log('[Vim Navigation] Executing command:', trimmed);
 
     if (trimmed === 'dev') {
@@ -237,15 +237,15 @@
    */
   function enterCommandMode() {
     console.log('[Vim Navigation] enterCommandMode called, current commandMode:', commandMode);
-    
+
     if (commandMode) {
       console.log('[Vim Navigation] Already in command mode, ignoring');
       return;
     }
-    
+
     commandMode = true;
     console.log('[Vim Navigation] Creating command input...');
-    
+
     const { overlay, input } = createCommandInput();
     commandInput = input;
 
@@ -258,7 +258,7 @@
     // Handle Enter key to execute command
     input.addEventListener('keydown', (e) => {
       console.log('[Vim Navigation] Command input keydown:', e.key);
-      
+
       if (e.key === 'Enter') {
         e.preventDefault();
         console.log('[Vim Navigation] Enter pressed, executing command:', input.value);
@@ -279,7 +279,7 @@
    */
   function exitCommandMode() {
     if (!commandMode) return;
-    
+
     commandMode = false;
     const overlay = document.getElementById('vim-command-overlay');
     if (overlay) {
