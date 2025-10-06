@@ -59,22 +59,26 @@ jobs:
         working-directory: main
         run: mkdocs build --site-dir ../combined-site
 
-      # Build developer docs from docs/devs branch
+      # Build developer docs from docs/devs branch to obfuscated path
       - name: Install developer docs dependencies
         working-directory: docs-devs
         run: pip install -r dev-docs/requirements.txt
 
-      - name: Build developer documentation site
+      - name: Build developer documentation site (obfuscated path)
         working-directory: docs-devs
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/dev
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1/dev
 
       - name: Verify combined build output
         run: |
           echo "Checking combined build output..."
           ls -la combined-site/
-          ls -la combined-site/dev/
+          ls -la combined-site/x9k2m7n4p8q1/dev/
           if [ ! -f "combined-site/index.html" ]; then
             echo "Error: User docs index.html not found"
+            exit 1
+          fi
+          if [ ! -f "combined-site/x9k2m7n4p8q1/dev/index.html" ]; then
+            echo "Error: Developer docs index.html not found"
             exit 1
           fi
           if [ ! -f "combined-site/dev/index.html" ]; then
