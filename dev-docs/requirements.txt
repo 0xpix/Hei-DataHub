@@ -1,0 +1,19 @@
+# Python dependencies for building the developer documentation site
+
+# MkDocs core
+mkdocs>=1.5.0
+mkdocs-material>=9.4.0
+
+# Plugins
+mkdocs-git-revision-date-localized-plugin>=1.2.0
+mkdocs-minify-plugin>=0.7.0
+
+# Extensions
+pymdown-extensions>=10.0.0
+markdown>=3.4.0
+
+# For mermaid diagrams
+mkdocs-mermaid2-plugin>=1.1.0
+
+# For better search
+mkdocs-material[imaging]>=9.4.0
