@@ -8,6 +8,7 @@
  *   G          - Jump to bottom of page
  *   h/l        - Navigate to previous/next page
  *   /          - Focus search box (if available)
+ *   :          - Enter command mode (type :dev to go to developer docs)
  *   Escape     - Blur active element (exit input focus)
  */
 
@@ -19,11 +20,14 @@
     scrollStep: 60,              // pixels for j/k
     scrollSmooth: true,          // enable smooth scrolling
     enableInInputs: false,       // allow vim keys while typing (usually false)
+    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/dev/',
   };
 
   // State
   let ggBuffer = false;          // track 'g' press for 'gg' command
   let ggTimeout = null;
+  let commandMode = false;       // track if in command mode
+  let commandInput = null;       // reference to command input element
 
   /**
    * Check if user is currently in an input field
@@ -115,12 +119,136 @@
   }
 
   /**
+   * Create command mode input overlay
+   */
+  function createCommandInput() {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'vim-command-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 0.5rem 1rem;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      border-top: 2px solid #007acc;
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    `;
+
+    // Create prompt
+    const prompt = document.createElement('span');
+    prompt.textContent = ':';
+    prompt.style.cssText = `
+      color: #007acc;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    `;
+
+    // Create input
+    const input = document.createElement('input');
+    input.id = 'vim-command-input';
+    input.type = 'text';
+    input.style.cssText = `
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #d4d4d4;
+      font-family: inherit;
+      font-size: inherit;
+      flex: 1;
+      padding: 0;
+    `;
+    input.placeholder = 'Type "dev" to go to Developer Docs';
+
+    overlay.appendChild(prompt);
+    overlay.appendChild(input);
+    document.body.appendChild(overlay);
+
+    return { overlay, input };
+  }
+
+  /**
+   * Execute vim command
+   */
+  function executeCommand(cmd) {
+    const trimmed = cmd.trim().toLowerCase();
+    
+    console.log('[Vim Navigation] Executing command:', trimmed);
+
+    if (trimmed === 'dev') {
+      window.location.href = config.devDocsUrl;
+      return true;
+    }
+
+    // Unknown command
+    console.warn('[Vim Navigation] Unknown command:', trimmed);
+    return false;
+  }
+
+  /**
+   * Enter command mode
+   */
+  function enterCommandMode() {
+    if (commandMode) return;
+    
+    commandMode = true;
+    const { overlay, input } = createCommandInput();
+    commandInput = input;
+
+    // Focus the input
+    input.focus();
+
+    // Handle Enter key to execute command
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const success = executeCommand(input.value);
+        exitCommandMode();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        exitCommandMode();
+      }
+    });
+
+    console.log('[Vim Navigation] Entered command mode');
+  }
+
+  /**
+   * Exit command mode
+   */
+  function exitCommandMode() {
+    if (!commandMode) return;
+    
+    commandMode = false;
+    const overlay = document.getElementById('vim-command-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
+    commandInput = null;
+
+    console.log('[Vim Navigation] Exited command mode');
+  }
+
+  /**
    * Main keyboard handler
    */
   function handleKeyPress(e) {
     // Debug: log key presses (remove in production if needed)
-    if (['j', 'k', 'h', 'l', 'g', 'G', 'd', 'u', '/'].includes(e.key)) {
+    if (['j', 'k', 'h', 'l', 'g', 'G', 'd', 'u', '/', ':'].includes(e.key)) {
       console.log('[Vim Navigation] Key pressed:', e.key, '| URL:', location.pathname);
+    }
+
+    // Handle command mode separately
+    if (commandMode) {
+      // Command input handles its own keys
+      return;
     }
 
     // Allow normal behavior in input fields (unless explicitly enabled)
@@ -130,6 +258,13 @@
         document.activeElement.blur();
         e.preventDefault();
       }
+      return;
+    }
+
+    // Enter command mode with ':'
+    if (e.key === ':' && !e.shiftKey) {
+      e.preventDefault();
+      enterCommandMode();
       return;
     }
 
@@ -297,7 +432,8 @@
     }
 
     // Log initialization
-    console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search)');
+    console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search), : (command mode)');
+    console.log('[Vim Navigation] Command mode: Type ":dev" to navigate to Developer Docs');
 
     // Listen for instant navigation / history changes (for MkDocs instant loading)
     // This ensures vim navigation works after client-side page transitions
