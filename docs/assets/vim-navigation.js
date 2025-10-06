@@ -183,7 +183,6 @@
    */
   function executeCommand(cmd) {
     const trimmed = cmd.trim().toLowerCase();
-
     console.log('[Vim Navigation] Executing command:', trimmed);
 
     if (trimmed === 'dev') {
@@ -201,7 +200,6 @@
    */
   function enterCommandMode() {
     if (commandMode) return;
-
     commandMode = true;
     const { overlay, input } = createCommandInput();
     commandInput = input;
