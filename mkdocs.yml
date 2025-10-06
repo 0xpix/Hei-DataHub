@@ -16,8 +16,8 @@ copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 theme:
   name: simple-blog
   custom_dir: docs/
-  logo: assets/1.png
-  favicon: assets/1.png
+  logo: assets/dark_logo.svg
+  favicon: assets/dark_logo_circle.svg
 
   # Simple blog theme customization options
   # Note: Features below are Material-specific and may not work with simple-blog
@@ -119,7 +119,7 @@ nav:
 extra:
   version:
     provider: mike
-  logo: assets/1.png
+  logo: assets/dark_logo.svg
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/0xpix/Hei-DataHub
