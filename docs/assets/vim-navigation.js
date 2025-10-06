@@ -128,7 +128,7 @@
   function createCommandInput() {
     console.log('[Vim Navigation] Creating command input overlay');
 
-    // Create overlay
+    // Create overlay with simple-blog theme styling
     const overlay = document.createElement('div');
     overlay.id = 'vim-command-overlay';
     overlay.style.cssText = `
@@ -182,6 +182,31 @@
       font-weight: 400 !important;
     `;
     input.placeholder = 'Type "dev" to go to Developer Docs';
+
+    // Style placeholder text
+    const style = document.createElement('style');
+    style.textContent = `
+      #vim-command-input::placeholder {
+        color: #6c757d !important;
+        opacity: 0.8 !important;
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        #vim-command-overlay {
+          background: #1a1a1a !important;
+          color: #e0e0e0 !important;
+          border-top-color: #333 !important;
+        }
+        #vim-command-input {
+          color: #e0e0e0 !important;
+        }
+        #vim-command-input::placeholder {
+          color: #999 !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
 
     overlay.appendChild(prompt);
     overlay.appendChild(input);
