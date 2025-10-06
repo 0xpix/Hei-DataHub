@@ -1,15 +1,5 @@
 <p align="center">
-  <img src="assets## What's in the Box (v0.56+ features, v0.57 docs)
-
-- **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
-- **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing (v0.56)
-- **✏️ Inline Editing:** Edit datasets directly in the TUI with undo/redo and validation (v0.56)
-- **✅ Validated Metadata:** JSON Schema + Pydantic validation ensure consistency
-- **🖥️ Clean TUI:** Terminal interface built with Textual, Neovim-style keybindings
-- **📦 Simple Storage:** One folder per dataset with `metadata.yaml`
-- **🔄 Automated PRs:** Save → PR workflow with GitHub integration (optional, v0.56)
-- **🎨 Themeable:** 12 built-in themes with easy customization (v0.56)
-- **⌨️ Customizable:** Configure keybindings, themes, and behavior (v0.56)="Hei-DataHub Logo" width="160"/>
+  <img src="assets/dark_logo.svg" alt="Hei-DataHub Logo" width="200"/>
 </p>
 
 # The Hei-DataHub Manual (v0.57.x beta)
