@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../assets/dark_logo.svg" alt="Hei-DataHub Logo" width="120"/>
+</p>
+
 !!! info "Version Notice — Renovation"
     **This manual tracks Hei-DataHub v0.57.x (beta).**
 
