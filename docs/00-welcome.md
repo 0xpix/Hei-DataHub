@@ -1,3 +1,5 @@
+# Welcome to Hei-DataHub
+
 ## What is Hei-DataHub?
 
 **Hei-DataHub** is a terminal-based application (TUI) designed to help researchers, data engineers, and teams **organize, search, and share datasets** without the overhead of complex data catalog infrastructure.
