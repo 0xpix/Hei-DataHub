@@ -219,6 +219,7 @@
    */
   function executeCommand(cmd) {
     const trimmed = cmd.trim().toLowerCase();
+
     console.log('[Vim Navigation] Executing command:', trimmed);
 
     if (trimmed === 'dev') {
