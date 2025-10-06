@@ -146,167 +146,78 @@ extra:
           data: 0
           note: Thanks! Help us improve by opening an issue.
 
-# Navigation structure
+# Navigation structure - Simplified for clarity
 nav:
   - Home: index.md
 
-  - Overview:
-    - Introduction: overview/introduction.md
-    - Audience & Scope: overview/audience.md
-    - Version Compatibility: overview/compatibility.md
-    - Contributing to Docs: overview/contributing-docs.md
-
-  - Architecture:
-    - System Overview: architecture/overview.md
-    - Module Map: architecture/module-map.md
-    - Data Flow: architecture/data-flow.md
-    - Dependency Graph: architecture/dependencies.md
-    - Component Diagrams: architecture/diagrams.md
-
-  - Core Concepts:
-    - What is "Core"?: core-concepts/what-is-core.md
-    - Platform Constraints: core-concepts/platform.md
-    - Domain Model: core-concepts/domain-model.md
-    - Design Principles: core-concepts/design-principles.md
-
-  - Codebase Tour:
-    - Navigation Guide: codebase/navigation.md
-    - Root Files: codebase/root-files.md
-    - src/mini_datahub:
-      - Package Init: codebase/src/init.md
-      - version.py: codebase/src/version.md
-      - app/: codebase/src/app.md
-      - cli/: codebase/src/cli.md
-      - core/: codebase/src/core.md
-      - infra/: codebase/src/infra.md
-      - services/: codebase/src/services.md
-      - ui/: codebase/src/ui.md
-      - utils/: codebase/src/utils.md
-    - tests/: codebase/tests.md
-    - scripts/: codebase/scripts.md
-    - data/: codebase/data.md
-    - docs/: codebase/docs.md
-
-  - API Reference:
-    - Overview: api-reference/overview.md
-    - app Module:
-      - runtime: api-reference/app/runtime.md
-      - settings: api-reference/app/settings.md
-    - core Module:
-      - models: api-reference/core/models.md
-      - rules: api-reference/core/rules.md
-      - errors: api-reference/core/errors.md
-      - queries: api-reference/core/queries.md
-    - infra Module:
-      - paths: api-reference/infra/paths.md
-      - config_paths: api-reference/infra/config_paths.md
-      - db: api-reference/infra/db.md
-      - index: api-reference/infra/index.md
-      - store: api-reference/infra/store.md
-      - git: api-reference/infra/git.md
-      - github_api: api-reference/infra/github_api.md
-    - services Module:
-      - search: api-reference/services/search.md
-      - catalog: api-reference/services/catalog.md
-      - sync: api-reference/services/sync.md
-      - publish: api-reference/services/publish.md
-      - autocomplete: api-reference/services/autocomplete.md
-      - outbox: api-reference/services/outbox.md
-      - update_check: api-reference/services/update_check.md
-      - actions: api-reference/services/actions.md
-      - config: api-reference/services/config.md
-      - state: api-reference/services/state.md
-      - storage: api-reference/services/storage.md
-    - ui Module:
-      - theme: api-reference/ui/theme.md
-      - views: api-reference/ui/views.md
-      - widgets: api-reference/ui/widgets.md
-    - cli Module:
-      - main: api-reference/cli/main.md
-
-  - Configuration:
-    - Overview: config/overview.md
-    - Environment Variables: config/environment.md
-    - Config Files: config/files.md
-    - Settings Profiles: config/profiles.md
-    - Adding New Config: config/adding-config.md
-
-  - Data Layer:
-    - Storage Architecture: data/storage.md
-    - Schema Definition: data/schema.md
-    - Migrations: data/migrations.md
-    - Adding Datasets: data/adding-datasets.md
-    - Indexing Strategy: data/indexing.md
-    - Performance Tips: data/performance.md
-
-  - UI/TUI Layer:
-    - Architecture: ui/architecture.md
-    - Views & Screens: ui/views.md
-    - Widgets & Components: ui/widgets.md
-    - State Management: ui/state.md
-    - Keybindings: ui/keybindings.md
-    - Theming: ui/theming.md
-    - Adding New Views: ui/adding-views.md
-
-  - Extensibility:
-    - Extension Points: extensibility/extension-points.md
-    - Plugin Architecture: extensibility/plugins.md
-    - Creating Adapters: extensibility/adapters.md
-    - Testing Extensions: extensibility/testing.md
-
-  - Build & Release:
-    - Build Pipeline: build/pipeline.md
-    - CI/CD Jobs: build/ci-cd.md
-    - Release Process: build/releases.md
-    - SemVer Guide: build/semver.md
-    - Changelog Policy: build/changelog.md
-
-  - Quality Assurance:
-    - Testing Strategy: qa/testing-strategy.md
-    - Test Data & Fixtures: qa/test-data.md
-    - Logging Conventions: qa/logging.md
-    - Metrics: qa/metrics.md
-    - Code Coverage: qa/coverage.md
-
-  - Performance:
-    - Overview: performance/overview.md
-    - Profiling Guide: performance/profiling.md
-    - Common Hotspots: performance/hotspots.md
-    - Optimization Playbooks: performance/playbooks.md
-    - Performance SLAs: performance/slas.md
-
-  - Security:
-    - Secrets Management: security/secrets.md
-    - Data Privacy: security/privacy.md
-    - Supply Chain: security/supply-chain.md
-    - Security Checklist: security/checklist.md
+  - Quick Start:
+    - Getting Started: quickstart/getting-started.md
+    - First Contribution: quickstart/first-contribution.md
+    - Development Setup: quickstart/development-setup.md
+    - Common Tasks: quickstart/common-tasks.md
 
   - Contributing:
-    - Contributor Workflow: contributing/workflow.md
+    - Workflow: contributing/workflow.md
     - Commit Conventions: contributing/commits.md
-    - Code Review Guide: contributing/code-review.md
+    - Code Review: contributing/code-review.md
     - Definition of Done: contributing/definition-of-done.md
-    - Labels & Triage: contributing/labels.md
 
-  - Decisions & Roadmap:
-    - ADRs: adr/index.md
-    - ADR-001: adr/001-docs-split.md
-    - ADR-002: adr/002-branching-strategy.md
-    - ADR-003: adr/003-changelog-enforcement.md
-    - Roadmap: roadmap.md
-    - Deprecation Policy: deprecation.md
+  - Development:
+    - Architecture:
+      - System Overview: architecture/overview.md
+      - Module Map: architecture/module-map.md
+      - Data Flow: architecture/data-flow.md
+      - Component Diagrams: architecture/diagrams.md
+      - Design Principles: architecture/design-principles.md
+    
+    - Codebase Tour:
+      - Overview: codebase/overview.md
+      - Root Files Explained: codebase/root-files.md
+      - Package Structure: codebase/package-structure.md
+      - Core Module (models, rules, errors, queries): codebase/core-module.md
+      - Services Module (search, catalog, sync, etc): codebase/services-module.md
+      - Infrastructure Module (db, git, config): codebase/infra-module.md
+      - UI Module (theme, views, widgets): codebase/ui-module.md
+      - CLI Module (commands, main): codebase/cli-module.md
+      - Utils Module (helpers, utilities): codebase/utils-module.md
+      - Tests Structure: codebase/tests.md
+    
+    - Configuration:
+      - Overview: config/overview.md
+      - Environment Variables: config/environment.md
+      - Config Files: config/files.md
+      - Adding New Config: config/adding-config.md
+    
+    - Data Layer:
+      - Storage Architecture: data/storage.md
+      - Schema Definition: data/schema.md
+      - Adding Datasets: data/adding-datasets.md
+      - Indexing Strategy: data/indexing.md
+      - Migrations: data/migrations.md
+    
+    - UI/TUI Layer:
+      - Architecture: ui/architecture.md
+      - Views & Screens: ui/views.md
+      - Widgets & Components: ui/widgets.md
+      - State Management: ui/state.md
+      - Keybindings: ui/keybindings.md
+      - Theming: ui/theming.md
+      - Adding New Views: ui/adding-views.md
+    
+    - Build & Release:
+      - Build Pipeline: build/pipeline.md
+      - CI/CD Jobs: build/ci-cd.md
+      - Release Process: build/releases.md
+      - Changelog Policy: build/changelog.md
+    
+    - Performance:
+      - Overview: performance/overview.md
+      - Profiling Guide: performance/profiling.md
+      - Common Hotspots: performance/hotspots.md
+      - Optimization Tips: performance/optimization.md
 
-  - Known Issues:
-    - Developer Docs Issues: known-issues.md
-    - Project Known Issues: ../devs/0.56.x-beta/KNOWN_ISSUES.md
-
-  - Maintenance:
-    - Docs Health Checklist: maintenance/health-checklist.md
-    - Coverage Tracker: maintenance/coverage-tracker.md
-    - Update Procedures: maintenance/update-procedures.md
-
-  - Appendices:
+  - Reference:
+    - API Documentation: api-reference/overview.md
+    - Architecture Decisions (ADRs): adr/index.md
+    - Known Issues: known-issues.md
     - Glossary: appendices/glossary.md
-    - File Index: appendices/file-index.md
-    - Function Index: appendices/function-index.md
-    - Quick Reference: appendices/quick-reference.md
