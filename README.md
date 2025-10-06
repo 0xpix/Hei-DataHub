@@ -1,7 +1,7 @@
 
 <p align="center">
-  <img src="assets/png/1.svg" alt="Hei-DataHub Logo" width="400"/>
-  <img src="assets/png/8.svg" alt="Hei-DataHub Logo" width="400"/>
+  <img src="assets/png/1.svg" alt="Hei-DataHub Logo" width="250"/>
+  <img src="assets/png/8.svg" alt="Hei-DataHub Logo" width="250"/>
 </p>
 
 <p align="center">
