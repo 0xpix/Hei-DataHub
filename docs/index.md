@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="/Hei-DataHub/assets/dark_logo_inline_v1.svg" alt="Hei-DataHub Logo" width="300"/>
+    <img src="/Hei-DataHub/assets/dark_logo_inline_v1.svg" alt="Hei-DataHub Logo" width="500"/>
 </p>
 
 # The Hei-DataHub Manual
