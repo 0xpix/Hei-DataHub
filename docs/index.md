@@ -1,5 +1,5 @@
-````markdown
-# The Hei-DataHub Man## What's in the Box (v0.56+ features, v0.57 docs)
+<p align="center">
+  <img src="assets## What's in the Box (v0.56+ features, v0.57 docs)
 
 - **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
 - **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing (v0.56)
@@ -9,7 +9,10 @@
 - **📦 Simple Storage:** One folder per dataset with `metadata.yaml`
 - **🔄 Automated PRs:** Save → PR workflow with GitHub integration (optional, v0.56)
 - **🎨 Themeable:** 12 built-in themes with easy customization (v0.56)
-- **⌨️ Customizable:** Configure keybindings, themes, and behavior (v0.56)x beta)
+- **⌨️ Customizable:** Configure keybindings, themes, and behavior (v0.56)="Hei-DataHub Logo" width="160"/>
+</p>
+
+# The Hei-DataHub Manual (v0.57.x beta)
 
 !!! info "Version Notice — Renovation"
     **This manual tracks Hei-DataHub v0.57.x (beta).**
