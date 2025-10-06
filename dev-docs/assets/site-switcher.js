@@ -16,15 +16,15 @@
         },
         dev: {
             name: 'Developer Docs',
-            url: 'https://0xpix.github.io/Hei-DataHub/dev',
+            url: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1',
             icon: '🔧',
             description: 'For contributors and maintainers'
         }
     };
 
     // Detect current site
-    const currentSite = window.location.pathname.includes('/dev') ? 'dev' : 'user';
-    const otherSite = currentSite === 'dev' ? 'user' : 'dev';
+    const currentSite = window.location.pathname.includes('/x9k2m7n4p8q1') ? 'x9k2m7n4p8q1' : 'user';
+    const otherSite = currentSite === 'x9k2m7n4p8q1' ? 'user' : 'x9k2m7n4p8q1';
 
     /**
      * Create site switcher banner
@@ -78,7 +78,7 @@
         indicator.style.cssText = `
             padding: 1rem;
             margin: 0.5rem;
-            background: ${currentSite === 'dev' ? '#6366f1' : '#059669'};
+            background: ${currentSite === 'x9k2m7n4p8q1' ? '#6366f1' : '#059669'};
             color: white;
             border-radius: 8px;
             text-align: center;
