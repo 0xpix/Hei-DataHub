@@ -60,17 +60,3 @@ a.headerlink {
     margin: 0.75rem 0;
   }
 }
-
-/* --------------------------------------------------------------------------
-   Code Block Improvements (optional)
-   Ensure code blocks don't overflow on narrow screens
-   -------------------------------------------------------------------------- */
-
-pre {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-code {
-  word-wrap: break-word;
-}
