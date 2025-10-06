@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mini-datahub"
-version = "0.56.0-beta"
+version = "0.57.0-beta"
 description = "A local-first TUI for managing datasets with consistent metadata"
 readme = "README.md"
 requires-python = ">=3.9"
