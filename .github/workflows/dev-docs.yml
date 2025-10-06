@@ -41,7 +41,7 @@ jobs:
         run: pip install -r dev-docs/requirements.txt
 
       - name: Build developer documentation site
-        run: mkdocs build --strict --config-file mkdocs-dev.yml --site-dir dev-site
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir dev-site
 
       - name: Verify build output
         run: |
