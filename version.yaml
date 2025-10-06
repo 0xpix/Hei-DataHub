@@ -2,11 +2,11 @@
 # Single source of truth for all version metadata
 # Edit this file and run `scripts/sync_version.py` to propagate changes
 
-version: "0.56.0-beta"
-codename: "Precision"
-release_date: "2025-10-05"
-compatibility: "Hei-DataHub v0.56.x (beta)"
-notes: "Structured Search and Inline Editing"
+version: "0.57.0-beta"
+codename: "Renovation"
+release_date: "2025-10-06"
+compatibility: "Hei-DataHub v0.57.x (beta)"
+notes: "Documentation Overhaul"
 
 # Additional metadata
 app_name: "Hei-DataHub"
