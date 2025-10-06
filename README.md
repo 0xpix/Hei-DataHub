@@ -18,22 +18,14 @@
 
 # Hei-DataHub
 
-<<<<<<< HEAD
 ![Beta](https://img.shields.io/badge/beta-0.57.2-blue.svg)
-=======
-![Version](https://img.shields.io/badge/version-0.58.0--beta-blue.svg)
->>>>>>> 75f6d72 (feat: Update README with new version and installation instructions for v0.58.0-beta)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
-<<<<<<< HEAD
 - **Latest:** 0.57.2-beta "Renovation" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.57-beta/)
 - **Docs:** Start with [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
-=======
-**📦 Latest Release:** [v0.58.0-beta "UV Install & Desktop Support"]
->>>>>>> 75f6d72 (feat: Update README with new version and installation instructions for v0.58.0-beta)
 
 ---
 
