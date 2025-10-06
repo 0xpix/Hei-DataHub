@@ -78,7 +78,7 @@ Find the action methods (usually near the end of the class). Add this method:
 def action_say_hello(self) -> None:
     """Show a hello message."""
     from mini_datahub.ui.widgets.notification import show_notification
-    
+
     # Replace "Developer" with your name!
     show_notification(
         self,
