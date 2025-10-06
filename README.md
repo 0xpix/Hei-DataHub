@@ -6,13 +6,10 @@
 <p align="center">
   <img src="assets/svg/dark_logo_circle.svg" alt="Logo Circle" width="120"/>
   <img src="assets/svg/dark_logo_H_large.svg" alt="Logo H Large" width="120"/>
-  <img src="assets/svg/dark_logo_H_small.svg" alt="Logo H Small" width="120"/>
-  <img src="assets/svg/dark_logo_inline_square.svg" alt="Logo Inline Square" width="120"/>
 </p>
 
 <p align="center">
   <img src="assets/svg/dark_logo_inline_v1.svg" alt="Logo Inline v1" width="200"/>
-  <img src="assets/svg/dark_logo_inline_v2.svg" alt="Logo Inline v2" width="200"/>
 </p>
 
 # Hei-DataHub
