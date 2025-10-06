@@ -55,54 +55,13 @@ It's built for people who:
 
 ---
 
-## What Ships in v0.55.x Beta
-
-This release includes:
-
-- **TUI (Terminal UI):** Home screen with search, dataset details, add/edit forms
-- **Search Engine:** SQLite FTS5 with BM25 ranking
-- **Metadata Validation:** JSON Schema + Pydantic models
-- **Storage:** YAML files (one per dataset) + SQLite index
-- **GitHub Integration (Optional):**
-    - Automatic PR creation from TUI
-    - Auto-stash uncommitted changes
-    - Configurable reviewers and labels
-- **Commands:**
-    - `hei-datahub` — Launch TUI
-    - `hei-datahub reindex` — Rebuild search index from YAML files
-    - `hei-datahub --version` — Show version information
-
----
-
-## Architecture Highlights
-
-Hei-DataHub follows **Clean Architecture** principles:
-
-```
-┌─────────────────────────────────────┐
-│         UI Layer (Textual)          │  ← TUI screens, widgets
-├─────────────────────────────────────┤
-│      Services (Business Logic)      │  ← Search, catalog, sync, publish
-├─────────────────────────────────────┤
-│    Core Domain (Models & Rules)     │  ← Pydantic models, validation
-├─────────────────────────────────────┤
-│    Infrastructure (I/O Adapters)    │  ← SQLite, YAML, Git, GitHub API
-└─────────────────────────────────────┘
-```
-
-- **No I/O in core domain:** Business rules are pure functions
-- **Dependency injection:** Easy to test and extend
-- **Clear boundaries:** Each layer has a single responsibility
-
----
-
-## Design Philosophy
+## Design
 
 1. **Local-first:** Your data lives in plain text (YAML) and SQLite—no vendor lock-in
 2. **Keyboard-driven:** Vim-style keybindings (`j/k` to navigate, `/` to search, `a` to add)
 3. **Fast by default:** Search is instant; no network round-trips
 4. **Validate early:** Schema validation catches errors before they spread
-5. **Optional collaboration:** Use GitHub PRs when you need team review, skip it when you don't
+5. **Collaboration:** Use GitHub PRs to add datasets and expand the catalog
 
 ---
 
@@ -111,7 +70,7 @@ Hei-DataHub follows **Clean Architecture** principles:
 Ready to get started?
 
 1. **[Getting Started](01-getting-started.md)** — Install and run Hei-DataHub
-2. **[Tutorial: Your First Dataset](20-tutorials/02-first-dataset.md)** — Add your first dataset
+2. **[Tutorial: Your First Dataset](how-to/02-first-dataset.md)** — Add your first dataset
 3. **[Navigation](02-navigation.md)** — Learn the keyboard shortcuts
 
 ---
@@ -122,4 +81,3 @@ Hei-DataHub is open source ([MIT License](https://github.com/0xpix/Hei-DataHub/b
 
 - **Report bugs:** [GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)
 - **Suggest features:** [GitHub Discussions](https://github.com/0xpix/Hei-DataHub/discussions)
-- **Edit docs:** Click the edit icon (✏️) on any page
