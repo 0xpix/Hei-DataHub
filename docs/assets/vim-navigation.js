@@ -180,7 +180,6 @@
    */
   function executeCommand(cmd) {
     const trimmed = cmd.trim().toLowerCase();
-
     console.log('[Vim Navigation] Executing command:', trimmed);
 
     if (trimmed === 'dev') {
@@ -198,7 +197,6 @@
    */
   function enterCommandMode() {
     if (commandMode) return;
-
     commandMode = true;
     const { overlay, input } = createCommandInput();
     commandInput = input;
@@ -436,7 +434,7 @@
     console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search), : (command mode)');
     console.log('[Vim Navigation] Command mode: Type ":dev" to navigate to Developer Docs');
 
-    
+
     // Listen for instant navigation / history changes (for MkDocs instant loading)
     // This ensures vim navigation works after client-side page transitions
     if (window.navigation) {
