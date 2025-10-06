@@ -1,15 +1,19 @@
 
 <p align="center">
   <img src="assets/png/1.svg" alt="Hei-DataHub Logo" width="400"/>
+  <img src="assets/png/8.svg" alt="Hei-DataHub Logo" width="400"/>
 </p>
 
 <p align="center">
+  <img src="assets/svg/light_logo_circle.svg" alt="Logo Circle" width="120"/>
   <img src="assets/svg/dark_logo_circle.svg" alt="Logo Circle" width="120"/>
+  <img src="assets/svg/light_logo_H_large.svg" alt="Logo H Large" width="120"/>
   <img src="assets/svg/dark_logo_H_large.svg" alt="Logo H Large" width="120"/>
 </p>
 
 <p align="center">
   <img src="assets/svg/dark_logo_inline_v1.svg" alt="Logo Inline v1" width="200"/>
+  <img src="assets/svg/light_logo_inline_v1.svg" alt="Logo Inline v1" width="200"/>
 </p>
 
 # Hei-DataHub
