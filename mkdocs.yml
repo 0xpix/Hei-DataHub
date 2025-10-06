@@ -69,13 +69,12 @@ nav:
   - Home: index.md
   - Getting Started:
     - Welcome: 00-welcome.md
-    - Installation: 01-getting-started.md
+    - Getting started: 01-getting-started.md
     - Navigation: 02-navigation.md
     - The Basics: 03-the-basics.md
   - What's New:
     - 0.57-beta "Renovation": whats-new/0.57-beta.md
   - How-to Guides:
-    - Installation: how-to/01-installation.md
     - Your First Dataset: how-to/02-first-dataset.md
     - Edit Datasets: how-to/edit-datasets.md
     - Search & Filters: how-to/03-search-and-filters.md
