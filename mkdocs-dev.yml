@@ -220,5 +220,7 @@ nav:
   - Reference:
     - API Documentation: api-reference/overview.md
     - Architecture Decisions (ADRs): adr/index.md
+    - Changelog: changelog.md
+    - Versioning Policy: versioning.md
     - Known Issues: known-issues.md
     - Glossary: appendices/glossary.md
