@@ -20,7 +20,8 @@
     scrollStep: 60,              // pixels for j/k
     scrollSmooth: true,          // enable smooth scrolling
     enableInInputs: false,       // allow vim keys while typing (usually false)
-    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/dev/',
+    // Obfuscated path to developer docs (not meant to be guessed)
+    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/',
   };
 
   // State
@@ -179,7 +180,7 @@
    */
   function executeCommand(cmd) {
     const trimmed = cmd.trim().toLowerCase();
-    
+
     console.log('[Vim Navigation] Executing command:', trimmed);
 
     if (trimmed === 'dev') {
@@ -197,7 +198,7 @@
    */
   function enterCommandMode() {
     if (commandMode) return;
-    
+
     commandMode = true;
     const { overlay, input } = createCommandInput();
     commandInput = input;
@@ -225,7 +226,7 @@
    */
   function exitCommandMode() {
     if (!commandMode) return;
-    
+
     commandMode = false;
     const overlay = document.getElementById('vim-command-overlay');
     if (overlay) {
@@ -435,6 +436,7 @@
     console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search), : (command mode)');
     console.log('[Vim Navigation] Command mode: Type ":dev" to navigate to Developer Docs');
 
+    
     // Listen for instant navigation / history changes (for MkDocs instant loading)
     // This ensures vim navigation works after client-side page transitions
     if (window.navigation) {
