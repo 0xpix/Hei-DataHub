@@ -17,3 +17,6 @@ mkdocs-mermaid2-plugin>=1.1.0
 
 # For better search
 mkdocs-material[imaging]>=9.4.0
+
+# Theme
+mkdocs-simple-blog>=0.2.0
