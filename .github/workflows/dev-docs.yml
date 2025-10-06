@@ -11,18 +11,27 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "dev-pages"
-  cancel-in-progress: true
+  group: "pages"  # Use same group as main docs to prevent conflicts
+  cancel-in-progress: false
 
 jobs:
   build:
-    name: Build Developer Documentation
+    name: Build Both User and Developer Documentation
     runs-on: ubuntu-latest
     steps:
+      # Checkout main branch for user docs
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      # Checkout docs/devs branch for developer docs
       - name: Checkout docs/devs branch
         uses: actions/checkout@v4
         with:
           ref: docs/devs
+          path: docs-devs
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,30 +42,52 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('dev-docs/requirements.txt') }}
+          key: ${{ runner.os }}-pip-mkdocs
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      # Build user docs from main branch
+      - name: Install user docs dependencies
+        working-directory: main
+        run: |
+          if [ -f docs/requirements.txt ]; then
+            pip install -r docs/requirements.txt
+          else
+            pip install mkdocs mkdocs-material pymdown-extensions mkdocs-macros-plugin
+          fi
+
+      - name: Build user documentation site
+        working-directory: main
+        run: mkdocs build --site-dir ../combined-site
+
+      # Build developer docs from docs/devs branch
+      - name: Install developer docs dependencies
+        working-directory: docs-devs
         run: pip install -r dev-docs/requirements.txt
 
       - name: Build developer documentation site
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir dev-site
+        working-directory: docs-devs
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/dev
 
-      - name: Verify build output
+      - name: Verify combined build output
         run: |
-          echo "Checking build output..."
-          ls -la dev-site/
-          if [ ! -f "dev-site/index.html" ]; then
-            echo "Error: index.html not found in build output"
+          echo "Checking combined build output..."
+          ls -la combined-site/
+          ls -la combined-site/dev/
+          if [ ! -f "combined-site/index.html" ]; then
+            echo "Error: User docs index.html not found"
             exit 1
           fi
-          echo "Build verification passed"
+          if [ ! -f "combined-site/dev/index.html" ]; then
+            echo "Error: Developer docs index.html not found"
+            exit 1
+          fi
+          echo "Build verification passed - both sites built successfully!"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dev-site
+          path: combined-site
 
   deploy:
     name: Deploy to GitHub Pages
