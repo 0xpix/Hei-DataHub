@@ -30,67 +30,67 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 <div class="grid cards" markdown>
 
--   :material-map-outline: **[Architecture Overview](architecture/overview.md)**
+-   **[Architecture Overview](architecture/overview.md)**
 
     Start here! System design, module map, data flow, and component diagrams.
 
--   :material-file-tree: **[Codebase Tour](codebase/navigation.md)**
+-   **[Codebase Tour](codebase/navigation.md)**
 
     Every file and directory explained: purpose, ownership, extension points.
 
--   :material-api: **[API Reference](api-reference/overview.md)**
+-   **[API Reference](api-reference/overview.md)**
 
     Function-by-function documentation with signatures, errors, and performance notes.
 
--   :material-wrench: **[Configuration](config/overview.md)**
+-   **[Configuration](config/overview.md)**
 
     All config files, environment variables, defaults, and precedence rules.
 
--   :material-database: **[Data Layer](data/storage.md)**
+-   **[Data Layer](data/storage.md)**
 
     Schemas, migrations, indexing strategy, and adding new datasets.
 
--   :material-monitor: **[UI/TUI Layer](ui/architecture.md)**
+-   **[UI/TUI Layer](ui/architecture.md)**
 
     View architecture, state management, keybindings, and theming.
 
--   :material-puzzle: **[Extensibility](extensibility/extension-points.md)**
+-   **[Extensibility](extensibility/extension-points.md)**
 
     Official extension points, plugin architecture, and adapter patterns.
 
--   :material-package-variant: **[Build & Release](build/pipeline.md)**
+-   **[Build & Release](build/pipeline.md)**
 
     CI/CD jobs, release process, SemVer, and changelog policy.
 
--   :material-test-tube: **[Quality Assurance](qa/testing-strategy.md)**
+-   **[Quality Assurance](qa/testing-strategy.md)**
 
     Testing strategy, fixtures, logging, metrics, and coverage.
 
--   :material-speedometer: **[Performance](performance/overview.md)**
+-   **[Performance](performance/overview.md)**
 
     Profiling, hotspots, optimization playbooks, and SLAs.
 
--   :material-shield-check: **[Security](security/secrets.md)**
+-   **[Security](security/secrets.md)**
 
     Secrets management, data privacy, and supply chain security.
 
--   :material-source-pull: **[Contributing](contributing/workflow.md)**
+-   **[Contributing](contributing/workflow.md)**
 
     End-to-end contributor workflow, commit conventions, and code review.
 
--   :material-book-open-variant: **[ADRs & Roadmap](adr/index.md)**
+-   **[ADRs & Roadmap](adr/index.md)**
 
     Architecture decision records, roadmap, and deprecation policy.
 
--   :material-alert-circle: **[Known Issues](known-issues.md)**
+-   **[Known Issues](known-issues.md)**
 
     Issues specific to this dev docs site and cross-links to project issues.
 
--   :material-clipboard-check: **[Maintenance](maintenance/health-checklist.md)**
+-   **[Maintenance](maintenance/health-checklist.md)**
 
     Docs health checklist, coverage tracker, and update procedures.
 
--   :material-book-alphabet: **[Glossary & Appendices](appendices/glossary.md)**
+-   *[Glossary & Appendices](appendices/glossary.md)**
 
     Terminology, file index, function index, and quick reference cards.
 
