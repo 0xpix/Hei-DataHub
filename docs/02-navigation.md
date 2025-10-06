@@ -1,6 +1,7 @@
+# Navigation & Keyboard Shortcuts
 
 Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with Vim/Neovim, you'll feel right at home.
-
+**TODO: Add the new shortcuts for settings, dataset details, etc**
 ---
 
 ## Philosophy
@@ -18,7 +19,7 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| ++slash++ | Focus Search | Enter insert mode in search box |
+| ++/++ | Focus Search | Enter insert mode in search box |
 | ++j++ | Move Down | Select next dataset in results |
 | ++k++ | Move Up | Select previous dataset in results |
 | ++g+g++ | Jump to Top | First dataset in list |
@@ -30,9 +31,9 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 | ++p++ | Outbox | View pending/failed PR tasks |
 | ++u++ | Pull Updates | Sync from remote (if configured) |
 | ++r++ | Refresh | Reload dataset list |
-| ++q++ | Quit | Exit Hei-DataHub |
+| ++Ctrl+q++ | Quit | Exit Hei-DataHub |
 | ++escape++ | Clear/Exit | Clear search or exit insert mode |
-| ++question++ | Help | Show keyboard shortcuts |
+| ++?++ | Help | Show keyboard shortcuts |
 
 ---
 
@@ -40,8 +41,9 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| ++escape++ | Back | Return to Home screen |
-| ++b++ | Back | Alternative to Escape |
+| ++escape/b++ | Back | Return to Home screen |
+| ++e++ | Edit | Edit a dataset |
+| ++Shift+P++ | Publish as Pull Request (PR) | Publish the dataset |
 | ++c++ | Copy Source | Copy source URL/snippet to clipboard |
 | ++o++ | Open URL | Open source URL in browser (if valid URL) |
 | ++q++ | Quit | Exit Hei-DataHub |
