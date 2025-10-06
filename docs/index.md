@@ -77,7 +77,6 @@ This manual is organized to get you productive quickly:
 - **[Advanced Search](how-to/search-advanced.md)** — Use filters and operators
 - **[Customize Keybindings](how-to/customize-keybindings.md)** — Remap shortcuts
 - **[Change Theme](how-to/change-theme.md)** — Choose from 12 themes
-- **[Installation](how-to/01-installation.md)** — Step-by-step setup
 - **[Your First Dataset](how-to/02-first-dataset.md)** — Create and manage data
 - **[Search & Filters](how-to/03-search-and-filters.md)** — Find datasets fast
 
@@ -91,7 +90,6 @@ This manual is organized to get you productive quickly:
 ### Help
 - **[FAQ](90-faq.md)** — Quick answers to common questions
 - **[Troubleshooting](troubleshooting.md)** — Known issues and fixes
-- **[What's New](whats-new/0.57-beta.md)** — Latest features and improvements
 
 ---
 
