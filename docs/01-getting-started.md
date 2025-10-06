@@ -1,4 +1,4 @@
-Getting Started
+# Getting Started
 
 This guide will help you install and run Hei-DataHub in minutes.
 
