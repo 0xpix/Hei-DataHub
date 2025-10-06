@@ -374,14 +374,14 @@ The parsed query is used in `services/search.py`:
 def search_datasets(query: str) -> List[Dict]:
     parser = QueryParser()
     parsed = parser.parse(query)
-    
+
     if parsed.has_field_filters():
         # Build SQL with WHERE clauses for each field
         sql = build_structured_query(parsed)
     else:
         # Use simple FTS5 search
         sql = f"SELECT * FROM datasets_fts WHERE datasets_fts MATCH '{parsed.free_text_query}*'"
-    
+
     return execute_query(sql)
 ```
 
@@ -675,7 +675,7 @@ def test_invalid_id_raises_error():
 def test_slugify():
     """Test slug generation."""
     from mini_datahub.core.rules import slugify
-    
+
     assert slugify("My Dataset") == "my-dataset"
     assert slugify("Climate_Data") == "climate-data"
     assert slugify("NASA!!!") == "nasa"
@@ -713,4 +713,3 @@ Try adding a new field to `DatasetMetadata`:
 2. Add validation that license must be one of ["MIT", "Apache-2.0", "GPL-3.0", "CC-BY-4.0"]
 3. Update `schema.json` with the new field
 4. Write tests for the validation
-
