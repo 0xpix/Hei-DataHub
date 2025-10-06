@@ -391,5 +391,5 @@ Each section of the docs should have an owner:
 
 ---
 
-**Last Audit:** 2025-10-06  
+**Last Audit:** 2025-10-06
 **Next Audit:** 2026-01-06

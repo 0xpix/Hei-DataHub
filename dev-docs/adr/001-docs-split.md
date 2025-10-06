@@ -249,5 +249,5 @@ This ADR will be reviewed after **3 months** (January 2026) to assess:
 
 ---
 
-**Status:** Accepted ✅  
+**Status:** Accepted ✅
 **Last Updated:** 2025-10-06
