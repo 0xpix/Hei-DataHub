@@ -21,7 +21,7 @@
     scrollSmooth: true,          // enable smooth scrolling
     enableInInputs: false,       // allow vim keys while typing (usually false)
     // Obfuscated path to developer docs (not meant to be guessed)
-    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/',
+    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/',
   };
 
   // State
