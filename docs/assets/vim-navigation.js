@@ -126,54 +126,64 @@
    * Create command mode input overlay
    */
   function createCommandInput() {
+    console.log('[Vim Navigation] Creating command input overlay');
+
     // Create overlay
     const overlay = document.createElement('div');
     overlay.id = 'vim-command-overlay';
     overlay.style.cssText = `
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 0.5rem 1rem;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 14px;
-      border-top: 2px solid #007acc;
-      z-index: 10001;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      background: #1e1e1e !important;
+      color: #d4d4d4 !important;
+      padding: 0.75rem 1rem !important;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+      font-size: 16px !important;
+      border-top: 3px solid #007acc !important;
+      z-index: 999999 !important;
+      display: flex !important;
+      align-items: center !important;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     `;
 
     // Create prompt
     const prompt = document.createElement('span');
     prompt.textContent = ':';
     prompt.style.cssText = `
-      color: #007acc;
-      font-weight: bold;
-      margin-right: 0.5rem;
+      color: #007acc !important;
+      font-weight: bold !important;
+      margin-right: 0.5rem !important;
+      font-size: 18px !important;
     `;
 
     // Create input
     const input = document.createElement('input');
     input.id = 'vim-command-input';
     input.type = 'text';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
     input.style.cssText = `
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #d4d4d4;
-      font-family: inherit;
-      font-size: inherit;
-      flex: 1;
-      padding: 0;
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      color: #d4d4d4 !important;
+      font-family: inherit !important;
+      font-size: inherit !important;
+      flex: 1 !important;
+      padding: 0 !important;
+      margin: 0 !important;
     `;
     input.placeholder = 'Type "dev" to go to Developer Docs';
 
     overlay.appendChild(prompt);
     overlay.appendChild(input);
     document.body.appendChild(overlay);
+
+    console.log('[Vim Navigation] Command overlay created and appended to body');
 
     return { overlay, input };
   }
@@ -199,27 +209,42 @@
    * Enter command mode
    */
   function enterCommandMode() {
-    if (commandMode) return;
+    console.log('[Vim Navigation] enterCommandMode called, current commandMode:', commandMode);
+
+    if (commandMode) {
+      console.log('[Vim Navigation] Already in command mode, ignoring');
+      return;
+    }
+
     commandMode = true;
+    console.log('[Vim Navigation] Creating command input...');
+
     const { overlay, input } = createCommandInput();
     commandInput = input;
 
     // Focus the input
-    input.focus();
+    setTimeout(() => {
+      input.focus();
+      console.log('[Vim Navigation] Input focused');
+    }, 10);
 
     // Handle Enter key to execute command
     input.addEventListener('keydown', (e) => {
+      console.log('[Vim Navigation] Command input keydown:', e.key);
+
       if (e.key === 'Enter') {
         e.preventDefault();
+        console.log('[Vim Navigation] Enter pressed, executing command:', input.value);
         const success = executeCommand(input.value);
         exitCommandMode();
       } else if (e.key === 'Escape') {
         e.preventDefault();
+        console.log('[Vim Navigation] Escape pressed, exiting command mode');
         exitCommandMode();
       }
     });
 
-    console.log('[Vim Navigation] Entered command mode');
+    console.log('[Vim Navigation] Command mode entered successfully');
   }
 
   /**
@@ -270,8 +295,8 @@
       return;
     }
 
-    // Enter command mode with ':'
-    if (e.key === ':' && !e.shiftKey) {
+    // Enter command mode with ':' (Shift + semicolon produces ':')
+    if (e.key === ':') {
       e.preventDefault();
       enterCommandMode();
       return;
