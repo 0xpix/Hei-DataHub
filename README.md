@@ -7,13 +7,13 @@
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/version-0.55.2--beta-blue.svg)
+![Version](https://img.shields.io/badge/version-0.57.0--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 
 > A local-first TUI for managing datasets with consistent metadata, fast full-text search, and automated PR workflows.
 
-**📦 Latest Release:** [v0.55.2-beta "Auto-Stash & Clean Architecture"]
+**📦 Latest Release:** [v0.57.0-beta "Renovation" - Documentation Overhaul]
 
 ## Overview
 
@@ -69,7 +69,7 @@ Hei-DataHub/
 ├── src/
 │   └── mini_datahub/          # Main source package
 │       ├── __init__.py        # Package initialization with version
-│       ├── version.py         # Version management (0.55.0-beta)
+│       ├── version.py         # Version management (0.57.0-beta)
 │       ├── app/               # Application runtime & settings
 │       │   ├── runtime.py     # Startup, logging, DI wiring
 │       │   └── settings.py    # Config load/persist (non-secrets)
@@ -244,7 +244,7 @@ hei-datahub reindex
 
 # Show version
 hei-datahub --version
-# Output: Hei-DataHub 0.55.0-beta
+# Output: Hei-DataHub 0.57.0-beta
 
 # Show detailed version info
 hei-datahub --version-info
@@ -253,7 +253,7 @@ hei-datahub --version-info
 
 ## GitHub PR Workflow (Optional)
 
-**Enhanced in v0.55.0:** Automatic stashing of uncommitted changes during PR workflow!
+**Enhanced in v0.56.0:** Automatic stashing of uncommitted changes during PR workflow!
 
 ### ✨ New: Auto-Stash Feature
 
@@ -466,7 +466,9 @@ pytest tests/ -v
 
 ## Version History
 
-- **v0.55.0-beta** (Current) - Auto-stash PR workflow, improved gitignore, enhanced version system
+- **v0.57.0-beta** (Current) - Documentation Overhaul for v0.56 features
+- **v0.56.0-beta** - Structured Search, Inline Editing, Themes, Keybindings
+- **v0.55.0-beta** - Auto-stash PR workflow, improved gitignore, enhanced version system
 - **v0.50.0-beta** - Clean architecture refactoring, dual command support
 - **v0.40.0-beta** - Restructured to src/ layout
 - Earlier versions - See [CHANGELOG.md](CHANGELOG.md)
@@ -528,4 +530,4 @@ See [QUICKSTART.md](QUICKSTART.md) for a comprehensive quick reference guide.
 
 **Built for teams who want to organize data without the overhead.**
 
-**v0.55.0-beta** brings seamless PR workflows with automatic git stash handling! 🚀
+**v0.57.0-beta "Renovation"** brings comprehensive documentation for all features! �
