@@ -1,7 +1,24 @@
-# The Hei-DataHub Manual (v0.55.x beta)
+````markdown
+# The Hei-DataHub Man## What's in the Box (v0.56+ features, v0.57 docs)
 
-<!-- Version banner - Auto-generated from version.yaml -->
-{% include "version.md" %}
+- **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
+- **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing (v0.56)
+- **✏️ Inline Editing:** Edit datasets directly in the TUI with undo/redo and validation (v0.56)
+- **✅ Validated Metadata:** JSON Schema + Pydantic validation ensure consistency
+- **🖥️ Clean TUI:** Terminal interface built with Textual, Neovim-style keybindings
+- **📦 Simple Storage:** One folder per dataset with `metadata.yaml`
+- **🔄 Automated PRs:** Save → PR workflow with GitHub integration (optional, v0.56)
+- **🎨 Themeable:** 12 built-in themes with easy customization (v0.56)
+- **⌨️ Customizable:** Configure keybindings, themes, and behavior (v0.56)x beta)
+
+!!! info "Version Notice — Renovation"
+    **This manual tracks Hei-DataHub v0.57.x (beta).**
+
+    **Release:** 0.57.0-beta (2025-10-06)
+    **Codename:** Renovation
+    **Focus:** Documentation Overhaul
+
+    **What's changed:** This is a **documentation-only release**. No new features—just complete guides for everything released in v0.56.0-beta.
 
 ---
 
@@ -11,16 +28,31 @@
 
 Everything runs locally—YAML files + SQLite database—no network required except for optional GitHub integration.
 
-## What's in the Box (v0.55.x beta)
+## What's New in v0.57 📚
+
+**[Read the full What's New guide →](whats-new/0.57-beta.md)**
+
+v0.57.0-beta is a **documentation-only release**—no new features, just complete documentation for everything released in v0.56.0-beta:
+
+- **📖 8 new documentation pages** – How-to guides, references, troubleshooting
+- **✏️ Inline editing guide** – Step-by-step dataset editing instructions
+- **🔍 Search syntax reference** – Complete field filter grammar
+- **⌨️ Keybindings reference** – All shortcuts by mode (including Edit Mode)
+- **🎨 Theme customization guide** – All 12 themes documented
+- **⚠️ Known issues documented** – 8 known bugs with workarounds
+- **❓ Expanded FAQ** – 8 new entries for v0.56 features
+
+## What's in the Box (v0.57.x beta)
 
 - **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
-- **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with BM25 ranking
+- **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing
+- **✏️ Inline Editing:** Edit datasets directly in the TUI with undo/redo and validation
 - **✅ Validated Metadata:** JSON Schema + Pydantic validation ensure consistency
 - **🖥️ Clean TUI:** Terminal interface built with Textual, Neovim-style keybindings
 - **📦 Simple Storage:** One folder per dataset with `metadata.yaml`
 - **🔄 Automated PRs:** Save → PR workflow with GitHub integration (optional)
-- **🎯 Auto-Stash:** Automatically handles uncommitted changes during PR workflow
-- **🏗️ Clean Architecture:** Layered design with clear separation of concerns
+- **� Themeable:** 12 built-in themes with easy customization
+- **⌨️ Customizable:** Configure keybindings, themes, and behavior
 
 ---
 
@@ -44,17 +76,38 @@ hei-datahub --version-info  # Detailed information
 
 This manual is organized to get you productive quickly:
 
+### Getting Started
 1. **[Welcome](00-welcome.md)** — What Hei-DataHub is and who it's for
 2. **[Getting Started](01-getting-started.md)** — Installation and first-run checklist
 3. **[Navigation](02-navigation.md)** — Keyboard shortcuts and workflow
 4. **[The Basics](03-the-basics.md)** — Projects, datasets, fields, search, filters
-5. **[UI Guide](10-ui.md)** — TUI structure, panels, status area, customization
-6. **[Data & SQL](11-data-and-sql.md)** — Data location, schemas, query patterns
-7. **[Configuration](12-config.md)** — Config file, environment variables, examples
-8. **[Tutorials](20-tutorials/01-installation.md)** — Step-by-step walkthroughs
-9. **[FAQ](90-faq.md)** — Common issues and troubleshooting
-10. **[Versioning](98-versioning.md)** — SemVer explained and release policy
-11. **[Changelog](99-changelog.md)** — What's new in each release
+
+### What's New
+- **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Latest features and improvements
+
+### How-to Guides
+- **[Edit Datasets](how-to/edit-datasets.md)** — Change metadata inline
+- **[Advanced Search](how-to/search-advanced.md)** — Use filters and operators
+- **[Customize Keybindings](how-to/customize-keybindings.md)** — Remap shortcuts
+- **[Change Theme](how-to/change-theme.md)** — Choose from 12 themes
+
+### Tutorials
+1. **[Installation](20-tutorials/01-installation.md)** — Step-by-step setup
+2. **[Your First Dataset](20-tutorials/02-first-dataset.md)** — Create and manage data
+3. **[Search & Filters](20-tutorials/03-search-and-filters.md)** — Find datasets fast
+
+### Reference
+- **[UI Guide](10-ui.md)** — TUI structure, panels, status area
+- **[Data & SQL](11-data-and-sql.md)** — Data location, schemas, query patterns
+- **[Configuration](12-config.md)** — Config file, environment variables, examples
+- **[Search Syntax](reference/search-syntax.md)** — Complete query reference
+- **[Keybindings](reference/keybindings.md)** — All shortcuts listed (coming soon)
+
+### Help
+- **[FAQ](90-faq.md)** — Quick answers to common questions
+- **[Troubleshooting](troubleshooting.md)** — Known issues and fixes
+- **[Versioning](98-versioning.md)** — SemVer explained and release policy
+- **[Changelog](99-changelog.md)** — What's new in each release
 
 ---
 
