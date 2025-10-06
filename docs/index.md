@@ -1,17 +1,11 @@
+
 <p align="center">
-  <img src="assets/dark_logo.svg" alt="Hei-DataHub Logo" width="200"/>
+    <img src="/Hei-DataHub/assets/dark_logo_inline_v1.svg" alt="Hei-DataHub Logo" width="300"/>
 </p>
 
-# The Hei-DataHub Manual (v0.57.x beta)
+# The Hei-DataHub Manual
 
-!!! info "Version Notice — Renovation"
-    **This manual tracks Hei-DataHub v0.57.x (beta).**
-
-    **Release:** 0.57.0-beta (2025-10-06)
-    **Codename:** Renovation
-    **Focus:** Documentation Overhaul
-
-    **What's changed:** This is a **documentation-only release**. No new features—just complete guides for everything released in v0.56.0-beta.
+Current version: `0.57.0-beta` (2025-10-06) — Codename: `Renovation`
 
 ---
 
@@ -35,7 +29,7 @@ v0.57.0-beta is a **documentation-only release**—no new features, just complet
 - **⚠️ Known issues documented** – 8 known bugs with workarounds
 - **❓ Expanded FAQ** – 8 new entries for v0.56 features
 
-## What's in the Box (v0.57.x beta)
+## What do we have so far (v0.57.x beta)
 
 - **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
 - **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing
@@ -83,11 +77,9 @@ This manual is organized to get you productive quickly:
 - **[Advanced Search](how-to/search-advanced.md)** — Use filters and operators
 - **[Customize Keybindings](how-to/customize-keybindings.md)** — Remap shortcuts
 - **[Change Theme](how-to/change-theme.md)** — Choose from 12 themes
-
-### Tutorials
-1. **[Installation](20-tutorials/01-installation.md)** — Step-by-step setup
-2. **[Your First Dataset](20-tutorials/02-first-dataset.md)** — Create and manage data
-3. **[Search & Filters](20-tutorials/03-search-and-filters.md)** — Find datasets fast
+- **[Installation](how-to/01-installation.md)** — Step-by-step setup
+- **[Your First Dataset](how-to/02-first-dataset.md)** — Create and manage data
+- **[Search & Filters](how-to/03-search-and-filters.md)** — Find datasets fast
 
 ### Reference
 - **[UI Guide](10-ui.md)** — TUI structure, panels, status area
@@ -99,8 +91,7 @@ This manual is organized to get you productive quickly:
 ### Help
 - **[FAQ](90-faq.md)** — Quick answers to common questions
 - **[Troubleshooting](troubleshooting.md)** — Known issues and fixes
-- **[Versioning](98-versioning.md)** — SemVer explained and release policy
-- **[Changelog](99-changelog.md)** — What's new in each release
+- **[What's New](whats-new/0.57-beta.md)** — Latest features and improvements
 
 ---
 
@@ -109,7 +100,6 @@ This manual is organized to get you productive quickly:
 - **Search:** Use the search bar at the top of this site
 - **FAQ:** Check [FAQ & Troubleshooting](90-faq.md) for common issues
 - **Issues:** File bugs or feature requests at [GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)
-- **Edit This Page:** Use the edit icon (✏️) to suggest improvements
 
 ---
 
