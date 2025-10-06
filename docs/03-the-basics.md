@@ -195,9 +195,9 @@ vim data/<dataset-id>/metadata.yaml
 hei-datahub reindex
 ```
 
-**Future TUI editing:**
+**TUI editing (✅ Available since v0.56-beta):**
 
-Planned for v0.56.x—inline editing from Details Screen.
+Inline editing from Details Screen. Press `e` to enter Edit Mode, modify fields, then `s` to save or `ESC` to cancel. See [How-To: Edit Datasets](how-to/edit-datasets.md) for full guide.
 
 ---
 
@@ -215,7 +215,7 @@ hei-datahub reindex
 
 **Future TUI deletion:**
 
-Planned for v0.56.x—delete from Details Screen with confirmation.
+Planned for v0.58.x—delete from Details Screen with confirmation.
 
 ---
 
