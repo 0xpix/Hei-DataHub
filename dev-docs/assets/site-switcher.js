@@ -5,7 +5,7 @@
 
 (function() {
     'use strict';
-    
+
     // Configuration
     const SITES = {
         user: {
@@ -21,11 +21,11 @@
             description: 'For contributors and maintainers'
         }
     };
-    
+
     // Detect current site
     const currentSite = window.location.pathname.includes('/dev') ? 'dev' : 'user';
     const otherSite = currentSite === 'dev' ? 'user' : 'dev';
-    
+
     /**
      * Create site switcher banner
      */
@@ -45,34 +45,34 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             font-size: 0.9rem;
         `;
-        
+
         banner.innerHTML = `
             <span style="font-weight: 600;">
                 ${SITES[currentSite].icon} You are viewing: <strong>${SITES[currentSite].name}</strong>
             </span>
             <span style="margin: 0 1rem;">|</span>
-            <a href="${SITES[otherSite].url}" 
+            <a href="${SITES[otherSite].url}"
                style="color: #fbbf24; text-decoration: underline; font-weight: 600;">
                 ${SITES[otherSite].icon} Switch to ${SITES[otherSite].name}
             </a>
         `;
-        
+
         document.body.insertBefore(banner, document.body.firstChild);
-        
+
         // Add top padding to prevent content overlap
         const header = document.querySelector('.md-header');
         if (header) {
             header.style.marginTop = '40px';
         }
     }
-    
+
     /**
      * Add site indicator to navigation
      */
     function addSiteIndicator() {
         const nav = document.querySelector('.md-nav--primary');
         if (!nav) return;
-        
+
         const indicator = document.createElement('div');
         indicator.className = 'site-indicator';
         indicator.style.cssText = `
@@ -85,16 +85,16 @@
             font-weight: 600;
             font-size: 0.85rem;
         `;
-        
+
         indicator.innerHTML = `
             ${SITES[currentSite].icon}<br>
             ${SITES[currentSite].name}<br>
             <small style="opacity: 0.8;">${SITES[currentSite].description}</small>
         `;
-        
+
         nav.insertBefore(indicator, nav.firstChild);
     }
-    
+
     /**
      * Initialize site switcher
      */
@@ -104,15 +104,15 @@
             document.addEventListener('DOMContentLoaded', init);
             return;
         }
-        
+
         createSiteSwitcher();
         addSiteIndicator();
-        
+
         // Log for debugging
         console.log(`[SiteSwitcher] Current site: ${currentSite}`);
     }
-    
+
     // Run initialization
     init();
-    
+
 })();
