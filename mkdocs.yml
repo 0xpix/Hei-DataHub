@@ -1,5 +1,5 @@
 # MkDocs Configuration for Hei-DataHub Manual
-site_name: Hei-DataHub Manual
+site_name: Doc
 site_description: 'Official documentation for Hei-DataHub v0.57.x (beta) - A local-first TUI for managing datasets with inline editing and structured search'
 site_author: Hei-DataHub Team
 site_url: https://0xpix.github.io/Hei-DataHub
@@ -15,32 +15,11 @@ copyright: Copyright &copy; 2025 Hei-DataHub Contributors
 # Configuration
 theme:
   name: simple-blog
+  components:
+    title: false
   custom_dir: docs/
-  logo: assets/dark_logo.svg
-  favicon: assets/dark_logo_circle.svg
-
-  # Simple blog theme customization options
-  # Note: Features below are Material-specific and may not work with simple-blog
-  # Kept commented for reference when switching back to Material theme
-  # features:
-  #   - navigation.instant
-  #   - navigation.tracking
-  #   - navigation.tabs
-  #   - navigation.sections
-  #   - navigation.expand
-  #   - navigation.top
-  #   - navigation.footer
-  #   - search.suggest
-  #   - search.highlight
-  #   - search.share
-  #   - content.code.copy
-  #   - content.action.edit
-  #   - content.action.view
-  #   - toc.follow
-  # icon:
-  #   repo: fontawesome/brands/github
-  #   edit: material/pencil
-  #   view: material/eye
+  logo: assets/dark_logo_H_large.svg
+  favicon: assets/dark_logo_H_large.svg
 
 # Plugins
 plugins:
@@ -59,7 +38,7 @@ markdown_extensions:
   - footnotes
   - md_in_html
   - toc:
-      permalink: true
+      permalink: false
       toc_depth: 3
   - pymdownx.arithmatex:
       generic: true
@@ -96,13 +75,13 @@ nav:
   - What's New:
     - 0.57-beta "Renovation": whats-new/0.57-beta.md
   - How-to Guides:
+    - Installation: how-to/01-installation.md
+    - Your First Dataset: how-to/02-first-dataset.md
     - Edit Datasets: how-to/edit-datasets.md
+    - Search & Filters: how-to/03-search-and-filters.md
     - Advanced Search: how-to/search-advanced.md
     - Customize Keybindings: how-to/customize-keybindings.md
     - Change Theme: how-to/change-theme.md
-  - Tutorials:
-    - Your First Dataset: 20-tutorials/02-first-dataset.md
-    - Search & Filters: 20-tutorials/03-search-and-filters.md
   - Reference:
     - UI Guide: 10-ui.md
     - Data & SQL: 11-data-and-sql.md
