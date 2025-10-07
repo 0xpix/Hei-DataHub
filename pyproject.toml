@@ -69,6 +69,7 @@ include = ["mini_datahub*", "hei_datahub*"]
 mini_datahub = [
     "infra/sql/*.sql",
     "schema.json",
+    "data/**/*",
     "templates/**/*"
 ]
 

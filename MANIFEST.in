@@ -9,6 +9,9 @@ recursive-include src/mini_datahub/infra/sql *
 # Include schema.json
 include src/mini_datahub/schema.json
 
+# Include all datasets
+recursive-include src/mini_datahub/data *
+
 # Include sample data templates
 recursive-include src/mini_datahub/templates *
 

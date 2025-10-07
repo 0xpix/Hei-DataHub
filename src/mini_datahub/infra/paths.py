@@ -108,20 +108,20 @@ def initialize_workspace():
         except Exception as e:
             print(f"⚠ Could not copy schema.json: {e}")
 
-    # Copy sample data if data directory is empty
+    # Copy packaged datasets if data directory is empty
     if DATA_DIR.exists() and not list(DATA_DIR.iterdir()):
         try:
-            # templates/ is in src/mini_datahub/ (parent.parent from infra/)
-            template_data = Path(__file__).parent.parent / "templates" / "data"
-            if template_data.exists():
+            # data/ is packaged in src/mini_datahub/ (parent.parent from infra/)
+            packaged_data = Path(__file__).parent.parent / "data"
+            if packaged_data.exists() and list(packaged_data.iterdir()):
                 import shutil
-                for item in template_data.iterdir():
+                for item in packaged_data.iterdir():
                     dest = DATA_DIR / item.name
                     if not dest.exists():
                         shutil.copytree(item, dest)
-                print(f"✓ Initialized sample data in {DATA_DIR}")
+                print(f"✓ Initialized {len(list(packaged_data.iterdir()))} datasets in {DATA_DIR}")
         except Exception as e:
-            print(f"⚠ Could not copy sample data: {e}")
+            print(f"⚠ Could not copy packaged datasets: {e}")
 
 
 def get_schema_sql() -> str:
