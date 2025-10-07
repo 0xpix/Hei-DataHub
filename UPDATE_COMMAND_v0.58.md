@@ -123,11 +123,11 @@ The update command is implemented in `src/mini_datahub/cli/main.py`:
 def handle_update(args):
     """Handle the update subcommand."""
     import subprocess
-    
+
     # Determine branch
     branch = args.branch or "chore/uv-install-data-desktop-v0.58.x"
     repo_url = f"git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}#egg=hei-datahub"
-    
+
     # Run uv tool install --upgrade
     result = subprocess.run(
         ["uv", "tool", "install", "--upgrade", repo_url],
@@ -135,7 +135,7 @@ def handle_update(args):
         text=True,
         check=False
     )
-    
+
     # Handle success/failure
     if result.returncode == 0:
         print("✓ Update completed successfully!")
