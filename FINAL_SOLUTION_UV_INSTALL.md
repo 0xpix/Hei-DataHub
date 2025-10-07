@@ -21,19 +21,19 @@ def _get_workspace_root() -> Path:
     # 1. If installed via UV/pip → ALWAYS ~/.hei-datahub/
     if is_installed:
         return Path.home() / ".hei-datahub"
-    
+
     # 2. Environment variable override
     if HEI_DATAHUB_WORKSPACE:
         return env_workspace
-    
+
     # 3. Development mode (repo with src/)
     if is_dev_mode:
         return repo_root
-    
+
     # 4. Custom workspace (CWD with data/)
     if (cwd / "data").exists():
         return cwd
-    
+
     # 5. Default fallback
     return Path.home() / ".hei-datahub"
 ```
@@ -190,6 +190,6 @@ hei-datahub
 
 ---
 
-**Status:** ✅ FIXED and pushed to GitHub  
-**Commits:** 77bf7ac (workspace detection) + 0f347d5 (package datasets)  
+**Status:** ✅ FIXED and pushed to GitHub
+**Commits:** 77bf7ac (workspace detection) + 0f347d5 (package datasets)
 **Next:** Reinstall and enjoy all 4 datasets from any directory! 🎉

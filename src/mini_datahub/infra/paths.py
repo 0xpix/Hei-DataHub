@@ -1,90 +1,89 @@
 """
 Centralized path management for Hei-DataHub.
 All file system paths are defined here.
+
+XDG Base Directory Specification compliant:
+- Config: ~/.config/hei-datahub/
+- Data: ~/.local/share/hei-datahub/
+- Cache: ~/.cache/hei-datahub/
+- State: ~/.local/state/hei-datahub/
 """
 from pathlib import Path
 import os
 
-# Determine workspace root
-# Priority: 1) Installed package, 2) Env var override, 3) Dev mode, 4) Custom workspace
-def _get_workspace_root() -> Path:
-    """Get the workspace root directory."""
-    cwd = Path.cwd()
-    
-    # Check if running from installed package (not editable/dev install)
-    # If __file__ is in site-packages or uv cache, we're installed
+def _is_installed_package() -> bool:
+    """Check if running from an installed package (not development mode)."""
     package_path = Path(__file__).resolve()
-    is_installed = "site-packages" in str(package_path) or ".local/share/uv" in str(package_path)
-    
-    # If installed via UV/pip, ALWAYS use ~/.hei-datahub/
-    if is_installed:
-        home_workspace = Path.home() / ".hei-datahub"
-        home_workspace.mkdir(parents=True, exist_ok=True)
-        return home_workspace
-    
-    # Check for explicit environment variable (overrides everything in dev mode)
-    env_workspace = os.environ.get("HEI_DATAHUB_WORKSPACE")
-    if env_workspace:
-        workspace = Path(env_workspace)
-        workspace.mkdir(parents=True, exist_ok=True)
-        return workspace
-    
-    # Check if running from source (development mode)
-    # Look for src/mini_datahub in the path structure
-    is_dev_mode = (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
-    
-    # If in development mode AND has data/, use repo root
-    if is_dev_mode and (cwd / "data").exists():
-        return cwd
-    
-    # If CWD has data/ subdirectory (custom user workspace), use it
-    if (cwd / "data").exists():
-        return cwd
-    
-    # Default: use user's home directory workspace
-    home_workspace = Path.home() / ".hei-datahub"
-    home_workspace.mkdir(parents=True, exist_ok=True)
-    return home_workspace# Workspace root - where data lives
-PROJECT_ROOT = _get_workspace_root()
+    return "site-packages" in str(package_path) or ".local/share/uv" in str(package_path)
 
-# Data directory (one folder per dataset)
-DATA_DIR = PROJECT_ROOT / "data"
+def _is_dev_mode() -> bool:
+    """Check if running from repository (development mode)."""
+    cwd = Path.cwd()
+    return (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
 
-# Database and cache
-CACHE_DIR = PROJECT_ROOT / ".cache"
-DB_PATH = PROJECT_ROOT / "db.sqlite"
+# XDG Base Directory paths (for installed package)
+XDG_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+XDG_DATA_HOME = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
+XDG_CACHE_HOME = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
+XDG_STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
 
-# JSON Schema path - check multiple locations
+# Determine base directories based on install mode
+if _is_installed_package():
+    # Installed package: Use XDG directories (completely standalone)
+    CONFIG_DIR = XDG_CONFIG_HOME / "hei-datahub"
+    DATA_DIR = XDG_DATA_HOME / "hei-datahub" / "datasets"
+    CACHE_DIR = XDG_CACHE_HOME / "hei-datahub"
+    STATE_DIR = XDG_STATE_HOME / "hei-datahub"
+    PROJECT_ROOT = XDG_DATA_HOME / "hei-datahub"
+elif _is_dev_mode():
+    # Development mode: Use repository
+    PROJECT_ROOT = Path.cwd()
+    CONFIG_DIR = PROJECT_ROOT
+    DATA_DIR = PROJECT_ROOT / "data"
+    CACHE_DIR = PROJECT_ROOT / ".cache"
+    STATE_DIR = PROJECT_ROOT
+else:
+    # Fallback: Use XDG directories
+    CONFIG_DIR = XDG_CONFIG_HOME / "hei-datahub"
+    DATA_DIR = XDG_DATA_HOME / "hei-datahub" / "datasets"
+    CACHE_DIR = XDG_CACHE_HOME / "hei-datahub"
+    STATE_DIR = XDG_STATE_HOME / "hei-datahub"
+    PROJECT_ROOT = XDG_DATA_HOME / "hei-datahub"
+
+# Database (in data directory per XDG)
+DB_PATH = XDG_DATA_HOME / "hei-datahub" / "db.sqlite" if _is_installed_package() else PROJECT_ROOT / "db.sqlite"
+
+# Schema paths
 def _get_schema_path() -> Path:
-    """Get schema.json path, checking multiple locations."""
-    # 1. Try workspace root
-    workspace_schema = PROJECT_ROOT / "schema.json"
-    if workspace_schema.exists():
-        return workspace_schema
-
-    # 2. Try packaged schema
-    package_schema = Path(__file__).parent.parent / "schema.json"
-    if package_schema.exists():
-        return package_schema
-
-    # 3. Create default in workspace
-    return workspace_schema
+    """Get schema.json path."""
+    if _is_installed_package():
+        # Installed: Use packaged schema, copy to data dir if needed
+        user_schema = XDG_DATA_HOME / "hei-datahub" / "schema.json"
+        if user_schema.exists():
+            return user_schema
+        # Return packaged schema path
+        return Path(__file__).parent.parent / "schema.json"
+    else:
+        # Dev mode: Use repo schema
+        return PROJECT_ROOT / "schema.json"
 
 SCHEMA_JSON = _get_schema_path()
 
-# SQL schema is now packaged
+# SQL schema (always packaged)
 SQL_SCHEMA_PATH = Path(__file__).parent / "sql" / "schema.sql"
 
-# Configuration
-CONFIG_DIR = Path.home() / ".mini-datahub"
-CONFIG_FILE = PROJECT_ROOT / ".datahub_config.json"  # Legacy location
-CONFIG_FILE_NEW = CONFIG_DIR / "config.toml"  # Future location
+# Config files
+CONFIG_FILE = CONFIG_DIR / "config.json"
+KEYMAP_FILE = CONFIG_DIR / "keymap.json"
 
 # Logs
-LOG_DIR = CONFIG_DIR / "logs"
+LOG_DIR = STATE_DIR / "logs"
 
-# Outbox for failed PRs
-OUTBOX_DIR = PROJECT_ROOT / ".outbox"
+# Outbox for failed operations
+OUTBOX_DIR = STATE_DIR / "outbox"
+
+# Assets (templates, etc.)
+ASSETS_DIR = XDG_DATA_HOME / "hei-datahub" / "assets" if _is_installed_package() else PROJECT_ROOT / "assets"
 
 # Keyring settings
 KEYRING_SERVICE = "mini-datahub"
@@ -92,45 +91,67 @@ KEYRING_USERNAME = "github-token"
 
 
 def ensure_directories():
-    """Ensure required directories exist."""
+    """Ensure all required directories exist."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     OUTBOX_DIR.mkdir(parents=True, exist_ok=True)
+    if _is_installed_package():
+        ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def initialize_workspace():
-    """Initialize workspace with schema and sample data if needed."""
-    # Ensure directories exist
+    """Initialize application on first run (for installed package)."""
+    if not _is_installed_package():
+        # In dev mode, just ensure directories exist
+        ensure_directories()
+        return
+    
+    # Ensure all directories exist
     ensure_directories()
-
-    # Copy schema.json if it doesn't exist
-    if not SCHEMA_JSON.exists():
+    
+    # Copy schema.json to user data directory
+    user_schema = XDG_DATA_HOME / "hei-datahub" / "schema.json"
+    if not user_schema.exists():
         try:
-            # schema.json is in src/mini_datahub/ (parent.parent from infra/)
             package_schema = Path(__file__).parent.parent / "schema.json"
             if package_schema.exists():
                 import shutil
-                shutil.copy(package_schema, SCHEMA_JSON)
-                print(f"✓ Created schema.json at {SCHEMA_JSON}")
+                shutil.copy(package_schema, user_schema)
+                print(f"✓ Initialized schema at {user_schema}")
         except Exception as e:
-            print(f"⚠ Could not copy schema.json: {e}")
-
-    # Copy packaged datasets if data directory is empty
-    if DATA_DIR.exists() and not list(DATA_DIR.iterdir()):
+            print(f"⚠ Could not copy schema: {e}")
+    
+    # Copy packaged datasets on first run
+    if not list(DATA_DIR.iterdir()):
         try:
-            # data/ is packaged in src/mini_datahub/ (parent.parent from infra/)
             packaged_data = Path(__file__).parent.parent / "data"
             if packaged_data.exists() and list(packaged_data.iterdir()):
                 import shutil
+                dataset_count = 0
                 for item in packaged_data.iterdir():
-                    dest = DATA_DIR / item.name
-                    if not dest.exists():
-                        shutil.copytree(item, dest)
-                print(f"✓ Initialized {len(list(packaged_data.iterdir()))} datasets in {DATA_DIR}")
+                    if item.is_dir():
+                        dest = DATA_DIR / item.name
+                        if not dest.exists():
+                            shutil.copytree(item, dest)
+                            dataset_count += 1
+                print(f"✓ Initialized {dataset_count} datasets in {DATA_DIR}")
         except Exception as e:
-            print(f"⚠ Could not copy packaged datasets: {e}")
+            print(f"⚠ Could not copy datasets: {e}")
+    
+    # Copy assets/templates if they exist
+    try:
+        packaged_templates = Path(__file__).parent.parent / "templates"
+        if packaged_templates.exists():
+            import shutil
+            templates_dest = ASSETS_DIR / "templates"
+            if not templates_dest.exists():
+                shutil.copytree(packaged_templates, templates_dest)
+                print(f"✓ Initialized templates in {ASSETS_DIR}")
+    except Exception as e:
+        pass  # Templates are optional
 
 
 def get_schema_sql() -> str:
