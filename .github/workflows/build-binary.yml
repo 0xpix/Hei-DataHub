@@ -1,0 +1,191 @@
+name: Build Desktop Binary
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to build (e.g., v0.58.0-beta)'
+        required: false
+        default: 'main'
+
+jobs:
+  build-linux-binary:
+    name: Build Linux Binary
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.version || github.ref }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install UV
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv pip install -e .
+          uv pip install pyinstaller
+      
+      - name: Build binary
+        run: |
+          source .venv/bin/activate
+          pyinstaller \
+            --onefile \
+            --name hei-datahub \
+            --add-data "src/mini_datahub/infra/sql:mini_datahub/infra/sql" \
+            --hidden-import=mini_datahub \
+            --hidden-import=mini_datahub.cli.main \
+            --hidden-import=textual \
+            --collect-all textual \
+            --clean \
+            src/mini_datahub/cli/main.py
+          
+          mkdir -p dist/linux
+          mv dist/hei-datahub dist/linux/
+      
+      - name: Test binary
+        run: |
+          ./dist/linux/hei-datahub --version
+      
+      - name: Create tarball
+        run: |
+          cd dist/linux
+          tar -czf hei-datahub-linux-x86_64.tar.gz hei-datahub
+          sha256sum hei-datahub-linux-x86_64.tar.gz > hei-datahub-linux-x86_64.tar.gz.sha256
+          cd ../..
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hei-datahub-linux-binary
+          path: |
+            dist/linux/hei-datahub-linux-x86_64.tar.gz
+            dist/linux/hei-datahub-linux-x86_64.tar.gz.sha256
+      
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/linux/hei-datahub-linux-x86_64.tar.gz
+            dist/linux/hei-datahub-linux-x86_64.tar.gz.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-appimage:
+    name: Build Linux AppImage
+    runs-on: ubuntu-20.04  # Older Ubuntu for better compatibility
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.version || github.ref }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install UV
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv pip install -e .
+          uv pip install pyinstaller
+      
+      - name: Build binary
+        run: |
+          source .venv/bin/activate
+          pyinstaller \
+            --onefile \
+            --name hei-datahub \
+            --add-data "src/mini_datahub/infra/sql:mini_datahub/infra/sql" \
+            --hidden-import=mini_datahub \
+            --hidden-import=mini_datahub.cli.main \
+            --hidden-import=textual \
+            --collect-all textual \
+            --clean \
+            src/mini_datahub/cli/main.py
+      
+      - name: Download AppImageTool
+        run: |
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+      
+      - name: Create AppImage structure
+        run: |
+          mkdir -p Hei-DataHub.AppDir/usr/bin
+          cp dist/hei-datahub Hei-DataHub.AppDir/usr/bin/
+          
+          # Create AppRun
+          cat > Hei-DataHub.AppDir/AppRun <<'EOF'
+          #!/bin/bash
+          SELF=$(readlink -f "$0")
+          HERE=${SELF%/*}
+          export PATH="${HERE}/usr/bin/:${PATH}"
+          exec "${HERE}/usr/bin/hei-datahub" "$@"
+          EOF
+          chmod +x Hei-DataHub.AppDir/AppRun
+          
+          # Create .desktop file
+          cat > Hei-DataHub.AppDir/hei-datahub.desktop <<'EOF'
+          [Desktop Entry]
+          Version=1.0
+          Type=Application
+          Name=Hei-DataHub
+          Comment=Lightweight local data hub with TUI
+          Exec=hei-datahub
+          Icon=hei-datahub
+          Terminal=true
+          Categories=Development;Utility;Database;
+          EOF
+          
+          # Create placeholder icon (replace with actual icon if available)
+          touch Hei-DataHub.AppDir/hei-datahub.png
+      
+      - name: Build AppImage
+        run: |
+          ./appimagetool-x86_64.AppImage Hei-DataHub.AppDir
+          mv Hei-DataHub-x86_64.AppImage hei-datahub-x86_64.AppImage
+          chmod +x hei-datahub-x86_64.AppImage
+          sha256sum hei-datahub-x86_64.AppImage > hei-datahub-x86_64.AppImage.sha256
+      
+      - name: Test AppImage
+        run: |
+          ./hei-datahub-x86_64.AppImage --version
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hei-datahub-appimage
+          path: |
+            hei-datahub-x86_64.AppImage
+            hei-datahub-x86_64.AppImage.sha256
+      
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            hei-datahub-x86_64.AppImage
+            hei-datahub-x86_64.AppImage.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
