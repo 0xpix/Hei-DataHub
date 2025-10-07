@@ -1,6 +1,6 @@
 # Hei-DataHub v0.58.0-beta Quick Reference
 
-**Version:** 0.58.0-beta "Streamline"  
+**Version:** 0.58.0-beta "Streamline"
 **Branch:** `chore/uv-install-data-desktop-v0.58.x`
 
 ---

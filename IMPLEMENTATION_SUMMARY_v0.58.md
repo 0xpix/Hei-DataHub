@@ -1,7 +1,7 @@
 # Hei-DataHub v0.58.0-beta Implementation Summary
 
-**Branch:** `chore/uv-install-data-desktop-v0.58.x`  
-**Date:** October 7, 2025  
+**Branch:** `chore/uv-install-data-desktop-v0.58.x`
+**Date:** October 7, 2025
 **Status:** ✅ Complete & Ready for Review
 
 ---
@@ -451,8 +451,8 @@ All features implemented and tested:
 
 ## 📄 Files Summary
 
-**This file:** `IMPLEMENTATION_SUMMARY_v0.58.md`  
-**Location:** Project root (for reference)  
+**This file:** `IMPLEMENTATION_SUMMARY_v0.58.md`
+**Location:** Project root (for reference)
 **Purpose:** Quick overview of all changes in v0.58.0-beta
 
 ---

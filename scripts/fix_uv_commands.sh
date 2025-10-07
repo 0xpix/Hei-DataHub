@@ -15,21 +15,21 @@ fix_file() {
         echo "⚠️  Skipping $file (not found)"
         return
     fi
-    
+
     echo "  📝 Updating $file"
-    
+
     # Fix: Remove #egg=hei-datahub and #egg=mini-datahub
     sed -i 's|#egg=hei-datahub||g' "$file"
     sed -i 's|#egg=mini-datahub||g' "$file"
-    
+
     # Fix: Remove --from flag for git installs
     sed -i 's|uv tool install --from "git+|uv tool install "git+|g' "$file"
     sed -i 's|uv tool install --from "git+|uv tool install "git+|g' "$file"
-    
+
     # Fix: Simplify install commands - remove package name at end
     sed -i 's| hei-datahub"| |g; s|" hei-datahub$|"|g' "$file"
     sed -i 's| mini-datahub"| |g; s|" mini-datahub$|"|g' "$file"
-    
+
     echo "  ✓ Done"
 }
 
