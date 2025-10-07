@@ -1,9 +1,9 @@
-!!! info "Version Notice — Renovation"
-    **This manual tracks Hei-DataHub v0.57.x (beta).**
+!!! info "Version Notice — Streamline"
+    **This manual tracks Hei-DataHub v0.58.x (beta).**
 
-    **Release:** 0.57.2-beta (2025-10-09)
-    **Codename:** Renovation
+    **Release:** 0.58.0-beta (2025-10-07)
+    **Codename:** Streamline
 
-    Documentation Overhaul
+    UV-based private installation, complete data packaging, and Linux desktop support
 
     **Compatibility note:** Features and shortcuts may differ slightly from other versions.
