@@ -1,6 +1,6 @@
 # Add Your First Dataset
 
-**Requirements:** Hei-DataHub v0.56-beta or later
+**Requirements:** Hei-DataHub 0.56-beta or later
 
 Learn how to add a dataset to Hei-DataHub, understand the metadata fields, and follow best practices for creating high-quality catalog entries.
 
