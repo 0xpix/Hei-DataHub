@@ -6,36 +6,45 @@ from pathlib import Path
 import os
 
 # Determine workspace root
-# Priority: 1) Explicit dev mode, 2) CWD with data/, 3) ~/.hei-datahub/
+# Priority: 1) Installed package, 2) Env var override, 3) Dev mode, 4) Custom workspace
 def _get_workspace_root() -> Path:
     """Get the workspace root directory."""
     cwd = Path.cwd()
-
-    # Check if running from source (development mode)
-    # Look for src/mini_datahub in the path structure
-    is_dev_mode = (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
-
-    # Check for explicit environment variable
+    
+    # Check if running from installed package (not editable/dev install)
+    # If __file__ is in site-packages or uv cache, we're installed
+    package_path = Path(__file__).resolve()
+    is_installed = "site-packages" in str(package_path) or ".local/share/uv" in str(package_path)
+    
+    # If installed via UV/pip, ALWAYS use ~/.hei-datahub/
+    if is_installed:
+        home_workspace = Path.home() / ".hei-datahub"
+        home_workspace.mkdir(parents=True, exist_ok=True)
+        return home_workspace
+    
+    # Check for explicit environment variable (overrides everything in dev mode)
     env_workspace = os.environ.get("HEI_DATAHUB_WORKSPACE")
     if env_workspace:
         workspace = Path(env_workspace)
         workspace.mkdir(parents=True, exist_ok=True)
         return workspace
-
+    
+    # Check if running from source (development mode)
+    # Look for src/mini_datahub in the path structure
+    is_dev_mode = (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
+    
     # If in development mode AND has data/, use repo root
     if is_dev_mode and (cwd / "data").exists():
         return cwd
-
-    # If CWD has data/ subdirectory (user's workspace), use it
-    if (cwd / "data").exists() and not is_dev_mode:
+    
+    # If CWD has data/ subdirectory (custom user workspace), use it
+    if (cwd / "data").exists():
         return cwd
-
+    
     # Default: use user's home directory workspace
     home_workspace = Path.home() / ".hei-datahub"
     home_workspace.mkdir(parents=True, exist_ok=True)
-    return home_workspace
-
-# Workspace root - where data lives
+    return home_workspace# Workspace root - where data lives
 PROJECT_ROOT = _get_workspace_root()
 
 # Data directory (one folder per dataset)
