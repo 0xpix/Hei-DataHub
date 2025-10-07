@@ -13,6 +13,7 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -93,6 +94,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          path: combined-site
           path: combined-site
 
   deploy:
