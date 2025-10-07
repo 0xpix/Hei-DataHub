@@ -110,9 +110,11 @@ hei-datahub paths
 ✓ Initialized schema at /home/user/.local/share/hei-datahub/schema.json
 ✓ Initialized 4 datasets in /home/user/.local/share/hei-datahub/datasets
   Indexing datasets...
-  ✓ Indexed 4 datasets
+  ✓ Indexed 4 datasets  ← ✨ AUTOMATIC! No manual reindex needed!
 ✓ Initialized templates in /home/user/.local/share/hei-datahub/assets
 ```
+
+**Note:** Datasets are now **automatically indexed** on first run. You can launch the TUI immediately without running `hei-datahub reindex`!
 
 ### 3. Verify Datasets Appear in TUI
 ```bash
@@ -209,3 +211,16 @@ Located at: `~/.local/share/hei-datahub/`
 - `9ae48d5` - fix: Call initialize_workspace() before all commands to ensure first-run dataset seeding
 - `b019e27` - chore: Remove debug output from initialize_workspace()
 - `9ed6587` - fix: Use __file__ instead of cwd() for environment detection
+- `d8fa52f` - docs: Update fix documentation with environment detection issue
+- `616d8c7` - fix: Auto-index datasets on first run using correct import paths
+
+## Summary
+
+After installing via `uv tool install`, **everything just works™**:
+
+1. ✅ First command (any command) automatically copies datasets from package
+2. ✅ Datasets are automatically indexed to database
+3. ✅ TUI launches immediately with all 4 datasets visible
+4. ✅ No manual `reindex` needed
+5. ✅ Works from any directory (repo or otherwise)
+6. ✅ Uninstall/reinstall preserves user data
