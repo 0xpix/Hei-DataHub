@@ -73,28 +73,29 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started:
-    - Welcome: 00-welcome.md
-    - Getting started: 01-getting-started.md
-    - Navigation: 02-navigation.md
-    - The Basics: 03-the-basics.md
+    - Welcome: getting-started/00-welcome.md
+    - Getting started: getting-started/01-getting-started.md
+    - Navigation: getting-started/02-navigation.md
+    - The Basics: getting-started/03-the-basics.md
   - What's New:
     - 0.57-beta "Renovation": whats-new/0.57-beta.md
+    - 0.58-beta "Packaging": whats-new/0.58-beta.md
   - How-to Guides:
-    - Configure GitHub Settings: how-to/settings.md
-    - Your First Dataset: how-to/02-first-dataset.md
-    - Edit Datasets: how-to/edit-datasets.md
-    - Advanced Search: how-to/search-advanced.md
-    - Customize Keybindings: how-to/customize-keybindings.md
-    - Change Theme: how-to/change-theme.md
+    - Configure GitHub Settings: how-to/04-settings.md
+    - Your First Dataset: how-to/05-first-dataset.md
+    - Edit Datasets: how-to/06-edit-datasets.md
+    - Advanced Search: how-to/07-search-advanced.md
+    - Customize Keybindings: how-to/08-customize-keybindings.md
+    - Change Theme: how-to/09-change-theme.md
   - Reference:
-    - UI Guide: 10-ui.md
-    - Data & SQL: 11-data-and-sql.md
-    - Configuration: 12-config.md
+    - UI Guide: reference/10-ui.md
+    - Data & SQL: reference/11-data-and-sql.md
+    - Configuration: reference/12-config.md
     - Search Syntax: reference/search-syntax.md
     - Keyboard Shortcuts: reference/keybindings.md
   - Help:
-    - FAQ: 90-faq.md
-    - Troubleshooting: troubleshooting.md
+    - FAQ: help/90-faq.md
+    - Troubleshooting: help/troubleshooting.md
 
 # Extra
 extra:
