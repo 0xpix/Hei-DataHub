@@ -138,18 +138,18 @@ def handle_update(args):
     """Handle the update subcommand."""
     import subprocess
     from pathlib import Path
-    
+
     print("Updating Hei-DataHub...")
     print()
-    
+
     # Determine the installation source
     branch = args.branch if hasattr(args, 'branch') and args.branch else "chore/uv-install-data-desktop-v0.58.x"
     repo_url = f"git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}#egg=hei-datahub"
-    
+
     print(f"  Source: {repo_url}")
     print(f"  Using uv tool install --upgrade...")
     print()
-    
+
     try:
         # Run uv tool install with --upgrade flag
         result = subprocess.run(
@@ -158,7 +158,7 @@ def handle_update(args):
             text=True,
             check=False
         )
-        
+
         if result.returncode == 0:
             print("✓ Update completed successfully!")
             print()
@@ -171,7 +171,7 @@ def handle_update(args):
                 print("Error output:")
                 print(result.stderr)
             sys.exit(1)
-            
+
     except FileNotFoundError:
         print("❌ Error: 'uv' command not found!")
         print()
