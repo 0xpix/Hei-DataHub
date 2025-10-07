@@ -48,14 +48,14 @@ Perfect for **one-time use** or **testing**. Nothing is installed globally.
 #### Using SSH (Recommended):
 
 ```bash
-uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub"
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 #### Using HTTPS + Token:
 
 ```bash
 export GH_PAT=ghp_xxxxxxxxxxxxx
-uvx "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub"
+uvx "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 ```
 
 **What happens:**
@@ -75,14 +75,14 @@ Install Hei-DataHub **globally** for repeated use.
 #### Using SSH:
 
 ```bash
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 #### Using HTTPS + Token:
 
 ```bash
 export GH_PAT=ghp_xxxxxxxxxxxxx
-uv tool install --from "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 ```
 
 **What happens:**
@@ -106,10 +106,10 @@ Pin to a Git tag (e.g., `v0.58.0-beta`):
 
 ```bash
 # Ephemeral
-uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.0-beta#egg=hei-datahub"
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.0-beta"
 
 # Persistent
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.0-beta#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.0-beta"
 ```
 
 ### Install from a Branch
@@ -117,7 +117,7 @@ uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.0-b
 Install from a specific branch (e.g., `develop`):
 
 ```bash
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@develop#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@develop"
 ```
 
 ### Install from a Commit
@@ -125,7 +125,7 @@ uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@develop#e
 Pin to a specific commit hash:
 
 ```bash
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@a1b2c3d4#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@a1b2c3d4"
 ```
 
 ---
@@ -135,7 +135,7 @@ uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@a1b2c3d4#
 ### Update to Latest Main
 
 ```bash
-uv tool install --upgrade --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install --upgrade --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 Or simply:
@@ -147,7 +147,7 @@ uv tool upgrade hei-datahub
 ### Update to a New Version
 
 ```bash
-uv tool install --upgrade --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.59.0-beta#egg=hei-datahub" hei-datahub
+uv tool install --upgrade --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.59.0-beta"
 ```
 
 ---
@@ -169,7 +169,7 @@ Copy-paste this for a complete setup (SSH method):
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh && \
   source ~/.bashrc && \
-  uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub && \
+  uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main" hei-datahub && \
   hei-datahub --version
 ```
 
@@ -187,20 +187,20 @@ uv tool list
 
 ```bash
 uv tool uninstall hei-datahub
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 ### Run with Verbose Output
 
 ```bash
-uv -v tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv -v tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 ---
 
 ## 🔍 Troubleshooting
 
-### "Command not found: hei-datahub"
+### "Command not found: 
 
 Make sure `~/.local/bin` is in your PATH:
 

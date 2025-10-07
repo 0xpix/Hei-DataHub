@@ -26,10 +26,10 @@ For the fastest installation experience with **UV** (private SSH access):
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # One-time run (ephemeral)
-uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub"
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
 # Or install globally
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
 # Run it
 hei-datahub

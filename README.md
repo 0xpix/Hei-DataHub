@@ -55,19 +55,19 @@ More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
 ### Ephemeral Run (SSH)
 ```bash
-uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub"
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 ### Global Install (SSH)
 ```bash
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
-hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+hei-datahub  # or mini-datahub
 ```
 
 ### Install with HTTPS + Token
 ```bash
 export GH_PAT=ghp_xxxxxxxxxxxxx  # Your GitHub Personal Access Token
-uv tool install --from "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 ```
 
 **📚 Need help?** See [docs/installation](docs/installation/README.md) for:

@@ -68,12 +68,12 @@ $env:GH_PAT = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 **Ephemeral run:**
 ```powershell
-uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub"
+uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"
 ```
 
 **Persistent install:**
 ```powershell
-uv tool install --from "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+uv tool install "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"
 ```
 
 #### Step 4: Run Hei-DataHub
@@ -130,7 +130,7 @@ You should see: `Hi username! You've successfully authenticated...`
 Back in **PowerShell**:
 
 ```powershell
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 ---
@@ -196,7 +196,7 @@ notepad $PROFILE
 **Solution:**
 Use double quotes instead of single quotes:
 ```powershell
-uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub"
+uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"
 ```
 
 ### "Authentication failed"
@@ -261,8 +261,8 @@ If you have Windows Terminal:
 |------|---------|
 | Install UV | `powershell -c "irm https://astral.sh/uv/install.ps1 \| iex"` |
 | Set token | `$env:GH_PAT = "ghp_xxxxx"` |
-| Install (ephemeral) | `uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub"` |
-| Install (persistent) | `uv tool install --from "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub` |
+| Install (ephemeral) | `uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"` |
+| Install (persistent) | `uv tool install "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main" hei-datahub` |
 | Run | `hei-datahub` |
 | Update | `uv tool upgrade hei-datahub` |
 | Uninstall | `uv tool uninstall hei-datahub` |
@@ -277,7 +277,7 @@ $env:GH_PAT = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Then run this
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"; `
-  & "$env:USERPROFILE\.local\bin\uv.exe" tool install --from "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub; `
+  & "$env:USERPROFILE\.local\bin\uv.exe" tool install --from "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main" hei-datahub; `
   hei-datahub --version
 ```
 

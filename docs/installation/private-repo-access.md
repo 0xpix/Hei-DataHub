@@ -102,10 +102,10 @@ Now you can install using SSH URLs:
 
 ```bash
 # Ephemeral run
-uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub"
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
 # Persistent install
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 ---
@@ -188,20 +188,20 @@ You should see your token.
 
 ```bash
 # Ephemeral run
-uvx "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub"
+uvx "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 
 # Persistent install
-uv tool install --from "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Ephemeral run
-uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub"
+uvx "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"
 
 # Persistent install
-uv tool install --from "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+uv tool install "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"
 ```
 
 ---
@@ -293,13 +293,13 @@ uv tool install --from "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@
 
 **SSH Install:**
 ```bash
-uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
 **HTTPS Install:**
 ```bash
 export GH_PAT=ghp_xxxxx
-uv tool install --from "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 ```
 
 ---
