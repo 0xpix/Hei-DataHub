@@ -108,10 +108,10 @@ def initialize_workspace():
         # In dev mode, just ensure directories exist
         ensure_directories()
         return
-    
+
     # Ensure all directories exist
     ensure_directories()
-    
+
     # Copy schema.json to user data directory
     user_schema = XDG_DATA_HOME / "hei-datahub" / "schema.json"
     if not user_schema.exists():
@@ -123,7 +123,7 @@ def initialize_workspace():
                 print(f"✓ Initialized schema at {user_schema}")
         except Exception as e:
             print(f"⚠ Could not copy schema: {e}")
-    
+
     # Copy packaged datasets on first run
     if not list(DATA_DIR.iterdir()):
         try:
@@ -137,10 +137,20 @@ def initialize_workspace():
                         if not dest.exists():
                             shutil.copytree(item, dest)
                             dataset_count += 1
-                print(f"✓ Initialized {dataset_count} datasets in {DATA_DIR}")
+                if dataset_count > 0:
+                    print(f"✓ Initialized {dataset_count} datasets in {DATA_DIR}")
+                    print("  Indexing datasets...")
+                    # Trigger reindex after copying datasets
+                    try:
+                        from mini_datahub.services.store import DatasetStore
+                        store = DatasetStore()
+                        store.reindex()
+                        print(f"  ✓ Indexed {dataset_count} datasets")
+                    except Exception as reindex_error:
+                        print(f"  ⚠ Please run 'hei-datahub reindex' to index datasets")
         except Exception as e:
             print(f"⚠ Could not copy datasets: {e}")
-    
+
     # Copy assets/templates if they exist
     try:
         packaged_templates = Path(__file__).parent.parent / "templates"
