@@ -1,21 +1,10 @@
 # How to Customize Keybindings
 
+**Requirements**: Hei-DataHub 0.56-beta or later
+
 **Goal:** Change keyboard shortcuts to match your preferences.
 
 **Time:** 5-10 minutes
-**Version:** 0.56-beta or later
-
----
-
-## Before You Start
-
-!!! warning "Restart Required"
-    Changes to keybindings require **restarting the app**. This will be improved in a future release.
-
-!!! note "What you'll need"
-    - Hei-DataHub 0.56-beta or later
-    - A text editor (Vim, Nano, VS Code, etc.)
-    - Basic YAML knowledge (we'll provide examples)
 
 ---
 
@@ -45,19 +34,14 @@ C:\Users\YourName\.config\hei-datahub\config.yaml
 
 If the file doesn't exist, the app will create it with defaults on first run.
 
-**Using Vim:**
+**Using NeoVim:**
 ```bash
-vim ~/.config/hei-datahub/config.yaml
+nvim ~/.config/hei-datahub/config.yaml
 ```
 
 **Using VS Code:**
 ```bash
 code ~/.config/hei-datahub/config.yaml
-```
-
-**Using Nano:**
-```bash
-nano ~/.config/hei-datahub/config.yaml
 ```
 
 ---
@@ -97,7 +81,7 @@ keybindings:
 
 ### 5. Save and Restart
 
-1. Save the file (`Ctrl+S` in most editors, `:wq` in Vim)
+1. Save the file (`Ctrl+s` in most editors, `:wq` in Nvim)
 2. Restart Hei-DataHub:
    ```bash
    hei-datahub
@@ -232,7 +216,7 @@ Make navigation more Vim-like:
 
 ```yaml
 keybindings:
-  quit: "shift+z shift+z"      # :q → ZZ
+  quit: "shift+z shift+z"       # :q → ZZ
   search: "slash"               # Already default
   back: "escape"                # Already default
   vim_down: "j"                 # Already default
@@ -312,6 +296,7 @@ Restart the app after editing to make sure your new bindings work.
 **Problem:** You changed a keybinding but it doesn't respond.
 
 **Solutions:**
+
 1. **Check spelling:** Action names are case-sensitive
 2. **Check syntax:** Use quotes around keys (`"ctrl+s"` not `ctrl+s`)
 3. **Restart app:** Changes require a restart
@@ -334,6 +319,7 @@ Restart the app after editing to make sure your new bindings work.
 **Problem:** Changes don't take effect.
 
 **Solutions:**
+
 1. **Check file location:** Must be `~/.config/hei-datahub/config.yaml`
 2. **Check YAML syntax:** Invalid YAML is silently ignored
 3. **Validate YAML:** Use an online YAML validator
@@ -372,7 +358,7 @@ Changes don't take effect until you restart. Hot-reloading is planned for a futu
 
 ### Some Keys Can't Be Rebound
 
-System keys (like `Ctrl+C` in some terminals) may not be rebindable.
+System keys (like `Ctrl+c` in some terminals) may not be rebindable.
 
 ---
 
@@ -418,7 +404,7 @@ github:
 
 # UI preferences
 ui:
-  enable_critter_parade: false  # Disable animated critters (0.57+)
+  enable_critter_parade: false   # Disable animated critters (0.57+)
   reduce_motion: false           # Accessibility setting
 ```
 
