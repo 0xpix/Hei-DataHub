@@ -29,6 +29,25 @@ article svg {
   margin-right: auto;
 }
 
+.navbar-nav{
+    align-self: center;
+}
+
+#navbarsMenu > ul.navbar-nav{
+    gap: 3rem;
+}
+
+.md-source-repo-text,
+.md-source-repo-url{
+    display: none;
+}
+
+.md-source-repo-icon,
+.md-search-icon{
+    margin-left: 20px;
+    font-size:x-large;
+}
+
 /* --------------------------------------------------------------------------
    Table of Contents Permalink Styling
    Make the heading permalink symbol (¶) subtle and less intrusive
