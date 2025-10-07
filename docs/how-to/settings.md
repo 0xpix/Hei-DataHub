@@ -1,20 +1,22 @@
 # Configure GitHub Integration
 
-**Requirements:** Hei-DataHub v0.56-beta or later
-
 Learn how to set up GitHub integration for automated Pull Request workflows in Hei-DataHub. This guide covers creating a Personal Access Token (PAT), configuring settings via the TUI or setup script, and understanding all available options.
 
 ---
 
 ## Overview
 
-Hei-DataHub can automatically create Pull Requests to a GitHub catalog repository when you add, edit, or delete datasets. This keeps your team synchronized and provides a review workflow.
+Hei-DataHub can automatically create Pull Requests to a GitHub catalog repository when you add, edit, or delete datasets.
 
 **What you'll need:**
+
 - A GitHub account
-- A catalog repository (public or private)
 - A Personal Access Token with appropriate permissions
 - 5-10 minutes for setup
+
+**Planned for the upcoming versions**
+
+- A catalog repository (public or private) dedicated to storing the entire dataset collection.
 
 ---
 
@@ -28,6 +30,7 @@ The fastest way to set up GitHub integration is using the automated setup script
 ```
 
 The script will guide you through:
+
 1. Installing dependencies (if needed)
 2. Creating/cloning your catalog repository
 3. Setting up `.gitignore` and `schema.json`
@@ -36,99 +39,22 @@ The script will guide you through:
 6. Launching the TUI to add your token
 
 **After running the script:**
+
 1. Launch Hei-DataHub: `mini-datahub`
 2. Press `S` to open Settings
 3. Paste your GitHub token (copied from GitHub)
 4. Click **Test Connection** to verify
 5. Click **Save Settings** to complete setup
 
+**Planned for 0.58-beta**
+
+- Add CLI flags to the script for fully automated setup (no TUI) -> `hei-datahub pr`
+
 ---
 
 ## Manual Setup: Step-by-Step
 
-### Step 1: Create a Catalog Repository
-
-1. Go to [github.com/new](https://github.com/new)
-2. **Repository name:** `mini-datahub-catalog` (or your choice)
-3. **Visibility:** Private or Public
-4. **Important:** Do NOT initialize with README or `.gitignore`
-5. Click **Create repository**
-6. Note the repository URL: `https://github.com/your-org/mini-datahub-catalog.git`
-
-### Step 2: Clone the Repository
-
-```bash
-# Clone to a local directory
-git clone https://github.com/your-org/mini-datahub-catalog.git ~/catalogs/my-catalog
-cd ~/catalogs/my-catalog
-```
-
-### Step 3: Set Up Repository Structure
-
-Create a `.gitignore` file to protect sensitive data:
-
-```bash
-cat > .gitignore << 'EOF'
-# Database files - never commit these
-db.sqlite
-db.sqlite-*
-
-# Python cache
-__pycache__/
-*.py[cod]
-
-# Virtual environments
-venv/
-.venv/
-
-# IDE
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-
-# Ignore all data directory contents EXCEPT metadata
-data/**
-
-# But explicitly include metadata.yaml files
-!data/**/metadata.yaml
-
-# Include optional README and images
-!data/**/README.md
-!data/**/images/
-!data/**/images/**
-
-# Application config (contains sensitive info)
-.datahub_config.json
-
-# Outbox (failed PR tasks)
-.outbox/
-EOF
-```
-
-Copy the schema file from Hei-DataHub:
-
-```bash
-# From your Hei-DataHub installation directory
-cp /path/to/Hei-DataHub/schema.json .
-```
-
-Create the data directory:
-
-```bash
-mkdir -p data
-```
-
-Commit and push the initial structure:
-
-```bash
-git add .gitignore schema.json
-git commit -m "Initial catalog structure"
-git push -u origin main
-```
-
-### Step 4: Create a Personal Access Token (PAT)
+### Step 1: Create a Personal Access Token (PAT)
 
 GitHub Personal Access Tokens provide secure, granular access to your repositories.
 
@@ -167,45 +93,45 @@ GitHub Personal Access Tokens provide secure, granular access to your repositori
 - Rotate tokens regularly
 - Revoke unused tokens
 
-### Step 5: Configure via TUI (Recommended)
+### Step 2: Configure via TUI (Recommended)
 
 Launch Hei-DataHub and open the Settings screen:
 
 ```bash
 mini-datahub
-# Press 'S' to open Settings
+# Press 's' to open Settings
 ```
 
 #### Fill in the Settings Form
 
 1. **GitHub Host:** `github.com` (default, leave as-is)
-   
+
 2. **Owner/Organization:** Your GitHub username or organization name
    - Example: `mycompany` (from `github.com/mycompany/mini-datahub-catalog`)
-   
+
 3. **Repository Name:** The catalog repository name
    - Example: `mini-datahub-catalog`
-   
+
 4. **Default Branch:** Main branch name
    - Example: `main` (or `master` for older repos)
-   
+
 5. **GitHub Username:** Your personal GitHub username
    - Used for commit attribution and PR authorship
-   
+
 6. **Personal Access Token (PAT):** Paste your token
    - Starts with `github_pat_` or `ghp_`
    - Will be stored securely in your OS keychain
    - Displayed as `••••••••` after saving
-   
+
 7. **Catalog Repository Path:** Full path to your cloned repository
    - Example: `/home/user/catalogs/my-catalog`
    - Use absolute paths, not relative (`~` is expanded automatically)
-   
+
 8. **Auto-assign Reviewers:** Comma-separated GitHub usernames (optional)
    - Example: `alice, bob, charlie`
    - These users will be automatically assigned to review PRs
    - Leave empty if you don't want auto-assignment
-   
+
 9. **PR Labels:** Comma-separated labels for automatic tagging (optional)
    - Example: `dataset:add, needs-review, climate`
    - Labels help organize PRs in your repository
@@ -216,11 +142,11 @@ mini-datahub
 1. Click **Test Connection** to verify your settings
    - Success: ✅ "Successfully connected to GitHub! Repository accessible."
    - Failure: Check your token, repository name, and permissions
-   
+
 2. Click **Save Settings** to persist configuration
    - Settings saved to `.datahub_config.json`
    - Token saved to OS keychain (macOS Keychain, GNOME Keyring, Windows Credential Manager)
-   
+
 3. Press `Escape` or `Q` to return to the home screen
 
 ### Step 6: Configure via Config File (Alternative)
@@ -245,7 +171,7 @@ Create `.datahub_config.json` in the Hei-DataHub root directory:
 **Important:** The config file does NOT store your token for security reasons. You must add it via the TUI:
 
 1. Launch Hei-DataHub: `mini-datahub`
-2. Press `S` for Settings
+2. Press `s` for Settings
 3. Verify pre-filled values from config file
 4. Paste your token in the **Personal Access Token** field
 5. Click **Test Connection**
@@ -286,7 +212,7 @@ Hei-DataHub uses your operating system's secure credential storage via the `keyr
 - **Linux:** GNOME Keyring, KWallet, or Secret Service
 - **Windows:** Windows Credential Manager
 
-**Service name:** `mini-datahub`  
+**Service name:** `mini-datahub`
 **Username:** `github-token`
 
 You can verify token storage using your OS tools:
@@ -308,7 +234,7 @@ cmdkey /list | findstr "mini-datahub"
 
 ### Test Connection in TUI
 
-1. Press `S` to open Settings
+1. Press `s` to open Settings
 2. Verify all fields are filled
 3. Click **Test Connection**
 4. Look for success message: ✅ "Successfully connected to GitHub!"
@@ -324,16 +250,6 @@ curl -H "Authorization: token YOUR_TOKEN" \
 
 # Should return JSON with repository details
 ```
-
-### Test PR Workflow
-
-1. Press `A` to add a new dataset
-2. Fill in metadata (name, description, source, etc.)
-3. Click **Create Dataset**
-4. Check your GitHub repository for a new PR
-5. Review the PR, approve, and merge
-6. Back in Hei-DataHub, the dataset should sync
-
 ---
 
 ## Troubleshooting
@@ -387,10 +303,10 @@ curl -H "Authorization: token YOUR_TOKEN" \
    ```bash
    # Linux
    sudo apt install gnome-keyring  # or libsecret-1-dev
-   
+
    # macOS (built-in)
    # No action needed
-   
+
    # Windows (built-in)
    # No action needed
    ```
@@ -409,33 +325,11 @@ curl -H "Authorization: token YOUR_TOKEN" \
 
 ## Advanced Configuration
 
-### Multiple Catalog Repositories
-
-You can switch between different catalogs by changing `catalog_repo_path`:
-
-1. Press `S` to open Settings
-2. Update **Catalog Repository Path**
-3. Update **Owner** and **Repo** if different
-4. Click **Save Settings**
-
-Or use separate config files:
-
-```bash
-# Save current config
-cp .datahub_config.json .datahub_config.work.json
-
-# Load different config
-cp .datahub_config.personal.json .datahub_config.json
-
-# Restart Hei-DataHub
-mini-datahub
-```
-
 ### Using GitHub Enterprise
 
 For GitHub Enterprise Server (self-hosted):
 
-1. Press `S` to open Settings
+1. Press `s` to open Settings
 2. Change **GitHub Host** to your server (e.g., `github.company.com`)
 3. Use a token from your Enterprise instance
 4. All other settings remain the same
@@ -482,13 +376,6 @@ Add `.datahub_config.json` to your `.gitignore`:
 echo ".datahub_config.json" >> .gitignore
 ```
 
-Ensure your catalog repository `.gitignore` excludes sensitive files:
-
-```bash
-# In catalog repository
-cat .gitignore | grep -E "(db.sqlite|.datahub_config.json|.outbox)"
-```
-
 ### Token Revocation
 
 If your token is compromised:
@@ -496,7 +383,7 @@ If your token is compromised:
 1. Go to [github.com/settings/tokens](https://github.com/settings/tokens)
 2. Find the token (e.g., "Mini DataHub Catalog Access")
 3. Click **Revoke**
-4. Generate a new token (see [Step 4](#step-4-create-a-personal-access-token-pat))
+4. Generate a new token (see [Step 4](#step-1-create-a-personal-access-token-pat))
 5. Update in Hei-DataHub Settings
 6. Click **Remove Token** → **Save Settings** → paste new token → **Save Settings**
 
@@ -506,12 +393,13 @@ If your token is compromised:
 
 ### What happens when you create a dataset?
 
-1. **Metadata saved locally** to your catalog repository (`data/dataset-name/metadata.yaml`)
+1. **Metadata saved locally** to `data/dataset-name/metadata.yaml`
 2. **Git operations:**
    - Branch created: `dataset/add-dataset-name-TIMESTAMP`
    - Files staged: `git add data/dataset-name/metadata.yaml`
    - Commit: `git commit -m "feat(dataset): Add dataset-name"`
    - Push: `git push origin dataset/add-dataset-name-TIMESTAMP`
+   - Switch back to default branch
 3. **Pull Request created** on GitHub with:
    - Title: `Add Dataset: dataset-name`
    - Body: Metadata summary (name, description, source, tags)
@@ -523,10 +411,8 @@ If your token is compromised:
 
 ### Customizing PR Templates
 
-Create a PR template in your catalog repository:
-
 ```bash
-# In your catalog repository
+# In your repository
 mkdir -p .github
 cat > .github/pull_request_template.md << 'EOF'
 ## Dataset Information
