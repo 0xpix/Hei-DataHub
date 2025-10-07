@@ -4,6 +4,8 @@
 
 Learn how to add a dataset to Hei-DataHub, understand the metadata fields, and follow best practices for creating high-quality catalog entries.
 
+**Note :** This is just a beta version of the feature, will add more form fields in future releases.
+
 ---
 
 ## Overview
@@ -12,6 +14,7 @@ Adding a dataset in Hei-DataHub creates a metadata record that helps you and you
 
 - Opening the Add Dataset form
 - Understanding required vs. optional fields
+- What happens when you save
 - Best practices for each field
 - Saving and verifying your dataset
 
@@ -40,11 +43,12 @@ hei-datahub
 
 ### 2. Open Add Dataset Form
 
-Press **`A`** (Shift+A) to open the Add Dataset form.
+Press **`a`** to open the Add Dataset form.
 
 **Expected:** A modal form appears with multiple input fields.
 
 **Keyboard shortcuts:**
+
 - `Tab` / `Shift+Tab` - Move between fields
 - `Ctrl+s` - Save dataset and publish
 - `Escape` - Cancel and close form
@@ -62,6 +66,7 @@ These fields must be filled in to save a dataset.
 **What it is:** Human-readable name for your dataset.
 
 **Best practices:**
+
 - ✅ Use descriptive, specific names: "Global Daily Temperature 2020-2024"
 - ✅ Include temporal scope: "MODIS Burned Area 2023"
 - ✅ Include spatial scope: "European Precipitation Records"
@@ -69,6 +74,7 @@ These fields must be filled in to save a dataset.
 - ❌ Avoid vague names: "Data", "Dataset 1", "Test"
 
 **Examples:**
+
 - `Global Weather Stations 2024`
 - `MODIS Land Cover 500m Annual`
 - `Amazon Basin Precipitation 1990-2020`
@@ -82,6 +88,7 @@ These fields must be filled in to save a dataset.
 **What it is:** Detailed explanation of what the dataset contains.
 
 **Best practices:**
+
 - ✅ Write 2-4 complete sentences
 - ✅ Mention what's included: variables, coverage, resolution
 - ✅ Include data quality notes: "quality-controlled", "gap-filled", "raw"
@@ -103,6 +110,7 @@ Coverage: 1990-2024, with higher density in North America and Europe.
 **What it is:** URL or code showing where the data originates.
 
 **Best practices:**
+
 - ✅ Provide direct URLs when available
 - ✅ Include code snippets for API/library data
 - ✅ Add DOIs for published datasets
@@ -140,6 +148,7 @@ Secondary: https://unstats.un.org/unsd/demographic-social/
 **What it is:** When the dataset was created or acquired (ISO 8601: `YYYY-MM-DD`).
 
 **Best practices:**
+
 - ✅ Use today's date for new acquisitions (auto-filled)
 - ✅ Use original publication date for historical datasets
 - ✅ Format: `YYYY-MM-DD` (e.g., `2025-10-07`)
@@ -153,12 +162,14 @@ Secondary: https://unstats.un.org/unsd/demographic-social/
 **What it is:** Where the actual data files are stored.
 
 **Best practices:**
+
 - ✅ Be specific with full paths/URLs
 - ✅ Include bucket/container names for cloud storage
 - ✅ Use `local` if data is on your machine
 - ❌ Avoid vague locations like "server" or "cloud"
 
 **Examples:**
+
 - `s3://my-bucket/climate/temperature/`
 - `gs://earth-engine-exports/modis/`
 - `/data/projects/climate-analysis/weather/`
@@ -187,6 +198,7 @@ These fields enrich your metadata but aren't required to save.
 **What it is:** Approximate size of the dataset.
 
 **Best practices:**
+
 - ✅ Use human-readable units: `2.5 GB`, `150 MB`, `~10 TB`
 - ✅ Approximate is fine: `~500 MB`
 - ✅ Include compressed vs. uncompressed if relevant: `1.2 GB (3.5 GB uncompressed)`
@@ -198,6 +210,7 @@ These fields enrich your metadata but aren't required to save.
 **What it is:** Comma-separated keywords for categorization.
 
 **Best practices:**
+
 - ✅ Use lowercase for consistency
 - ✅ Include domain: `climate`, `satellite`, `demographics`
 - ✅ Include data type: `raster`, `vector`, `timeseries`
@@ -215,6 +228,7 @@ These fields enrich your metadata but aren't required to save.
 **What it is:** List of variables, fields, or columns in the dataset.
 
 **Best practices:**
+
 - ✅ One per line or comma-separated
 - ✅ Include units in parentheses: `Temperature (°C)`
 - ✅ Be specific: `Mean Daily Temperature` not just `Temperature`
@@ -231,6 +245,7 @@ Temperature (°C), Precipitation (mm), Wind Speed (m/s), Humidity (%), Pressure 
 **What it is:** Projects or analyses that use this dataset.
 
 **Best practices:**
+
 - ✅ List project names for traceability
 - ✅ Update as new projects use the data
 - ✅ Helps find related datasets by project
@@ -249,6 +264,7 @@ Climate Dashboard 2024, ML Weather Prediction, Research Paper: Climate Trends
 **What it is:** Any additional context, warnings, or documentation.
 
 **Best practices:**
+
 - ✅ Mention known issues: "Missing data for January 2023"
 - ✅ Add preprocessing notes: "Outliers removed using 3-sigma rule"
 - ✅ Include access requirements: "Requires authentication to download"
@@ -269,7 +285,7 @@ Let's add a real dataset together.
 
 ### Example: Global Weather Stations 2024
 
-**1. Open the form:** Press `A`
+**1. Open the form:** Press `a`
 
 **2. Fill in required fields:**
 
@@ -295,6 +311,7 @@ Let's add a real dataset together.
 **4. Save:** Press `Ctrl+S`
 
 **Expected:**
+
 - ✅ "Dataset saved successfully!" notification
 - ✅ Form closes, returns to Home screen
 - ✅ New dataset appears in results
@@ -318,27 +335,13 @@ All Datasets (45 total)
 ```
 
 **Note:** The Dataset ID is auto-generated from the name:
+
 - "Global Weather Stations 2024" → `global-weather-stations-2024`
 - Lowercase, spaces→dashes, special characters removed
 
 ---
 
 ### 2. Search for Your Dataset
-
-Press `/` to focus search, then type:
-
-```
-weather
-```
-
-**Expected:** Your dataset appears in filtered results.
-
-**Try field-specific search:**
-```
-tag:climate
-source:github
-format:csv
-```
 
 👉 [Learn more about search](search-advanced.md)
 
@@ -408,11 +411,13 @@ notes: |
 ### 1. Naming Conventions
 
 **✅ Good names:**
+
 - Descriptive: `European Precipitation Records 1950-2020`
 - Specific: `MODIS Burned Area MCD64A1 500m Monthly`
 - Scoped: `California Wildfire Perimeters 2020-2024`
 
 **❌ Avoid:**
+
 - Generic: `Dataset 1`, `Test`, `Data`
 - Unclear: `New Folder`, `Downloaded Data`
 - Too short: `Temp`, `DB`, `Files`
@@ -455,6 +460,7 @@ collection = ee.ImageCollection("MODIS/061/MCD64A1") \
 ### 4. Tags for Discoverability
 
 **Strategy:** Include tags for:
+
 - Domain: `climate`, `ecology`, `demographics`
 - Data type: `raster`, `vector`, `timeseries`, `tabular`
 - Source: `modis`, `landsat`, `sentinel`, `worldbank`
@@ -470,6 +476,7 @@ collection = ee.ImageCollection("MODIS/061/MCD64A1") \
 ### 5. Temporal and Spatial Scope
 
 Include in **Name** or **Description**:
+
 - Time range: `1990-2020`, `Monthly 2024`, `Historical`
 - Geography: `Global`, `North America`, `Sub-Saharan Africa`
 - Resolution: `500m`, `1km`, `Daily`, `Annual`
@@ -481,6 +488,7 @@ Include in **Name** or **Description**:
 ### 6. Data Quality Indicators
 
 Document in **Description** or **Notes**:
+
 - Processing level: `L1`, `L2`, `Raw`, `Processed`
 - QA/QC: `Quality-controlled`, `Validated`, `Preliminary`
 - Completeness: `95% complete`, `Gaps filled`, `Missing Jan 2023`
@@ -500,6 +508,7 @@ used_in_projects:
 ```
 
 **Benefits:**
+
 - Find all project datasets: `project:"Climate Dashboard"`
 - Track data lineage
 - Identify dataset reuse
@@ -509,6 +518,7 @@ used_in_projects:
 ### 8. Storage Location Best Practices
 
 **Be specific:**
+
 - ✅ `s3://my-bucket/climate/temperature/v2/`
 - ✅ `/mnt/data/projects/climate/processed/`
 - ✅ `Google Earth Engine: MODIS/061/MCD64A1`
@@ -558,6 +568,7 @@ Then relaunch the TUI.
 **Cause:** A dataset with the same ID already exists.
 
 **Solution:**
+
 1. Choose a more specific name (e.g., add year or version)
 2. Or delete the existing dataset first
 3. Or provide a custom ID
@@ -567,17 +578,6 @@ Then relaunch the TUI.
 ## Editing Datasets (v0.56+)
 
 You can edit datasets directly in the TUI using inline editing:
-
-1. Navigate to a dataset and press `Enter` to open Details
-2. Press `E` to enter Edit Mode
-3. Modify any field (navigate with `Tab`/`Shift+Tab`)
-4. Press `Ctrl+S` to save changes
-
-**Alternative:** Edit YAML files directly:
-```bash
-vim data/global-weather-stations-2024/metadata.yaml
-hei-datahub reindex  # Update search index
-```
 
 👉 [Complete editing guide](edit-datasets.md)
 
