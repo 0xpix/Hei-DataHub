@@ -1,8 +1,3 @@
-# Configuration Reference
-
-This guide covers all configuration options for Hei-DataHub, including config files, environment variables, and example scenarios.
-
----
 
 ## Configuration Overview
 

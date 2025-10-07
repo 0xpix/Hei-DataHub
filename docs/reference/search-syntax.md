@@ -1,12 +1,6 @@
-# Search Syntax Reference
 
-Complete guide to search filters, operators, and query syntax in Hei-DataHub.
 
-**Version:** 0.56-beta or later
-
----
-
-## Overview
+## Search Syntax Overview
 
 Hei-DataHub uses a **structured query parser** that supports:
 - Field-specific filters

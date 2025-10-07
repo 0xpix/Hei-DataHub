@@ -1,10 +1,3 @@
-# Keyboard Shortcuts Reference
-
-Complete list of all keyboard shortcuts in Hei-DataHub v0.57.x beta.
-
-**Tip:** Press `?` in the app to see context-aware shortcuts.
-
----
 
 ## Global Shortcuts
 
@@ -20,6 +13,7 @@ These work from any screen:
 | `r` | Refresh | Refresh data without reindexing |
 | `u` | Pull updates | Pull latest changes from Git |
 
+**Tip:** Press `?` in the app to see context-aware shortcuts.
 ---
 
 ## Home Screen
