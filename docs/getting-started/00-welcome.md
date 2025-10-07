@@ -72,8 +72,8 @@ It's built for people who:
 Ready to get started?
 
 1. **[Getting Started](01-getting-started.md)** — Install and run Hei-DataHub
-2. **[Tutorial: Your First Dataset](how-to/02-first-dataset.md)** — Add your first dataset
 3. **[Navigation](02-navigation.md)** — Learn the keyboard shortcuts
+2. **[Tutorial: Your First Dataset](../how-to/05-first-dataset.md)** — Add your first dataset
 
 ---
 

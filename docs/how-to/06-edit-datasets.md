@@ -229,15 +229,15 @@ Done! 🎉
 
 ## Next Steps
 
-- **[Search for your updated dataset](search-advanced.md)** using field filters
-- **[Customize keyboard shortcuts](customize-keybindings.md)** (change `E` to something else)
-- **[Learn about themes](change-theme.md)** for visual customization
+- **[Search for your updated dataset](07-search-advanced.md)** using field filters
+- **[Customize keyboard shortcuts](08-customize-keybindings.md)** (change `E` to something else)
+- **[Learn about themes](09-change-theme.md)** for visual customization
 
 ---
 
 ## Related
 
-- [Configuration reference](../12-config.md)
+- [Configuration reference](../reference/12-config.md)
 - [Keyboard shortcuts](../reference/keybindings.md)
-- [Troubleshooting](../troubleshooting.md)
-- [Changelog](../99-changelog.md#0560-beta)
+- [Troubleshooting](../help/troubleshooting.md)
+- [What's New](../whats-new/0.57-beta.md)

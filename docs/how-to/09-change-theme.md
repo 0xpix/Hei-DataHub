@@ -356,15 +356,15 @@ theme: "dracula"        # High contrast, dark
 
 ## Next Steps
 
-- **[Customize keybindings](customize-keybindings.md)** to match your workflow
-- **[Configure GitHub integration](../12-config.md)** for publishing
-- **[See all config options](../12-config.md)** for more customization
+- **[Customize keybindings](08-customize-keybindings.md)** to match your workflow
+- **[Configure GitHub integration](../reference/12-config.md)** for publishing
+- **[See all config options](../reference/12-config.md)** for more customization
 
 ---
 
 ## Related
 
-- [Configuration reference](../12-config.md)
-- [UI guide](../10-ui.md)
-- [FAQ](../90-faq.md#themes)
-- [Changelog](../99-changelog.md#theme-support)
+- [Configuration reference](../reference/12-config.md)
+- [UI guide](../reference/10-ui.md)
+- [FAQ](../help/90-faq.md)
+- [What's New](../whats-new/0.57-beta.md)

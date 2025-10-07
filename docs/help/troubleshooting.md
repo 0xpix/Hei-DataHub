@@ -400,7 +400,7 @@ See [Known Issue #4](#4-pr-shows-as-failed-but-actually-succeeds) above.
 
 **Cause:** Context-aware help may be empty for new screens.
 
-**Workaround:** Check [Keybindings Reference](reference/keybindings.md) for full list.
+**Workaround:** Check [Keybindings Reference](../reference/keybindings.md) for full list.
 
 ---
 
@@ -519,5 +519,5 @@ File an issue with:
 ## Related
 
 - [FAQ](90-faq.md) – Quick answers to common questions
-- [Configuration](12-config.md) – All settings explained
-- [Changelog](99-changelog.md) – What's new and what's fixed
+- [Configuration](../reference/12-config.md) – All settings explained
+- [What's New](../whats-new/0.57-beta.md) – What's new and what's fixed

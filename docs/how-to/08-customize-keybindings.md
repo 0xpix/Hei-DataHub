@@ -412,15 +412,15 @@ ui:
 
 ## Next Steps
 
-- **[Change your theme](change-theme.md)** to match your terminal
-- **[Configure GitHub integration](../12-config.md#github-settings)** for publishing
-- **[See all configuration options](../12-config.md)** for more customization
+- **[Change your theme](09-change-theme.md)** to match your terminal
+- **[Configure GitHub integration](../reference/12-config.md#github-configuration)** for publishing
+- **[See all configuration options](../reference/12-config.md)** for more customization
 
 ---
 
 ## Related
 
-- [Configuration reference](../12-config.md)
+- [Configuration reference](../reference/12-config.md)
 - [Keyboard shortcuts reference](../reference/keybindings.md)
-- [Theme customization](change-theme.md)
-- [FAQ](../90-faq.md#customization)
+- [Theme customization](09-change-theme.md)
+- [FAQ](../help/90-faq.md)

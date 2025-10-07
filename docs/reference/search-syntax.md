@@ -471,15 +471,14 @@ Press **`?`** at any time to see:
 
 ## Next Steps
 
-- **[Advanced search tutorial](../how-to/search-advanced.md)** – Learn by example
-- **[Edit datasets](../how-to/edit-datasets.md)** – Change searchable fields
-- **[UI guide](../10-ui.md)** – Understand the interface
+- **[Advanced search tutorial](../how-to/07-search-advanced.md)** – Learn by example
+- **[Edit datasets](../how-to/06-edit-datasets.md)** – Change searchable fields
+- **[UI guide](10-ui.md)** – Understand the interface
 
 ---
 
 ## Related
 
-- [How-to: Advanced Search](../how-to/search-advanced.md)
-- [Tutorial: Search & Filters](../20-tutorials/03-search-and-filters.md)
-- [FAQ](../90-faq.md#search)
-- [Changelog](../99-changelog.md#search-improvements)
+- [How-to: Advanced Search](../how-to/07-search-advanced.md)
+- [FAQ](../help/90-faq.md)
+- [What's New](../whats-new/0.57-beta.md)

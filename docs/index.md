@@ -64,39 +64,39 @@ hei-datahub --version-info  # Detailed information
 This manual is organized to get you productive quickly:
 
 ### Getting Started
-1. **[Welcome](00-welcome.md)** — What Hei-DataHub is and who it's for
-2. **[Getting Started](01-getting-started.md)** — Installation and first-run checklist
-3. **[Navigation](02-navigation.md)** — Keyboard shortcuts and workflow
-4. **[The Basics](03-the-basics.md)** — Projects, datasets, fields, search, filters
+1. **[Welcome](getting-started/00-welcome.md)** — What Hei-DataHub is and who it's for
+2. **[Getting Started](getting-started/01-getting-started.md)** — Installation and first-run checklist
+3. **[Navigation](getting-started/02-navigation.md)** — Keyboard shortcuts and workflow
+4. **[The Basics](getting-started/03-the-basics.md)** — Projects, datasets, fields, search, filters
 
 ### What's New
 - **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Latest features and improvements
 
 ### How-to Guides
-- **[Edit Datasets](how-to/edit-datasets.md)** — Change metadata inline
-- **[Advanced Search](how-to/search-advanced.md)** — Use filters and operators
-- **[Customize Keybindings](how-to/customize-keybindings.md)** — Remap shortcuts
-- **[Change Theme](how-to/change-theme.md)** — Choose from 12 themes
-- **[Your First Dataset](how-to/02-first-dataset.md)** — Create and manage data
-- **[Search & Filters](how-to/03-search-and-filters.md)** — Find datasets fast
+- **[GitHub Workflow Guide](how-to/04-settings.md)** — Detailed PR workflow docs
+- **[Your First Dataset](how-to/05-first-dataset.md)** — Create and manage data
+- **[Edit Datasets](how-to/06-edit-datasets.md)** — Change metadata inline
+- **[Advanced Search](how-to/07-search-advanced.md)** — Use filters and operators
+- **[Customize Keybindings](how-to/08-customize-keybindings.md)** — Remap shortcuts
+- **[Change Theme](how-to/09-change-theme.md)** — Choose from 12 themes
 
 ### Reference
-- **[UI Guide](10-ui.md)** — TUI structure, panels, status area
-- **[Data & SQL](11-data-and-sql.md)** — Data location, schemas, query patterns
-- **[Configuration](12-config.md)** — Config file, environment variables, examples
+- **[UI Guide](reference/10-ui.md)** — TUI structure, panels, status area
+- **[Data & SQL](reference/11-data-and-sql.md)** — Data location, schemas, query patterns
+- **[Configuration](reference/12-config.md)** — Config file, environment variables, examples
 - **[Search Syntax](reference/search-syntax.md)** — Complete query reference
 - **[Keybindings](reference/keybindings.md)** — All shortcuts listed (coming soon)
 
 ### Help
-- **[FAQ](90-faq.md)** — Quick answers to common questions
-- **[Troubleshooting](troubleshooting.md)** — Known issues and fixes
+- **[FAQ](help/90-faq.md)** — Quick answers to common questions
+- **[Troubleshooting](help/troubleshooting.md)** — Known issues and fixes
 
 ---
 
 ## Getting Help
 
 - **Search:** Use the search bar at the top of this site
-- **FAQ:** Check [FAQ & Troubleshooting](90-faq.md) for common issues
+- **FAQ:** Check [FAQ & Troubleshooting](help/90-faq.md) for common issues
 - **Issues:** File bugs or feature requests at [GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)
 
 ---

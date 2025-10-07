@@ -294,14 +294,14 @@ As you type, field names don't auto-suggest. Autocomplete is planned for 0.59-be
 ## Next Steps
 
 - **[Learn all search syntax](../reference/search-syntax.md)** (complete reference)
-- **[Edit datasets](edit-datasets.md)** to fix search results
-- **[Customize keybindings](customize-keybindings.md)** (change search key from `/`)
+- **[Edit datasets](06-edit-datasets.md)** to fix search results
+- **[Customize keybindings](08-customize-keybindings.md)** (change search key from `/`)
 
 ---
 
 ## Related
 
 - [Search syntax reference](../reference/search-syntax.md)
-- [UI guide](../10-ui.md)
-- [FAQ](../90-faq.md)
-- [Changelog](../99-changelog.md#search-improvements)
+- [UI guide](../reference/10-ui.md)
+- [FAQ](../help/90-faq.md)
+- [What's New](../whats-new/0.57-beta.md)
