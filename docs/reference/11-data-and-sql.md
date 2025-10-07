@@ -1,8 +1,3 @@
-# Data & SQL Reference
-
-This guide explains how Hei-DataHub stores and queries data, including schema conventions, performance tips, and safe query patterns.
-
----
 
 ## Data Storage Architecture
 
