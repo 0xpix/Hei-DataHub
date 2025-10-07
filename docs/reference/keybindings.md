@@ -1,10 +1,3 @@
-# Keyboard Shortcuts Reference
-
-Complete list of all keyboard shortcuts in Hei-DataHub v0.57.x beta.
-
-**Tip:** Press `?` in the app to see context-aware shortcuts.
-
----
 
 ## Global Shortcuts
 
