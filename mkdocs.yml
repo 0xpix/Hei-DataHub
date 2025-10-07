@@ -80,10 +80,10 @@ nav:
   - What's New:
     - 0.57-beta "Renovation": whats-new/0.57-beta.md
   - How-to Guides:
+    - Configure GitHub Settings: how-to/settings.md
     - Your First Dataset: how-to/02-first-dataset.md
     - Edit Datasets: how-to/edit-datasets.md
     - Advanced Search: how-to/search-advanced.md
-    - Configure GitHub Settings: how-to/settings.md
     - Customize Keybindings: how-to/customize-keybindings.md
     - Change Theme: how-to/change-theme.md
   - Reference:
