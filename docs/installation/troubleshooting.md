@@ -232,7 +232,7 @@ ERROR: Repository not found: 0xpix/Hei-DataHub
    ```bash
    # SSH
    ssh -T git@github.com
-   
+
    # HTTPS
    curl -H "Authorization: token $GH_PAT" https://api.github.com/repos/0xpix/Hei-DataHub
    ```
@@ -322,7 +322,7 @@ FileNotFoundError: data/datasets/metadata.yaml not found
    ```bash
    hei-datahub --version
    ```
-   
+
    Should be `0.58.0-beta` or later.
 
 2. **Upgrade to v0.58.0-beta:**
@@ -452,12 +452,12 @@ sqlite3.OperationalError: no such table: datasets
    ```bash
    nano ~/.local/share/applications/hei-datahub.desktop
    ```
-   
+
    Change:
    ```ini
    Exec=hei-datahub
    ```
-   
+
    To:
    ```ini
    Exec=/home/username/.local/bin/hei-datahub
