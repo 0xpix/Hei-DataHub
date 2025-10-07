@@ -23,7 +23,6 @@ A **dataset** is the fundamental unit in Hei-DataHub. Each dataset represents a 
 data/
 └── global-temperature-2024/
     ├── metadata.yaml       ← Required metadata file
-    └── README.md           ← Optional documentation
 ```
 
 ---
@@ -78,7 +77,7 @@ Hei-DataHub validates metadata using **JSON Schema** + **Pydantic models**.
 
 1. When adding a dataset in the TUI (live validation)
 2. When saving via `catalog.save_dataset()`
-3. During reindexing (`hei-datahub reindex`)
+3. During reindexing (`hei-datahub reindex` or when clicking "r" in TUI)
 
 **Common validation errors:**
 
@@ -143,20 +142,65 @@ Matches: "GeoTIFF", "geospatial", "geometry"
 
 ---
 
-## Filters
+## Filters & Advanced Search
 
-Currently, Hei-DataHub supports **text-based search** across all indexed fields. Future versions may add:
+**✅ Available since v0.56-beta:** Hei-DataHub now supports **structured search** with field-specific filters and operators!
 
-- Field-specific filters (e.g., `source:github.com`)
-- Date range filters
-- Size filters
-- Project filters
+### Field-Specific Filters
+
+Search specific fields instead of searching everything:
+
+```
+source:github          # Datasets from GitHub
+format:csv             # CSV files only
+tag:climate            # Datasets tagged "climate"
+project:Gideon         # Datasets in Gideon project
+```
+
+### Numeric & Date Operators
+
+Filter by size, dates, and numeric values:
+
+```
+size:>1000000          # Files larger than 1 MB
+date_created:>=2025-01-01  # Created this year
+rows:<5000             # Small datasets
+```
+
+**Supported operators:** `>`, `<`, `>=`, `<=`
+
+### Exact Phrase Matching
+
+Use quotes for exact matches:
+
+```
+"climate data"         # Exact phrase only
+"burned area"          # Both words together
+```
+
+### Combining Filters
+
+Mix and match multiple filters:
+
+```
+source:s3 format:parquet size:>5000000
+```
+Finds large Parquet files stored in S3.
+
+### Visual Filter Badges
+
+Active filters show as colored badges below the search box:
+
+- **🏷 source:github** — Field filter
+- **📝 "climate data"** — Exact phrase
+
+👉 **Learn more:** [Advanced Search Guide](how-to/search-advanced.md) | [Search Syntax Reference](reference/search-syntax.md)
 
 ---
 
 ## Saved Views
 
-**Not yet implemented** in v0.55.x beta. Planned for future releases:
+**Not yet implemented** in v0.57.x beta. Planned for future releases:
 
 - Save frequently used search queries
 - Pin important datasets
@@ -171,9 +215,9 @@ Currently, Hei-DataHub supports **text-based search** across all indexed fields.
 **Via TUI:**
 
 ```
-1. Press a from Home screen
+1. Press `a` from Home screen
 2. Fill required fields
-3. Press Ctrl+S to save
+3. Press `Ctrl+S` to save
 ```
 
 **Result:**
@@ -224,27 +268,32 @@ Planned for v0.58.x—delete from Details Screen with confirmation.
 
 **Enable GitHub integration:**
 
-1. Press ++s++ to open Settings
+1. Press `s` to open Settings
 2. Configure:
     - GitHub Owner
     - Repository Name
     - GitHub Username
     - Personal Access Token (PAT)
-3. Save with ++ctrl+s++
+3. Save with `ctrl+s`
+
+See [How-To: Settings Guide](how-to/settings.md) for more details.
 
 **Create PR from dataset:**
 
 ```
 1. Add or edit a dataset
-2. Press Ctrl+S to save
+2. Press `Ctrl+S` to save
 3. App automatically:
    - Stashes uncommitted changes (if any)
    - Creates a new branch
    - Commits metadata.yaml
    - Pushes to GitHub
    - Opens a Pull Request
-   - Restores stashed changes
+   - Chenge back to the previous branch
+   - Restores stashed changes (if any)
 ```
+
+See [How-To: First dataset](how-to/02-first-dataset.md) for full guide.
 
 ---
 
@@ -257,7 +306,6 @@ Hei-DataHub/
 ├── data/                       ← All datasets live here
 │   ├── dataset-one/
 │   │   ├── metadata.yaml       ← Required
-│   │   └── README.md           ← Optional
 │   ├── dataset-two/
 │   │   └── metadata.yaml
 │   └── ...
@@ -286,6 +334,64 @@ used_in_projects:
   - Climate Dashboard
   - Research Paper 2024
 ```
+
+---
+
+## Customization
+
+**✅ Available since v0.56-beta:** Personalize Hei-DataHub with themes and custom keyboard shortcuts!
+
+### Themes
+
+Choose from **12 beautiful built-in themes**:
+
+- **Gruvbox** — Warm, retro palette
+- **Nord** — Cool, minimalist blue tones
+- **Dracula** — Dark purple theme
+- **Monokai** — Classic code editor colors
+- **Catppuccin Mocha** — Soft pastel dark theme
+- **Tokyo Night** — Popular terminal theme
+- And 6 more!
+
+**Change theme:**
+
+1. Edit `~/.config/hei-datahub/config.yaml`
+2. Set: `theme: "gruvbox"`
+3. Restart the app
+
+👉 **See all themes:** [Change Theme Guide](how-to/change-theme.md)
+
+### Custom Keybindings
+
+Remap any keyboard shortcut to match your workflow:
+
+**Example configurations:**
+
+```yaml
+# Vim-style
+keybindings:
+  search: "/"
+  quit: ":q"
+
+# Emacs-style
+keybindings:
+  search: "ctrl+s"
+  quit: "ctrl+x ctrl+c"
+
+# VS Code-style
+keybindings:
+  search: "ctrl+p"
+  edit_dataset: "f2"
+```
+
+**Available actions:**
+
+- Navigation: `up`, `down`, `page_up`, `page_down`
+- Search: `search`, `clear_search`, `focus_results`
+- Dataset actions: `open_dataset`, `edit_dataset`, `add_dataset`
+- Global: `help`, `quit`, `settings`
+
+👉 **Full list:** [Customize Keybindings Guide](how-to/customize-keybindings.md) | [Keybindings Reference](reference/keybindings.md)
 
 ---
 
