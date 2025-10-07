@@ -59,11 +59,11 @@ def handle_tui(args):
         # Import the TUI runner from new location
         from mini_datahub.ui.views.home import run_tui
 
-        from mini_datahub.infra.paths import ensure_directories
+        from mini_datahub.infra.paths import initialize_workspace
         from mini_datahub.infra.db import ensure_database
 
-        # Ensure required directories and database exist
-        ensure_directories()
+        # Initialize workspace (creates dirs, schema, sample data)
+        initialize_workspace()
         ensure_database()
 
         # Launch TUI

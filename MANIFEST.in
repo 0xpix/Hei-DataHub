@@ -6,25 +6,14 @@ include version.yaml
 # Include all SQL schemas
 recursive-include src/mini_datahub/infra/sql *
 
-# Include data directories
+# Include schema.json
+include src/mini_datahub/schema.json
+
+# Include data directories (datasets)
 recursive-include src/mini_datahub/data *
-recursive-include src/hei_datahub/data *
 
-# Include assets
-recursive-include src/mini_datahub/assets *
-recursive-include src/hei_datahub/assets *
-
-# Include configuration files
-recursive-include src/mini_datahub/config *
-recursive-include src/hei_datahub/config *
-
-# Include schemas
-recursive-include src/mini_datahub/schemas *
-recursive-include src/hei_datahub/schemas *
-
-# Include templates
+# Include sample data templates
 recursive-include src/mini_datahub/templates *
-recursive-include src/hei_datahub/templates *
 
 # Include documentation
 include README.md
