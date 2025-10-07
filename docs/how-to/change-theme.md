@@ -1,19 +1,10 @@
 # How to Change Your Theme
 
+**Requirements:** Hei-DataHub 0.56-beta or later
+
 **Goal:** Customize the app's colors and appearance with built-in themes.
 
 **Time:** 2 minutes
-**Version:** 0.56-beta or later
-
----
-
-## Before You Start
-
-!!! warning "Restart Required"
-    Theme changes require **restarting the app**. Hot-reload coming in a future release.
-
-!!! note "What's new"
-    Version 0.56 includes **12 beautiful themes** powered by the Textual framework.
 
 ---
 
@@ -22,7 +13,7 @@
 ### Step 1: Open Config File
 
 ```bash
-vim ~/.config/hei-datahub/config.yaml
+nvim ~/.config/hei-datahub/config.yaml
 ```
 
 (Or use any text editor: `nano`, `code`, etc.)
@@ -258,6 +249,7 @@ If you have color vision deficiency, try **high-contrast themes** like solarized
 **Problem:** You edited the config but the theme looks the same.
 
 **Solutions:**
+
 1. **Restart the app** – Changes don't apply until restart
 2. **Check spelling** – Theme names are case-sensitive and must match exactly
 3. **Check YAML syntax** – Incorrect YAML is silently ignored
@@ -269,10 +261,12 @@ If you have color vision deficiency, try **high-contrast themes** like solarized
 **Problem:** Colors are wrong or hard to read.
 
 **Possible causes:**
+
 1. **Terminal doesn't support 256 colors** – Check your terminal settings
 2. **Terminal theme conflicts** – Your terminal's own color scheme may override app colors
 
 **Solutions:**
+
 - Use a modern terminal (iTerm2, Windows Terminal, Alacritty, etc.)
 - Set terminal to use "default" or "true color" mode
 - Try a different theme
@@ -312,10 +306,10 @@ These terminals may have issues:
 
 ## Custom Themes (Advanced)
 
-!!! note "Future Feature"
-    Custom CSS themes are planned for version 0.58-beta. For now, choose from the 12 built-in themes.
+!!! note "Future Feature" - Custom CSS themes are planned for version 0.59-beta. For now, choose from the 12 built-in themes.
 
 If you want to experiment with custom colors today, you can:
+
 1. Fork the repo
 2. Edit `src/mini_datahub/ui/theme.py`
 3. Add your custom theme definition
