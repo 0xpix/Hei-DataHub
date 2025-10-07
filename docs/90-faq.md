@@ -321,6 +321,8 @@ hei-datahub reindex
 
 ## GitHub Integration
 
+💡 **New!** See the comprehensive [GitHub Settings Guide](how-to/settings.md) for detailed PAT setup instructions.
+
 ### Q: "GitHub Not Connected" after configuring
 
 **A:** PAT invalid or missing `repo` scope.
@@ -328,8 +330,10 @@ hei-datahub reindex
 **Fix:**
 
 1. Regenerate PAT at [GitHub Tokens](https://github.com/settings/tokens)
-2. Select `repo` scope
+2. Select `repo` scope (or `Contents` + `Pull requests` for fine-grained tokens)
 3. Re-enter in Settings (++s++)
+
+📖 [Detailed PAT setup guide](how-to/settings.md#step-4-create-a-personal-access-token-pat)
 
 ---
 
@@ -339,9 +343,11 @@ hei-datahub reindex
 
 **Fix:**
 
-1. Check PAT scopes include `repo`
+1. Check PAT scopes include `repo` (classic) or `Contents: Read and write` + `Pull requests: Read and write` (fine-grained)
 2. Ensure you have write access to the repository
 3. Regenerate PAT if needed
+
+📖 [Troubleshoot token issues](how-to/settings.md#troubleshooting)
 
 ---
 
