@@ -18,7 +18,7 @@ def _is_installed_package() -> bool:
 
 def _is_dev_mode() -> bool:
     """Check if running from repository (development mode).
-    
+
     This checks if the code is being imported from a repository structure
     (not from an installed package), regardless of the current working directory.
     """
@@ -159,12 +159,28 @@ def initialize_workspace():
                     print("  Indexing datasets...")
                     # Trigger reindex after copying datasets
                     try:
-                        from mini_datahub.services.store import DatasetStore
-                        store = DatasetStore()
-                        store.reindex()
-                        print(f"  ✓ Indexed {dataset_count} datasets")
+                        from mini_datahub.infra.db import ensure_database
+                        from mini_datahub.infra.store import list_datasets, read_dataset
+                        from mini_datahub.infra.index import upsert_dataset
+                        
+                        # Ensure database exists
+                        ensure_database()
+                        
+                        # Index all copied datasets
+                        indexed_count = 0
+                        for dataset_id in list_datasets():
+                            try:
+                                metadata = read_dataset(dataset_id)
+                                if metadata:
+                                    upsert_dataset(dataset_id, metadata)
+                                    indexed_count += 1
+                            except Exception as e:
+                                print(f"  ⚠ Could not index {dataset_id}: {e}")
+                        
+                        print(f"  ✓ Indexed {indexed_count} datasets")
                     except Exception as reindex_error:
-                        print(f"  ⚠ Please run 'hei-datahub reindex' to index datasets")
+                        print(f"  ⚠ Reindex failed: {reindex_error}")
+                        print(f"  Please run 'hei-datahub reindex' manually")
         except Exception as e:
             print(f"⚠ Could not copy datasets: {e}")
 
