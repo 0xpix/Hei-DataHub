@@ -3,18 +3,18 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mini-datahub"
-version = "0.57.2-beta"
-description = "A local-first TUI for managing datasets with consistent metadata"
+name = "hei-datahub"
+version = "0.58.0-beta"
+description = "Hei-DataHub — lightweight local data hub with TUI for managing datasets"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
     {name = "Aness Chelfat", email = "ns.chlfat@gmail.com"}
 ]
-keywords = ["data", "catalog", "tui", "metadata", "search"]
+keywords = ["data", "catalog", "tui", "metadata", "search", "datahub"]
 classifiers = [
-    "Development Status :: 5 - Beta",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -55,17 +55,31 @@ hei-datahub = "mini_datahub.cli.main:main"
 [project.urls]
 Homepage = "https://github.com/0xpix/Hei-DataHub"
 Repository = "https://github.com/0xpix/Hei-DataHub"
+Documentation = "https://0xpix.github.io/Hei-DataHub/"
+"Bug Tracker" = "https://github.com/0xpix/Hei-DataHub/issues"
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["mini_datahub*"]
+include = ["mini_datahub*", "hei_datahub*"]
 
 [tool.setuptools.package-data]
 mini_datahub = [
     "infra/sql/*.sql",
-    "ui/styles/*.tcss",
-    "ui/assets/ascii/*.txt",
-    "../../../version.yaml"
+    "data/**/*",
+    "assets/**/*",
+    "schemas/**/*",
+    "config/**/*",
+    "templates/**/*"
+]
+hei_datahub = [
+    "data/**/*",
+    "assets/**/*",
+    "schemas/**/*",
+    "config/**/*",
+    "templates/**/*"
 ]
 
 [tool.black]
