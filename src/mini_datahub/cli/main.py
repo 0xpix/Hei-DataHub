@@ -58,12 +58,9 @@ def handle_tui(args):
     try:
         # Import the TUI runner from new location
         from mini_datahub.ui.views.home import run_tui
-
-        from mini_datahub.infra.paths import initialize_workspace
         from mini_datahub.infra.db import ensure_database
 
-        # Initialize workspace (creates dirs, schema, sample data)
-        initialize_workspace()
+        # Ensure database exists (workspace already initialized in main())
         ensure_database()
 
         # Launch TUI
@@ -289,6 +286,11 @@ def main():
     if hasattr(args, 'version_info') and args.version_info:
         print_version_info(verbose=True)
         sys.exit(0)
+
+    # Initialize workspace on first run (creates dirs, copies packaged datasets)
+    # This happens BEFORE any command to ensure data is always available
+    from mini_datahub.infra.paths import initialize_workspace
+    initialize_workspace()
 
     # Apply CLI config overrides
     if hasattr(args, 'set') and args.set:

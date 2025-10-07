@@ -104,13 +104,26 @@ def ensure_directories():
 
 def initialize_workspace():
     """Initialize application on first run (for installed package)."""
-    if not _is_installed_package():
+    import sys
+    
+    # Debug: Show what mode we're in
+    is_installed = _is_installed_package()
+    print(f"[DEBUG] initialize_workspace() called", file=sys.stderr)
+    print(f"[DEBUG] _is_installed_package() = {is_installed}", file=sys.stderr)
+    print(f"[DEBUG] __file__ = {__file__}", file=sys.stderr)
+    
+    if not is_installed:
         # In dev mode, just ensure directories exist
+        print(f"[DEBUG] Dev mode detected, skipping dataset copy", file=sys.stderr)
         ensure_directories()
         return
 
     # Ensure all directories exist
     ensure_directories()
+    
+    print(f"[DEBUG] DATA_DIR = {DATA_DIR}", file=sys.stderr)
+    print(f"[DEBUG] DATA_DIR exists = {DATA_DIR.exists()}", file=sys.stderr)
+    print(f"[DEBUG] DATA_DIR contents = {list(DATA_DIR.iterdir())}", file=sys.stderr)
 
     # Copy schema.json to user data directory
     user_schema = XDG_DATA_HOME / "hei-datahub" / "schema.json"
@@ -125,9 +138,15 @@ def initialize_workspace():
             print(f"⚠ Could not copy schema: {e}")
 
     # Copy packaged datasets on first run
+    print(f"[DEBUG] Checking if DATA_DIR is empty...", file=sys.stderr)
     if not list(DATA_DIR.iterdir()):
+        print(f"[DEBUG] DATA_DIR is empty, proceeding with copy", file=sys.stderr)
         try:
             packaged_data = Path(__file__).parent.parent / "data"
+            print(f"[DEBUG] packaged_data = {packaged_data}", file=sys.stderr)
+            print(f"[DEBUG] packaged_data exists = {packaged_data.exists()}", file=sys.stderr)
+            if packaged_data.exists():
+                print(f"[DEBUG] packaged_data contents = {list(packaged_data.iterdir())}", file=sys.stderr)
             if packaged_data.exists() and list(packaged_data.iterdir()):
                 import shutil
                 dataset_count = 0
