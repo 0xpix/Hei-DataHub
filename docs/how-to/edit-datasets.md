@@ -1,18 +1,10 @@
 # How to Edit Datasets
 
+Requirements: Hei-DataHub 0.56-beta or later
+
 **Goal:** Change dataset information directly in the app without editing YAML files manually.
 
 **Time:** 2-5 minutes
-**Version:** 0.56-beta or later
-
----
-
-## Before You Start
-
-!!! note "What you'll need"
-    - Hei-DataHub 0.56-beta or later installed
-    - At least one dataset in your catalog
-    - Write permissions to the `data/` folder
 
 ---
 
@@ -36,7 +28,7 @@ hei-datahub
 
 Once you're viewing the dataset details:
 
-1. Press **`E`** (uppercase E) to start editing
+1. Press **`e`** to start editing
 2. You'll see the edit form with all editable fields
 3. The first field (usually "Name") will be selected
 
@@ -57,18 +49,21 @@ Once you're viewing the dataset details:
 ### 3. Edit Fields
 
 **Move between fields:**
+
 - **`Tab`** – Next field
 - **`Shift+Tab`** – Previous field
 - **Mouse click** – Jump to any field
 
 **Edit text:**
+
 - Type normally to change values
-- **`Ctrl+A`** – Select all text in field
-- **`Ctrl+C` / `Ctrl+V`** – Copy/paste
+- **`Ctrl+a`** – Select all text in field
+- **`Ctrl+c` / `Ctrl+v`** – Copy/paste
 
 **Undo/Redo:**
-- **`Ctrl+Z`** – Undo last change
-- **`Ctrl+Shift+Z`** – Redo
+
+- **`Ctrl+z`** – Undo last change
+- **`Ctrl+Shift+z`** – Redo
 
 ---
 
@@ -76,11 +71,12 @@ Once you're viewing the dataset details:
 
 When you're done editing:
 
-1. Press **`Ctrl+S`** to save
+1. Press **`Ctrl+s`** to save
 2. Wait for the success message: "✅ Dataset saved and reindexed"
 3. The details view refreshes automatically
 
 **What happens when you save:**
+
 - Original YAML file is backed up
 - New values are written to disk
 - Database is automatically updated
@@ -95,10 +91,9 @@ Changed your mind?
 1. Press **`Esc`** to cancel
 2. If you have unsaved changes, you'll see a confirmation dialog:
    ```
-   Discard unsaved changes?
-   [Yes] [No]
+   Y to discard changes, N to continue editing
    ```
-3. Choose "Yes" to exit without saving
+3. Choose "Y" to exit without saving
 
 ---
 
@@ -118,60 +113,27 @@ Changed your mind?
 | **Date Modified** | Last update | `2024-03-20` |
 
 !!! important "Field validation"
-    - **Name** must be unique across all datasets
-    - **Dates** must be in `YYYY-MM-DD` format
-    - **Size** must be a number (bytes)
-    - Invalid values are highlighted when you try to save
+
+- **Name** must be unique across all datasets
+- **Dates** must be in `YYYY-MM-DD` format
+- **Size** must be a number (bytes)
+- Invalid values are highlighted when you try to save
 
 ---
 
-## Common Tasks
+## Bulk Changes (Future)
 
-### Change the Dataset Name
-
-1. Press `E` to edit
-2. Tab to the "Name" field
-3. Type the new name
-4. Press `Ctrl+S` to save
-
-!!! warning "Name conflicts"
-    If another dataset has the same name, you'll see an error. Choose a unique name.
-
----
-
-### Update the Description
-
-1. Press `E`
-2. Tab to "Description"
-3. Type your new description (can be multiple lines)
-4. Press `Ctrl+S`
-
-**Tip:** Descriptions support Markdown in some views (bold, italic, links).
-
----
-
-### Fix a Broken Source URL
-
-1. Press `E`
-2. Find the "Source" field
-3. Update or correct the URL
-4. Press `Ctrl+S`
-
----
-
-### Bulk Changes (Future)
-
-Currently, you must edit datasets one at a time. Bulk editing is planned for version 0.60-beta.
+Currently, you must edit datasets one at a time. Bulk editing is planned for version 0.60-beta (will decide later).
 
 ---
 
 ## Tips & Tricks
 
 ### ✅ Save Often
-Press `Ctrl+S` frequently. Each save creates a backup of the original file.
+Press `Ctrl+s` frequently. Each save creates a backup of the original file.
 
 ### ✅ Use Undo
-Made a typo? `Ctrl+Z` works across all fields (until you save).
+Made a typo? `Ctrl+z` works across all fields (until you save).
 
 ### ✅ Check Validation
 If a field turns red or shows an error, fix it before saving.
@@ -185,14 +147,16 @@ After saving, the details view refreshes automatically. You don't need to restar
 
 ### "Save failed" Error
 
-**Symptom:** You press `Ctrl+S` but see an error message.
+**Symptom:** You press `Ctrl+s` but see an error message.
 
 **Possible causes:**
+
 1. **Name conflict** – Another dataset has the same name
 2. **Invalid date format** – Use `YYYY-MM-DD`
 3. **File permission error** – Check folder write permissions
 
 **What to do:**
+
 - Read the error message carefully
 - Fix the highlighted field
 - Try saving again
@@ -201,9 +165,10 @@ After saving, the details view refreshes automatically. You don't need to restar
 
 ### Edited Dataset Reverts After Closing App
 
-**Known issue in 0.57-beta:** Some users report changes disappear after restarting.
+**Known issue in 0.57-beta:**
 
 **Workaround:**
+
 1. After editing, verify YAML file was updated:
    ```bash
    cat data/my-dataset/metadata.yaml
@@ -213,7 +178,7 @@ After saving, the details view refreshes automatically. You don't need to restar
    hei-datahub reindex
    ```
 
-This issue is being investigated for 0.57.1.
+This issue is being investigated for 0.57.1-beta
 
 ---
 
@@ -222,6 +187,7 @@ This issue is being investigated for 0.57.1.
 **Known issue:** If your terminal is small, some fields may be hidden.
 
 **Workarounds:**
+
 - Resize your terminal to at least 80x24
 - Use `Tab` to navigate to hidden fields
 - Edit the YAML file manually for now
