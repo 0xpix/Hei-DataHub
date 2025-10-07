@@ -10,26 +10,26 @@ import os
 def _get_workspace_root() -> Path:
     """Get the workspace root directory."""
     cwd = Path.cwd()
-    
+
     # Check if running from source (development mode)
     # Look for src/mini_datahub in the path structure
     is_dev_mode = (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
-    
+
     # Check for explicit environment variable
     env_workspace = os.environ.get("HEI_DATAHUB_WORKSPACE")
     if env_workspace:
         workspace = Path(env_workspace)
         workspace.mkdir(parents=True, exist_ok=True)
         return workspace
-    
+
     # If in development mode AND has data/, use repo root
     if is_dev_mode and (cwd / "data").exists():
         return cwd
-    
+
     # If CWD has data/ subdirectory (user's workspace), use it
     if (cwd / "data").exists() and not is_dev_mode:
         return cwd
-    
+
     # Default: use user's home directory workspace
     home_workspace = Path.home() / ".hei-datahub"
     home_workspace.mkdir(parents=True, exist_ok=True)
