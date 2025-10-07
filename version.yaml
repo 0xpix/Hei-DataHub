@@ -3,14 +3,14 @@
 # Edit this file and run `scripts/sync_version.py` to propagate changes
 # Last updated: 2025-10-08
 
-version: "0.57.2-beta"
-codename: "Renovation"
-release_date: "2025-10-09"
-compatibility: "Hei-DataHub v0.57.x (beta)"
-notes: "Documentation Overhaul"
+version: "0.58.0-beta"
+codename: "Streamline"
+release_date: "2025-10-07"
+compatibility: "Hei-DataHub v0.58.x (beta)"
+notes: "UV-based private installation, complete data packaging, and Linux desktop support"
 
 # Additional metadata
 app_name: "Hei-DataHub"
 github_repo: "0xpix/Hei-DataHub"
-python_requires: ">=3.9"
+python_requires: ">=3.10"
 license: "MIT"
