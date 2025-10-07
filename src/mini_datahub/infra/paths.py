@@ -162,10 +162,10 @@ def initialize_workspace():
                         from mini_datahub.infra.db import ensure_database
                         from mini_datahub.infra.store import list_datasets, read_dataset
                         from mini_datahub.infra.index import upsert_dataset
-                        
+
                         # Ensure database exists
                         ensure_database()
-                        
+
                         # Index all copied datasets
                         indexed_count = 0
                         for dataset_id in list_datasets():
@@ -176,7 +176,7 @@ def initialize_workspace():
                                     indexed_count += 1
                             except Exception as e:
                                 print(f"  ⚠ Could not index {dataset_id}: {e}")
-                        
+
                         print(f"  ✓ Indexed {indexed_count} datasets")
                     except Exception as reindex_error:
                         print(f"  ⚠ Reindex failed: {reindex_error}")
