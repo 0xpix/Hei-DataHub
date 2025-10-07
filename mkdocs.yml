@@ -1,5 +1,5 @@
 # MkDocs Configuration for Hei-DataHub Manual
-site_name: Doc
+site_name: Hei-DataHub Documentation
 site_description: 'Official documentation for Hei-DataHub v0.57.x (beta) - A local-first TUI for managing datasets with inline editing and structured search'
 site_author: Hei-DataHub Team
 site_url: https://0xpix.github.io/Hei-DataHub
@@ -17,6 +17,14 @@ theme:
   name: simple-blog
   components:
     title: false
+    preview: true
+    site_name: false
+  highlightjs: true
+    - bash
+    -python
+    - yaml
+  sidebar: true
+  navigation_depth: 2
   custom_dir: docs/
   logo: assets/dark_logo_H_large.svg
   favicon: assets/dark_logo_H_large.svg
@@ -38,8 +46,7 @@ markdown_extensions:
   - footnotes
   - md_in_html
   - toc:
-      permalink: false
-      toc_depth: 3
+      permalink: true
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.betterem:
@@ -79,6 +86,7 @@ nav:
     - Edit Datasets: how-to/edit-datasets.md
     - Search & Filters: how-to/03-search-and-filters.md
     - Advanced Search: how-to/search-advanced.md
+    - Configure GitHub Settings: how-to/settings.md
     - Customize Keybindings: how-to/customize-keybindings.md
     - Change Theme: how-to/change-theme.md
   - Reference:
