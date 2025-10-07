@@ -6,16 +6,31 @@ from pathlib import Path
 import os
 
 # Determine workspace root
-# Priority: 1) CWD if it has data/, 2) ~/.hei-datahub/, 3) fallback to package location
+# Priority: 1) Explicit dev mode, 2) CWD with data/, 3) ~/.hei-datahub/
 def _get_workspace_root() -> Path:
     """Get the workspace root directory."""
     cwd = Path.cwd()
     
-    # If CWD has data/ directory, use it (development mode)
-    if (cwd / "data").exists() or (cwd / "pyproject.toml").exists():
+    # Check if running from source (development mode)
+    # Look for src/mini_datahub in the path structure
+    is_dev_mode = (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
+    
+    # Check for explicit environment variable
+    env_workspace = os.environ.get("HEI_DATAHUB_WORKSPACE")
+    if env_workspace:
+        workspace = Path(env_workspace)
+        workspace.mkdir(parents=True, exist_ok=True)
+        return workspace
+    
+    # If in development mode AND has data/, use repo root
+    if is_dev_mode and (cwd / "data").exists():
         return cwd
     
-    # Otherwise use user's home directory workspace
+    # If CWD has data/ subdirectory (user's workspace), use it
+    if (cwd / "data").exists() and not is_dev_mode:
+        return cwd
+    
+    # Default: use user's home directory workspace
     home_workspace = Path.home() / ".hei-datahub"
     home_workspace.mkdir(parents=True, exist_ok=True)
     return home_workspace
@@ -37,12 +52,12 @@ def _get_schema_path() -> Path:
     workspace_schema = PROJECT_ROOT / "schema.json"
     if workspace_schema.exists():
         return workspace_schema
-    
+
     # 2. Try packaged schema
     package_schema = Path(__file__).parent.parent / "schema.json"
     if package_schema.exists():
         return package_schema
-    
+
     # 3. Create default in workspace
     return workspace_schema
 
@@ -77,45 +92,36 @@ def ensure_directories():
 
 
 def initialize_workspace():
-    """Initialize workspace with schema and packaged datasets if needed."""
+    """Initialize workspace with schema and sample data if needed."""
     # Ensure directories exist
     ensure_directories()
-    
+
     # Copy schema.json if it doesn't exist
     if not SCHEMA_JSON.exists():
         try:
-            package_schema = Path(__file__).parent / "schema.json"
+            # schema.json is in src/mini_datahub/ (parent.parent from infra/)
+            package_schema = Path(__file__).parent.parent / "schema.json"
             if package_schema.exists():
                 import shutil
                 shutil.copy(package_schema, SCHEMA_JSON)
                 print(f"✓ Created schema.json at {SCHEMA_JSON}")
         except Exception as e:
             print(f"⚠ Could not copy schema.json: {e}")
-    
-    # Copy packaged datasets if data directory is empty
+
+    # Copy sample data if data directory is empty
     if DATA_DIR.exists() and not list(DATA_DIR.iterdir()):
         try:
-            # Try packaged data first (real datasets)
-            package_data = Path(__file__).parent / "data"
-            if package_data.exists() and list(package_data.iterdir()):
+            # templates/ is in src/mini_datahub/ (parent.parent from infra/)
+            template_data = Path(__file__).parent.parent / "templates" / "data"
+            if template_data.exists():
                 import shutil
-                for item in package_data.iterdir():
+                for item in template_data.iterdir():
                     dest = DATA_DIR / item.name
                     if not dest.exists():
                         shutil.copytree(item, dest)
-                print(f"✓ Initialized datasets in {DATA_DIR}")
-            else:
-                # Fallback to templates if packaged data doesn't exist
-                template_data = Path(__file__).parent / "templates" / "data"
-                if template_data.exists():
-                    import shutil
-                    for item in template_data.iterdir():
-                        dest = DATA_DIR / item.name
-                        if not dest.exists():
-                            shutil.copytree(item, dest)
-                    print(f"✓ Initialized sample data in {DATA_DIR}")
+                print(f"✓ Initialized sample data in {DATA_DIR}")
         except Exception as e:
-            print(f"⚠ Could not copy data: {e}")
+            print(f"⚠ Could not copy sample data: {e}")
 
 
 def get_schema_sql() -> str:

@@ -4,7 +4,7 @@
 
 **Issue:** When installed via UV, the app runs from UV's cache directory, not the repository root. Therefore:
 - ❌ `data/` doesn't exist
-- ❌ `schema.json` doesn't exist  
+- ❌ `schema.json` doesn't exist
 - ❌ `config/`, `assets/` etc. don't exist
 - ✅ Only `infra/sql/` is packaged (inside the Python package)
 
@@ -32,11 +32,11 @@ Updated `src/mini_datahub/infra/paths.py`:
 def _get_workspace_root() -> Path:
     """Get the workspace root directory."""
     cwd = Path.cwd()
-    
+
     # If CWD has data/ directory, use it (development mode)
     if (cwd / "data").exists() or (cwd / "pyproject.toml").exists():
         return cwd
-    
+
     # Otherwise use user's home directory workspace
     home_workspace = Path.home() / ".hei-datahub"
     home_workspace.mkdir(parents=True, exist_ok=True)
@@ -180,7 +180,7 @@ uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git"
 hei-datahub
 ```
 
-**Result:** 
+**Result:**
 - Workspace at `~/.hei-datahub/`
 - Sample dataset available
 - Ready to add more datasets
