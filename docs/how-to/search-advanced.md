@@ -8,13 +8,6 @@ Requirements: Hei-DataHub 0.56-beta or later
 
 ---
 
-## Before You Start
-
-!!! note "What's new in 0.57"
-    Version 0.56 added **structured search** with field filters and operators. You can now search specific fields instead of searching everything at once.
-
----
-
 ## Quick Start
 
 ### Basic Search (Free Text)
@@ -146,70 +139,7 @@ When you use filters, **colored badges** appear below the search box:
 
 These badges help you see what's active.
 
----
-
-## Common Search Patterns
-
-### Find CSV Files
-```
-format:csv
-```
-
----
-
-### Find Large Datasets
-```
-size:>10000000
-```
-(More than 10 MB)
-
----
-
-### Find Recent Datasets
-```
-date_created:>=2025-01-01
-```
-(Created this year)
-
----
-
-### Find S3 Data
-```
-storage:s3
-```
-or
-```
-source:s3
-```
-
----
-
-### Find Specific Project
-```
-project:climate-research
-```
-
----
-
-### Find Archived Data
-```
-tag:archived
-```
-
----
-
-### Find Raster Data
-```
-type:raster
-```
-
----
-
-### Complex Example
-```
-type:vector format:geojson size:>500000 project:mapping
-```
-Finds large GeoJSON vector datasets in the "mapping" project.
+**Note:** BUGFIX coming in 0.57.x-beta - only one tah appears
 
 ---
 
@@ -264,6 +194,7 @@ Press **`?`** to see available fields and example queries.
 **Problem:** Your search returns nothing.
 
 **Solutions:**
+
 1. Remove one filter at a time to find the culprit
 2. Check for typos in field values
 3. Try a simpler query first
@@ -275,6 +206,7 @@ Press **`?`** to see available fields and example queries.
 **Problem:** Search returns hundreds of datasets.
 
 **Solutions:**
+
 1. Add more specific filters
 2. Use exact phrases: `"specific term"`
 3. Use numeric operators to narrow by size or date
@@ -355,7 +287,7 @@ These are planned for future versions.
 
 ### No Autocomplete (Yet)
 
-As you type, field names don't auto-suggest. Autocomplete is planned for 0.57-beta.
+As you type, field names don't auto-suggest. Autocomplete is planned for 0.59-beta.
 
 ---
 
