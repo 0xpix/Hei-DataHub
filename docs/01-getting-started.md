@@ -129,7 +129,7 @@ Now that Hei-DataHub is running:
 
 1. **[Learn the keyboard shortcuts](02-navigation.md)** — Master the Vim-style navigation
 2. **[Add your first dataset](how-to/02-first-dataset.md)** — Step-by-step tutorial
-3. **[Configure GitHub integration](12-config.md#github-configuration)** — Enable PR workflow (optional)
+3. **[Configure GitHub integration](how-to/settings.md)** — Enable PR workflow with detailed PAT setup (optional)
 
 ---
 
