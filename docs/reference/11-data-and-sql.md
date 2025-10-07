@@ -480,5 +480,5 @@ Planned for post-v0.55.x:
 ## Next Steps
 
 - **[Configuration](12-config.md)** — Configure database paths and settings
-- **[FAQ](90-faq.md)** — Troubleshooting database issues
-- **[Tutorials](20-tutorials/01-installation.md)** — Hands-on examples
+- **[FAQ](../help/90-faq.md)** — Troubleshooting database issues
+- **[Getting Started](../getting-started/01-getting-started.md)** — Installation and setup

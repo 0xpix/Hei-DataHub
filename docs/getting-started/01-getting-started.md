@@ -128,8 +128,8 @@ When you run `hei-datahub` for the first time, the app will:
 Now that Hei-DataHub is running:
 
 1. **[Learn the keyboard shortcuts](02-navigation.md)** — Master the Vim-style navigation
-2. **[Add your first dataset](how-to/02-first-dataset.md)** — Step-by-step tutorial
-3. **[Configure GitHub integration](how-to/settings.md)** — Enable PR workflow with detailed PAT setup (optional)
+2. **[Add your first dataset](../how-to/05-first-dataset.md)** — Step-by-step tutorial
+3. **[Configure GitHub integration](../how-to/04-settings.md)** — Enable PR workflow with detailed PAT setup (optional)
 
 ---
 
@@ -137,5 +137,5 @@ Now that Hei-DataHub is running:
 
 For common issues, see:
 
-- **[FAQ & Troubleshooting](90-faq.md)** — Solutions to frequent problems
+- **[FAQ & Troubleshooting](../help/90-faq.md)** — Solutions to frequent problems
 - **[GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)** — Report bugs or get help

@@ -343,7 +343,7 @@ All Datasets (45 total)
 
 ### 2. Search for Your Dataset
 
-👉 [Learn more about search](search-advanced.md)
+👉 [Learn more about search](07-search-advanced.md)
 
 ---
 
@@ -579,7 +579,7 @@ Then relaunch the TUI.
 
 You can edit datasets directly in the TUI using inline editing:
 
-👉 [Complete editing guide](edit-datasets.md)
+👉 [Complete editing guide](06-edit-datasets.md)
 
 ---
 
@@ -626,17 +626,17 @@ Try adding another dataset to build muscle memory:
 
 ✅ **You can now add datasets!** Here's what to explore next:
 
-1. **[Search & Filters](search-advanced.md)** — Find datasets with field-specific queries
-2. **[Edit Datasets](edit-datasets.md)** — Modify metadata using inline editing (v0.56+)
-3. **[Configure GitHub](settings.md)** — Enable PR workflow for team collaboration
-4. **[Customize Keybindings](customize-keybindings.md)** — Optimize your workflow
-5. **[Change Theme](change-theme.md)** — Personalize the interface
+1. **[Search & Filters](07-search-advanced.md)** — Find datasets with field-specific queries
+2. **[Edit Datasets](06-edit-datasets.md)** — Modify metadata using inline editing (v0.56+)
+3. **[Configure GitHub](04-settings.md)** — Enable PR workflow for team collaboration
+4. **[Customize Keybindings](08-customize-keybindings.md)** — Optimize your workflow
+5. **[Change Theme](09-change-theme.md)** — Personalize the interface
 
 ---
 
 ## Related Documentation
 
-- **[The Basics](../03-the-basics.md)** - Core concepts and workflows
+- **[The Basics](../getting-started/03-the-basics.md)** - Core concepts and workflows
 - **[Search Syntax Reference](../reference/search-syntax.md)** - Complete query grammar
-- **[FAQ](../90-faq.md#dataset-management)** - Common dataset questions
-- **[Troubleshooting](../troubleshooting.md)** - Solve common issues
+- **[FAQ](../help/90-faq.md#dataset-management)** - Common dataset questions
+- **[Troubleshooting](../help/troubleshooting.md)** - Solve common issues

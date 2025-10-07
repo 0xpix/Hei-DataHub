@@ -84,7 +84,7 @@ Hei-DataHub/.datahub_config.json
 
 ## GitHub Configuration
 
-💡 **See the comprehensive [GitHub Settings Guide](how-to/settings.md)** for detailed setup instructions, including:
+💡 **See the comprehensive [GitHub Settings Guide](../how-to/04-settings.md)** for detailed setup instructions, including:
 - Step-by-step PAT creation (fine-grained vs classic tokens)
 - Using the automated setup script (`setup_pr_workflow.sh`)
 - Troubleshooting common issues
@@ -109,7 +109,7 @@ Hei-DataHub/.datahub_config.json
 - **Fine-grained tokens** (recommended): `Contents: Read and write` + `Pull requests: Read and write`
 - **Classic tokens**: `repo` scope
 
-📖 [Detailed token setup guide](how-to/settings.md#step-4-create-a-personal-access-token-pat)
+📖 [Detailed token setup guide](../how-to/04-settings.md#step-1-create-a-personal-access-token-pat)
 
 **Security:**
 
@@ -520,6 +520,6 @@ cmdkey /delete:mini-datahub
 
 ## Next Steps
 
-- **[Tutorial: Your First Dataset](20-tutorials/02-first-dataset.md)** — Practice adding datasets
-- **[FAQ](90-faq.md)** — Troubleshooting config issues
+- **[Tutorial: Your First Dataset](../how-to/05-first-dataset.md)** — Practice adding datasets
+- **[FAQ](../help/90-faq.md)** — Troubleshooting config issues
 - **[GitHub Workflow Guide](https://github.com/0xpix/Hei-DataHub/blob/main/GITHUB_WORKFLOW.md)** — Detailed PR workflow docs

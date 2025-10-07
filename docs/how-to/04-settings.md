@@ -385,7 +385,7 @@ If your token is compromised:
 1. Go to [github.com/settings/tokens](https://github.com/settings/tokens)
 2. Find the token (e.g., "Mini DataHub Catalog Access")
 3. Click **Revoke**
-4. Generate a new token (see [Step 4](#step-1-create-a-personal-access-token-pat))
+4. Generate a new token (see [Step 1](#step-1-create-a-personal-access-token-pat))
 5. Update in Hei-DataHub Settings
 6. Click **Remove Token** → **Save Settings** → paste new token → **Save Settings**
 
@@ -445,10 +445,10 @@ git push
 
 ## Related Documentation
 
-- [**Search for Datasets**](search-advanced.md) - Find and filter datasets in your catalog
-- [**Edit Datasets**](edit-datasets.md) - Modify existing dataset metadata (creates PRs)
-- [**FAQ**](../90-faq.md) - Common questions about GitHub integration
-- [**Troubleshooting**](../troubleshooting.md) - Resolve common issues
+- [**Search for Datasets**](07-search-advanced.md) - Find and filter datasets in your catalog
+- [**Edit Datasets**](06-edit-datasets.md) - Modify existing dataset metadata (creates PRs)
+- [**FAQ**](../help/90-faq.md) - Common questions about GitHub integration
+- [**Troubleshooting**](../help/troubleshooting.md) - Resolve common issues
 
 ---
 
@@ -462,6 +462,6 @@ git push
 - Check GitHub for new Pull Requests
 
 **Learn more:**
-- [Getting Started Guide](../01-getting-started.md)
-- [The Basics](../03-the-basics.md)
+- [Getting Started Guide](../getting-started/01-getting-started.md)
+- [The Basics](../getting-started/03-the-basics.md)
 - [All Keyboard Shortcuts](../reference/keybindings.md)

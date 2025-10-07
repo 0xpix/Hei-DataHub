@@ -150,7 +150,7 @@ keybindings:
   quit: "ctrl+q"             # Change from 'q' to Ctrl+Q
 ```
 
-👉 [Full customization guide](../how-to/customize-keybindings.md)
+👉 [Full customization guide](../how-to/08-customize-keybindings.md)
 
 ---
 
@@ -249,7 +249,7 @@ All actions are keyboard-only (no mouse required).
 
 ## Related
 
-- [How to customize keybindings](../how-to/customize-keybindings.md)
-- [Navigation guide](../02-navigation.md)
-- [UI guide](../10-ui.md)
-- [FAQ](../90-faq.md)
+- [How to customize keybindings](../how-to/08-customize-keybindings.md)
+- [Navigation guide](../getting-started/02-navigation.md)
+- [UI guide](10-ui.md)
+- [FAQ](../help/90-faq.md)

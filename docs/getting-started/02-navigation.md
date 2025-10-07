@@ -94,15 +94,17 @@ Details Screen
 Home Screen
 ```
 
-**Example workflow:**
+**Example flow:**
 
-1. Start at **Home Screen**
-2. Press ++slash++ to search
-3. Type "weather"
-4. Press ++enter++ to move focus to results
-5. Use ++j++ / ++k++ to navigate results
-6. Press ++enter++ to open **Details Screen**
-7. Press ++escape++ to return to **Home Screen**
+```
+Home → Search → Details → Edit → Save → PR
+```
+
+For detailed instructions, see:
+
+- **[The Basics](03-the-basics.md)** — Understanding datasets and search
+- **[Tutorial: Configure GitHub integration](../how-to/04-settings.md)** — Enable PR workflow
+- **[Tutorial: Create your first dataset](../how-to/05-first-dataset.md)** — Learn how to create a dataset
 
 ---
 
@@ -253,5 +255,5 @@ Currently, keybindings are **hardcoded** but follow Vim conventions. Future vers
 ## Next Steps
 
 - **[Learn the basics](03-the-basics.md)** — Understand datasets, fields, and metadata
-- **[Configure GitHub integration](12-config.md#github-configuration)** — Enable PR workflow
-- **[Tutorial: Search & Filters](20-tutorials/03-search-and-filters.md)** — Master search techniques
+- **[Tutorial: Configure GitHub integration](../how-to/04-settings.md)** — Enable PR workflow
+- **[Tutorial: Create your first dataset](../how-to/05-first-dataset.md)** — Learn how to create a dataset

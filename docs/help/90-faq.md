@@ -32,7 +32,7 @@ Common questions, issues, and solutions for Hei-DataHub v0.57.x beta.
 3. Edit fields with Tab/Shift+Tab to navigate
 4. Press `Ctrl+S` to save
 
-👉 [Full editing guide](how-to/edit-datasets.md)
+👉 [Full editing guide](../how-to/06-edit-datasets.md)
 
 ---
 
@@ -49,7 +49,7 @@ format:csv
 - `size:>1000000` - Find files larger than 1 MB
 - `project:climate` - Find datasets in "climate" project
 
-👉 [Advanced search guide](how-to/search-advanced.md)
+👉 [Advanced search guide](../how-to/07-search-advanced.md)
 
 ---
 
@@ -81,7 +81,7 @@ Available themes: gruvbox, nord, dracula, monokai, catppuccin-mocha, solarized-d
 
 Then restart the app.
 
-👉 [Theme customization guide](how-to/change-theme.md)
+👉 [Theme customization guide](../how-to/09-change-theme.md)
 
 ---
 
@@ -102,7 +102,7 @@ keybindings:
 
 Then restart the app.
 
-👉 [Keybinding customization guide](how-to/customize-keybindings.md)
+👉 [Keybinding customization guide](../how-to/08-customize-keybindings.md)
 
 ---
 
@@ -321,7 +321,7 @@ hei-datahub reindex
 
 ## GitHub Integration
 
-💡 **New!** See the comprehensive [GitHub Settings Guide](how-to/settings.md) for detailed PAT setup instructions.
+💡 **New!** See the comprehensive [GitHub Settings Guide](../how-to/04-settings.md) for detailed PAT setup instructions.
 
 ### Q: "GitHub Not Connected" after configuring
 
@@ -333,7 +333,7 @@ hei-datahub reindex
 2. Select `repo` scope (or `Contents` + `Pull requests` for fine-grained tokens)
 3. Re-enter in Settings (++s++)
 
-📖 [Detailed PAT setup guide](how-to/settings.md#step-4-create-a-personal-access-token-pat)
+📖 [Detailed PAT setup guide](../how-to/04-settings.md#step-1-create-a-personal-access-token-pat)
 
 ---
 
@@ -347,7 +347,7 @@ hei-datahub reindex
 2. Ensure you have write access to the repository
 3. Regenerate PAT if needed
 
-📖 [Troubleshoot token issues](how-to/settings.md#troubleshooting)
+📖 [Troubleshoot token issues](../how-to/04-settings.md#troubleshooting)
 
 ---
 
@@ -703,12 +703,11 @@ Press ++s++ → Set "Debug Logging" → ++ctrl+s++
 - **No conflict detection:** Duplicate keybindings not detected (planned for v0.58)
 - **No hot-reload:** Theme/keybinding changes require restart (planned for v0.58)
 
-**Planned for future releases. See [Changelog](99-changelog.md#unreleased) for roadmap.**
+**Planned for future releases.**
 
 ---
 
 ## Next Steps
 
-- **[Versioning](98-versioning.md)** — Understand release versioning
-- **[Changelog](99-changelog.md)** — See what's new in each release
 - **[GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)** — Report bugs or request features
+- **[What's New](../whats-new/0.57-beta.md)** — See what's new in the latest release

@@ -194,7 +194,7 @@ Active filters show as colored badges below the search box:
 - **🏷 source:github** — Field filter
 - **📝 "climate data"** — Exact phrase
 
-👉 **Learn more:** [Advanced Search Guide](how-to/search-advanced.md) | [Search Syntax Reference](reference/search-syntax.md)
+👉 **Learn more:** [Advanced Search Guide](../how-to/07-search-advanced.md) | [Search Syntax Reference](../reference/search-syntax.md)
 
 ---
 
@@ -242,7 +242,7 @@ hei-datahub reindex
 
 **TUI editing (✅ Available since v0.56-beta):**
 
-Inline editing from Details Screen. Press `e` to enter Edit Mode, modify fields, then `s` to save or `ESC` to cancel. See [How-To: Edit Datasets](how-to/edit-datasets.md) for full guide.
+Inline editing from Details Screen. Press `e` to enter Edit Mode, modify fields, then `s` to save or `ESC` to cancel. See [How-To: Edit Datasets](../how-to/06-edit-datasets.md) for full guide.
 
 ---
 
@@ -276,7 +276,7 @@ Planned for v0.58.x—delete from Details Screen with confirmation.
     - Personal Access Token (PAT)
 3. Save with `ctrl+s`
 
-See [How-To: Settings Guide](how-to/settings.md) for more details.
+See [How-To: Settings Guide](../how-to/04-settings.md) for more details.
 
 **Create PR from dataset:**
 
@@ -293,7 +293,7 @@ See [How-To: Settings Guide](how-to/settings.md) for more details.
    - Restores stashed changes (if any)
 ```
 
-See [How-To: First dataset](how-to/02-first-dataset.md) for full guide.
+See [How-To: First dataset](../how-to/05-first-dataset.md) for full guide.
 
 ---
 
@@ -359,7 +359,7 @@ Choose from **12 beautiful built-in themes**:
 2. Set: `theme: "gruvbox"`
 3. Restart the app
 
-👉 **See all themes:** [Change Theme Guide](how-to/change-theme.md)
+👉 **See all themes:** [Change Theme Guide](../how-to/09-change-theme.md)
 
 ### Custom Keybindings
 
@@ -391,7 +391,7 @@ keybindings:
 - Dataset actions: `open_dataset`, `edit_dataset`, `add_dataset`
 - Global: `help`, `quit`, `settings`
 
-👉 **Full list:** [Customize Keybindings Guide](how-to/customize-keybindings.md) | [Keybindings Reference](reference/keybindings.md)
+👉 **Full list:** [Customize Keybindings Guide](../how-to/08-customize-keybindings.md) | [Keybindings Reference](../reference/keybindings.md)
 
 ---
 
@@ -481,6 +481,5 @@ used_in_projects:
 
 ## Next Steps
 
-- **[UI Guide](10-ui.md)** — Deep dive into TUI structure and customization
-- **[Data & SQL](11-data-and-sql.md)** — Understanding the storage layer
-- **[Tutorial: Your First Dataset](20-tutorials/02-first-dataset.md)** — Hands-on walkthrough
+- **[Tutorial: Configure GitHub integration](../how-to/04-settings.md)** — Enable PR workflow
+- **[Tutorial: Create your first dataset](../how-to/05-first-dataset.md)** — Learn how to create a dataset
