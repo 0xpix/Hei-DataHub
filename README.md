@@ -18,14 +18,22 @@
 
 # Hei-DataHub
 
+<<<<<<< HEAD
 ![Beta](https://img.shields.io/badge/beta-0.57.2-blue.svg)
+=======
+![Version](https://img.shields.io/badge/version-0.58.0--beta-blue.svg)
+>>>>>>> 75f6d72 (feat: Update README with new version and installation instructions for v0.58.0-beta)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
+<<<<<<< HEAD
 - **Latest:** 0.57.2-beta "Renovation" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.57-beta/)
 - **Docs:** Start with [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
+=======
+**📦 Latest Release:** [v0.58.0-beta "UV Install & Desktop Support"]
+>>>>>>> 75f6d72 (feat: Update README with new version and installation instructions for v0.58.0-beta)
 
 ---
 
@@ -41,10 +49,63 @@ More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
 ---
 
-## Quick Start
+## 🚀 Quick Install — UV Method (v0.58.x-beta)
+
+**No cloning required!** Install directly from the private repository:
+
+### Ephemeral Run (SSH)
+```bash
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub"
+```
+
+### Global Install (SSH)
+```bash
+uv tool install --from "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main#egg=hei-datahub" hei-datahub
+hei-datahub
+```
+
+### Install with HTTPS + Token
+```bash
+export GH_PAT=ghp_xxxxxxxxxxxxx  # Your GitHub Personal Access Token
+uv tool install --from "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main#egg=hei-datahub" hei-datahub
+```
+
+**📚 Need help?** See [docs/installation](docs/installation/README.md) for:
+- Token/SSH setup
+- Windows instructions
+- Troubleshooting
+
+**🖥️ Desktop Version (Linux):**
+After installation, create a desktop launcher:
+```bash
+bash scripts/create_desktop_entry.sh
+```
+
+---
+
+## Classic Install (For Development)
 
 Linux:
 
+```bash
+# Clone the repository
+git clone git@github.com:0xpix/Hei-DataHub.git
+cd Hei-DataHub
+
+# Install using uv
+uv sync --dev
+source .venv/bin/activate
+
+# Launch the TUI
+hei-datahub
+
+# Or use the setup script
+./scripts/setup_dev.sh
+source .venv/bin/activate
+hei-datahub
+```
+
+**Note:** We use [uv](https://github.com/astral-sh/uv) for fast, reproducible dependency management. Install it with:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 git clone git@github.com:0xpix/Hei-DataHub.git
