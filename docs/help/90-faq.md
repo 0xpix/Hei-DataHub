@@ -32,7 +32,7 @@ Common questions, issues, and solutions for Hei-DataHub v0.57.x beta.
 3. Edit fields with Tab/Shift+Tab to navigate
 4. Press `Ctrl+S` to save
 
-👉 [Full editing guide](how-to/edit-datasets.md)
+👉 [Full editing guide](../how-to/06-edit-datasets.md)
 
 ---
 
@@ -49,7 +49,7 @@ format:csv
 - `size:>1000000` - Find files larger than 1 MB
 - `project:climate` - Find datasets in "climate" project
 
-👉 [Advanced search guide](how-to/search-advanced.md)
+👉 [Advanced search guide](../how-to/07-search-advanced.md)
 
 ---
 
@@ -81,7 +81,7 @@ Available themes: gruvbox, nord, dracula, monokai, catppuccin-mocha, solarized-d
 
 Then restart the app.
 
-👉 [Theme customization guide](how-to/change-theme.md)
+👉 [Theme customization guide](../how-to/09-change-theme.md)
 
 ---
 
@@ -102,7 +102,7 @@ keybindings:
 
 Then restart the app.
 
-👉 [Keybinding customization guide](how-to/customize-keybindings.md)
+👉 [Keybinding customization guide](../how-to/08-customize-keybindings.md)
 
 ---
 
@@ -703,7 +703,7 @@ Press ++s++ → Set "Debug Logging" → ++ctrl+s++
 - **No conflict detection:** Duplicate keybindings not detected (planned for v0.58)
 - **No hot-reload:** Theme/keybinding changes require restart (planned for v0.58)
 
-**Planned for future releases. See [Changelog](99-changelog.md#unreleased) for roadmap.**
+**Planned for future releases.**
 
 ---
 

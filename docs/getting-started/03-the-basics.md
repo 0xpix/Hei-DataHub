@@ -244,7 +244,7 @@ hei-datahub reindex
 
 **TUI editing (✅ Available since v0.56-beta):**
 
-Inline editing from Details Screen. Press `e` to enter Edit Mode, modify fields, then `s` to save or `ESC` to cancel. See [How-To: Edit Datasets](how-to/edit-datasets.md) for full guide.
+Inline editing from Details Screen. Press `e` to enter Edit Mode, modify fields, then `s` to save or `ESC` to cancel. See [How-To: Edit Datasets](../how-to/06-edit-datasets.md) for full guide.
 
 ---
 

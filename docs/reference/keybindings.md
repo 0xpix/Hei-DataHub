@@ -151,7 +151,7 @@ keybindings:
   quit: "ctrl+q"             # Change from 'q' to Ctrl+Q
 ```
 
-👉 [Full customization guide](../how-to/customize-keybindings.md)
+👉 [Full customization guide](../how-to/08-customize-keybindings.md)
 
 ---
 
