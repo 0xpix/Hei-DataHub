@@ -1,226 +1,80 @@
-/* Developer Documentation Site Overrides */
+/* ==========================================================================
+   Hei-DataHub Documentation - Simple Blog Theme Overrides
+   ========================================================================== */
 
-/* Site Switcher Banner */
-.site-switcher {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    margin: 2rem 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #fbbf24;
+/* --------------------------------------------------------------------------
+   Image & SVG Constraints
+   Prevent images and SVGs from overflowing the content width
+   -------------------------------------------------------------------------- */
+
+/* Constrain images/SVGs to the content width */
+article img,
+article svg,
+img,
+svg {
+  max-width: 100%;
+  height: auto;
 }
 
-.site-switcher strong {
-    color: #fbbf24;
-    font-weight: 700;
+/* Pleasant spacing around figures */
+article img,
+article svg {
+  margin: 1rem 0;
 }
 
-.site-switcher a {
-    color: #fbbf24;
-    text-decoration: underline;
-    font-weight: 600;
+/* Center images by default for better presentation */
+article img,
+article svg {
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.site-switcher a:hover {
-    color: #fcd34d;
+.navbar-nav{
+    align-self: center;
 }
 
-/* Developer Docs Branding */
-.md-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+#navbarsMenu > ul.navbar-nav{
+    gap: 3rem;
 }
 
-/* Warning/Info Boxes for Developer Content */
-.admonition.warning {
-    border-left-color: #f59e0b;
+.md-source-repo-text,
+.md-source-repo-url{
+    display: none;
 }
 
-.admonition.info {
-    border-left-color: #6366f1;
+.md-source-repo-icon,
+.md-search-icon{
+    margin-left: 20px;
+    font-size:x-large;
 }
 
-/* Code Blocks - Enhanced for Developer Content */
-.highlight {
-    border-radius: 8px;
-    overflow: hidden;
-}
+/* --------------------------------------------------------------------------
+   Table of Contents Permalink Styling
+   Make the heading permalink symbol (¶) subtle and less intrusive
+   -------------------------------------------------------------------------- */
+/*
+a.headerlink {
+  opacity: 0.35;
+  font-size: 0.8em;
+  margin-left: 0.25rem;
+  text-decoration: none;
+} */
 
-code {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-    font-size: 0.9em;
-}
-
-/* Tables - Better for API References */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.5rem 0;
-}
-
-table th {
-    background: #f3f4f6;
-    font-weight: 600;
-    text-align: left;
-    padding: 0.75rem 1rem;
-    border-bottom: 2px solid #e5e7eb;
-}
-
-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-table tr:hover {
-    background: #f9fafb;
-}
-
-/* Status Badges */
-.status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.85em;
-    font-weight: 600;
-    margin-left: 0.5rem;
-}
-
-.status-badge.accepted {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.status-badge.proposed {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.status-badge.deprecated {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-/* Grid Cards (Material for MkDocs) */
-.grid.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.grid.cards > * {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 1.5rem;
-    transition: all 0.2s ease;
-}
-
-.grid.cards > *:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #6366f1;
-    transform: translateY(-2px);
-}
-
-/* Function/API Signatures */
-.api-signature {
-    background: #1f2937;
-    color: #f3f4f6;
-    padding: 1rem;
-    border-radius: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    margin: 1rem 0;
-    overflow-x: auto;
-}
-
-/* Mermaid Diagrams */
-.mermaid {
-    text-align: center;
-    margin: 2rem 0;
-}
-
-/* Navigation Breadcrumbs */
-.md-nav--primary .md-nav__title {
-    font-weight: 700;
-    color: #667eea;
-}
-
-/* Footer Customization */
-.md-footer {
-    background: #1f2937;
-}
-
-.md-footer-meta {
-    background: #111827;
-}
-
-/* Dark Mode Adjustments */
-[data-md-color-scheme="slate"] .site-switcher {
-    background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%);
-}
-
-[data-md-color-scheme="slate"] table th {
-    background: #374151;
-}
-
-[data-md-color-scheme="slate"] table tr:hover {
-    background: #1f2937;
-}
-
-/* Version Banner */
-.version-banner {
-    background: #eff6ff;
-    border-left: 4px solid #3b82f6;
-    padding: 1rem 1.5rem;
-    margin: 2rem 0;
-    border-radius: 4px;
-}
-
-[data-md-color-scheme="slate"] .version-banner {
-    background: #1e3a8a;
-    border-left-color: #60a5fa;
-}
-
-/* Coverage Tracker Styles */
-.coverage-metric {
-    display: inline-block;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.2em;
-    margin: 0.5rem;
-}
-
-.coverage-high {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.coverage-medium {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.coverage-low {
-    background: #fee2e2;
-    color: #991b1b;
-}
+/* Uncomment below to hide permalink symbols completely */
 
 a.headerlink {
   display: none;
 }
 
-/* Responsive adjustments */
-@media screen and (max-width: 768px) {
-    .grid.cards {
-        grid-template-columns: 1fr;
-    }
 
-    .site-switcher {
-        padding: 0.75rem 1rem;
-        font-size: 0.9em;
-    }
+/* --------------------------------------------------------------------------
+   Responsive Adjustments
+   Ensure images scale properly on mobile devices
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  article img,
+  article svg {
+    margin: 0.75rem 0;
+  }
 }
