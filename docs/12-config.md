@@ -84,14 +84,20 @@ Hei-DataHub/.datahub_config.json
 
 ## GitHub Configuration
 
-### Setup via TUI
+💡 **See the comprehensive [GitHub Settings Guide](how-to/settings.md)** for detailed setup instructions, including:
+- Step-by-step PAT creation (fine-grained vs classic tokens)
+- Using the automated setup script (`setup_pr_workflow.sh`)
+- Troubleshooting common issues
+- Security best practices
+
+### Quick Setup via TUI
 
 1. Press ++s++ to open Settings screen
 2. Fill in required fields:
     - **GitHub Owner:** Your username or org (e.g., `0xpix`)
     - **Repository Name:** Repo name (e.g., `Hei-DataHub`)
     - **GitHub Username:** Your GitHub username
-    - **Personal Access Token (PAT):** Token with `repo` scope
+    - **Personal Access Token (PAT):** Token with appropriate permissions
 3. Press ++ctrl+s++ to save
 
 **Result:**
@@ -99,16 +105,11 @@ Hei-DataHub/.datahub_config.json
 - Config saved to `.datahub_config.json`
 - PAT saved to OS keyring (secure storage)
 
----
+**Token Requirements:**
+- **Fine-grained tokens** (recommended): `Contents: Read and write` + `Pull requests: Read and write`
+- **Classic tokens**: `repo` scope
 
-### Generate GitHub PAT
-
-1. Go to [GitHub Settings → Tokens](https://github.com/settings/tokens)
-2. Click "Generate new token (classic)"
-3. Select scopes:
-    - ✅ `repo` (full control of private repos)
-4. Copy token (you won't see it again!)
-5. Paste into Hei-DataHub Settings
+📖 [Detailed token setup guide](how-to/settings.md#step-4-create-a-personal-access-token-pat)
 
 **Security:**
 
