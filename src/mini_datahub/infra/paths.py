@@ -17,9 +17,24 @@ def _is_installed_package() -> bool:
     return "site-packages" in str(package_path) or ".local/share/uv" in str(package_path)
 
 def _is_dev_mode() -> bool:
-    """Check if running from repository (development mode)."""
-    cwd = Path.cwd()
-    return (cwd / "src" / "mini_datahub").exists() and (cwd / "pyproject.toml").exists()
+    """Check if running from repository (development mode).
+    
+    This checks if the code is being imported from a repository structure
+    (not from an installed package), regardless of the current working directory.
+    """
+    package_path = Path(__file__).resolve()
+    # Check if __file__ is in a repo structure (has src/mini_datahub parent)
+    try:
+        # If we're in: /path/to/repo/src/mini_datahub/infra/paths.py
+        # Then go up 4 levels: infra -> mini_datahub -> src -> repo_root
+        potential_repo = package_path.parent.parent.parent.parent
+        return (
+            (potential_repo / "src" / "mini_datahub").exists() and
+            (potential_repo / "pyproject.toml").exists() and
+            "site-packages" not in str(package_path)
+        )
+    except:
+        return False
 
 # XDG Base Directory paths (for installed package)
 XDG_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
@@ -36,8 +51,10 @@ if _is_installed_package():
     STATE_DIR = XDG_STATE_HOME / "hei-datahub"
     PROJECT_ROOT = XDG_DATA_HOME / "hei-datahub"
 elif _is_dev_mode():
-    # Development mode: Use repository
-    PROJECT_ROOT = Path.cwd()
+    # Development mode: Use repository (derive from __file__, not cwd)
+    package_path = Path(__file__).resolve()
+    # Go up 4 levels: infra -> mini_datahub -> src -> repo_root
+    PROJECT_ROOT = package_path.parent.parent.parent.parent
     CONFIG_DIR = PROJECT_ROOT
     DATA_DIR = PROJECT_ROOT / "data"
     CACHE_DIR = PROJECT_ROOT / ".cache"
