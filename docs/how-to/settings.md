@@ -1,5 +1,7 @@
 # Configure GitHub Integration
 
+**Requirements:** Hei-DataHub v0.56-beta or later
+
 Learn how to set up GitHub integration for automated Pull Request workflows in Hei-DataHub. This guide covers creating a Personal Access Token (PAT), configuring settings via the TUI or setup script, and understanding all available options.
 
 ---
