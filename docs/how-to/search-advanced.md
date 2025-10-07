@@ -1,9 +1,10 @@
 # How to Use Advanced Search
 
+Requirements: Hei-DataHub 0.56-beta or later
+
 **Goal:** Find datasets quickly using field-specific filters, operators, and exact phrases.
 
 **Time:** 5 minutes to learn, seconds to use
-**Version:** 0.56-beta or later
 
 ---
 
