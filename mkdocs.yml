@@ -21,8 +21,6 @@ theme:
     site_name: false
   highlightjs: true
     - bash
-    -python
-    - yaml
   sidebar: true
   navigation_depth: 2
   custom_dir: docs/
@@ -120,3 +118,4 @@ markdown_extensions:
 # Additional JavaScript
 extra_javascript:
   - assets/vim-navigation.js
+  - assets/repo-url.js
