@@ -147,7 +147,6 @@ def handle_update(args):
     repo_url = f"git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}#egg=hei-datahub"
 
     print(f"  Source: {repo_url}")
-    print(f"  Using uv tool install --upgrade...")
     print()
 
     try:
