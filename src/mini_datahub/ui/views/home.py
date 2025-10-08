@@ -131,7 +131,7 @@ class HomeScreen(Screen):
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
             Static(id="github-status"),
-            Input(placeholder="Type / to search, j/k to navigate, Enter to open...", id="search-input"),
+            Input(placeholder="Type / to search | Tab/→/Ctrl+F for autocomplete | Enter to view", id="search-input"),
             Horizontal(id="filter-badges-container", classes="filter-badges"),
             Label("All Datasets", id="results-label"),
             DataTable(id="results-table", cursor_type="row"),
@@ -351,6 +351,25 @@ class HomeScreen(Screen):
         search_input = self.query_one("#search-input", Input)
         search_input.focus()
         self.search_mode = True
+
+    def on_key(self, event) -> None:
+        """Handle key events for autocomplete and navigation."""
+        # Only handle when search input is focused
+        search_input = self.query_one("#search-input", Input)
+
+        if search_input.has_focus:
+            # Tab accepts autocomplete and prevents navigation to table
+            if event.key == "tab":
+                # Manually accept the suggestion by moving cursor to end
+                # This is what Textual does internally for Right Arrow with suggester
+                if hasattr(search_input, 'suggester') and search_input.suggester:
+                    # Move cursor to end to accept suggestion
+                    search_input.cursor_position = len(search_input.value)
+                    # Trigger cursor_right action which accepts the suggestion
+                    search_input.action_cursor_right()
+                # Prevent Tab from navigating away
+                event.prevent_default()
+                event.stop()
 
     @on(Input.Submitted, "#search-input")
     def on_search_submitted(self) -> None:
