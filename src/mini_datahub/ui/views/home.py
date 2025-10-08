@@ -147,11 +147,24 @@ class HomeScreen(Screen):
         # Start with table focused, but don't refocus it during searches
         table.focus()
 
+        # Setup search autocomplete
+        self._setup_search_autocomplete()
+
         # Update GitHub status indicator
         self.update_github_status()
 
         # Load all datasets initially
         self.load_all_datasets()
+    
+    def _setup_search_autocomplete(self) -> None:
+        """Setup autocomplete suggester for search input."""
+        try:
+            from mini_datahub.ui.widgets.autocomplete import SearchSuggester
+            
+            search_input = self.query_one("#search-input", Input)
+            search_input.suggester = SearchSuggester()
+        except Exception as e:
+            logger.warning(f"Failed to setup search autocomplete: {e}")
 
     def update_github_status(self) -> None:
         """Update GitHub connection status display."""
