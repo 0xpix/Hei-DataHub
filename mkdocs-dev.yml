@@ -95,7 +95,7 @@ extra_css:
 
 extra_javascript:
   - assets/vim-navigation-dev.js
-  - assets/site-switcher.js
+  - assets/repo_url.js
 
 # Extra configuration
 extra:
