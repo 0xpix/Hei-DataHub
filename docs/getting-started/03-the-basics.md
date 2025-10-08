@@ -146,6 +146,8 @@ Matches: "GeoTIFF", "geospatial", "geometry"
 
 **✅ Available since v0.56-beta:** Hei-DataHub now supports **structured search** with field-specific filters and operators!
 
+**✨ New in v0.57.1-beta:** **Search autocomplete** - Get smart suggestions as you type! Press **Tab** or **Ctrl+F** to accept.
+
 ### Field-Specific Filters
 
 Search specific fields instead of searching everything:
