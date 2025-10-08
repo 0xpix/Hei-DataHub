@@ -1,6 +1,7 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 # Edit this file and run `scripts/sync_version.py` to propagate changes
+# Last updated: 2025-10-08
 
 version: "0.57.1-beta"
 codename: "Renovation"
