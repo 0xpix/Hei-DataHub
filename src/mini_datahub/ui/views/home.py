@@ -127,12 +127,12 @@ class HomeScreen(Screen):
 
         # Load all datasets initially
         self.load_all_datasets()
-    
+
     def _setup_search_autocomplete(self) -> None:
         """Setup autocomplete suggester for search input."""
         try:
             from mini_datahub.ui.widgets.autocomplete import SearchSuggester
-            
+
             search_input = self.query_one("#search-input", Input)
             search_input.suggester = SearchSuggester()
         except Exception as e:
