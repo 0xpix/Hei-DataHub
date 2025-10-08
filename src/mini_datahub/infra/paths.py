@@ -1,15 +1,20 @@
-"""
+r"""
 Centralized path management for Hei-DataHub.
 All file system paths are defined here.
 
-XDG Base Directory Specification compliant:
+Cross-platform directory support:
+- Linux: XDG Base Directory Specification (~/.local/share/Hei-DataHub)
+- macOS: ~/Library/Application Support/Hei-DataHub
+- Windows: %LOCALAPPDATA%\Hei-DataHub
+
+Config still uses XDG on all platforms:
 - Config: ~/.config/hei-datahub/
-- Data: ~/.local/share/hei-datahub/
 - Cache: ~/.cache/hei-datahub/
 - State: ~/.local/state/hei-datahub/
 """
 from pathlib import Path
 import os
+import sys
 
 def _is_installed_package() -> bool:
     """Check if running from an installed package (not development mode)."""
@@ -36,20 +41,30 @@ def _is_dev_mode() -> bool:
     except:
         return False
 
-# XDG Base Directory paths (for installed package)
+# XDG Base Directory paths (for config/cache/state - used on all platforms)
 XDG_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 XDG_DATA_HOME = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
 XDG_CACHE_HOME = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
 XDG_STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
 
+# Get CLI override from command line args (if available)
+_CLI_DATA_DIR_OVERRIDE = None
+for i, arg in enumerate(sys.argv):
+    if arg == '--data-dir' and i + 1 < len(sys.argv):
+        _CLI_DATA_DIR_OVERRIDE = sys.argv[i + 1]
+        break
+
 # Determine base directories based on install mode
 if _is_installed_package():
-    # Installed package: Use XDG directories (completely standalone)
+    # Installed package: Use platform-aware data directory
+    from mini_datahub.infra.platform_paths import resolve_data_directory
+    PLATFORM_DATA_DIR, _ = resolve_data_directory(_CLI_DATA_DIR_OVERRIDE)
+
     CONFIG_DIR = XDG_CONFIG_HOME / "hei-datahub"
-    DATA_DIR = XDG_DATA_HOME / "hei-datahub" / "datasets"
+    DATA_DIR = PLATFORM_DATA_DIR / "datasets"
     CACHE_DIR = XDG_CACHE_HOME / "hei-datahub"
     STATE_DIR = XDG_STATE_HOME / "hei-datahub"
-    PROJECT_ROOT = XDG_DATA_HOME / "hei-datahub"
+    PROJECT_ROOT = PLATFORM_DATA_DIR
 elif _is_dev_mode():
     # Development mode: Use repository (derive from __file__, not cwd)
     package_path = Path(__file__).resolve()
@@ -67,15 +82,15 @@ else:
     STATE_DIR = XDG_STATE_HOME / "hei-datahub"
     PROJECT_ROOT = XDG_DATA_HOME / "hei-datahub"
 
-# Database (in data directory per XDG)
-DB_PATH = XDG_DATA_HOME / "hei-datahub" / "db.sqlite" if _is_installed_package() else PROJECT_ROOT / "db.sqlite"
+# Database (in data directory)
+DB_PATH = PROJECT_ROOT / "db.sqlite"
 
 # Schema paths
 def _get_schema_path() -> Path:
     """Get schema.json path."""
     if _is_installed_package():
         # Installed: Use packaged schema, copy to data dir if needed
-        user_schema = XDG_DATA_HOME / "hei-datahub" / "schema.json"
+        user_schema = PROJECT_ROOT / "schema.json"
         if user_schema.exists():
             return user_schema
         # Return packaged schema path
@@ -100,7 +115,7 @@ LOG_DIR = STATE_DIR / "logs"
 OUTBOX_DIR = STATE_DIR / "outbox"
 
 # Assets (templates, etc.)
-ASSETS_DIR = XDG_DATA_HOME / "hei-datahub" / "assets" if _is_installed_package() else PROJECT_ROOT / "assets"
+ASSETS_DIR = PROJECT_ROOT / "assets" if _is_installed_package() else PROJECT_ROOT / "assets"
 
 # Keyring settings
 KEYRING_SERVICE = "mini-datahub"
@@ -130,7 +145,7 @@ def initialize_workspace():
     ensure_directories()
 
     # Copy schema.json to user data directory
-    user_schema = XDG_DATA_HOME / "hei-datahub" / "schema.json"
+    user_schema = PROJECT_ROOT / "schema.json"
     if not user_schema.exists():
         try:
             package_schema = Path(__file__).parent.parent / "schema.json"
