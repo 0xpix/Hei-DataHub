@@ -42,6 +42,7 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 **v0.57-beta (Oct 6, 2025)** — Documentation overhaul:
 
+**v0.57.0-beta (Oct 6, 2025)** — Documentation overhaul:
 - **📖 8 new documentation pages** – How-to guides, references, troubleshooting
 - **🎨 New logo design** – Multiple variants for different use cases
 
