@@ -78,19 +78,15 @@ vim data/my-dataset/metadata.yaml
 
 **Symptom:** You edit a dataset, save successfully, close the app, reopen – changes are gone.
 
-**Cause:** Database index not persisting correctly in some cases.
+**Status:** ✅ **Fixed in v0.57.1-beta** – This issue has been resolved. Edits now persist correctly across app restarts.
 
-**Workaround:**
-1. After editing, verify YAML file was updated:
+**If you still experience this on v0.57.1+:**
+1. Verify you're running the latest version: `hei-datahub --version`
+2. Check YAML file was updated:
    ```bash
    cat data/my-dataset/metadata.yaml
    ```
-2. If YAML is correct but app shows old data, reindex:
-   ```bash
-   hei-datahub reindex
-   ```
-
-**Status:** Under investigation for v0.57.1.
+3. If issue persists, file a bug report with reproduction steps.
 
 ---
 

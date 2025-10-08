@@ -135,11 +135,11 @@ When you use filters, **colored badges** appear below the search box:
 
 - **🏷 source:github** (field filter)
 - **🏷 size:>1000000** (numeric filter)
-- **📝 "exact phrase"** (phrase match)
+- **📝 rainfall** (free-text term)
+- **📝 temp** (free-text term)
+- **📝 "exact phrase"** (quoted phrase)
 
-These badges help you see what's active.
-
-**Note:** BUGFIX coming in 0.57.x-beta - only one tah appears
+**Since v0.57.1-beta:** Each search term gets its own badge, making it clear what you're searching for. Multiple terms (e.g., "rainfall temp rice") display as separate badges instead of one combined badge.
 
 ---
 
