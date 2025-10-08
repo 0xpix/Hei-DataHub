@@ -20,11 +20,13 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 **[Read the full What's New guide →](whats-new/0.57-beta.md)**
 
 **v0.57.1-beta (Oct 8, 2025)** — Bug fix patch:
+
 - **✅ Config reload** – Theme/keybinding changes now apply without restart
 - **✅ Persistent edits** – Dataset edits now save correctly across app restarts
 - **✅ Search autocomplete** – Field name suggestions now work in search
 
 **v0.57.0-beta (Oct 6, 2025)** — Documentation overhaul:
+
 - **📖 8 new documentation pages** – How-to guides, references, troubleshooting
 - **🎨 New logo design** – Multiple variants for different use cases
 
