@@ -183,6 +183,16 @@ def handle_update(args):
         sys.exit(1)
 
 
+def handle_doctor(args):
+    """Handle doctor diagnostic command."""
+    from mini_datahub.cli.doctor import run_doctor
+
+    # Pass data-dir override if provided
+    data_dir_override = getattr(args, 'data_dir', None)
+    exit_code = run_doctor(data_dir_override)
+    sys.exit(exit_code)
+
+
 def handle_paths(args):
     """Handle paths diagnostic command."""
     from mini_datahub.infra import paths
@@ -277,6 +287,20 @@ def main():
     )
 
     parser.add_argument(
+        "--data-dir",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help=(
+            "Override data directory location. "
+            "Examples: "
+            "Linux: ~/.local/share/Hei-DataHub | "
+            "macOS: ~/Library/Application Support/Hei-DataHub | "
+            "Windows: C:\\Users\\<User>\\AppData\\Local\\Hei-DataHub"
+        ),
+    )
+
+    parser.add_argument(
         "--set",
         action="append",
         metavar="KEY=VALUE",
@@ -291,6 +315,13 @@ def main():
         help="Reindex all datasets from the data directory"
     )
     parser_reindex.set_defaults(func=handle_reindex)
+
+    # Doctor diagnostic command
+    parser_doctor = subparsers.add_parser(
+        "doctor",
+        help="Run system diagnostics and health checks"
+    )
+    parser_doctor.set_defaults(func=handle_doctor)
 
     # Paths diagnostic command
     parser_paths = subparsers.add_parser(
