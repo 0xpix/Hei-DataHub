@@ -17,32 +17,32 @@ def analyze_query(query: str):
     print(f"\n{'='*70}")
     print(f"QUERY: '{query}'")
     print(f"{'='*70}")
-    
+
     parser = QueryParser()
     try:
         parsed = parser.parse(query)
-        
+
         # Count badges
         field_badges = [t for t in parsed.terms if not t.is_free_text]
         text_badges = [t for t in parsed.terms if t.is_free_text]
-        
+
         print(f"\nExpected badges in UI:")
         print(f"  • Field filters: {len(field_badges)}")
         for term in field_badges:
             print(f"    - 🏷 {term.field}:{term.value}")
-        
+
         print(f"  • Free text terms: {len(text_badges)}")
         for term in text_badges:
             print(f"    - 📝 {term.value}")
-        
+
         total = len(field_badges) + len(text_badges)
         print(f"\n  ⚠️  TOTAL BADGES SHOULD APPEAR: {total}")
-        
+
         if total == 1:
             print(f"  ⚠️  If you see only 1 badge in the app, Bug #10 NOT fixed!")
         else:
             print(f"  ✅ If you see {total} badges in the app, Bug #10 IS fixed!")
-            
+
     except Exception as e:
         print(f"\nError parsing query: {e}")
 
@@ -51,7 +51,7 @@ def main():
     print("BUG #10 FIX VERIFICATION - Badge Display Test")
     print("="*70)
     print("\nTest these queries in the actual app and compare with expected results:")
-    
+
     test_queries = [
         "the data",
         "rainfall temp rice",
@@ -61,10 +61,10 @@ def main():
         "burned area precipitation",
         "land cover climate data",
     ]
-    
+
     for query in test_queries:
         analyze_query(query)
-    
+
     print("\n" + "="*70)
     print("HOW TO TEST IN THE APP:")
     print("="*70)

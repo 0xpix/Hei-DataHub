@@ -5,6 +5,7 @@ import logging
 import webbrowser
 from datetime import date
 from typing import Any, Optional
+import random
 
 import pyperclip
 import requests
@@ -267,6 +268,20 @@ class HomeScreen(Screen):
         except Exception as e:
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
 
+    def _get_badge_color(self, text: str) -> str:
+        """Get a theme-appropriate color for a badge based on text hash."""
+        # Use hash for consistent color per term
+        color_seed = hash(text) % 100
+        
+        # Rich color palette that works well with most themes
+        colors = [
+            "cyan", "magenta", "yellow", "green", "blue", 
+            "red", "bright_cyan", "bright_magenta", "bright_yellow",
+            "bright_green", "bright_blue", "bright_red"
+        ]
+        
+        return colors[color_seed % len(colors)]
+
     def _update_filter_badges(self, query: str) -> None:
         """Update visual badges showing active search filters."""
         from mini_datahub.core.queries import QueryParser
@@ -294,15 +309,17 @@ class HomeScreen(Screen):
                     }
                     op_symbol = operator_symbols.get(term.operator.name, ':')
                     badge_text = f"{term.field}{op_symbol}{term.value}"
-                    badges_container.mount(Static(f"[bold cyan]🏷 {badge_text}[/bold cyan]", classes="filter-badge"))
+                    color = self._get_badge_color(badge_text)
+                    badges_container.mount(Static(f"[bold {color}]🏷 {badge_text}[/bold {color}]", classes="filter-badge"))
 
             # Show individual badges for each free text term
             # Fix for Bug #10: Display separate tags instead of one combined token
             free_text_terms = [term for term in parsed.terms if term.is_free_text]
             logger.debug(f"DEBUG Bug #10: Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
-            
+
             for term in free_text_terms:
-                badge = Static(f"[dim]📝 {term.value}[/dim]", classes="filter-badge")
+                color = self._get_badge_color(term.value)
+                badge = Static(f"[bold {color}]📝 {term.value}[/bold {color}]", classes="filter-badge")
                 badges_container.mount(badge)
                 logger.debug(f"DEBUG Bug #10: Mounted badge for term: {term.value}")
 
