@@ -33,19 +33,19 @@ jobs:
         run: |
           python scripts/sync_version.py
 
-    #   - name: Check for uncommitted changes
-    #     run: |
-    #       if [ -n "$(git status --porcelain)" ]; then
-    #         echo "❌ Version files are out of sync!"
-    #         echo ""
-    #         echo "The following files have uncommitted changes:"
-    #         git status --porcelain
-    #         echo ""
-    #         echo "Please run 'python scripts/sync_version.py' locally and commit the changes."
-    #         exit 1
-    #       else
-    #         echo "✅ All version files are in sync!"
-    #       fi
+      - name: Check for uncommitted changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "❌ Version files are out of sync!"
+            echo ""
+            echo "The following files have uncommitted changes:"
+            git status --porcelain
+            echo ""
+            echo "Please run 'python scripts/sync_version.py' locally and commit the changes."
+            exit 1
+          else
+            echo "✅ All version files are in sync!"
+          fi
 
       - name: Display current version
         run: |
