@@ -270,7 +270,6 @@ class HomeScreen(Screen):
             "badge-retro-amber",
             "badge-retro-slate",
         ]
-
         return color_classes[color_seed % len(color_classes)]
 
     def _update_filter_badges(self, query: str) -> None:
@@ -309,8 +308,8 @@ class HomeScreen(Screen):
             logger.debug(f"DEBUG Bug #10: Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
 
             for term in free_text_terms:
-                color = self._get_badge_color(term.value)
-                badge = Static(f"[bold {color}]📝 {term.value}[/bold {color}]", classes="filter-badge")
+                color_class = self._get_badge_color_class(term.value)
+                badge = Static(f"📝 {term.value}", classes=f"filter-badge {color_class}")
                 badges_container.mount(badge)
                 logger.debug(f"DEBUG Bug #10: Mounted badge for term: {term.value}")
 
