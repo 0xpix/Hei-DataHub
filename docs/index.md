@@ -15,20 +15,18 @@ Current version: `0.57.1-beta` (2025-10-08) — Codename: `Renovation`
 
 Everything runs locally—YAML files + SQLite database—no network required except for optional GitHub integration.
 
-## What's New in v0.57 📚
+## What's New in v0.57-beta 📚
 
 **[Read the full What's New guide →](whats-new/0.57-beta.md)**
 
-v0.57.0-beta is a **documentation-only release**—no new features, just complete documentation for everything released in v0.56.0-beta:
+**v0.57.1-beta (Oct 8, 2025)** — Bug fix patch:
+- **✅ Config reload** – Theme/keybinding changes now apply without restart
+- **✅ Persistent edits** – Dataset edits now save correctly across app restarts
+- **✅ Search autocomplete** – Field name suggestions now work in search
 
+**v0.57.0-beta (Oct 6, 2025)** — Documentation overhaul:
 - **📖 8 new documentation pages** – How-to guides, references, troubleshooting
-- **✏️ Inline editing guide** – Step-by-step dataset editing instructions
-- **🔍 Search syntax reference** – Complete field filter grammar
-- **Autocomplete guide** – How to use new search suggestions
-- **⌨️ Keybindings reference** – All shortcuts by mode (including Edit Mode)
-- **🎨 Theme customization guide** – All 12 themes documented
-- **⚠️ Known issues documented** – 8 known bugs with workarounds
-- **❓ Expanded FAQ** – 8 new entries for v0.56 features
+- **🎨 New logo design** – Multiple variants for different use cases
 
 ## What do we have so far (v0.57.x beta)
 
@@ -71,7 +69,7 @@ This manual is organized to get you productive quickly:
 4. **[The Basics](getting-started/03-the-basics.md)** — Projects, datasets, fields, search, filters
 
 ### What's New
-- **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Latest features and improvements
+- **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Documentation overhaul + bug fixes (Oct 2025)
 
 ### How-to Guides
 - **[GitHub Workflow Guide](how-to/04-settings.md)** — Detailed PR workflow docs
