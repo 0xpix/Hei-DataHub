@@ -5,7 +5,7 @@
 
 # The Hei-DataHub Manual
 
-Current version: `0.57.0-beta` (2025-10-06) — Codename: `Renovation`
+Current version: `0.57.1-beta` (2025-10-08) — Codename: `Renovation`
 
 ---
 
@@ -24,6 +24,7 @@ v0.57.0-beta is a **documentation-only release**—no new features, just complet
 - **📖 8 new documentation pages** – How-to guides, references, troubleshooting
 - **✏️ Inline editing guide** – Step-by-step dataset editing instructions
 - **🔍 Search syntax reference** – Complete field filter grammar
+- **Autocomplete guide** – How to use new search suggestions
 - **⌨️ Keybindings reference** – All shortcuts by mode (including Edit Mode)
 - **🎨 Theme customization guide** – All 12 themes documented
 - **⚠️ Known issues documented** – 8 known bugs with workarounds
