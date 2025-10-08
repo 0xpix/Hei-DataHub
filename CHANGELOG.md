@@ -5,6 +5,42 @@ All notable changes to Hei-DataHub will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.1-beta] - 2025-10-08
+
+### Fixed
+- **Cross-platform data directory resolution** — Data now appears correctly on Windows and macOS
+  - Windows: Uses `%LOCALAPPDATA%\Hei-DataHub` (e.g., `C:\Users\<User>\AppData\Local\Hei-DataHub`)
+  - macOS: Uses `~/Library/Application Support/Hei-DataHub`
+  - Linux: Uses `~/.local/share/Hei-DataHub` (unchanged)
+- **Filename globbing and case handling** — Consistent behavior across all platforms
+- **Windows filename sanitation** — Prevents illegal characters and reserved names
+
+### Added
+- **`hei-datahub doctor` command** — Comprehensive system diagnostics with actionable health checks
+  - Exit codes: 0 (healthy), 1 (directory issue), 2 (permission error), 3 (data issues)
+  - Checks: OS info, data directory access, datasets, database, migration needs, filename sanitation
+  - Clear, copy-pasteable output with helpful suggestions
+- **`--data-dir` CLI flag** — Override data directory location from command line
+  - Higher precedence than environment variable
+  - Works with all commands including `doctor`
+  - Examples provided in help text for each OS
+- **Environment variable support** — `HEIDATAHUB_DATA_DIR` for persistent override
+- **One-time migration detection** — Notifies users of legacy Linux-style paths on Windows/macOS
+  - Provides clear migration instructions
+  - Prevents repeated notices with marker
+
+### Changed
+- **Override precedence** (highest to lowest):
+  1. `--data-dir` CLI flag
+  2. `HEIDATAHUB_DATA_DIR` environment variable
+  3. OS-specific default
+- **Path logging** — All path resolutions now log the reason (CLI/env/default)
+
+### Notes
+- No distribution changes in this release (no PyPI/public artifacts)
+- Internal build and testing only
+- Full backward compatibility with 0.58.0-beta
+
 ## [0.58.0-beta] - 2025-10-07 "Streamline"
 
 ### ✨ Added
