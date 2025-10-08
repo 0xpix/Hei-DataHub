@@ -3,11 +3,11 @@
 # Edit this file and run `scripts/sync_version.py` to propagate changes
 # Last updated: 2025-10-08
 
-version: "0.58.0-beta"
+version: "0.58.1-beta"
 codename: "Streamline"
-release_date: "2025-10-07"
+release_date: "2025-10-08"
 compatibility: "Hei-DataHub v0.58.x (beta)"
-notes: "UV-based private installation, complete data packaging, and Linux desktop support"
+notes: "Cross-platform data directories, doctor diagnostics, Windows filename sanitation"
 
 # Additional metadata
 app_name: "Hei-DataHub"
