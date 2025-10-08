@@ -43,6 +43,63 @@ Finds CSV files stored in S3.
 
 ---
 
+## Search Autocomplete
+
+**New in 0.57.1-beta:** The search field now provides smart autocomplete suggestions!
+
+### How It Works
+
+As you type, Hei-DataHub suggests:
+
+1. **Field names** - Type `for` → suggests `format:`
+2. **Field values** - Type `format:` → suggests `csv`, `json`, `parquet`, etc.
+3. **Multi-term** - After completing one filter, start typing the next
+
+### Accepting Suggestions
+
+When you see a suggestion (shown in gray text), press:
+
+- **Tab** - Accept suggestion
+- **Right Arrow (→)** - Accept suggestion
+- Keep typing to ignore the suggestion
+
+### Examples
+
+**Typing field names:**
+```
+Type: "for"
+Suggests: "format:"
+Press Tab → "format:"
+```
+
+**Typing field values:**
+```
+Type: "format:c"
+Suggests: "format:csv"
+Press Tab → "format:csv "
+```
+
+**Multi-term queries:**
+```
+Type: "format:csv ty"
+Suggests: "format:csv type:"
+Press Tab → continues building query
+```
+
+### What Gets Suggested
+
+- **Field names:** All supported fields (source, format, type, tag, etc.)
+
+Coming soon in [0.57.2-beta]:
+
+- **Project names:** Projects referenced in your datasets
+- **Format values:** Common formats from your datasets (csv, json, parquet, xlsx, etc.)
+- **Type values:** Data types from your catalog (time-series, geospatial, tabular, etc.)
+
+**Note:** Value suggestions are learned from your existing datasets. The more datasets you have, the better the suggestions!
+
+---
+
 ## Search Syntax
 
 ### Field Filters
