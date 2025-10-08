@@ -1,3 +1,4 @@
+# The Hei-DataHub Manual
 
 <p align="center">
     <img src="/Hei-DataHub/assets/dark_logo_inline_v1.svg" alt="Hei-DataHub Logo" width="500"/>
@@ -6,6 +7,15 @@
 # The Hei-DataHub Manual
 
 Current version: `{{ project_version }}` (2025-10-08) — Codename: `{{ project_codename }}`
+
+!!! tip "What's New in v0.58.1-beta"
+    **Cross-platform data directory fix + `doctor` diagnostics + Windows filename normalization**
+
+    - ✅ Data appears correctly on Windows and macOS (OS-specific defaults)
+    - ✅ New `hei-datahub doctor` command for system diagnostics
+    - ✅ `--data-dir` CLI override with precedence: CLI > env > default
+    - ✅ Windows filename sanitation (illegal chars, reserved names, case handling)
+    - ✅ One-time migration detection for legacy Linux-style paths
 
 ---
 
@@ -56,8 +66,17 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 # Launch the TUI (use either command)
 hei-datahub
 
+# Run system diagnostics (new in v0.58.1)
+hei-datahub doctor
+
+# Override data directory location (new in v0.58.1)
+hei-datahub --data-dir /path/to/custom/location
+
 # Reindex from YAML files
 hei-datahub reindex
+
+# Show diagnostic paths
+hei-datahub paths
 
 # Show version
 hei-datahub --version
