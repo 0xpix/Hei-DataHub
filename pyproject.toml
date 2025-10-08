@@ -60,7 +60,7 @@ where = ["src"]
 include = ["mini_datahub*"]
 
 [tool.setuptools.package-data]
-mini_datahub = ["infra/sql/*.sql", "ui/views/*.tcss"]
+mini_datahub = ["infra/sql/*.sql", "ui/views/*.tcss", "ui/widgets/*.tcss"]
 
 [tool.black]
 line-length = 100
