@@ -305,9 +305,13 @@ class HomeScreen(Screen):
 
             # Show individual badges for each free text term
             # Fix for Bug #10: Display separate tags instead of one combined token
-            for term in parsed.terms:
-                if term.is_free_text:
-                    badges_container.mount(Static(f"[dim]📝 {term.value}[/dim]", classes="filter-badge"))
+            free_text_terms = [term for term in parsed.terms if term.is_free_text]
+            logger.debug(f"DEBUG Bug #10: Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
+
+            for term in free_text_terms:
+                badge = Static(f"[dim]📝 {term.value}[/dim]", classes="filter-badge")
+                badges_container.mount(badge)
+                logger.debug(f"DEBUG Bug #10: Mounted badge for term: {term.value}")
 
         except Exception as e:
             # If parsing fails, just show the raw query
