@@ -1,0 +1,216 @@
+/* Home Screen Styles for Hei-DataHub */
+
+#banner {
+    text-align: center;
+    padding: 1 0;
+    background: $panel;
+}
+
+#update-status {
+    text-align: center;
+    padding: 1;
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: solid #2563eb;
+    border-right: solid #2563eb;
+}
+
+#update-status.hidden {
+    display: none;
+}
+
+#mode-indicator {
+    text-align: center;
+    padding: 1 0;
+    background: $panel;
+}
+
+.title {
+    text-align: center;
+    text-style: bold;
+    padding: 1;
+    background: $primary;
+}
+
+#github-status {
+    text-align: right;
+    padding: 0 1;
+    background: $panel;
+}
+
+.pr-status {
+    margin-top: 2;
+    padding: 1;
+    text-align: center;
+    background: $panel;
+}
+
+#search-container {
+    height: 100%;
+    padding: 1;
+}
+
+#filter-badges-container {
+    height: auto;
+    margin: 0 0 1 0;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    layout: horizontal;
+}
+
+.filter-badge {
+    margin: 0 1 0 0;
+    padding: 0 1;
+    background: $accent;
+    border: solid $accent-darken-2;
+    width: auto;
+    height: auto;
+}
+
+/* Retro color palette for badges - muted, vintage colors */
+.badge-retro-teal {
+    background: #5a9a8a;
+    color: #ffffff;
+    border: solid #4a7a6a;
+}
+
+.badge-retro-coral {
+    background: #c97064;
+    color: #ffffff;
+    border: solid #a95854;
+}
+
+.badge-retro-sage {
+    background: #8b9a7a;
+    color: #ffffff;
+    border: solid #6b7a5a;
+}
+
+.badge-retro-mauve {
+    background: #9a7a9a;
+    color: #ffffff;
+    border: solid #7a5a7a;
+}
+
+.badge-retro-amber {
+    background: #b8945a;
+    color: #ffffff;
+    border: solid #98743a;
+}
+
+.badge-retro-slate {
+    background: #6a7a8a;
+    color: #ffffff;
+    border: solid #4a5a6a;
+}
+
+#results-label {
+    padding: 1 0;
+    text-style: bold;
+}
+
+#results-table {
+    height: 1fr;
+    margin-top: 1;
+}
+
+#details-container {
+    height: 100%;
+    padding: 1;
+}
+
+#details-content {
+    padding: 1;
+}
+
+#add-data-scroll {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-size: 1 1;
+}
+
+#form-container {
+    padding: 1;
+    padding-bottom: 3;
+    height: auto;
+    min-height: 100%;
+}
+
+#form-container Label {
+    margin-top: 1;
+}
+
+#form-container Input,
+#form-container TextArea {
+    margin-bottom: 1;
+}
+
+#form-container TextArea {
+    height: 5;
+}
+
+#form-container Button {
+    margin: 1 1 2 0;
+}
+
+#form-container Horizontal {
+    margin-bottom: 2;
+}
+
+#error-message {
+    color: $error;
+    margin-top: 1;
+    margin-bottom: 2;
+}
+
+#probe-status {
+    margin-left: 1;
+    align: center middle;
+}
+
+#help-content {
+    padding: 2;
+}
+
+#settings-container {
+    padding: 2;
+    height: auto;
+}
+
+#settings-container Label {
+    margin-top: 1;
+}
+
+#settings-container Input {
+    margin-bottom: 1;
+}
+
+#settings-container Button {
+    margin: 1 1 1 0;
+}
+
+#status-message {
+    margin-top: 2;
+    padding: 1;
+}
+
+#outbox-container {
+    height: 100%;
+    padding: 1;
+}
+
+#outbox-label {
+    padding: 1 0;
+    text-style: bold;
+}
+
+#outbox-table {
+    height: 1fr;
+    margin: 1 0;
+}
+
+#outbox-status {
+    margin-top: 1;
+    padding: 1;
+}
