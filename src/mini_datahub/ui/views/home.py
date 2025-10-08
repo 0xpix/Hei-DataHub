@@ -268,19 +268,22 @@ class HomeScreen(Screen):
         except Exception as e:
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
 
-    def _get_badge_color(self, text: str) -> str:
-        """Get a theme-appropriate color for a badge based on text hash."""
+    def _get_badge_color_class(self, text: str) -> str:
+        """Get a retro background color class for a badge based on text hash."""
         # Use hash for consistent color per term
         color_seed = hash(text) % 100
         
-        # Rich color palette that works well with most themes
-        colors = [
-            "cyan", "magenta", "yellow", "green", "blue", 
-            "red", "bright_cyan", "bright_magenta", "bright_yellow",
-            "bright_green", "bright_blue", "bright_red"
+        # Retro color palette (muted, vintage colors)
+        color_classes = [
+            "badge-retro-teal",
+            "badge-retro-coral", 
+            "badge-retro-sage",
+            "badge-retro-mauve",
+            "badge-retro-amber",
+            "badge-retro-slate",
         ]
         
-        return colors[color_seed % len(colors)]
+        return color_classes[color_seed % len(color_classes)]
 
     def _update_filter_badges(self, query: str) -> None:
         """Update visual badges showing active search filters."""
@@ -309,8 +312,8 @@ class HomeScreen(Screen):
                     }
                     op_symbol = operator_symbols.get(term.operator.name, ':')
                     badge_text = f"{term.field}{op_symbol}{term.value}"
-                    color = self._get_badge_color(badge_text)
-                    badges_container.mount(Static(f"[bold {color}]🏷 {badge_text}[/bold {color}]", classes="filter-badge"))
+                    color_class = self._get_badge_color_class(badge_text)
+                    badges_container.mount(Static(f"🏷 {badge_text}", classes=f"filter-badge {color_class}"))
 
             # Show individual badges for each free text term
             # Fix for Bug #10: Display separate tags instead of one combined token
@@ -318,8 +321,8 @@ class HomeScreen(Screen):
             logger.debug(f"DEBUG Bug #10: Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
 
             for term in free_text_terms:
-                color = self._get_badge_color(term.value)
-                badge = Static(f"[bold {color}]📝 {term.value}[/bold {color}]", classes="filter-badge")
+                color_class = self._get_badge_color_class(term.value)
+                badge = Static(f"📝 {term.value}", classes=f"filter-badge {color_class}")
                 badges_container.mount(badge)
                 logger.debug(f"DEBUG Bug #10: Mounted badge for term: {term.value}")
 
@@ -1701,6 +1704,43 @@ class DataHubApp(App):
         border: solid $accent-darken-2;
         width: auto;
         height: auto;
+    }
+
+    /* Retro color palette for badges - muted, vintage colors */
+    .badge-retro-teal {
+        background: #5a9a8a;
+        color: #ffffff;
+        border: solid #4a7a6a;
+    }
+
+    .badge-retro-coral {
+        background: #c97064;
+        color: #ffffff;
+        border: solid #a95854;
+    }
+
+    .badge-retro-sage {
+        background: #8b9a7a;
+        color: #ffffff;
+        border: solid #6b7a5a;
+    }
+
+    .badge-retro-mauve {
+        background: #9a7a9a;
+        color: #ffffff;
+        border: solid #7a5a7a;
+    }
+
+    .badge-retro-amber {
+        background: #b8945a;
+        color: #ffffff;
+        border: solid #98743a;
+    }
+
+    .badge-retro-slate {
+        background: #6a7a8a;
+        color: #ffffff;
+        border: solid #4a5a6a;
     }
 
     #results-label {
