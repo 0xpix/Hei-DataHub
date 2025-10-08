@@ -8,6 +8,7 @@ Having issues with Hei-DataHub installation or usage? This guide covers common p
 
 ## 📑 Table of Contents
 
+- [Cross-Platform Data Directory Issues](#cross-platform-data-directory-issues) ⭐ New in v0.58.1
 - [Installation Issues](#installation-issues)
 - [Authentication Problems](#authentication-problems)
 - [Runtime Errors](#runtime-errors)
@@ -15,6 +16,225 @@ Having issues with Hei-DataHub installation or usage? This guide covers common p
 - [Desktop Launcher Issues](#desktop-launcher-issues)
 - [Performance Problems](#performance-problems)
 - [Getting Help](#getting-help)
+
+---
+
+## Cross-Platform Data Directory Issues
+
+> ⭐ **New in v0.58.1-beta:** Cross-platform data directory support with diagnostics
+
+### "Data not appearing on Windows/macOS"
+
+**Symptoms:**
+- Fresh install shows no datasets on Windows or macOS
+- Datasets work fine on Linux but not on other platforms
+- `hei-datahub` launches but data directory is empty
+
+**Cause:**
+Starting in v0.58.1-beta, Hei-DataHub uses OS-specific default data directories:
+- **Linux**: `~/.local/share/Hei-DataHub`
+- **macOS**: `~/Library/Application Support/Hei-DataHub`
+- **Windows**: `%LOCALAPPDATA%\Hei-DataHub` (e.g., `C:\Users\<YourName>\AppData\Local\Hei-DataHub`)
+
+**Solution 1: Use the doctor command (recommended)**
+
+```bash
+hei-datahub doctor
+```
+
+This command will:
+- ✓ Show your resolved data directory and why it was chosen
+- ✓ Check read/write permissions
+- ✓ Count datasets and show the first 10
+- ✓ Detect legacy path issues
+- ✓ Provide actionable suggestions
+
+**Solution 2: Override with environment variable**
+
+Set a custom data directory persistently:
+
+```bash
+# Linux/macOS (add to ~/.bashrc or ~/.zshrc)
+export HEIDATAHUB_DATA_DIR="$HOME/my-data-hub"
+
+# Windows PowerShell (add to profile)
+$env:HEIDATAHUB_DATA_DIR = "C:\Users\YourName\HeiDataHub"
+
+# Windows Command Prompt
+set HEIDATAHUB_DATA_DIR=C:\Users\YourName\HeiDataHub
+```
+
+**Solution 3: Override with CLI flag**
+
+Use `--data-dir` for one-time overrides:
+
+```bash
+# Linux example
+hei-datahub --data-dir ~/.local/share/Hei-DataHub
+
+# macOS example
+hei-datahub --data-dir ~/Library/Application\ Support/Hei-DataHub
+
+# Windows example (PowerShell)
+hei-datahub --data-dir "$env:LOCALAPPDATA\Hei-DataHub"
+
+# Windows example (CMD)
+hei-datahub --data-dir %LOCALAPPDATA%\Hei-DataHub
+```
+
+**Override precedence (highest to lowest):**
+1. `--data-dir` CLI flag
+2. `HEIDATAHUB_DATA_DIR` environment variable
+3. OS-specific default
+
+---
+
+### Windows filename sanitation warnings
+
+**Symptoms:**
+When running `hei-datahub doctor`, you see warnings like:
+```
+⚠ Filename Sanitation: 2 name(s) need sanitation
+  Found names requiring sanitation:
+  my:dataset → my_dataset
+  PRN → PRN_file
+```
+
+**Cause:**
+Windows doesn't allow certain characters in filenames:
+- **Illegal characters**: `\ / : * ? " < > |` → replaced with `_`
+- **Reserved names**: `CON`, `PRN`, `AUX`, `NUL`, `COM1-9`, `LPT1-9` → suffix added
+- **Trailing dots/spaces**: stripped
+
+**What it means:**
+These are informational warnings showing how dataset names will be normalized on Windows. The original metadata is preserved; only the filesystem directory name is sanitized.
+
+**Solution:**
+If you want consistent names across platforms:
+
+1. **Rename datasets** to avoid problematic characters:
+   ```
+   # Avoid:  my:dataset  →  Use:  my-dataset
+   # Avoid:  data?      →  Use:  data
+   # Avoid:  PRN        →  Use:  print-queue
+   ```
+
+2. **Use alphanumeric + hyphens/underscores** for maximum compatibility:
+   ```
+   ✓ my-dataset
+   ✓ land_cover
+   ✓ precipitation-2024
+   ```
+
+---
+
+### One-time migration from legacy paths
+
+**Symptoms:**
+When running `hei-datahub doctor` on Windows/macOS, you see:
+```
+⚠ Migration: Legacy Linux-style path detected
+  Found: /Users/you/.hei-datahub
+  Current: /Users/you/Library/Application Support/Hei-DataHub
+```
+
+**Cause:**
+You previously used a Linux-style installation that placed data in `~/.hei-datahub` or `~/.local/share/hei-datahub` (lowercase).
+
+**Solution:**
+
+**Option 1: Migrate to new location (recommended)**
+
+```bash
+# 1. Copy your datasets
+cp -r ~/.hei-datahub/datasets/* ~/Library/Application\ Support/Hei-DataHub/datasets/
+
+# 2. Reindex
+hei-datahub reindex
+
+# 3. Verify with doctor
+hei-datahub doctor
+
+# 4. Remove old directory
+rm -rf ~/.hei-datahub
+```
+
+**Option 2: Keep using old location**
+
+Set environment variable to point to legacy path:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export HEIDATAHUB_DATA_DIR="$HOME/.hei-datahub"
+```
+
+---
+
+### Long path issues on Windows
+
+**Symptoms (Windows only):**
+```
+Error: [WinError 206] The filename or extension is too long
+```
+
+**Cause:**
+Windows has a 260-character path limit by default (including drive letter and filename).
+
+**Solution:**
+
+**Option 1: Enable long path support (Windows 10 1607+)**
+
+1. Open **Registry Editor** (`Win + R`, type `regedit`)
+2. Navigate to: `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem`
+3. Set `LongPathsEnabled` to `1`
+4. Restart your computer
+
+**Option 2: Use shorter data directory**
+
+```bash
+# Instead of deeply nested:
+hei-datahub --data-dir "C:\Users\VeryLongUsername\Documents\Projects\DataHub"
+
+# Use shorter:
+hei-datahub --data-dir "C:\DataHub"
+```
+
+**Option 3: Set via environment variable**
+
+```powershell
+# PowerShell (add to profile)
+$env:HEIDATAHUB_DATA_DIR = "C:\DataHub"
+```
+
+---
+
+### Case-insensitive collision warnings
+
+**Symptoms (macOS/Windows):**
+Datasets named `MyData` and `mydata` both exist on Linux, but only one appears on macOS/Windows.
+
+**Cause:**
+macOS (HFS+/APFS) and Windows (NTFS) use case-insensitive (but case-preserving) filesystems. Linux (ext4) is case-sensitive.
+
+**Solution:**
+
+1. **Standardize naming** — Use consistent casing:
+   ```
+   # Bad (will collide on macOS/Windows):
+   - MyData
+   - mydata
+   - MYDATA
+
+   # Good (unique on all platforms):
+   - my-data-v1
+   - my-data-v2
+   - my-data-archive
+   ```
+
+2. **Check for collisions** with doctor:
+   ```bash
+   hei-datahub doctor
+   ```
 
 ---
 
