@@ -61,9 +61,8 @@
 
 .filter-badge {
     margin: 0 1 0 0;
-    padding: 0 1;
+    padding: 1 1;
     background: $accent;
-    border: solid $accent-darken-2;
     width: auto;
     height: auto;
 }
@@ -72,37 +71,31 @@
 .badge-retro-teal {
     background: #5a9a8a;
     color: #ffffff;
-    border: solid #4a7a6a;
 }
 
 .badge-retro-coral {
     background: #c97064;
     color: #ffffff;
-    border: solid #a95854;
 }
 
 .badge-retro-sage {
     background: #8b9a7a;
     color: #ffffff;
-    border: solid #6b7a5a;
 }
 
 .badge-retro-mauve {
     background: #9a7a9a;
     color: #ffffff;
-    border: solid #7a5a7a;
 }
 
 .badge-retro-amber {
     background: #b8945a;
     color: #ffffff;
-    border: solid #98743a;
 }
 
 .badge-retro-slate {
     background: #6a7a8a;
     color: #ffffff;
-    border: solid #4a5a6a;
 }
 
 #results-label {
