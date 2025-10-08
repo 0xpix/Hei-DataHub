@@ -2,27 +2,22 @@
 
 Common issues and how to fix them.
 
-**Version:** 0.56-beta and 0.57-beta
+**Version:** 0.56-beta, 0.57-beta, and 0.57.1-beta
 
 ---
 
 ## Known Issues (from v0.56-beta)
 
-These issues were introduced in v0.56-beta and persist in v0.57-beta (documentation-only release). Fixes are planned for v0.57.1 or v0.58-beta.
+These issues were introduced in v0.56-beta. Some were fixed in v0.57.1-beta, others remain open.
 
 ### 1. Theme/Keybinding Changes Require Restart
 
-**Symptom:** You change `theme` or `keybindings` in config, but nothing happens.
+**Status:** ✅ **Fixed in v0.57.1-beta** – Config changes now apply automatically without restart.
 
-**Cause:** Config is only loaded on startup.
-
-**Workaround:**
-```bash
-# Restart the app
-hei-datahub
-```
-
-**Status:** Hot-reload planned for v0.58-beta.
+**If you still experience this on v0.57.1+:**
+1. Verify you're running the latest version: `hei-datahub --version`
+2. Check that your config file is valid YAML
+3. If issue persists, file a bug report with reproduction steps.
 
 ---
 
@@ -119,13 +114,12 @@ git checkout main
 
 ### 8. No Search Field Autocomplete
 
-**Symptom:** Field names don't auto-suggest as you type in search.
+**Status:** ✅ **Fixed in v0.57.1-beta** – Search field now provides autocomplete suggestions for field names.
 
-**Cause:** Autocomplete not yet implemented.
-
-**Workaround:** Press `?` to see available fields.
-
-**Status:** Autocomplete planned for v0.58-beta.
+**If you still experience this on v0.57.1+:**
+1. Verify you're running the latest version: `hei-datahub --version`
+2. Try typing a field name like `source:` and wait for suggestions
+3. If issue persists, file a bug report with reproduction steps.
 
 ---
 
