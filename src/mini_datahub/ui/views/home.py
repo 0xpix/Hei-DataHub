@@ -309,7 +309,8 @@ class HomeScreen(Screen):
             logger.debug(f"DEBUG Bug #10: Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
 
             for term in free_text_terms:
-                badge = Static(f"[dim]📝 {term.value}[/dim]", classes="filter-badge")
+                color = self._get_badge_color(term.value)
+                badge = Static(f"[bold {color}]📝 {term.value}[/bold {color}]", classes="filter-badge")
                 badges_container.mount(badge)
                 logger.debug(f"DEBUG Bug #10: Mounted badge for term: {term.value}")
 
