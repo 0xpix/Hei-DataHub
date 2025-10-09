@@ -5,16 +5,7 @@
 
 # The Hei-DataHub Manual
 
-Current version: `{{ project_version }}` (2025-10-08) — Codename: `{{ project_codename }}`
-
-!!! tip "What's New in v0.58.1-beta"
-    **Cross-platform data directory fix + `doctor` diagnostics + Windows filename normalization**
-
-    - ✅ Data appears correctly on Windows and macOS (OS-specific defaults)
-    - ✅ New `hei-datahub doctor` command for system diagnostics
-    - ✅ `--data-dir` CLI override with precedence: CLI > env > default
-    - ✅ Windows filename sanitation (illegal chars, reserved names, case handling)
-    - ✅ One-time migration detection for legacy Linux-style paths
+Current version: `{{ project_version }}` (2025-10-09) — Codename: `{{ project_codename }}`
 
 ---
 
@@ -24,28 +15,31 @@ Current version: `{{ project_version }}` (2025-10-08) — Codename: `{{ project_
 
 Everything runs locally—YAML files + SQLite database—no network required except for optional GitHub integration.
 
-## What's New in v0.57-beta 📚
+## What's New in v0.58-beta 📚
 
-**[Read the full What's New guide →](whats-new/0.57-beta.md)**
+**[Read the full What's New guide →](whats-new/0.58-beta.md)**
 
-**v{{ project_version }} (Oct 9, 2025)** — Versioning patch:
+### **v0.58.1-beta** (Oct 9, 2025)
 
-- ✨ Version tag feature under logo (configurable)
-- 🔧 Simplified version system (direct YAML reading)
-- ✅ New version consistency checker
+- **🎨 Re-design CLI:** `hei-datahub update`, hei-datahub --version-info`, etc.
 
-**v0.57-1-beta (Oct 8, 2025)** — Bug fix patch:
+### **v0.58.0-beta** (Oct 9, 2025) - "Streamline" release (Linux only)
 
-- **✅ Config reload** – Theme/keybinding changes now apply without restart
-- **✅ Persistent edits** – Dataset edits now save correctly across app restarts
-- **✅ Search autocomplete** – Field name suggestions now work in search
+- **🚀 UV-Based Install\Update:** Direct from GitHub—no cloning required
+- **⚡ Ephemeral Runs:** Test with `uvx` before installing
+- **📌 Version Control:** Pin to specific tags, branches, or commits
+- **📦 Complete Packaging:** All assets and data files included automatically
+- **🔧 Health Checks:** `hei-datahub doctor` command for diagnostics
+- **📂 Directory Control:** `--data-dir` flag and environment variable support
+- **🗂️ XDG Compliance:** Follows Linux desktop standards
 
-**v0.57-beta (Oct 6, 2025)** — Documentation overhaul:
+### More to come:
 
-- **📖 8 new documentation pages** – How-to guides, references, troubleshooting
-- **🎨 New logo design** – Multiple variants for different use cases
+- **🖥️ Desktop Integration:** Linux application menu launcher (GNOME, KDE, XFCE)
+- **✨ Linux Desktop Launcher** — Application menu integration with one command
+- **🛠️ Windows/macOS Support** — Coming soon...
 
-## What do we have so far (v0.57.x beta)
+## What do we have so far (v0.58.x beta)
 
 - **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
 - **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing
@@ -61,15 +55,28 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 ## Commands at a Glance
 
+### Installation (UV Method - Linux)
+```bash
+# Install UV
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Ephemeral run (test without installing)
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+
+# Persistent install (recommended)
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+
+# Create desktop launcher
+bash scripts/create_desktop_entry.sh
+```
+
+### Runtime Commands
 ```bash
 # Launch the TUI (use either command)
 hei-datahub
 
-# Run system diagnostics (new in v0.58.1)
+# Run system diagnostics (new in v0.58)
 hei-datahub doctor
-
-# Override data directory location (new in v0.58.1)
-hei-datahub --data-dir /path/to/custom/location
 
 # Reindex from YAML files
 hei-datahub reindex
@@ -80,6 +87,12 @@ hei-datahub paths
 # Show version
 hei-datahub --version
 hei-datahub --version-info  # Detailed information
+```
+
+### Updates & Maintenance
+```bash
+# Update to latest version (It can be updated from main branch or a specific branch)
+hei-datahub update
 ```
 
 ---
@@ -95,7 +108,8 @@ This manual is organized to get you productive quickly:
 4. **[The Basics](getting-started/03-the-basics.md)** — Projects, datasets, fields, search, filters
 
 ### What's New
-- **[0.57-beta "{{ project_codename }}"](whats-new/0.57-beta.md)** — Documentation overhaul + bug fixes (Oct 2025)
+- **[0.58-beta "Streamline"](whats-new/0.58-beta.md)** — UV installation + Desktop integration + Data directory control (Oct 2025)
+- **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Documentation overhaul + bug fixes (Oct 2025)
 
 ### How-to Guides
 - **[GitHub Workflow Guide](how-to/04-settings.md)** — Detailed PR workflow docs
