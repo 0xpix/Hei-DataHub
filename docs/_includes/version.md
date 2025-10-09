@@ -1,4 +1,4 @@
-!!! info "Version Notice — Renovation"
+!!! info "Version Notice — {{ project_codename }}"
     **This manual tracks Hei-DataHub v0.57.x (beta).**
 
     **Release:** 0.58.1-beta (2025-10-08)
