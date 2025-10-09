@@ -24,8 +24,7 @@
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
-- **Latest:** 0.57.2-beta "Renovation" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.57-beta/)
-- **Docs:** Start with [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
+**📦 Latest Release:** [v${PROJECT_VERSION} "${PROJECT_CODENAME}" - Documentation Overhaul & Bug Fixes]
 
 ---
 
