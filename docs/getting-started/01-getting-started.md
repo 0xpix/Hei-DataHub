@@ -10,46 +10,70 @@ Before installing, ensure you have:
 
 | Requirement | Version | Notes |
 |------------|---------|-------|
-| **Python** | 3.9+ | Check: `python --version` |
-| **uv** (recommended) | Latest | Fast Python package installer: [astral.sh/uv](https://astral.sh/uv) |
+| **Python** | 3.10+ | Check: `python --version` |
+| **uv** | Latest | Fast Python package installer: [astral.sh/uv](https://astral.sh/uv) |
 | **Git** | Any recent | Required for PR workflow (optional feature) |
 | **Terminal** | Any | Works in any terminal emulator |
+| **SSH/PAT** | - | GitHub access via SSH key or Personal Access Token |
+
+**Platform Support (v0.58):**
+- ✅ **Linux** — Full support with desktop integration
+- 🚧 **macOS** — Coming in v0.59
+- 🚧 **Windows** — Coming in v0.59
 
 ---
 
 ## Installation
 
-### Option 1: Automated Setup (Recommended)
+### Option 1: UV Direct Install (Recommended — New in v0.58)
+
+**No cloning required!** Install directly from GitHub.
 
 ```bash
-# Install uv
+# Install UV
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Clone the repository
-git clone https://github.com/0xpix/Hei-DataHub.git
-cd Hei-DataHub
+# Install Hei-DataHub (SSH method)
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
-# Run setup script
-./scripts/setup_dev.sh
+# Or with Personal Access Token
+export GH_PAT=ghp_xxxxxxxxxxxxx
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 
-# Activate virtual environment
-source .venv/bin/activate
-
-# Launch the TUI
+# Launch from anywhere
 hei-datahub
 ```
 
-### Option 2: Manual Setup with uv
+**Benefits:**
+- ⚡ No repository cloning needed
+- 📦 All dependencies handled automatically
+- 🔒 Works with private repositories
+- 🚀 Global command available system-wide
+- 🔄 Easy updates with `uv tool upgrade hei-datahub`
+
+**Desktop Integration (Linux):**
+```bash
+# Create application menu entry
+bash scripts/create_desktop_entry.sh
+```
+
+**See also:** [Complete Installation Guide](../installation/README.md)
+
+---
+
+### Option 2: Development Setup (For Contributors)
+
+For those who want to modify the code:
 
 ```bash
-# Install uv
+# Install UV
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone the repository
-git clone https://github.com/0xpix/Hei-DataHub.git
+git clone git@github.com:0xpix/Hei-DataHub.git
 cd Hei-DataHub
 
-# Install dependencies
+# Install with development dependencies
 uv sync --dev
 
 # Activate virtual environment
@@ -61,12 +85,30 @@ hei-datahub
 
 ---
 
+### Option 3: Ephemeral Run (Testing)
+
+Try without installing:
+
+```bash
+# One-time run (SSH)
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+
+# Or with token
+export GH_PAT=ghp_xxxxxxxxxxxxx
+uvx "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
+```
+
+Perfect for testing before committing to installation.
+
+---
+
 ## Command Reference
 
+### Basic Commands
 ```bash
 # Launch TUI (use either command)
 hei-datahub
-mini-datahub # Will be deprecated in future
+mini-datahub  # Alternative command
 
 # Rebuild search index from YAML files
 hei-datahub reindex
@@ -78,17 +120,59 @@ hei-datahub --version
 hei-datahub --version-info
 ```
 
+### New in v0.58
+```bash
+# Run system diagnostics
+hei-datahub doctor
+
+# Override data directory for single run
+hei-datahub --data-dir /path/to/custom/location
+
+# Show current paths
+hei-datahub paths
+```
+
+### UV Tool Management
+```bash
+# Update to latest version
+uv tool upgrade hei-datahub
+
+# Uninstall
+uv tool uninstall hei-datahub
+
+# Install specific version
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.1-beta"
+
+# List installed UV tools
+uv tool list
+```
+
 ---
 
 ## First Launch Checklist
 
-When you run `hei-datahub` for the first time, the app will:
+When you run `hei-datahub` for the first time (v0.58+), the app will:
 
-1. ✅ Create `.cache/` directory for temporary files
-2. ✅ Initialize `db.sqlite` database at project root
+1. ✅ Create workspace directory at `~/.local/share/Hei-DataHub/` (Linux)
+2. ✅ Initialize `db.sqlite` database
 3. ✅ Create FTS5 search index tables
-4. ✅ Index example datasets from `data/` folder
-5. ✅ Open the Home screen with search functionality
+4. ✅ Copy 4 sample datasets with complete metadata
+5. ✅ Index all datasets for search
+6. ✅ Open the Home screen with search functionality
+
+**Workspace Location:**
+- **Linux:** `~/.local/share/Hei-DataHub/` (XDG-compliant)
+- **macOS:** `~/Library/Application Support/Hei-DataHub/` (coming soon)
+- **Windows:** `%LOCALAPPDATA%\Hei-DataHub\` (coming soon)
+
+**Override workspace location:**
+```bash
+# Temporary
+hei-datahub --data-dir ~/my-custom-workspace
+
+# Persistent (add to ~/.bashrc or ~/.zshrc)
+export HEIDATAHUB_DATA_DIR=~/my-custom-workspace
+```
 
 **Expected output:**
 
