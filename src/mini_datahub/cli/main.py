@@ -135,50 +135,222 @@ def handle_keymap_import(args):
 
 
 def handle_update(args):
-    """Handle the update subcommand."""
+    """Handle the update subcommand with beautiful interactive UI."""
     import subprocess
+    import time
     from pathlib import Path
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.prompt import Prompt, Confirm
+    from rich.table import Table
+    from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+    from rich.markdown import Markdown
+    from rich import box
 
-    print("Updating Hei-DataHub...")
-    print()
+    console = Console()
 
-    # Determine the installation source
-    branch = args.branch if hasattr(args, 'branch') and args.branch else "chore/uv-install-data-desktop-v0.58.x"
-    repo_url = f"git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}#egg=hei-datahub"
+    # Display header
+    console.print()
+    console.print(Panel.fit(
+        "[bold cyan]🚀 Hei-DataHub Update Manager[/bold cyan]",
+        border_style="cyan"
+    ))
+    console.print()
 
-    print(f"  Source: {repo_url}")
-    print()
-
+    # Check if UV is installed
     try:
-        # Run uv tool install with --upgrade flag
-        result = subprocess.run(
-            ["uv", "tool", "install", "--upgrade", repo_url],
-            capture_output=True,
-            text=True,
-            check=False
+        subprocess.run(["uv", "--version"], capture_output=True, check=True)
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        console.print("[red]❌ Error: UV is not installed![/red]")
+        console.print()
+        console.print("📦 Install UV first:")
+        console.print("   [cyan]curl -LsSf https://astral.sh/uv/install.sh | sh[/cyan]")
+        sys.exit(1)
+
+    # Get current version
+    current_version = __version__
+    console.print(f"📍 Current version: [yellow]{current_version}[/yellow]")
+    console.print()
+
+    # Define available branches with metadata
+    branches = {
+        "1": {
+            "name": "main",
+            "label": "[green]main[/green] [dim](recommended)[/dim]",
+            "description": "Stable release - tested and production-ready",
+            "url": "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main",
+        },
+        "2": {
+            "name": "chore/uv-install-data-desktop-v0.58.x",
+            "label": "[yellow]chore/uv-install-data-desktop-v0.58.x[/yellow] [dim](beta)[/dim]",
+            "description": "v0.58.x beta - UV installation, cross-platform data dirs, doctor diagnostics",
+            "url": "git+ssh://git@github.com/0xpix/Hei-DataHub.git@chore/uv-install-data-desktop-v0.58.x",
+        },
+        "3": {
+            "name": "develop",
+            "label": "[red]develop[/red] [dim](dev/unstable)[/dim]",
+            "description": "Development branch - latest features, may be unstable",
+            "url": "git+ssh://git@github.com/0xpix/Hei-DataHub.git@develop",
+        },
+    }
+
+    # If branch specified via CLI, use it
+    if hasattr(args, 'branch') and args.branch:
+        selected_branch = args.branch
+        selected_url = f"git+ssh://git@github.com/0xpix/Hei-DataHub.git@{selected_branch}"
+        console.print(f"🎯 Using specified branch: [cyan]{selected_branch}[/cyan]")
+    else:
+        # Interactive branch selection
+        table = Table(
+            title="📦 Available Versions",
+            box=box.ROUNDED,
+            show_header=True,
+            header_style="bold cyan"
+        )
+        table.add_column("#", style="dim", width=4)
+        table.add_column("Branch", style="bold")
+        table.add_column("Description", style="dim")
+
+        for key, branch in branches.items():
+            table.add_row(key, branch["label"], branch["description"])
+
+        console.print(table)
+        console.print()
+
+        choice = Prompt.ask(
+            "🔍 Select version to install",
+            choices=list(branches.keys()),
+            default="1"
         )
 
-        if result.returncode == 0:
-            print("✓ Update completed successfully!")
-            print()
-            print("Run 'hei-datahub --version-info' to see the new version.")
-            sys.exit(0)
-        else:
-            print("❌ Update failed!")
-            print()
-            if result.stderr:
-                print("Error output:")
-                print(result.stderr)
+        selected_branch = branches[choice]["name"]
+        selected_url = branches[choice]["url"]
+        
+        console.print()
+        console.print(f"✓ Selected: [cyan]{selected_branch}[/cyan]")
+
+    console.print()
+
+    # Show what's new (if updating to beta branch)
+    if "0.58" in selected_branch:
+        console.print(Panel(
+            Markdown("""
+### 🎉 What's New in v0.58.1-beta
+
+#### ✨ New Features
+- **Cross-platform data directories** - Windows & macOS support
+- **Doctor diagnostics** - `hei-datahub doctor` for health checks
+- **Data directory overrides** - CLI flag and env variable support
+- **Windows compatibility** - Filename sanitization & reserved names
+
+#### 🐛 Bug Fixes
+- Fixed datasets not appearing on Windows/macOS
+- Platform-specific path resolution
+- Data seeding on first run
+
+#### 📚 Testing
+- 35+ automated tests
+- Cross-platform verification scripts
+- Comprehensive testing documentation
+            """),
+            title="[bold green]📋 Release Notes[/bold green]",
+            border_style="green",
+            padding=(1, 2)
+        ))
+        console.print()
+
+    # Confirm update
+    if not Confirm.ask(f"[bold]Continue with update?[/bold]", default=True):
+        console.print("[yellow]⚠ Update cancelled[/yellow]")
+        sys.exit(0)
+
+    console.print()
+
+    # Perform update with progress bar
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        console=console,
+    ) as progress:
+        
+        # Step 1: Fetching
+        task1 = progress.add_task("[cyan]Fetching package from GitHub...", total=100)
+        
+        try:
+            # Start the uv command
+            result = subprocess.Popen(
+                ["uv", "tool", "install", "--reinstall", selected_url],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1
+            )
+            
+            # Simulate progress (UV doesn't give us real progress)
+            for i in range(30):
+                time.sleep(0.1)
+                progress.update(task1, advance=3)
+            
+            progress.update(task1, completed=100)
+            progress.remove_task(task1)
+            
+            # Step 2: Resolving dependencies
+            task2 = progress.add_task("[cyan]Resolving dependencies...", total=100)
+            for i in range(20):
+                time.sleep(0.05)
+                progress.update(task2, advance=5)
+            progress.update(task2, completed=100)
+            progress.remove_task(task2)
+            
+            # Step 3: Installing
+            task3 = progress.add_task("[cyan]Installing packages...", total=100)
+            
+            # Wait for process to complete while showing progress
+            while result.poll() is None:
+                time.sleep(0.1)
+                if progress.tasks[0].completed < 95:
+                    progress.update(task3, advance=2)
+            
+            progress.update(task3, completed=100)
+            
+            # Get the output
+            output = result.stdout.read() if result.stdout else ""
+            returncode = result.returncode
+
+        except Exception as e:
+            console.print(f"\n[red]❌ Update failed: {e}[/red]")
             sys.exit(1)
 
-    except FileNotFoundError:
-        print("❌ Error: 'uv' command not found!")
-        print()
-        print("Please ensure UV is installed:")
-        print("  curl -LsSf https://astral.sh/uv/install.sh | sh")
-        sys.exit(1)
-    except Exception as e:
-        print(f"❌ Update failed: {e}")
+    console.print()
+
+    if returncode == 0:
+        # Success!
+        console.print(Panel.fit(
+            "[bold green]✅ Update completed successfully![/bold green]\n\n"
+            f"[dim]Updated to:[/dim] [cyan]{selected_branch}[/cyan]",
+            border_style="green"
+        ))
+        console.print()
+        console.print("🎯 Next steps:")
+        console.print("   • Run [cyan]hei-datahub --version-info[/cyan] to verify")
+        console.print("   • Run [cyan]hei-datahub doctor[/cyan] to check health")
+        console.print("   • Launch with [cyan]hei-datahub[/cyan]")
+        console.print()
+        sys.exit(0)
+    else:
+        console.print(Panel(
+            "[bold red]❌ Update failed![/bold red]\n\n"
+            "[dim]Check the error output above for details.[/dim]",
+            border_style="red"
+        ))
+        console.print()
+        console.print("💡 Troubleshooting:")
+        console.print("   • Check your SSH keys: [cyan]ssh -T git@github.com[/cyan]")
+        console.print("   • Try with a token: Set [cyan]GH_PAT[/cyan] environment variable")
+        console.print("   • Run with [cyan]--branch main[/cyan] to try stable version")
+        console.print()
         sys.exit(1)
 
 
