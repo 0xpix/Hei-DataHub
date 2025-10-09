@@ -270,6 +270,6 @@ site/
 .hei-datahub/
 # Benchmark results
 bench/
-tests/*
+tests/
 dev-docs/
 /dev-site/
