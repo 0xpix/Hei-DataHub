@@ -14,14 +14,14 @@ def bind_actions_from_config(
 ) -> list[Binding]:
     """
     Build Textual bindings from config and action map.
-    
+
     Args:
         action_map: Map of action_name -> (display_name, key_display, show_in_footer)
         keys_cfg: Config keybindings dict {action_name: [keys]}
-        
+
     Returns:
         List of Textual Binding objects
-        
+
     Example:
         action_map = {
             "add_dataset": ("Add Dataset", "a", True),
@@ -34,13 +34,13 @@ def bind_actions_from_config(
         bindings = bind_actions_from_config(action_map, keys_cfg)
     """
     bindings = []
-    
+
     for action, (display_name, key_display, show) in action_map.items():
         keys = keys_cfg.get(action, [])
         if not keys:
             logger.warning(f"No keys configured for action: {action}")
             continue
-        
+
         # Add bindings for each key
         for i, key in enumerate(keys):
             bindings.append(
@@ -52,7 +52,7 @@ def bind_actions_from_config(
                     show=show if i == 0 else False  # Only show first binding in footer
                 )
             )
-    
+
     return bindings
 
 
