@@ -18,13 +18,13 @@
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/version-${PROJECT_VERSION}-blue.svg)
+![Version](https://img.shields.io/badge/version-0.57.2-beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 
 > A local-first TUI for managing datasets with consistent metadata, fast full-text search, and automated PR workflows.
 
-**📦 Latest Release:** [v${PROJECT_VERSION} "${PROJECT_CODENAME}" - Documentation Overhaul & Bug Fixes]
+**📦 Latest Release:** 0.57.2-beta "Renovation" - Documentation Overhaul & Bug Fixes
 
 ## Overview
 
@@ -477,7 +477,7 @@ pytest tests/ -v
 
 ## Version History
 
-- **v0.57.1-beta** (Current) - Bug fixes: config reload, persistent edits, search autocomplete
+- **v0.57.1-beta** - Bug fixes: config reload, persistent edits, search autocomplete
 - **v0.57.0-beta** - Documentation Overhaul for v0.56 features + new logo design
 - **v0.56.0-beta** - Structured Search, Inline Editing, Themes, Keybindings
 - **v0.55.0-beta** - Auto-stash PR workflow, improved gitignore, enhanced version system
