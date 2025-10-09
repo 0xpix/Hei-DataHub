@@ -80,8 +80,6 @@ nav:
   - What's New:
     - 0.58-beta "Packaging": whats-new/0.58-beta.md
     - 0.57-beta "Renovation": whats-new/0.57-beta.md
-    - 0.58-beta "Packaging": whats-new/0.58-beta.md
-    - 0.57-beta "Renovation": whats-new/0.57-beta.md
   - How-to Guides:
     - Configure GitHub Settings: how-to/04-settings.md
     - Your First Dataset: how-to/05-first-dataset.md
