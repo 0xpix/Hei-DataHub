@@ -332,13 +332,11 @@ keybindings:
   # Multi-key bindings
   add_dataset: ["a", "ctrl+n", "insert"]
   quit: ["q", "ctrl+q", "ctrl+d"]
-
   # Vim-style
   move_down: ["j", "ctrl+n"]
   move_up: ["k", "ctrl+p"]
   jump_top: ["gg"]
   jump_bottom: ["G"]
-
   # Quick access
   settings: ["s", "comma"]
   show_help: ["?", "f1"]
