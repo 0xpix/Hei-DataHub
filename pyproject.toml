@@ -64,7 +64,8 @@ include = ["mini_datahub*"]
 mini_datahub = [
     "infra/sql/*.sql",
     "ui/styles/*.tcss",
-    "ui/assets/ascii/*.txt"
+    "ui/assets/ascii/*.txt",
+    "../../../version.yaml"
 ]
 
 [tool.black]
