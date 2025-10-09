@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-  <img src="assets/svg/light_logo_circle.svg" alt="Logo Circle" width="120"/>
   <img src="assets/svg/dark_logo_circle.svg" alt="Logo Circle" width="120"/>
-  <img src="assets/svg/light_logo_H_large.svg" alt="Logo H Large" width="120"/>
+  <img src="assets/svg/light_logo_circle.svg" alt="Logo Circle" width="120"/>
   <img src="assets/svg/dark_logo_H_large.svg" alt="Logo H Large" width="120"/>
+  <img src="assets/svg/light_logo_H_large.svg" alt="Logo H Large" width="120"/>
 </p>
 
 <p align="center">
@@ -24,7 +24,8 @@
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
-**📦 Latest Release:** 0.57.2-beta "Renovation" - Documentation Overhaul & Bug Fixes
+- **Latest:** 0.57.2-beta "Renovation" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.57-beta/)
+- **Docs:** Start with [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
 
 ---
 
@@ -79,21 +80,10 @@ bash scripts/create_desktop_entry.sh
 Linux:
 
 ```bash
-# Clone the repository
-git clone git@github.com:0xpix/Hei-DataHub.git
+git clone <your-repo-url>
 cd Hei-DataHub
-
-# Install using uv
-uv sync --dev
-source .venv/bin/activate
-
-# Launch the TUI
-hei-datahub
-
-# Or use the setup script
-./scripts/setup_dev.sh
-source .venv/bin/activate
-hei-datahub
+uv sync --dev && source .venv/bin/activate
+hei-datahub     # or: mini-datahub
 ```
 
 **Note:** We use [uv](https://github.com/astral-sh/uv) for fast, reproducible dependency management. Install it with:
