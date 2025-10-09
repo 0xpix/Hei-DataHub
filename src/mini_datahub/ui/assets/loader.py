@@ -61,6 +61,20 @@ def get_logo_text(config) -> str:
         return "HEI DATAHUB"
 
 
+def _detect_version_codename():
+    """
+    Detect version and codename from the package.
+
+    Returns:
+        Tuple of (version, codename) as strings
+    """
+    try:
+        from mini_datahub.version import __version__ as VERSION, CODENAME
+        return str(VERSION or ""), str(CODENAME or "")
+    except Exception:
+        return "", ""
+
+
 def format_logo(text: str, config) -> str:
     """
     Format logo with color and alignment from config.
@@ -88,6 +102,27 @@ def format_logo(text: str, config) -> str:
 
     # Wrap in color tags
     formatted = f"[bold {color}]{formatted}[/bold {color}]"
+
+    # Add version tag if enabled
+    if logo_config.get("show_version_tag", True):
+        ver, code = _detect_version_codename()
+        if ver or code:
+            fmt = logo_config.get("version_format", "v{version} — {codename}")
+            style = logo_config.get("version_style", None)
+            tag = fmt.format(version=ver, codename=code).strip()
+
+            if style:
+                tag = f"[{style}]{tag}[/{style}]"
+
+            # Calculate logo width (without Rich markup)
+            lines = text.rstrip("\n").splitlines()
+            width = max((len(line.expandtabs(4)) for line in lines), default=len(tag))
+
+            # Right-align the version tag
+            version_line = tag.rjust(width)
+
+            # Append version line to formatted output
+            formatted = formatted + "\n" + version_line
 
     return formatted
 
