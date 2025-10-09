@@ -57,13 +57,15 @@ It's built for people who:
 
 ---
 
-## Design
+## Design Principles
 
 1. **Local-first:** Your data lives in plain text (YAML) and SQLite—no vendor lock-in
 2. **Keyboard-driven:** Vim-style keybindings (`j/k` to navigate, `/` to search, `a` to add)
 3. **Fast by default:** Search is instant; no network round-trips
 4. **Validate early:** Schema validation catches errors before they spread
 5. **Collaboration:** Use GitHub PRs to add datasets and expand the catalog
+6. **Easy deployment:** *(New in v0.58-beta)* Install with one command—no cloning needed
+7. **Desktop integration:** *(Coming in v0.58.x-beta)* Linux launcher for seamless access
 
 ---
 
@@ -71,9 +73,10 @@ It's built for people who:
 
 Ready to get started?
 
-1. **[Getting Started](01-getting-started.md)** — Install and run Hei-DataHub
+1. **[Installation Guide](../installation/README.md)** — Quick start with UV (v0.58)
+2. **[Getting Started](01-getting-started.md)** — First launch and commands
 3. **[Navigation](02-navigation.md)** — Learn the keyboard shortcuts
-2. **[Tutorial: Your First Dataset](../how-to/05-first-dataset.md)** — Add your first dataset
+4. **[Tutorial: Your First Dataset](../how-to/05-first-dataset.md)** — Add your first dataset
 
 ---
 
