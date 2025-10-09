@@ -1,0 +1,16 @@
+# Hei-DataHub Version Configuration
+# Single source of truth for all version metadata
+# Edit this file and run `scripts/sync_version.py` to propagate changes
+# Last updated: 2025-10-08
+
+version: "0.58.1-beta"
+codename: "Streamline"
+release_date: "2025-10-08"
+compatibility: "Hei-DataHub v0.58.x (beta)"
+notes: "Cross-platform data directories, doctor diagnostics, Windows filename sanitation"
+
+# Additional metadata
+app_name: "Hei-DataHub"
+github_repo: "0xpix/Hei-DataHub"
+python_requires: ">=3.10"
+license: "MIT"

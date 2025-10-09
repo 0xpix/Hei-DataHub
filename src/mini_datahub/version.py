@@ -16,17 +16,12 @@ def _load_version_data() -> dict:
     Returns:
         Dictionary with version metadata
     """
-    # Find version.yaml in project root (3 levels up from this file)
-    version_file = Path(__file__).parent.parent.parent / "version.yaml"
+    # Try package directory first (works in both dev and installed)
+    version_file = Path(__file__).parent / "version.yaml"
 
-    # Fallback: try installed package location
+    # Fallback: try project root (for dev mode)
     if not version_file.exists():
-        try:
-            from importlib import resources
-            # Try to find it as a package resource
-            version_file = resources.files("mini_datahub").parent.parent / "version.yaml"
-        except Exception:
-            pass
+        version_file = Path(__file__).parent.parent.parent / "version.yaml"
 
     # Last resort: use defaults if file not found
     if not version_file.exists():

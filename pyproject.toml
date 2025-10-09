@@ -69,13 +69,13 @@ include = ["mini_datahub*", "hei_datahub*"]
 mini_datahub = [
     "infra/sql/*.sql",
     "schema.json",
+    "version.yaml",
     "data/**/*",
     "templates/**/*",
     "ui/views/*.tcss",
     "ui/widgets/*.tcss",
     "ui/styles/*.tcss",
-    "ui/assets/ascii/*.txt",
-    "../../../version.yaml"
+    "ui/assets/ascii/*.txt"
 ]
 
 [tool.black]
