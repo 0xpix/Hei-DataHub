@@ -18,13 +18,13 @@
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/version-0.57.2--beta-blue.svg)
+![Version](https://img.shields.io/badge/version-${PROJECT_VERSION}-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 
 > A local-first TUI for managing datasets with consistent metadata, fast full-text search, and automated PR workflows.
 
-**📦 Latest Release:** [v0.57.2-beta "Renovation" - Documentation Overhaul]
+**📦 Latest Release:** [v${PROJECT_VERSION} "${PROJECT_CODENAME}" - Documentation Overhaul & Bug Fixes]
 
 ## Overview
 
@@ -477,7 +477,8 @@ pytest tests/ -v
 
 ## Version History
 
-- **v0.57.0-beta** (Current) - Documentation Overhaul for v0.56 features
+- **v0.57.1-beta** (Current) - Bug fixes: config reload, persistent edits, search autocomplete
+- **v0.57.0-beta** - Documentation Overhaul for v0.56 features + new logo design
 - **v0.56.0-beta** - Structured Search, Inline Editing, Themes, Keybindings
 - **v0.55.0-beta** - Auto-stash PR workflow, improved gitignore, enhanced version system
 - **v0.50.0-beta** - Clean architecture refactoring, dual command support
@@ -541,4 +542,4 @@ See [QUICKSTART.md](QUICKSTART.md) for a comprehensive quick reference guide.
 
 **Built for teams who want to organize data without the overhead.**
 
-**v0.57.0-beta "Renovation"** brings comprehensive documentation for all features! �
+**v0.57.1-beta "Renovation"** is the latest release with bug fixes and comprehensive documentation for all features! 📚✨
