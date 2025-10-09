@@ -14,6 +14,8 @@ recursive-include src/mini_datahub/data *
 
 # Include sample data templates
 recursive-include src/mini_datahub/templates *
+# Include version configuration
+include version.yaml
 
 # Include documentation
 include README.md
@@ -29,3 +31,8 @@ include CHANGELOG.md
 global-exclude __pycache__
 global-exclude *.py[co]
 global-exclude .DS_Store
+
+# Include important root files
+include pyproject.toml
+include uv.lock
+include mkdocs.yml
