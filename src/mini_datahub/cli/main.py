@@ -233,7 +233,10 @@ def handle_update(args):
     if hasattr(args, 'branch') and args.branch:
         selected_branch = args.branch
         selected_url = f"git+ssh://git@github.com/0xpix/Hei-DataHub.git@{selected_branch}"
-        console.print(f"🎯 Using specified branch: [cyan]{selected_branch}[/cyan]")
+        console.print(Panel.fit(
+            f"[bold cyan]🎯 Using specified branch:[/bold cyan]\n[bold yellow]{selected_branch}[/bold yellow]",
+            border_style="cyan"
+        ))
     else:
         # Interactive branch selection
         table = Table(
@@ -568,8 +571,8 @@ def main():
     parser_update.add_argument(
         "--branch",
         type=str,
-        default="chore/uv-install-data-desktop-v0.58.x",
-        help="Git branch to install from (default: chore/uv-install-data-desktop-v0.58.x)"
+        default=None,
+        help="Git branch to install from (if not specified, interactive selection will be shown)"
     )
     parser_update.set_defaults(func=handle_update)
 
