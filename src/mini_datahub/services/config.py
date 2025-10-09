@@ -34,10 +34,21 @@ class TelemetryConfig(BaseModel):
     opt_in: bool = False
 
 
+class LogoConfig(BaseModel):
+    """Logo configuration."""
+    path: Optional[str] = None  # User override path
+    align: str = Field(default="center")  # left | center | right
+    color: str = Field(default="cyan")  # color name or theme token
+    padding_top: int = Field(default=0, ge=0)
+    padding_bottom: int = Field(default=1, ge=0)
+
+
 class ThemeConfig(BaseModel):
     """Theme configuration."""
     name: str = Field(default="gruvbox")
     overrides: Dict[str, str] = Field(default_factory=dict)
+    stylesheets: list[str] = Field(default_factory=list)  # User TCSS files
+    tokens: Optional[str] = None  # Path to tokens YAML file
 
     @field_validator("name")
     @classmethod
@@ -54,6 +65,12 @@ class ThemeConfig(BaseModel):
             logger.warning(f"Unknown theme '{v}', falling back to 'gruvbox'. Available: {', '.join(sorted(allowed))}")
             return "gruvbox"
         return v
+
+
+class UIConfig(BaseModel):
+    """UI customization configuration."""
+    logo: LogoConfig = Field(default_factory=LogoConfig)
+    help_file: Optional[str] = None  # Optional external help file
 
 
 def get_default_keybindings() -> Dict[str, list[str]]:
@@ -83,8 +100,9 @@ class UserConfig(BaseModel):
 
     This represents the full user config file structure.
     """
-    config_version: int = Field(default=1)
+    config_version: int = Field(default=2)
     theme: ThemeConfig = Field(default_factory=ThemeConfig)
+    ui: UIConfig = Field(default_factory=UIConfig)
     keybindings: Dict[str, list[str]] = Field(default_factory=get_default_keybindings)
     search: SearchDefaults = Field(default_factory=SearchDefaults)
     startup: StartupConfig = Field(default_factory=StartupConfig)
@@ -111,8 +129,19 @@ class ConfigManager:
             try:
                 with open(config_file, "r", encoding="utf-8") as f:
                     data = yaml.safe_load(f) or {}
+                
+                # Migrate config if needed
+                data = self._migrate_config(data)
+                
                 logger.info(f"Loaded user config from {config_file}")
-                return UserConfig(**data)
+                config = UserConfig(**data)
+                
+                # Save migrated config if version changed
+                if data.get("config_version", 1) < 2:
+                    logger.info("Migrating config to version 2")
+                    self._save_user_config(config)
+                
+                return config
             except Exception as e:
                 logger.error(f"Failed to load user config: {e}")
                 logger.info("Using default configuration")
@@ -123,6 +152,36 @@ class ConfigManager:
             config = UserConfig()
             self._save_user_config(config)
             return config
+
+    def _migrate_config(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Migrate config from v1 to v2 non-destructively."""
+        current_version = data.get("config_version", 1)
+        
+        if current_version < 2:
+            # Add v2 fields if they don't exist
+            if "ui" not in data:
+                data["ui"] = {
+                    "logo": {
+                        "path": None,  # Will use packaged default
+                        "align": "center",
+                        "color": "cyan",
+                        "padding_top": 0,
+                        "padding_bottom": 1
+                    }
+                }
+            
+            # Add theme.stylesheets and theme.tokens if not present
+            if "theme" in data:
+                if "stylesheets" not in data["theme"]:
+                    data["theme"]["stylesheets"] = []
+                if "tokens" not in data["theme"]:
+                    data["theme"]["tokens"] = None
+            
+            # Update version
+            data["config_version"] = 2
+            logger.info("Migrated config from v1 to v2")
+        
+        return data
 
     def _save_user_config(self, config: UserConfig) -> None:
         """Save user config to file with documentation."""
@@ -142,6 +201,19 @@ class ConfigManager:
                 # Write config_version
                 f.write(f"config_version: {data['config_version']}\n\n")
 
+                # Write UI section
+                f.write("# UI Customization\n")
+                f.write("ui:\n")
+                f.write("  logo:\n")
+                f.write(f"    path: {data['ui']['logo'].get('path') or 'null'}  # Custom logo path (null = use default)\n")
+                f.write(f"    align: {data['ui']['logo']['align']}  # left | center | right\n")
+                f.write(f"    color: {data['ui']['logo']['color']}  # color name\n")
+                f.write(f"    padding_top: {data['ui']['logo']['padding_top']}\n")
+                f.write(f"    padding_bottom: {data['ui']['logo']['padding_bottom']}\n")
+                if data['ui'].get('help_file'):
+                    f.write(f"  help_file: {data['ui']['help_file']}\n")
+                f.write("\n")
+
                 # Write theme section
                 f.write("# Available themes: textual-dark, textual-light, gruvbox, monokai,\n")
                 f.write("# nord, dracula, catppuccin-mocha, catppuccin-latte, flexoki,\n")
@@ -152,6 +224,8 @@ class ConfigManager:
                     f.write("  overrides:\n")
                     for k, v in data['theme']['overrides'].items():
                         f.write(f"    {k}: {v}\n")
+                f.write("  stylesheets: []  # List of custom TCSS file paths\n")
+                f.write("  tokens: null     # Path to design tokens YAML (optional)\n")
                 f.write("\n")
 
                 # Write keybindings section
@@ -291,6 +365,28 @@ class ConfigManager:
     def get_keybindings(self) -> Dict[str, list[str]]:
         """Get user keybindings."""
         return self.get("keybindings", {})
+
+    def get_logo_config(self) -> Dict[str, Any]:
+        """Get logo configuration with defaults."""
+        return {
+            "path": self.get("ui.logo.path"),
+            "align": self.get("ui.logo.align", "center"),
+            "color": self.get("ui.logo.color", "cyan"),
+            "padding_top": self.get("ui.logo.padding_top", 0),
+            "padding_bottom": self.get("ui.logo.padding_bottom", 1),
+        }
+
+    def get_stylesheets(self) -> list[str]:
+        """Get user-defined stylesheets."""
+        return self.get("theme.stylesheets", [])
+
+    def get_theme_tokens_path(self) -> Optional[str]:
+        """Get path to theme tokens file."""
+        return self.get("theme.tokens")
+
+    def get_help_file_path(self) -> Optional[str]:
+        """Get path to custom help file."""
+        return self.get("ui.help_file")
 
     def update_user_config(self, updates: Dict[str, Any]) -> None:
         """
