@@ -3,9 +3,9 @@
 # Edit this file and run `scripts/sync_version.py` to propagate changes
 # Last updated: 2025-10-08
 
-version: "0.57.1-beta"
+version: "0.57.2-beta"
 codename: "Renovation"
-release_date: "2025-10-08"
+release_date: "2025-10-09"
 compatibility: "Hei-DataHub v0.57.x (beta)"
 notes: "Documentation Overhaul"
 
