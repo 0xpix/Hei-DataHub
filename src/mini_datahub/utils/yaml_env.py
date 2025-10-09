@@ -14,38 +14,38 @@ from typing import Any, Dict
 def load_yaml_with_env(path: Path | str) -> Dict[str, Any]:
     """
     Load a YAML file with environment variable expansion.
-    
+
     Supports ${VAR_NAME} and ${VAR_NAME:-default} syntax.
-    
+
     Args:
         path: Path to the YAML file
-        
+
     Returns:
         Parsed YAML data with environment variables expanded
-        
+
     Example YAML:
         version: ${PROJECT_VERSION}
         codename: ${PROJECT_CODENAME:-Unnamed}
     """
     path = Path(path) if isinstance(path, str) else path
-    
+
     with open(path, "r", encoding="utf-8") as f:
         text = f.read()
-    
+
     # Expand environment variables in the text
     expanded_text = os.path.expandvars(text)
-    
+
     return yaml.safe_load(expanded_text)
 
 
 def load_yaml_with_env_safe(path: Path | str, default: Any = None) -> Dict[str, Any]:
     """
     Load a YAML file with environment variable expansion, with error handling.
-    
+
     Args:
         path: Path to the YAML file
         default: Default value to return if file doesn't exist or can't be parsed
-        
+
     Returns:
         Parsed YAML data or default value
     """
