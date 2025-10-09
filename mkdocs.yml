@@ -101,8 +101,8 @@ nav:
 extra:
   version:
     provider: mike
-  project_version: !ENV [PROJECT_VERSION, "0.0.0-dev"]
-  project_codename: !ENV [PROJECT_CODENAME, "Unnamed"]
+  project_version: !ENV [PROJECT_VERSION]
+  project_codename: !ENV [PROJECT_CODENAME]
   logo: assets/dark_logo.svg
   social:
     - icon: fontawesome/brands/github
