@@ -25,7 +25,7 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 - **✅ Persistent edits** – Dataset edits now save correctly across app restarts
 - **✅ Search autocomplete** – Field name suggestions now work in search
 
-**v{{ project_version }} (Oct 6, 2025)** — Documentation overhaul:
+**v0.57-beta (Oct 6, 2025)** — Documentation overhaul:
 
 - **📖 8 new documentation pages** – How-to guides, references, troubleshooting
 - **🎨 New logo design** – Multiple variants for different use cases
