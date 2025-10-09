@@ -129,18 +129,18 @@ class ConfigManager:
             try:
                 with open(config_file, "r", encoding="utf-8") as f:
                     data = yaml.safe_load(f) or {}
-                
+
                 # Migrate config if needed
                 data = self._migrate_config(data)
-                
+
                 logger.info(f"Loaded user config from {config_file}")
                 config = UserConfig(**data)
-                
+
                 # Save migrated config if version changed
                 if data.get("config_version", 1) < 2:
                     logger.info("Migrating config to version 2")
                     self._save_user_config(config)
-                
+
                 return config
             except Exception as e:
                 logger.error(f"Failed to load user config: {e}")
@@ -156,7 +156,7 @@ class ConfigManager:
     def _migrate_config(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Migrate config from v1 to v2 non-destructively."""
         current_version = data.get("config_version", 1)
-        
+
         if current_version < 2:
             # Add v2 fields if they don't exist
             if "ui" not in data:
@@ -169,18 +169,18 @@ class ConfigManager:
                         "padding_bottom": 1
                     }
                 }
-            
+
             # Add theme.stylesheets and theme.tokens if not present
             if "theme" in data:
                 if "stylesheets" not in data["theme"]:
                     data["theme"]["stylesheets"] = []
                 if "tokens" not in data["theme"]:
                     data["theme"]["tokens"] = None
-            
+
             # Update version
             data["config_version"] = 2
             logger.info("Migrated config from v1 to v2")
-        
+
         return data
 
     def _save_user_config(self, config: UserConfig) -> None:
