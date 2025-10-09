@@ -91,6 +91,7 @@ nav:
     - UI Guide: reference/10-ui.md
     - Data & SQL: reference/11-data-and-sql.md
     - Configuration: reference/12-config.md
+    - Cli: reference/13-cli-reference.md
     - Search Syntax: reference/search-syntax.md
     - Keyboard Shortcuts: reference/keybindings.md
   - Help:
