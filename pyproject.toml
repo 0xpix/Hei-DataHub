@@ -73,6 +73,9 @@ mini_datahub = [
     "templates/**/*"
 ]
 mini_datahub = ["infra/sql/*.sql", "ui/views/*.tcss", "ui/widgets/*.tcss"]
+    "ui/styles/*.tcss",
+    "ui/assets/ascii/*.txt"
+]
 
 [tool.black]
 line-length = 100
