@@ -70,9 +70,9 @@ mini_datahub = [
     "infra/sql/*.sql",
     "schema.json",
     "data/**/*",
-    "templates/**/*"
-]
-mini_datahub = ["infra/sql/*.sql", "ui/views/*.tcss", "ui/widgets/*.tcss"]
+    "templates/**/*",
+    "ui/views/*.tcss",
+    "ui/widgets/*.tcss",
     "ui/styles/*.tcss",
     "ui/assets/ascii/*.txt",
     "../../../version.yaml"
