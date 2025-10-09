@@ -18,13 +18,13 @@
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/version-0.57.1--beta-blue.svg)
+![Version](https://img.shields.io/badge/version-0.57.2--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 
 > A local-first TUI for managing datasets with consistent metadata, fast full-text search, and automated PR workflows.
 
-**📦 Latest Release:** [v0.57.1-beta "Renovation" - Documentation Overhaul]
+**📦 Latest Release:** [v0.57.2-beta "Renovation" - Documentation Overhaul]
 
 ## Overview
 
