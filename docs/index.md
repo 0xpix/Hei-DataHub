@@ -19,7 +19,13 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 **[Read the full What's New guide →](whats-new/0.57-beta.md)**
 
-**v{{ project_version }} (Oct 8, 2025)** — Bug fix patch:
+**v{{ project_version }} (Oct 9, 2025)** — Versioning patch:
+
+- ✨ Version tag feature under logo (configurable)
+- 🔧 Simplified version system (direct YAML reading)
+- ✅ New version consistency checker
+
+**v0.57-1-beta (Oct 8, 2025)** — Bug fix patch:
 
 - **✅ Config reload** – Theme/keybinding changes now apply without restart
 - **✅ Persistent edits** – Dataset edits now save correctly across app restarts
