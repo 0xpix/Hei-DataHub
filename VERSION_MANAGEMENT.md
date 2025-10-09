@@ -1,33 +1,57 @@
 # Version Management System
 
-This project uses environment variables as the single source of truth for version and codename information.
+This project uses `.env-version` as the **single source of truth** for version and codename information.
 
-## For Local Development
+## Quick Start
 
-1. **Create `.env` file** (if it doesn't exist):
-   ```bash
-   cp .env.example .env
-   ```
+To update version/codename everywhere:
 
-2. **Update version/codename** in `.env`:
+1. Edit `.env-version`:
    ```bash
    PROJECT_VERSION=0.58.0-beta
    PROJECT_CODENAME=NewRelease
    ```
 
-3. **Rebuild documentation** to see changes:
+2. Commit and push:
    ```bash
-   mkdocs build
+   git add .env-version
+   git commit -m "chore: bump version to 0.58.0-beta"
+   git push
    ```
+
+That's it! GitHub Actions will automatically:
+- Update the documentation with new version/codename
+- Deploy to GitHub Pages
+
+For local docs preview:
+```bash
+export $(cat .env-version | xargs) && mkdocs serve
+```
+
+## For Local Development
+
+1. **Edit `.env-version`**:
+   ```bash
+   PROJECT_VERSION=0.58.0-beta
+   PROJECT_CODENAME=NewRelease
+   ```
+
+2. **Preview documentation locally**:
+   ```bash
+   export $(cat .env-version | grep -v '^#' | xargs)
+   mkdocs serve
+   ```
+
+The environment variables are automatically loaded and used in docs.
 
 ## For CI/CD (GitHub Actions)
 
-Set **Repository Variables** (Settings → Secrets and variables → Actions → Variables):
+GitHub Actions automatically reads from `.env-version` file.
 
-- `PROJECT_VERSION`: e.g., `0.58.0-beta`
-- `PROJECT_CODENAME`: e.g., `NewRelease`
-
-The workflows will automatically use these values when building documentation.
+No repository variables needed! The workflow:
+1. Loads `PROJECT_VERSION` and `PROJECT_CODENAME` from `.env-version`
+2. Exports them as environment variables
+3. MkDocs picks them up automatically
 
 ## How It Works
 
@@ -42,6 +66,17 @@ from mini_datahub.versioning import VERSION, CODENAME
 Priority:
 1. Environment variables (`PROJECT_VERSION`, `PROJECT_CODENAME`)
 2. Fallback to `_version.py` (generated from `version.yaml`)
+
+### README.md
+
+README.md uses variable placeholders:
+```markdown
+![Version](https://img.shields.io/badge/version-${PROJECT_VERSION}-blue.svg)
+**Latest Release:** [v${PROJECT_VERSION} "${PROJECT_CODENAME}"]
+```
+
+These are displayed as-is on GitHub, but they clearly show the intended structure.
+For rendered viewing, see the documentation site.
 
 ### MkDocs Documentation
 
@@ -85,26 +120,67 @@ The system maintains full backward compatibility:
 
 ## Updating Version/Codename
 
-### Method 1: Environment Variables (Recommended)
+**One file to rule them all: `.env-version`**
 
-**Local:**
 ```bash
-# Edit .env
+# Edit .env-version
+nano .env-version
+
+# Update the values
 PROJECT_VERSION=0.58.0-beta
 PROJECT_CODENAME=NewRelease
+
+# Commit and push
+git add .env-version
+git commit -m "chore: bump version to 0.58.0-beta"
+git push
 ```
 
-**CI/CD:**
-Update Repository Variables in GitHub Settings.
+Done! Everything updates automatically.
 
-### Method 2: Traditional (Still Supported)
+## Files Involved
 
-1. Edit `version.yaml`
-2. Run `python scripts/sync_version.py`
-3. This regenerates `_version.py` with the new values
+- **`.env-version`** - **Single source of truth** (tracked in git)
+- `src/mini_datahub/versioning.py` - Python module for env-based version access
+- `src/mini_datahub/_version.py` - Generated fallback (from `version.yaml`)
+- `mkdocs.yml` - MkDocs config with env var bindings
+- `.github/workflows/pages.yml` - CI/CD that loads `.env-version`
 
 ## Migration Notes
 
 Historical version references in documentation (changelogs, release notes) have been preserved as-is. Only current version/codename references have been migrated to use macros.
 
 Files that reference historical versions (e.g., "Fixed in v0.56.0") are intentionally left unchanged.
+
+## Complete Workflow Example
+
+When releasing version 0.58.0-beta "Packaging":
+
+```bash
+# 1. Update .env-version
+cat > .env-version << 'EOF'
+# Hei-DataHub Version Configuration
+PROJECT_VERSION=0.58.0-beta
+PROJECT_CODENAME=Packaging
+EOF
+
+# 2. (Optional) Update version.yaml for backward compat
+cat > version.yaml << 'EOF'
+version: "0.58.0-beta"
+codename: "Packaging"
+release_date: "2025-10-15"
+...
+EOF
+python scripts/sync_version.py  # Regenerate _version.py
+
+# 3. Preview locally (optional)
+export $(cat .env-version | grep -v '^#' | xargs)
+mkdocs serve
+
+# 4. Commit and push
+git add .env-version version.yaml src/mini_datahub/_version.py
+git commit -m "chore: bump version to 0.58.0-beta (Packaging)"
+git push
+
+# Done! CI/CD handles the rest
+```
