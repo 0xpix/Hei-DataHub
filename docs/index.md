@@ -5,7 +5,7 @@
 
 # The Hei-DataHub Manual
 
-Current version: `0.57.1-beta` (2025-10-08) — Codename: `Renovation`
+Current version: `{{ project_version }}` (2025-10-08) — Codename: `{{ project_codename }}`
 
 ---
 
@@ -19,13 +19,13 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 **[Read the full What's New guide →](whats-new/0.57-beta.md)**
 
-**v0.57.1-beta (Oct 8, 2025)** — Bug fix patch:
+**v{{ project_version }} (Oct 8, 2025)** — Bug fix patch:
 
 - **✅ Config reload** – Theme/keybinding changes now apply without restart
 - **✅ Persistent edits** – Dataset edits now save correctly across app restarts
 - **✅ Search autocomplete** – Field name suggestions now work in search
 
-**v0.57.0-beta (Oct 6, 2025)** — Documentation overhaul:
+**v{{ project_version }} (Oct 6, 2025)** — Documentation overhaul:
 
 - **📖 8 new documentation pages** – How-to guides, references, troubleshooting
 - **🎨 New logo design** – Multiple variants for different use cases
@@ -71,7 +71,7 @@ This manual is organized to get you productive quickly:
 4. **[The Basics](getting-started/03-the-basics.md)** — Projects, datasets, fields, search, filters
 
 ### What's New
-- **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Documentation overhaul + bug fixes (Oct 2025)
+- **[0.57-beta "{{ project_codename }}"](whats-new/0.57-beta.md)** — Documentation overhaul + bug fixes (Oct 2025)
 
 ### How-to Guides
 - **[GitHub Workflow Guide](how-to/04-settings.md)** — Detailed PR workflow docs

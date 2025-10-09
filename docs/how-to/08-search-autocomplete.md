@@ -1,6 +1,6 @@
 # Search Autocomplete Guide
 
-**Available in:** Hei-DataHub 0.57.1-beta and later
+**Available in:** Hei-DataHub {{ project_version }} and later
 
 **Goal:** Use smart autocomplete to search faster with less typing.
 

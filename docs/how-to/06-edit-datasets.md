@@ -178,7 +178,7 @@ After saving, the details view refreshes automatically. You don't need to restar
    hei-datahub reindex
    ```
 
-This issue is being investigated for 0.57.1-beta
+This issue is being investigated for {{ project_version }}
 
 ---
 

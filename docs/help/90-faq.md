@@ -88,7 +88,7 @@ Then restart the app.
 
 ### Q: My edited dataset reverts after restarting the app. Why?
 
-**A:** ✅ **Fixed in v0.57.1-beta** – This issue has been resolved. Edits now persist correctly across app restarts.
+**A:** ✅ **Fixed in v{{ project_version }}** – This issue has been resolved. Edits now persist correctly across app restarts.
 
 **If you're still experiencing this:**
 1. Verify you're running v0.57.1 or later: `hei-datahub --version`
@@ -102,7 +102,7 @@ Then restart the app.
 
 ### Q: The app says "PR creation failed" but the PR was actually created. What's happening?
 
-**A:** This is a known issue in v0.57.0-beta. The PR is created successfully on GitHub, but the app doesn't detect it.
+**A:** This is a known issue in v{{ project_version }}. The PR is created successfully on GitHub, but the app doesn't detect it.
 
 **Workaround:**
 1. Check GitHub: `https://github.com/YOUR_ORG/YOUR_REPO/pulls`
@@ -115,7 +115,7 @@ Then restart the app.
 
 ### Q: Theme/keybinding changes don't work until I restart. Can I reload config?
 
-**A:** ✅ **Fixed in v0.57.1-beta** – Config changes now apply automatically without restart.
+**A:** ✅ **Fixed in v{{ project_version }}** – Config changes now apply automatically without restart.
 
 **If you're still experiencing this:**
 1. Verify you're running v0.57.1 or later: `hei-datahub --version`

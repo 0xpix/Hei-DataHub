@@ -2,17 +2,17 @@
 
 Common issues and how to fix them.
 
-**Version:** 0.56-beta, 0.57-beta, and 0.57.1-beta
+**Version:** 0.56-beta, 0.57-beta, and {{ project_version }}
 
 ---
 
 ## Known Issues (from v0.56-beta)
 
-These issues were introduced in v0.56-beta. Some were fixed in v0.57.1-beta, others remain open.
+These issues were introduced in v0.56-beta. Some were fixed in v{{ project_version }}, others remain open.
 
 ### 1. Theme/Keybinding Changes Require Restart
 
-**Status:** ✅ **Fixed in v0.57.1-beta** – Config changes now apply automatically without restart.
+**Status:** ✅ **Fixed in v{{ project_version }}** – Config changes now apply automatically without restart.
 
 **If you still experience this on v0.57.1+:**
 1. Verify you're running the latest version: `hei-datahub --version`
@@ -73,7 +73,7 @@ vim data/my-dataset/metadata.yaml
 
 **Symptom:** You edit a dataset, save successfully, close the app, reopen – changes are gone.
 
-**Status:** ✅ **Fixed in v0.57.1-beta** – This issue has been resolved. Edits now persist correctly across app restarts.
+**Status:** ✅ **Fixed in v{{ project_version }}** – This issue has been resolved. Edits now persist correctly across app restarts.
 
 **If you still experience this on v0.57.1+:**
 1. Verify you're running the latest version: `hei-datahub --version`
@@ -114,7 +114,7 @@ git checkout main
 
 ### 8. No Search Field Autocomplete
 
-**Status:** ✅ **Fixed in v0.57.1-beta** – Search field now provides autocomplete suggestions for field names.
+**Status:** ✅ **Fixed in v{{ project_version }}** – Search field now provides autocomplete suggestions for field names.
 
 **If you still experience this on v0.57.1+:**
 1. Verify you're running the latest version: `hei-datahub --version`

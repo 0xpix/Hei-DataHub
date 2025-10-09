@@ -45,7 +45,7 @@ Finds CSV files stored in S3.
 
 ## Search Autocomplete
 
-**New in 0.57.1-beta:** The search field now provides smart autocomplete suggestions!
+**New in {{ project_version }}:** The search field now provides smart autocomplete suggestions!
 
 ### How It Works
 
@@ -196,7 +196,7 @@ When you use filters, **colored badges** appear below the search box:
 - **📝 temp** (free-text term)
 - **📝 "exact phrase"** (quoted phrase)
 
-**Since v0.57.1-beta:** Each search term gets its own badge, making it clear what you're searching for. Multiple terms (e.g., "rainfall temp rice") display as separate badges instead of one combined badge.
+**Since v{{ project_version }}:** Each search term gets its own badge, making it clear what you're searching for. Multiple terms (e.g., "rainfall temp rice") display as separate badges instead of one combined badge.
 
 ---
 
