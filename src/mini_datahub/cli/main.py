@@ -163,7 +163,7 @@ def handle_update(args):
 
     # Display beautiful header with logo
     console.print()
-    
+
     if logo_text:
         # Display logo in cyan gradient
         logo_lines = logo_text.strip().split('\n')
@@ -178,7 +178,7 @@ def handle_update(args):
             "[bold cyan]🚀 Hei-DataHub Update Manager[/bold cyan]",
             border_style="cyan"
         ))
-    
+
     console.print()
     console.print("─" * console.width, style="dim")
     console.print()
@@ -265,7 +265,7 @@ def handle_update(args):
 
         selected_branch = branches[choice]["name"]
         selected_url = branches[choice]["url"]
-        
+
         console.print()
         console.print(Panel.fit(
             f"[bold green]✓[/bold green] Selected: [bold cyan]{selected_branch}[/bold cyan]",
@@ -317,10 +317,10 @@ def handle_update(args):
         TaskProgressColumn(),
         console=console,
     ) as progress:
-        
+
         # Step 1: Fetching
         task1 = progress.add_task("[cyan]Fetching package from GitHub...", total=100)
-        
+
         try:
             # Start the uv command
             result = subprocess.Popen(
@@ -330,15 +330,15 @@ def handle_update(args):
                 text=True,
                 bufsize=1
             )
-            
+
             # Simulate progress (UV doesn't give us real progress)
             for i in range(30):
                 time.sleep(0.1)
                 progress.update(task1, advance=3)
-            
+
             progress.update(task1, completed=100)
             progress.remove_task(task1)
-            
+
             # Step 2: Resolving dependencies
             task2 = progress.add_task("[cyan]Resolving dependencies...", total=100)
             for i in range(20):
@@ -346,18 +346,18 @@ def handle_update(args):
                 progress.update(task2, advance=5)
             progress.update(task2, completed=100)
             progress.remove_task(task2)
-            
+
             # Step 3: Installing
             task3 = progress.add_task("[cyan]Installing packages...", total=100)
-            
+
             # Wait for process to complete while showing progress
             while result.poll() is None:
                 time.sleep(0.1)
                 if progress.tasks[0].completed < 95:
                     progress.update(task3, advance=2)
-            
+
             progress.update(task3, completed=100)
-            
+
             # Get the output
             output = result.stdout.read() if result.stdout else ""
             returncode = result.returncode
@@ -380,7 +380,7 @@ def handle_update(args):
             padding=(1, 2)
         ))
         console.print()
-        
+
         next_steps = Table(
             show_header=False,
             box=box.SIMPLE,
@@ -389,11 +389,11 @@ def handle_update(args):
         next_steps.add_column("Icon", style="bold cyan")
         next_steps.add_column("Command", style="cyan")
         next_steps.add_column("Description", style="dim")
-        
+
         next_steps.add_row("📋", "hei-datahub --version-info", "View detailed version information")
         next_steps.add_row("🏥", "hei-datahub doctor", "Run system health checks")
         next_steps.add_row("🚀", "hei-datahub", "Launch the application")
-        
+
         console.print(Panel(
             next_steps,
             title="[bold]🎯 Next Steps[/bold]",
