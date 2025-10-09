@@ -43,14 +43,19 @@ More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
 ## Quick Start
 
+Linux:
+
 ```bash
-git clone <your-repo-url>
+curl -LsSf https://astral.sh/uv/install.sh | sh
+git clone git@github.com:0xpix/Hei-DataHub.git
 cd Hei-DataHub
 uv sync --dev && source .venv/bin/activate
 hei-datahub     # or: mini-datahub
 ```
 
-Need uv? See [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/).
+Macos/Windows coming soon...
+
+Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/) for details.
 
 ---
 
@@ -69,7 +74,7 @@ Full guide: [PR Workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-da
 * Validation via JSON Schema + Pydantic
 * Textual TUI (keyboard-first)
 
-Details: [User Guide](https://0xpix.github.io/Hei-DataHub/)
+Details: [Basics](https://0xpix.github.io/Hei-DataHub/getting-started/03-the-basics/)
 
 ---
 
