@@ -146,50 +146,85 @@ def handle_update(args):
     from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
     from rich.markdown import Markdown
     from rich import box
+    from rich.text import Text
+    from rich.align import Align
 
     console = Console()
 
-    # Display header
+    # Load ASCII logo
+    try:
+        logo_path = Path(__file__).parent.parent / "ui" / "assets" / "ascii" / "logo_default.txt"
+        if logo_path.exists():
+            logo_text = logo_path.read_text()
+        else:
+            logo_text = None
+    except:
+        logo_text = None
+
+    # Display beautiful header with logo
     console.print()
-    console.print(Panel.fit(
-        "[bold cyan]🚀 Hei-DataHub Update Manager[/bold cyan]",
-        border_style="cyan"
-    ))
+    
+    if logo_text:
+        # Display logo in cyan gradient
+        logo_lines = logo_text.strip().split('\n')
+        for line in logo_lines:
+            console.print(f"[bold cyan]{line}[/bold cyan]", justify="center")
+        console.print()
+        console.print(Align.center("[bold bright_white]━━━━━━━━━━━━━ UPDATE MANAGER ━━━━━━━━━━━━━[/bold bright_white]"))
+        console.print(Align.center("[dim italic]Keep your DataHub fresh and updated ✨[/dim italic]"))
+    else:
+        # Fallback if logo not found
+        console.print(Panel.fit(
+            "[bold cyan]🚀 Hei-DataHub Update Manager[/bold cyan]",
+            border_style="cyan"
+        ))
+    
+    console.print()
+    console.print("─" * console.width, style="dim")
     console.print()
 
     # Check if UV is installed
     try:
         subprocess.run(["uv", "--version"], capture_output=True, check=True)
     except (FileNotFoundError, subprocess.CalledProcessError):
-        console.print("[red]❌ Error: UV is not installed![/red]")
-        console.print()
-        console.print("📦 Install UV first:")
-        console.print("   [cyan]curl -LsSf https://astral.sh/uv/install.sh | sh[/cyan]")
+        console.print(Panel(
+            "[red]❌ UV package manager is not installed![/red]\n\n"
+            "📦 [bold]Install UV first:[/bold]\n"
+            "[cyan]curl -LsSf https://astral.sh/uv/install.sh | sh[/cyan]",
+            border_style="red",
+            title="[red]Error[/red]"
+        ))
         sys.exit(1)
 
-    # Get current version
+    # Get current version in a nice box
     current_version = __version__
-    console.print(f"📍 Current version: [yellow]{current_version}[/yellow]")
+    version_box = Panel(
+        f"[bold yellow]{current_version}[/bold yellow]",
+        title="[bold]📍 Current Version[/bold]",
+        border_style="yellow",
+        padding=(0, 2)
+    )
+    console.print(version_box)
     console.print()
 
     # Define available branches with metadata
     branches = {
         "1": {
             "name": "main",
-            "label": "[green]main[/green] [dim](recommended)[/dim]",
+            "label": "✅ [bold green]main[/bold green] [dim](recommended)[/dim]",
             "description": "Stable release - tested and production-ready",
             "url": "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main",
         },
         "2": {
             "name": "chore/uv-install-data-desktop-v0.58.x",
-            "label": "[yellow]chore/uv-install-data-desktop-v0.58.x[/yellow] [dim](beta)[/dim]",
-            "description": "v0.58.x beta - UV installation, cross-platform data dirs, doctor diagnostics",
+            "label": "🧪 [bold yellow]v0.58.x[/bold yellow] [dim](beta)[/dim]",
+            "description": "Latest beta - UV installation, cross-platform support, doctor diagnostics",
             "url": "git+ssh://git@github.com/0xpix/Hei-DataHub.git@chore/uv-install-data-desktop-v0.58.x",
         },
         "3": {
             "name": "develop",
-            "label": "[red]develop[/red] [dim](dev/unstable)[/dim]",
-            "description": "Development branch - latest features, may be unstable",
+            "label": "🚧 [bold red]develop[/bold red] [dim](dev/unstable)[/dim]",
+            "description": "Development branch - bleeding edge, may be unstable",
             "url": "git+ssh://git@github.com/0xpix/Hei-DataHub.git@develop",
         },
     }
@@ -202,23 +237,25 @@ def handle_update(args):
     else:
         # Interactive branch selection
         table = Table(
-            title="📦 Available Versions",
+            title="[bold cyan]📦 Available Versions[/bold cyan]",
             box=box.ROUNDED,
             show_header=True,
-            header_style="bold cyan"
+            header_style="bold bright_white on blue",
+            border_style="cyan",
+            title_style="bold cyan"
         )
-        table.add_column("#", style="dim", width=4)
-        table.add_column("Branch", style="bold")
+        table.add_column("Choice", justify="center", style="bold cyan", width=8)
+        table.add_column("Version", style="bold", no_wrap=True, width=40)
         table.add_column("Description", style="dim")
 
         for key, branch in branches.items():
-            table.add_row(key, branch["label"], branch["description"])
+            table.add_row(f"[{key}]", branch["label"], branch["description"])
 
         console.print(table)
         console.print()
 
         choice = Prompt.ask(
-            "🔍 Select version to install",
+            "[bold cyan]🔍 Select version to install[/bold cyan]",
             choices=list(branches.keys()),
             default="1"
         )
@@ -227,7 +264,10 @@ def handle_update(args):
         selected_url = branches[choice]["url"]
         
         console.print()
-        console.print(f"✓ Selected: [cyan]{selected_branch}[/cyan]")
+        console.print(Panel.fit(
+            f"[bold green]✓[/bold green] Selected: [bold cyan]{selected_branch}[/bold cyan]",
+            border_style="green"
+        ))
 
     console.print()
 
@@ -327,16 +367,35 @@ def handle_update(args):
 
     if returncode == 0:
         # Success!
-        console.print(Panel.fit(
-            "[bold green]✅ Update completed successfully![/bold green]\n\n"
-            f"[dim]Updated to:[/dim] [cyan]{selected_branch}[/cyan]",
-            border_style="green"
+        console.print()
+        console.print(Panel(
+            "[bold green]✨ Update completed successfully! ✨[/bold green]\n\n"
+            f"[dim]Updated to:[/dim] [bold cyan]{selected_branch}[/bold cyan]\n"
+            f"[dim]From:[/dim] [yellow]{current_version}[/yellow] → [green]Latest[/green]",
+            title="[bold green]🎉 Success[/bold green]",
+            border_style="green",
+            padding=(1, 2)
         ))
         console.print()
-        console.print("🎯 Next steps:")
-        console.print("   • Run [cyan]hei-datahub --version-info[/cyan] to verify")
-        console.print("   • Run [cyan]hei-datahub doctor[/cyan] to check health")
-        console.print("   • Launch with [cyan]hei-datahub[/cyan]")
+        
+        next_steps = Table(
+            show_header=False,
+            box=box.SIMPLE,
+            padding=(0, 1)
+        )
+        next_steps.add_column("Icon", style="bold cyan")
+        next_steps.add_column("Command", style="cyan")
+        next_steps.add_column("Description", style="dim")
+        
+        next_steps.add_row("📋", "hei-datahub --version-info", "View detailed version information")
+        next_steps.add_row("🏥", "hei-datahub doctor", "Run system health checks")
+        next_steps.add_row("🚀", "hei-datahub", "Launch the application")
+        
+        console.print(Panel(
+            next_steps,
+            title="[bold]🎯 Next Steps[/bold]",
+            border_style="cyan"
+        ))
         console.print()
         sys.exit(0)
     else:
