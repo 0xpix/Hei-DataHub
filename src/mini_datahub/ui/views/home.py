@@ -41,43 +41,17 @@ from mini_datahub.services.config import get_config
 def _build_bindings_from_config() -> list[Binding]:
     """Build keybindings list from config file."""
     try:
+        from mini_datahub.ui.keybindings import bind_actions_from_config, get_action_display_map_home
+
         config = get_config()
         keybindings = config.get_keybindings()
+        action_map = get_action_display_map_home()
 
-        # Map action names to display names and visibility
-        action_display = {
-            "add_dataset": ("Add Dataset", "a", True),
-            "settings": ("Settings", "s", True),
-            "open_details": ("Open", "o", False),
-            "outbox": ("Outbox", "p", True),
-            "pull_updates": ("Pull", "u", True),
-            "refresh_data": ("Refresh", "r", True),
-            "quit": ("Quit", "q", True),
-            "move_down": ("Down", "j", False),
-            "move_up": ("Up", "k", False),
-            "jump_top": ("Top", "gg", False),
-            "jump_bottom": ("Bottom", "G", False),
-            "focus_search": ("Search", "/", True),
-            "clear_search": ("Clear", "esc", False),
-            "debug_console": ("Debug", ":", False),
-            "show_help": ("Help", "?", True),
-        }
+        bindings = bind_actions_from_config(action_map, keybindings)
 
-        bindings = []
-        for action, (display_name, key_display, show) in action_display.items():
-            keys = keybindings.get(action, [])
-            if keys:
-                # Use first key as primary, add all keys as bindings
-                for i, key in enumerate(keys):
-                    bindings.append(
-                        Binding(
-                            key,
-                            action,
-                            display_name if i == 0 else "",
-                            key_display=key_display if i == 0 else key,
-                            show=show if i == 0 else False
-                        )
-                    )
+        if not bindings:
+            logger.warning("No bindings generated from config, using defaults")
+            raise ValueError("Empty bindings")
 
         return bindings
     except Exception as e:
@@ -111,23 +85,21 @@ class HomeScreen(Screen):
     # Load bindings from config file
     BINDINGS = _build_bindings_from_config()
 
-    # Load CSS from external file
-    CSS_PATH = "home_screen.tcss"
+    # Load CSS from styles directory
+    CSS_PATH = "../styles/home.tcss"
 
     search_mode = reactive(False)
     _debounce_timer: Optional[Timer] = None
 
     def compose(self) -> ComposeResult:
+        from mini_datahub.ui.assets.loader import get_logo_widget_text
+
+        # Load logo from config
+        logo_text = get_logo_widget_text(get_config())
+
         yield Header()
         yield Container(
-            Static("""[bold cyan]
- _   _ _____ ___     ____    _  _____  _    _   _ _   _ ____
-| | | | ____|_ _|   |  _ \\  / \\|_   _|/ \\  | | | | | | | __ )
-| |_| |  _|  | |    | | | |/ _ \\ | | / _ \\ | |_| | | | |  _ \\
-|  _  | |___ | |    | |_| / ___ \\| |/ ___ \\|  _  | |_| | |_) |
-|_| |_|_____|___|   |____/_/   \\_\\_/_/   \\_\\_| |_|\\___/|____/
-
-[/bold cyan]""", id="banner"),
+            Static(logo_text, id="banner"),
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
             Static(id="github-status"),
