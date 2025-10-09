@@ -18,6 +18,9 @@ jobs:
   build:
     name: Build User and Developer Documentation
     runs-on: ubuntu-latest
+    env:
+      PROJECT_VERSION: ${{ vars.PROJECT_VERSION || '0.0.0-dev' }}
+      PROJECT_CODENAME: ${{ vars.PROJECT_CODENAME || 'Unnamed' }}
     steps:
       # Checkout main branch for user docs
       - name: Checkout main branch
