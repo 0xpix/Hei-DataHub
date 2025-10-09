@@ -18,14 +18,14 @@
 
 # Hei-DataHub
 
-![Beta](https://img.shields.io/badge/beta-0.57.2-blue.svg)
+![Version](https://img.shields.io/badge/version-0.58.1--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
-- **Latest:** 0.57.2-beta "Renovation" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.57-beta/)
-- **Docs:** Start with [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
+- **Latest:** 0.58.1-beta "Streamline" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.58-beta/)
+- **Docs:** Start with [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation/README/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
 
 ---
 
@@ -36,6 +36,8 @@
 - **Work local:** YAML on disk, no servers
 - **Publish safely:** Auto-stash → branch → PR
 - **Team-friendly:** Outbox retries, simple token setup
+- **Easy install:** Direct from GitHub with UV—no cloning needed
+- **Desktop ready:** Linux launcher for application menu integration
 
 More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
@@ -43,55 +45,123 @@ More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
 ## 🚀 Quick Install — UV Method (v0.58.x-beta)
 
-**No cloning required!** Install directly from the private repository:
+**Linux users:** No cloning required! Install directly from the private repository with modern UV tooling.
 
-### Ephemeral Run (SSH)
+### Prerequisites
+
 ```bash
-uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+# Install UV (fast Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Verify installation
+uv --version
 ```
 
-### Global Install (SSH)
+### Ephemeral Run (Try without installing)
 ```bash
+# With SSH (recommended)
+uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+
+# With HTTPS + Personal Access Token
+export GH_PAT=ghp_xxxxxxxxxxxxx
+uvx "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
+```
+
+### Persistent Install (Recommended)
+```bash
+# With SSH (recommended)
 uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
+
+# With HTTPS + Token
+export GH_PAT=ghp_xxxxxxxxxxxxx
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
+
+# Run the application
 hei-datahub  # or mini-datahub
 ```
 
-### Install with HTTPS + Token
+### Version Pinning
 ```bash
-export GH_PAT=ghp_xxxxxxxxxxxxx  # Your GitHub Personal Access Token
-uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
+# Install specific version
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.1-beta"
+
+# Install from feature branch
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@chore/uv-install-data-desktop-v0.58.x"
 ```
 
 **📚 Need help?** See [docs/installation](docs/installation/README.md) for:
-- Token/SSH setup
-- Windows instructions
-- Troubleshooting
+- SSH key and PAT setup
+- Troubleshooting authentication
+- Updating and uninstalling
+- Windows/macOS support (coming soon)
 
-**🖥️ Desktop Version (Linux):**
-After installation, create a desktop launcher:
+**🖥️ Desktop Integration (Linux):**
+After installation, create a desktop launcher to access from your application menu:
 ```bash
 bash scripts/create_desktop_entry.sh
 ```
+This creates a `.desktop` entry compatible with GNOME, KDE, XFCE, and other desktop environments.
 
 ---
 
-## Classic Install (For Development)
+## Development Install
 
-Linux:
+For contributors who want to modify the code:
+
+**Linux:**
 
 ```bash
+# Install UV if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone the repository
 git clone git@github.com:0xpix/Hei-DataHub.git
 cd Hei-DataHub
+
+# Install with development dependencies
 uv sync --dev && source .venv/bin/activate
+
+# Run from source
 hei-datahub     # or: mini-datahub
 ```
 
-Macos/Windows coming soon...
+**macOS/Windows:** Coming soon in future releases.
 
 Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/) for details.
 
 ---
+
+## ✨ Key Features in v0.58-beta
+
+### 🎯 Modern Installation
+- **UV-based installation** — Install directly from GitHub without cloning
+- **Ephemeral runs** — Test with `uvx` before committing to installation
+- **Version pinning** — Lock to specific tags, branches, or commits
+- **Dual authentication** — SSH keys or HTTPS with Personal Access Tokens
+
+### 🗂️ Data Management
+- **XDG-compliant paths** — Linux uses `~/.local/share/Hei-DataHub`
+- **Auto-initialization** — First run creates workspace with sample datasets
+- **Complete packaging** — All data files, configs, and assets included
+- **Persistent storage** — UV installs always use home directory workspace
+
+### 🖥️ Desktop Integration (Linux)
+- **Application menu entry** — Launch from GNOME, KDE, XFCE, etc.
+- **XDG desktop integration** — Follows Linux desktop standards
+- **Auto-detection** — Finds installed executable automatically
+- **One-command setup** — Simple script creates launcher
+
+### 🔧 System Diagnostics
+- **`hei-datahub doctor`** — Comprehensive health checks
+- **Exit codes** — Clear status for scripting (0=healthy, 1-3=issues)
+- **Actionable output** — Specific suggestions for fixing problems
+- **Cross-platform** — Detects OS-specific data directories
+
+### 📊 Data Directory Control
+- **`--data-dir` flag** — Override workspace location from CLI
+- **Environment variable** — Set `HEIDATAHUB_DATA_DIR` for persistence
+- **Clear precedence** — CLI > env var > OS default
+- **Migration detection** — Notifies about legacy path locations
 
 ## Typical Workflow
 
