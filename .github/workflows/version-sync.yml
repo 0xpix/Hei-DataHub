@@ -1,20 +1,22 @@
-name: Version Sync Check
+name: Version Consistency Check
 
 on:
   pull_request:
     paths:
       - 'version.yaml'
-      - 'src/mini_datahub/_version.py'
       - 'src/mini_datahub/version.py'
       - 'pyproject.toml'
+      - 'README.md'
+      - 'docs/_includes/version.md'
   push:
     branches:
       - main
     paths:
       - 'version.yaml'
+      - 'src/mini_datahub/version.py'
 
 jobs:
-  check-version-sync:
+  check-version-consistency:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,24 +31,11 @@ jobs:
         run: |
           pip install pyyaml
 
-      - name: Run version sync
+      - name: Check version consistency
         run: |
-          python scripts/sync_version.py
-
-      - name: Check for uncommitted changes
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "❌ Version files are out of sync!"
-            echo ""
-            echo "The following files have uncommitted changes:"
-            git status --porcelain
-            echo ""
-            echo "Please run 'python scripts/sync_version.py' locally and commit the changes."
-            exit 1
-          else
-            echo "✅ All version files are in sync!"
-          fi
+          python scripts/check_version_consistency.py
 
       - name: Display current version
+        if: success()
         run: |
-          python -c "import sys; sys.path.insert(0, 'src'); from mini_datahub._version import __version__, CODENAME, RELEASE_DATE; print(f'Version: {__version__}'); print(f'Codename: {CODENAME}'); print(f'Release Date: {RELEASE_DATE}')"
+          python -c "import sys; sys.path.insert(0, 'src'); from mini_datahub.version import __version__, CODENAME, RELEASE_DATE; print(f'✅ Version: {__version__}'); print(f'✅ Codename: {CODENAME}'); print(f'✅ Release Date: {RELEASE_DATE}')"
