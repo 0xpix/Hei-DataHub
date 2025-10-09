@@ -18,9 +18,6 @@ jobs:
   build:
     name: Build User and Developer Documentation
     runs-on: ubuntu-latest
-    env:
-      PROJECT_VERSION: ${{ vars.PROJECT_VERSION || '0.0.0-dev' }}
-      PROJECT_CODENAME: ${{ vars.PROJECT_CODENAME || 'Unnamed' }}
     steps:
       # Checkout main branch for user docs
       - name: Checkout main branch
@@ -28,6 +25,21 @@ jobs:
         with:
           ref: main
           path: main
+
+      # Load version from .env-version file
+      - name: Load version variables
+        working-directory: main
+        run: |
+          if [ -f .env-version ]; then
+            export $(cat .env-version | grep -v '^#' | xargs)
+            echo "PROJECT_VERSION=$PROJECT_VERSION" >> $GITHUB_ENV
+            echo "PROJECT_CODENAME=$PROJECT_CODENAME" >> $GITHUB_ENV
+            echo "Loaded version: $PROJECT_VERSION ($PROJECT_CODENAME)"
+          else
+            echo "PROJECT_VERSION=0.0.0-dev" >> $GITHUB_ENV
+            echo "PROJECT_CODENAME=Unnamed" >> $GITHUB_ENV
+            echo "Warning: .env-version not found, using defaults"
+          fi
 
       # Checkout docs/devs branch for developer docs (if exists)
       - name: Checkout docs/devs branch
