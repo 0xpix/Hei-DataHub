@@ -1,0 +1,11 @@
+# Include version configuration
+include version.yaml
+
+# Include documentation
+include README.md
+include LICENSE
+
+# Include important root files
+include pyproject.toml
+include uv.lock
+include mkdocs.yml
