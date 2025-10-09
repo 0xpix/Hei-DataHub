@@ -80,14 +80,6 @@ bash scripts/create_desktop_entry.sh
 Linux:
 
 ```bash
-git clone <your-repo-url>
-cd Hei-DataHub
-uv sync --dev && source .venv/bin/activate
-hei-datahub     # or: mini-datahub
-```
-
-**Note:** We use [uv](https://github.com/astral-sh/uv) for fast, reproducible dependency management. Install it with:
-```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 git clone git@github.com:0xpix/Hei-DataHub.git
 cd Hei-DataHub
