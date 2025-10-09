@@ -509,8 +509,8 @@ def main():
 
     parser.add_argument(
         "--version",
-        action="version",
-        version=f"{__app_name__} {__version__}",
+        action="store_true",
+        help="Show version information with ASCII art",
     )
 
     parser.add_argument(
@@ -608,7 +608,12 @@ def main():
     # Parse arguments
     args = parser.parse_args()
 
-    # Handle --version-info flag
+    # Handle --version flag (simple display with dog ASCII)
+    if hasattr(args, 'version') and args.version:
+        print_version_info(verbose=False)
+        sys.exit(0)
+
+    # Handle --version-info flag (detailed display with dog ASCII)
     if hasattr(args, 'version_info') and args.version_info:
         print_version_info(verbose=True)
         sys.exit(0)
