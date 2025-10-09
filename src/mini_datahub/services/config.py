@@ -41,6 +41,9 @@ class LogoConfig(BaseModel):
     color: str = Field(default="cyan")  # color name or theme token
     padding_top: int = Field(default=0, ge=0)
     padding_bottom: int = Field(default=1, ge=0)
+    show_version_tag: bool = Field(default=True)  # Show version tag under logo
+    version_format: str = Field(default="v{version} — {codename}")  # Format string for version tag
+    version_style: Optional[str] = Field(default="accent")  # Rich markup style for version tag
 
 
 class ThemeConfig(BaseModel):
@@ -176,9 +179,24 @@ class ConfigManager:
                         "align": "center",
                         "color": "cyan",
                         "padding_top": 0,
-                        "padding_bottom": 1
+                        "padding_bottom": 1,
+                        "show_version_tag": True,
+                        "version_format": "v{version} — {codename}",
+                        "version_style": "accent"
                     }
                 }
+            else:
+                # Ensure logo section exists and has new fields
+                if "logo" not in data["ui"]:
+                    data["ui"]["logo"] = {}
+
+                logo = data["ui"]["logo"]
+                if "show_version_tag" not in logo:
+                    logo["show_version_tag"] = True
+                if "version_format" not in logo:
+                    logo["version_format"] = "v{version} — {codename}"
+                if "version_style" not in logo:
+                    logo["version_style"] = "accent"
 
             # Add theme.stylesheets and theme.tokens if not present
             if "theme" in data:
@@ -220,6 +238,9 @@ class ConfigManager:
                 f.write(f"    color: {data['ui']['logo']['color']}  # color name\n")
                 f.write(f"    padding_top: {data['ui']['logo']['padding_top']}\n")
                 f.write(f"    padding_bottom: {data['ui']['logo']['padding_bottom']}\n")
+                f.write(f"    show_version_tag: {str(data['ui']['logo'].get('show_version_tag', True)).lower()}  # Show version tag under logo\n")
+                f.write(f"    version_format: \"{data['ui']['logo'].get('version_format', 'v{version} — {codename}')}\"  # Format: {{version}} {{codename}}\n")
+                f.write(f"    version_style: {data['ui']['logo'].get('version_style') or 'accent'}  # Rich markup style (accent, cyan, etc.)\n")
                 if data['ui'].get('help_file'):
                     f.write(f"  help_file: {data['ui']['help_file']}\n")
                 f.write("\n")
@@ -386,6 +407,9 @@ class ConfigManager:
             "color": self.get("ui.logo.color", "cyan"),
             "padding_top": self.get("ui.logo.padding_top", 0),
             "padding_bottom": self.get("ui.logo.padding_bottom", 1),
+            "show_version_tag": self.get("ui.logo.show_version_tag", True),
+            "version_format": self.get("ui.logo.version_format", "v{version} — {codename}"),
+            "version_style": self.get("ui.logo.version_style", "accent"),
         }
 
     def get_stylesheets(self) -> list[str]:
