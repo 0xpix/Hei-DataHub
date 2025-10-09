@@ -86,16 +86,16 @@ keybindings:
 1. Create a custom TCSS file:
    ```css
    /* ~/.config/hei-datahub/theme/custom.tcss */
-   
+
    #banner {
        background: #2d3748;
        border: solid green;
    }
-   
+
    #results-table {
        border: solid cyan;
    }
-   
+
    .filter-badge {
        background: #4a5568;
        color: #f7fafc;
@@ -147,10 +147,10 @@ keybindings:
   # Use Vim-style navigation
   move_down: ["j", "down", "ctrl+n"]
   move_up: ["k", "up", "ctrl+p"]
-  
+
   # Add multiple keys for the same action
   quit: ["q", "ctrl+q", "ctrl+c"]
-  
+
   # Use special key combinations
   add_dataset: ["a", "ctrl+shift+n"]
   settings: ["s", "ctrl+comma"]
@@ -332,13 +332,13 @@ keybindings:
   # Multi-key bindings
   add_dataset: ["a", "ctrl+n", "insert"]
   quit: ["q", "ctrl+q", "ctrl+d"]
-  
+
   # Vim-style
   move_down: ["j", "ctrl+n"]
   move_up: ["k", "ctrl+p"]
   jump_top: ["gg"]
   jump_bottom: ["G"]
-  
+
   # Quick access
   settings: ["s", "comma"]
   show_help: ["?", "f1"]
