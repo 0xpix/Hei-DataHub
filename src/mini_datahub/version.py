@@ -121,17 +121,94 @@ def get_version_info() -> dict:
 
 
 def print_version_info(verbose: bool = False) -> None:
-    """Print version information to stdout."""
-    print(f"{__app_name__} {__version__}")
-    if verbose:
-        print(f"Build: {BUILD_NUMBER}")
-        print(f"Release Date: {RELEASE_DATE}")
-        print(f"Codename: {CODENAME}")
-        print(f"Compatibility: {COMPATIBILITY}")
-        print(f"Repository: {GITHUB_URL}")
-        print(f"Documentation: {DOCS_URL}")
+    """Print version information to stdout with beautiful formatting."""
+    try:
+        from rich.console import Console
+        from pathlib import Path
         import sys
-        print(f"Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({sys.implementation.name})")
+        import platform
+
+        console = Console()
+
+        # Load dog ASCII art
+        dog_path = Path(__file__).parent / "ui" / "assets" / "ascii" / "dog.txt"
+        if dog_path.exists():
+            dog_lines = dog_path.read_text().splitlines()
+        else:
+            dog_lines = ["[ASCII art not found]"]
+
+        # Prepare info lines based on verbosity
+        if verbose:
+            info_lines = [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                f"[bold cyan]{__app_name__}[/bold cyan]",
+                "",
+                f"[bold]Version:[/bold] [green]{__version__}[/green]",
+                f"[bold]Codename:[/bold] [yellow]{CODENAME}[/yellow]",
+                f"[bold]Build:[/bold] {BUILD_NUMBER}",
+                f"[bold]Release Date:[/bold] {RELEASE_DATE}",
+                "",
+                f"[bold]Python:[/bold] {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+                f"[bold]Platform:[/bold] {platform.system()} {platform.machine()}",
+                "",
+                f"[bold]Repository:[/bold]",
+                f"  [link={GITHUB_URL}]{GITHUB_URL}[/link]",
+                f"[bold]Documentation:[/bold]",
+                f"  [link={DOCS_URL}]{DOCS_URL}[/link]",
+            ]
+        else:
+            info_lines = [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                f"[bold cyan]{__app_name__}[/bold cyan]",
+                "",
+                f"[bold]Version:[/bold] [green]{__version__}[/green]",
+                f"[bold]Codename:[/bold] [yellow]{CODENAME}[/yellow]",
+                "",
+                f"[dim]Use --version-info for details[/dim]",
+            ]
+
+        # Calculate max width of dog ASCII (for padding)
+        dog_width = max(len(line) for line in dog_lines) if dog_lines else 0
+
+        # Build side-by-side display: dog on left, info on right
+        console.print()
+        for i in range(max(len(dog_lines), len(info_lines))):
+            # Get dog line (left side)
+            dog_line = dog_lines[i] if i < len(dog_lines) else ""
+
+            # Get info line (right side)
+            info_line = info_lines[i] if i < len(info_lines) else ""
+
+            # Print dog in dim cyan + spacing + info
+            # Using markup=True to handle Rich formatting in info_line
+            console.print(f"[dim cyan]{dog_line.ljust(dog_width)}[/dim cyan]  {info_line}", highlight=False)
+
+        console.print()
+
+    except ImportError:
+        # Fallback to simple text if Rich is not available
+        print(f"{__app_name__} {__version__}")
+        if verbose:
+            print(f"Build: {BUILD_NUMBER}")
+            print(f"Release Date: {RELEASE_DATE}")
+            print(f"Codename: {CODENAME}")
+            print(f"Compatibility: {COMPATIBILITY}")
+            print(f"Repository: {GITHUB_URL}")
+            print(f"Documentation: {DOCS_URL}")
+            import sys
+            print(f"Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({sys.implementation.name})")
 
 
 __all__ = [
