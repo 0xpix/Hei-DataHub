@@ -24,7 +24,7 @@
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
-**📦 Latest Release:** [v${PROJECT_VERSION} "${PROJECT_CODENAME}" - Documentation Overhaul & Bug Fixes]
+**📦 Latest Release:** 0.57.2-beta "Renovation" - Documentation Overhaul & Bug Fixes
 
 ---
 
