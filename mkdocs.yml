@@ -101,8 +101,8 @@ nav:
 extra:
   version:
     provider: mike
-  project_version: !ENV [PROJECT_VERSION]
-  project_codename: !ENV [PROJECT_CODENAME]
+  project_version: "0.57.2-beta"
+  project_codename: "Renovation"
   logo: assets/dark_logo.svg
   social:
     - icon: fontawesome/brands/github
