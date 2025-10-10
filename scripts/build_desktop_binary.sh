@@ -7,6 +7,7 @@
 #   bash scripts/build_desktop_binary.sh
 #
 # Requirements:
+#   - uv (package manager)
 #   - pyinstaller (will be installed if not present)
 #   - Active Python environment with hei-datahub installed
 #
@@ -21,18 +22,36 @@ echo ""
 # Ensure we're in the project root
 cd "$(dirname "$0")/.."
 
-# Check if we're in a virtual environment
-if [ -z "${VIRTUAL_ENV}" ] && [ ! -f ".venv/bin/activate" ]; then
-    echo "⚠️  No virtual environment detected."
-    echo "   Please activate your venv first:"
-    echo "   source .venv/bin/activate"
+# Check if uv is installed
+if ! command -v uv >/dev/null 2>&1; then
+    echo "❌ Error: uv is not installed"
+    echo "   Install it with: curl -LsSf https://astral.sh/uv/install.sh | sh"
     exit 1
 fi
 
+# Check if we're in a virtual environment
+if [ -z "${VIRTUAL_ENV}" ] && [ ! -f ".venv/bin/activate" ]; then
+    echo "⚠️  No virtual environment detected."
+    echo "   Creating .venv with uv..."
+    uv venv
+    source .venv/bin/activate
+fi
+
+# Activate venv if not already active
+if [ -z "${VIRTUAL_ENV}" ] && [ -f ".venv/bin/activate" ]; then
+    echo "📦 Activating virtual environment..."
+    source .venv/bin/activate
+fi
+
+# Ensure project is installed in editable mode
+echo "📦 Installing project dependencies with uv..."
+uv pip install -e .
+echo ""
+
 # Install PyInstaller if not present
 if ! command -v pyinstaller >/dev/null 2>&1; then
-    echo "📦 Installing PyInstaller..."
-    pip install pyinstaller
+    echo "📦 Installing PyInstaller with uv..."
+    uv pip install pyinstaller
     echo ""
 fi
 
@@ -54,6 +73,10 @@ pyinstaller \
     --onefile \
     --name hei-datahub \
     --add-data "src/mini_datahub/infra/sql:mini_datahub/infra/sql" \
+    --add-data "src/mini_datahub/ui/styles:mini_datahub/ui/styles" \
+    --add-data "src/mini_datahub/ui/assets:mini_datahub/ui/assets" \
+    --add-data "src/hei_datahub/assets:hei_datahub/assets" \
+    --add-data "src/mini_datahub/version.yaml:mini_datahub" \
     --hidden-import=mini_datahub \
     --hidden-import=mini_datahub.cli.main \
     --hidden-import=textual \
