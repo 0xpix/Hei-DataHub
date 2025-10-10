@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Symbolic icon for system tray - single color, simple shapes -->
+  <!-- This will be recolored by the system theme -->
+  <g fill="currentColor">
+    <!-- Simple "H" shape representing Hei-DataHub -->
+    <rect x="2" y="2" width="2" height="12"/>
+    <rect x="2" y="7" width="10" height="2"/>
+    <rect x="10" y="2" width="2" height="12"/>
+    <!-- Small data symbol (dots) -->
+    <circle cx="6" cy="4" r="0.8"/>
+    <circle cx="8" cy="4" r="0.8"/>
+    <circle cx="6" cy="11" r="0.8"/>
+    <circle cx="8" cy="11" r="0.8"/>
+  </g>
+</svg>
