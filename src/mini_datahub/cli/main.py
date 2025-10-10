@@ -212,14 +212,15 @@ pause
 
         input()  # Wait for user confirmation
 
-        # Execute batch script in the same terminal using os.execv
+        # Execute batch script in the same terminal
         import os
         console.print("\n[bold green]✓ Starting update...[/bold green]\n")
-
-        # Use os.system to run in the same window (this will replace the current process)
-        os.execv('C:\\Windows\\System32\\cmd.exe', ['cmd', '/c', temp_batch])
-
-        # This line will never be reached because os.execv replaces the process
+        
+        # Use os.system to run the batch file directly, then exit
+        # This works on both native Windows and WSL
+        os.system(f'cmd.exe /c "{temp_batch}"')
+        
+        # Exit after the batch script completes
         sys.exit(0)
 
     # Initialize atomic update manager for non-Windows systems
