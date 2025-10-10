@@ -261,6 +261,124 @@ def handle_doctor(args):
     sys.exit(exit_code)
 
 
+def handle_setup_desktop(args):
+    """Handle setup desktop command."""
+    try:
+        from hei_datahub.desktop_install import (
+            install_desktop_assets,
+            get_install_paths_info,
+            get_desktop_assets_status,
+        )
+    except ImportError:
+        print("❌ Desktop integration module not available", file=sys.stderr)
+        sys.exit(1)
+
+    import sys
+
+    # Check platform
+    if sys.platform != "linux" and not sys.platform.startswith("linux"):
+        print("❌ Desktop integration is only available on Linux")
+        print(f"   Current platform: {sys.platform}")
+        sys.exit(1)
+
+    # Show current status
+    status = get_desktop_assets_status()
+    print("Desktop Integration Setup")
+    print("=" * 60)
+    print()
+
+    print("Current Status:")
+    print(f"  Installed:       {'✓ Yes' if status['installed'] else '✗ No'}")
+    if status['version']:
+        print(f"  Version:         {status['version']}")
+    print(f"  Current version: {status['current_version']}")
+    print(f"  Needs update:    {'Yes' if status['needs_update'] else 'No'}")
+    print()
+
+    # Show paths
+    print(get_install_paths_info())
+    print()
+
+    # Perform installation
+    force = getattr(args, 'force', False)
+    no_cache_refresh = getattr(args, 'no_cache_refresh', False)
+
+    print("Installing desktop assets...")
+    print()
+
+    result = install_desktop_assets(
+        user_scope=True,
+        force=force,
+        verbose=True
+    )
+
+    print()
+    if result['success']:
+        if result.get('skipped', False):
+            print("✓ Desktop assets are already up-to-date")
+        else:
+            print("✓ Desktop assets installed successfully")
+            print()
+            print("Installed files:")
+            for filepath in result['installed_files']:
+                print(f"  • {filepath}")
+            print()
+            if result['cache_refreshed']:
+                print("✓ Icon caches refreshed")
+            else:
+                print("⚠ Icon cache refresh skipped (tools not available)")
+            print()
+            print("The application should now appear in your launcher/app grid.")
+            print("If the icon doesn't appear immediately, try:")
+            print("  • Logging out and back in")
+            print("  • Restarting your desktop environment")
+            print("  • Running: killall -HUP gnome-shell (GNOME)")
+    else:
+        print(f"❌ Installation failed: {result['message']}")
+        sys.exit(1)
+
+    print()
+    print("=" * 60)
+    sys.exit(0)
+
+
+def handle_uninstall(args):
+    """Handle uninstall command."""
+    try:
+        from hei_datahub.desktop_install import uninstall_desktop_assets
+    except ImportError:
+        print("❌ Desktop integration module not available", file=sys.stderr)
+        sys.exit(1)
+
+    import sys
+
+    # Check platform
+    if sys.platform != "linux" and not sys.platform.startswith("linux"):
+        print("Desktop integration is only available on Linux (nothing to uninstall)")
+        sys.exit(0)
+
+    print("Uninstalling Desktop Integration")
+    print("=" * 60)
+    print()
+
+    result = uninstall_desktop_assets(verbose=True)
+
+    print()
+    if result['success']:
+        if result['removed_files']:
+            print(f"✓ Removed {len(result['removed_files'])} file(s)")
+            print()
+            print("Desktop launcher and icons have been removed.")
+        else:
+            print("✓ No desktop assets found (already uninstalled)")
+    else:
+        print(f"⚠ Uninstall completed with warnings: {result['message']}")
+
+    print()
+    print("=" * 60)
+    sys.exit(0)
+
+
 def handle_paths(args):
     """Handle paths diagnostic command."""
     from mini_datahub.infra import paths
@@ -416,6 +534,35 @@ def main():
     )
     parser_update.set_defaults(func=handle_update)
 
+    # Desktop integration command with subcommands
+    parser_desktop = subparsers.add_parser(
+        "desktop",
+        help="Manage desktop integration (Linux only)"
+    )
+    desktop_subparsers = parser_desktop.add_subparsers(dest="desktop_command")
+
+    parser_desktop_install = desktop_subparsers.add_parser(
+        "install",
+        help="Install desktop integration (icons and .desktop entry)"
+    )
+    parser_desktop_install.add_argument(
+        "--force",
+        action="store_true",
+        help="Force reinstall even if already up-to-date"
+    )
+    parser_desktop_install.add_argument(
+        "--no-cache-refresh",
+        action="store_true",
+        help="Skip refreshing icon caches"
+    )
+    parser_desktop_install.set_defaults(func=handle_setup_desktop)
+
+    parser_desktop_uninstall = desktop_subparsers.add_parser(
+        "uninstall",
+        help="Uninstall desktop integration (removes launcher and icons)"
+    )
+    parser_desktop_uninstall.set_defaults(func=handle_uninstall)
+
     # Keymap commands
     parser_keymap = subparsers.add_parser(
         "keymap",
@@ -463,14 +610,34 @@ def main():
     from mini_datahub.infra.paths import initialize_workspace
     initialize_workspace()
 
+    # Ensure desktop assets are installed (Linux only, idempotent, fast)
+    # This happens automatically on first run after workspace initialization
+    try:
+        from hei_datahub.desktop_install import ensure_desktop_assets_once
+        # Only show message if actually installing (not if already present)
+        if ensure_desktop_assets_once(verbose=False):
+            # Installed for first time - show a subtle message
+            print("✓ Desktop integration installed")
+    except ImportError:
+        pass  # Desktop integration module not available
+    except Exception:
+        pass  # Silently ignore errors during auto-install
+
     # Apply CLI config overrides
     if hasattr(args, 'set') and args.set:
         from mini_datahub.services.config import get_config
         config = get_config()
         config.parse_cli_overrides(args.set)
 
+    # Handle desktop subcommands
+    if args.command == "desktop":
+        if hasattr(args, 'func'):
+            args.func(args)
+        else:
+            parser.print_help()
+            sys.exit(1)
     # Handle keymap subcommands
-    if args.command == "keymap":
+    elif args.command == "keymap":
         if hasattr(args, 'func'):
             args.func(args)
         else:
