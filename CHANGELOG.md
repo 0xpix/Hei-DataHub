@@ -7,7 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.58.3-beta] - 2025-10-10
+## [Unreleased]
+
+## [0.58.3-beta] - 2025-10-10 - Windows Update Fix
+
+**The Windows update nightmare is finally over!** This release completely solves the "Failed to install entrypoint" error that plagued Windows users.
+
+### Added
+
+- Each OS now has its own dedicated, maintainable update script!
+- **Interactive Branch Selection** - Windows users can now choose update branch
+
+### Fixed
+
+- **Critical: "Failed to install entrypoint" Error** - The root cause and solution:
+  - **Problem**: Windows locks `.exe` files while they're running (OS error 32)
+  - **Previous Issue**: Running `uv tool install` while `hei-datahub.exe` was active
+  - **Solution**: External batch script + new terminal strategy
+  - **Result**: Python exits completely before update runs = no file lock! ✨
+
+### Documentation
+
+- Updated all Windows-related documentation
+- Added inline comments explaining the Windows workaround
+- Documented the OS-specific architecture
+
+---
+
+## [0.58.2-beta] - 2025-10-10
 
 ### Added
 
