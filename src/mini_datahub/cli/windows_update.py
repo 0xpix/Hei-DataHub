@@ -24,9 +24,19 @@ echo =====================================
 echo.
 echo Updating to branch: {branch}
 echo.
-echo [1/2] Waiting for app to close...
-timeout /t 3 /nobreak >nul
-echo [2/2] Running update...
+echo [1/3] Waiting for Python process to exit...
+timeout /t 2 /nobreak >nul
+
+echo [2/3] Checking if hei-datahub.exe is still running...
+:WAIT_LOOP
+tasklist /FI "IMAGENAME eq hei-datahub.exe" 2>NUL | find /I /N "hei-datahub.exe">NUL
+if "%ERRORLEVEL%"=="0" (
+    echo Still running... waiting 2 more seconds
+    timeout /t 2 /nobreak >nul
+    goto WAIT_LOOP
+)
+
+echo [3/3] Running update...
 echo.
 
 uv tool install --force --python-preference only-managed git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}
@@ -72,12 +82,23 @@ pause
 
     input()  # Wait for user confirmation
 
-    # Execute batch script in the same terminal
-    console.print("\n[bold green]✓ Starting update...[/bold green]\n")
+    # Execute batch script in the same terminal using START command
+    # START /B runs it in the background, allowing Python to exit immediately
+    console.print("\n[bold green]✓ Starting update...[/bold green]")
+    console.print("[dim]The update will continue in 3 seconds...[/dim]\n")
 
-    # Use os.system to run the batch file directly, then exit
-    # This works on both native Windows and WSL
-    os.system(f'cmd.exe /c "{temp_batch}"')
+    import subprocess
+    # Use subprocess.Popen to start the batch script without waiting
+    # The batch script will wait for Python to exit before running uv
+    # On Windows, we don't create a new window - it runs in the same terminal
+    try:
+        # Try to use CREATE_NO_WINDOW flag (Windows only)
+        CREATE_NO_WINDOW = 0x08000000
+        subprocess.Popen(['cmd.exe', '/c', temp_batch], creationflags=CREATE_NO_WINDOW)
+    except:
+        # Fallback for non-Windows or if flag doesn't work
+        subprocess.Popen(['cmd.exe', '/c', temp_batch])
 
-    # Exit after the batch script completes
+    # Exit immediately to release the file lock
+    # The batch script is now running independently and will check for process exit
     sys.exit(0)
