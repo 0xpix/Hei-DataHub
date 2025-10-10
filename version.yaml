@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.58.1-beta"
+version: "0.58.2-beta"
 codename: "Streamline"
-release_date: "2025-10-09"
+release_date: "2025-10-10"
 compatibility: "Hei-DataHub v0.58.x (beta)"
-notes: "Beta release with new installation and desktop integration features."
+notes: "Beta release with automatic desktop integration on Linux - icons and launcher installed automatically."
 
 # Additional metadata
 app_name: "Hei-DataHub"
