@@ -39,15 +39,15 @@ def windows_update(args, console):
         console.print("\n[yellow]Update cancelled.[/yellow]")
         sys.exit(0)
 
-    # Create temporary batch script
+    # Create temporary batch script (using ASCII-safe characters for Windows compatibility)
     batch_content = f"""@echo off
 cls
 echo.
-echo ┌────────────────────────────────────────────────────────────────┐
-echo │                                                                │
-echo │              Hei-DataHub Windows Update                       │
-echo │                                                                │
-echo └────────────────────────────────────────────────────────────────┘
+echo ================================================================
+echo.
+echo              Hei-DataHub Windows Update
+echo.
+echo ================================================================
 echo.
 echo Branch: {branch}
 echo.
@@ -70,9 +70,9 @@ uv tool install --force --python-preference only-managed git+ssh://git@github.co
 
 if %ERRORLEVEL% neq 0 (
     echo.
-    echo ┌────────────────────────────────────────────────────────────────┐
-    echo │  ERROR: Update failed!                                        │
-    echo └────────────────────────────────────────────────────────────────┘
+    echo ================================================================
+    echo   ERROR: Update failed!
+    echo ================================================================
     echo.
     echo Try using HTTPS with a token:
     echo   1. Get token: https://github.com/settings/tokens
@@ -84,19 +84,19 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo ┌────────────────────────────────────────────────────────────────┐
-echo │                                                                │
-echo │  ✓ Update completed successfully!                             │
-echo │                                                                │
-echo └────────────────────────────────────────────────────────────────┘
+echo ================================================================
+echo.
+echo   Update completed successfully!
+echo.
+echo ================================================================
 echo.
 echo You can now run: hei-datahub
 echo.
 pause
 """
 
-    # Write to temp file
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False) as f:
+    # Write to temp file with UTF-8 encoding
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False, encoding='utf-8') as f:
         temp_batch = f.name
         f.write(batch_content)
 
