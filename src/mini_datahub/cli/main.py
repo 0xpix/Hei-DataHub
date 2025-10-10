@@ -144,6 +144,15 @@ def handle_update(args):
 
     console = Console()
 
+    # Initialize atomic update manager
+    manager = AtomicUpdateManager(console=console)
+
+    # Handle --check or --repair flags
+    if getattr(args, 'check', False) or getattr(args, 'repair', False):
+        console.print("\n[bold cyan]🔍 Checking Installation Health[/bold cyan]\n")
+        manager.check_and_repair()
+        return
+
     # Load ASCII logo
     try:
         logo_path = Path(__file__).parent.parent / "ui" / "assets" / "ascii" / "logo_default.txt"
@@ -187,9 +196,6 @@ def handle_update(args):
     )
     console.print(version_box)
     console.print()
-
-    # Initialize atomic update manager
-    manager = AtomicUpdateManager(console=console)
 
     try:
         # Run the atomic update process
@@ -531,6 +537,16 @@ def main():
         "--force",
         action="store_true",
         help="Skip preflight safety checks (use with caution)"
+    )
+    parser_update.add_argument(
+        "--check",
+        action="store_true",
+        help="Check installation health and offer to repair if broken"
+    )
+    parser_update.add_argument(
+        "--repair",
+        action="store_true",
+        help="Repair a broken installation (alias for --check)"
     )
     parser_update.set_defaults(func=handle_update)
 
