@@ -19,6 +19,24 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 **[Read the full What's New guide →](whats-new/0.58-beta.md)**
 
+## [0.58.3-beta] - 2025-10-10 - Windows Update Patch
+
+**The Windows SUCKS Patch** - This patch completely solves the "Failed to install entrypoint" error that plagued Windows users.
+
+### Added
+- Each OS now has its own dedicated, maintainable update script!
+- **Interactive Branch Selection** - Windows users can now choose update branch
+- **Update Repair Tool** - New `hei-datahub update --repair` command to fix broken installations
+- **Installation Health Check** - Pre-flight check for file locks before attempting update
+- **Better Error Recovery** - Specific error messages for "failed to remove directory" errors
+
+### Fixed
+- **Critical: "Failed to install entrypoint" Error** - The root cause and solution:
+  - **Problem**: Windows locks `.exe` files while they're running (OS error 32)
+  - **Previous Issue**: Running `uv tool install` while `hei-datahub.exe` was active
+  - **Solution**: External batch script + new terminal strategy
+  - **Result**: Python exits completely before update runs = no file lock!
+
 ### **v0.58.2-beta** (Oct 10, 2025) — Bug fix release
 
 - **Atomic Updates** — Update command never breaks existing installation (Windows/Linux) - **Haven't tested on macOS yet**
