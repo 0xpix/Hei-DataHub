@@ -134,236 +134,32 @@ def handle_keymap_import(args):
         sys.exit(1)
 
 
-def windows_update(args, console):
-    """Windows-specific update using external batch script to avoid file locks."""
-    import sys
-    import tempfile
-    import os
-    from rich.panel import Panel
-
-    console.print("\n[bold cyan]🪟 Windows Update Strategy[/bold cyan]\n")
-    console.print("[dim]Windows locks running executables, so we'll use an external script...[/dim]\n")
-
-    # Get branch parameter
-    branch = getattr(args, 'branch', None) or 'main'
-
-    # Create temporary batch script
-    batch_content = f"""@echo off
-echo.
-echo =====================================
-echo  Hei-DataHub Windows Update
-echo =====================================
-echo.
-echo Updating to branch: {branch}
-echo.
-echo [1/2] Waiting for app to close...
-timeout /t 3 /nobreak >nul
-echo [2/2] Running update...
-echo.
-
-uv tool install --force --python-preference only-managed git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}
-
-if %ERRORLEVEL% neq 0 (
-    echo.
-    echo ERROR: Update failed!
-    echo.
-    echo Try using HTTPS with a token:
-    echo   1. Get token: https://github.com/settings/tokens
-    echo   2. Run: set GH_PAT=your_token
-    echo   3. Run: uv tool install --force git+https://%%GH_PAT%%@github.com/0xpix/Hei-DataHub@{branch}
-    echo.
-    pause
-    exit /b 1
-)
-
-echo.
-echo =====================================
-echo  Update completed successfully!
-echo =====================================
-echo.
-echo You can now run: hei-datahub
-echo.
-pause
-"""
-
-    # Write to temp file
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False) as f:
-        temp_batch = f.name
-        f.write(batch_content)
-
-    console.print(Panel(
-        "[bold green]✓ Update script created[/bold green]\n\n"
-        "The app will now:\n"
-        "  1. Exit to release the executable lock\n"
-        "  2. Run the update script in this window\n"
-        "  3. Update will complete automatically\n\n"
-        "[dim]Press any key to continue...[/dim]",
-        title="[bold cyan]🚀 Ready to Update[/bold cyan]",
-        border_style="cyan"
-    ))
-
-    input()  # Wait for user confirmation
-
-    # Execute batch script in the same terminal
-    console.print("\n[bold green]✓ Starting update...[/bold green]\n")
-    
-    # Use os.system to run the batch file directly, then exit
-    # This works on both native Windows and WSL
-    os.system(f'cmd.exe /c "{temp_batch}"')
-    
-    # Exit after the batch script completes
-    sys.exit(0)
-
-
-def linux_update(args, console):
-    """Linux-specific update using AtomicUpdateManager."""
-    from pathlib import Path
-    from rich.panel import Panel
-    from rich.align import Align
-    from mini_datahub.cli.update_manager import AtomicUpdateManager
-
-    # Initialize atomic update manager
-    manager = AtomicUpdateManager(console=console)
-
-    # Handle --check or --repair flags
-    if getattr(args, 'check', False) or getattr(args, 'repair', False):
-        console.print("\n[bold cyan]🔍 Checking Installation Health[/bold cyan]\n")
-        manager.check_and_repair()
-        return
-
-    # Load ASCII logo
-    try:
-        logo_path = Path(__file__).parent.parent / "ui" / "assets" / "ascii" / "logo_default.txt"
-        if logo_path.exists():
-            logo_text = logo_path.read_text()
-        else:
-            logo_text = None
-    except:
-        logo_text = None
-
-    # Display beautiful header with logo
-    console.print()
-
-    if logo_text:
-        # Display logo in cyan gradient
-        logo_lines = logo_text.strip().split('\n')
-        for line in logo_lines:
-            console.print(f"[bold cyan]{line}[/bold cyan]", justify="center")
-        console.print()
-        console.print(Align.center("[bold bright_white]━━━━━━━━━━━━━ UPDATE MANAGER ━━━━━━━━━━━━━[/bold bright_white]"))
-        console.print(Align.center("[dim italic]Atomic updates • Never lose your working app ✨[/dim italic]"))
-    else:
-        # Fallback if logo not found
-        console.print(Panel.fit(
-            "[bold cyan]🚀 Hei-DataHub Update Manager[/bold cyan]\n"
-            "[dim]Atomic updates • Never lose your working app[/dim]",
-            border_style="cyan"
-        ))
-
-    console.print()
-    console.print("─" * console.width, style="dim")
-    console.print()
-
-    # Get current version in a nice box
-    from mini_datahub import __version__
-    current_version = __version__
-    version_box = Panel(
-        f"[bold yellow]{current_version}[/bold yellow]",
-        title="[bold]📍 Current Version[/bold]",
-        border_style="yellow",
-        padding=(0, 2)
-    )
-    console.print(version_box)
-    console.print()
-
-    try:
-        # Run the atomic update process
-        from mini_datahub.cli.update_manager import UpdateError, format_error_panel
-        import sys
-        
-        manager.run_update(
-            branch=getattr(args, 'branch', None),
-            force=getattr(args, 'force', False)
-        )
-
-        # Success - show next steps
-        from rich.table import Table
-        from rich import box
-
-        console.print()
-        next_steps = Table(
-            show_header=False,
-            box=box.SIMPLE,
-            padding=(0, 1)
-        )
-        next_steps.add_column("Icon", style="bold cyan")
-        next_steps.add_column("Command", style="cyan")
-        next_steps.add_column("Description", style="dim")
-
-        next_steps.add_row("📋", "hei-datahub --version-info", "View detailed version information")
-        next_steps.add_row("🏥", "hei-datahub doctor", "Run system health checks")
-        next_steps.add_row("🚀", "hei-datahub", "Launch the application")
-
-        console.print(Panel(
-            next_steps,
-            title="[bold]🎯 Next Steps[/bold]",
-            border_style="cyan"
-        ))
-        console.print()
-        sys.exit(0)
-
-    except UpdateError as e:
-        # Display formatted error with phase-specific guidance
-        format_error_panel(e, console)
-        console.print()
-
-        # Exit with different codes based on recoverability
-        sys.exit(2 if e.recoverable else 1)
-
-    except KeyboardInterrupt:
-        console.print("\n[yellow]⚠ Update cancelled by user[/yellow]")
-        sys.exit(130)
-
-    except Exception as e:
-        # Unexpected error
-        console.print()
-        console.print(Panel(
-            f"[bold red]Unexpected error during update:[/bold red]\n\n"
-            f"{type(e).__name__}: {str(e)}\n\n"
-            "[yellow]Your existing installation should still be intact.[/yellow]\n\n"
-            "If this persists, please report at:\n"
-            "https://github.com/0xpix/Hei-DataHub/issues",
-            title="[red]Error[/red]",
-            border_style="red"
-        ))
-        sys.exit(1)
-
-
-def macos_update(args, console):
-    """macOS-specific update using AtomicUpdateManager (same as Linux for now)."""
-    # macOS can use the same logic as Linux
-    linux_update(args, console)
-
-
 def handle_update(args):
     """Handle the update subcommand with atomic update strategy.
-    
-    Dispatches to OS-specific update functions based on the platform.
+
+    Dispatches to OS-specific update modules based on the platform.
+    Each OS has its own dedicated update script:
+    - windows_update.py: Windows-specific logic with batch script workaround
+    - linux_update.py: Linux-specific logic with AtomicUpdateManager
+    - macos_update.py: macOS-specific logic (currently uses Linux implementation)
     """
     from rich.console import Console
     import sys
 
     console = Console()
 
-    # Detect OS and dispatch to appropriate update function
+    # Detect OS and dispatch to appropriate update module
     if sys.platform == "win32":
-        # Windows update
+        # Windows update - import and execute
+        from mini_datahub.cli.windows_update import windows_update
         windows_update(args, console)
     elif sys.platform == "darwin":
-        # macOS update
+        # macOS update - import and execute
+        from mini_datahub.cli.macos_update import macos_update
         macos_update(args, console)
     else:
-        # Linux and other Unix-like systems
+        # Linux and other Unix-like systems - import and execute
+        from mini_datahub.cli.linux_update import linux_update
         linux_update(args, console)
 
 
