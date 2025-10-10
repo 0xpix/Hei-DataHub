@@ -41,6 +41,9 @@ def windows_update(args, console):
 
     # Create temporary batch script (using ASCII-safe characters for Windows compatibility)
     batch_content = f"""@echo off
+REM Wait a moment for Python to start this script
+timeout /t 1 /nobreak >nul
+
 cls
 echo.
 echo ================================================================
@@ -100,23 +103,13 @@ pause
         temp_batch = f.name
         f.write(batch_content)
 
-    # Execute batch script using 'call' to run in the same window
-    console.print("\n[bold green]✓ Starting update...[/bold green]")
-    console.print("[dim]Preparing update script...[/dim]")
+    # Execute batch script and exit cleanly
+    console.print("\n[bold green]✓ Starting update...[/bold green]\n")
 
-    import subprocess
-    import time
+    # Use START command to launch the batch in the same window but detached
+    # /B = same window, /WAIT = not used (we want to exit immediately)
+    os.system(f'start /B cmd /c "{temp_batch}"')
 
-    # Give user a moment to see the message
-    time.sleep(1)
-
-    # Use 'call' command to run batch script in current terminal
-    # Using shell=True allows the batch to continue in the same window after Python exits
-    subprocess.Popen(f'call "{temp_batch}"', shell=True)
-
-    # Give subprocess a moment to start, then exit to release the file lock
-    time.sleep(0.5)
-
-    # Exit immediately to release the file lock
-    # The batch script will clear the screen and show clean output
+    # Exit Python immediately to release file lock
+    # The batch script has a 1-second delay to let this complete
     sys.exit(0)
