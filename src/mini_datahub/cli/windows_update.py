@@ -41,12 +41,15 @@ def windows_update(args, console):
 
     # Create temporary batch script
     batch_content = f"""@echo off
+cls
 echo.
-echo =====================================
-echo  Hei-DataHub Windows Update
-echo =====================================
+echo ┌────────────────────────────────────────────────────────────────┐
+echo │                                                                │
+echo │              Hei-DataHub Windows Update                       │
+echo │                                                                │
+echo └────────────────────────────────────────────────────────────────┘
 echo.
-echo Updating to branch: {branch}
+echo Branch: {branch}
 echo.
 echo [1/3] Waiting for Python process to exit...
 timeout /t 2 /nobreak >nul
@@ -55,7 +58,7 @@ echo [2/3] Checking if hei-datahub.exe is still running...
 :WAIT_LOOP
 tasklist /FI "IMAGENAME eq hei-datahub.exe" 2>NUL | find /I /N "hei-datahub.exe">NUL
 if "%ERRORLEVEL%"=="0" (
-    echo Still running... waiting 2 more seconds
+    echo        Still running... waiting 2 more seconds
     timeout /t 2 /nobreak >nul
     goto WAIT_LOOP
 )
@@ -67,7 +70,9 @@ uv tool install --force --python-preference only-managed git+ssh://git@github.co
 
 if %ERRORLEVEL% neq 0 (
     echo.
-    echo ERROR: Update failed!
+    echo ┌────────────────────────────────────────────────────────────────┐
+    echo │  ERROR: Update failed!                                        │
+    echo └────────────────────────────────────────────────────────────────┘
     echo.
     echo Try using HTTPS with a token:
     echo   1. Get token: https://github.com/settings/tokens
@@ -79,9 +84,11 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo =====================================
-echo  Update completed successfully!
-echo =====================================
+echo ┌────────────────────────────────────────────────────────────────┐
+echo │                                                                │
+echo │  ✓ Update completed successfully!                             │
+echo │                                                                │
+echo └────────────────────────────────────────────────────────────────┘
 echo.
 echo You can now run: hei-datahub
 echo.
@@ -95,17 +102,21 @@ pause
 
     # Execute batch script using 'call' to run in the same window
     console.print("\n[bold green]✓ Starting update...[/bold green]")
-    console.print("[dim]The app will exit and update will continue automatically...[/dim]\n")
+    console.print("[dim]Preparing update script...[/dim]")
 
     import subprocess
+    import time
+
+    # Give user a moment to see the message
+    time.sleep(1)
+
     # Use 'call' command to run batch script in current terminal
     # Using shell=True allows the batch to continue in the same window after Python exits
     subprocess.Popen(f'call "{temp_batch}"', shell=True)
 
     # Give subprocess a moment to start, then exit to release the file lock
-    import time
     time.sleep(0.5)
 
     # Exit immediately to release the file lock
-    # The batch script is now running independently and will check for process exit
+    # The batch script will clear the screen and show clean output
     sys.exit(0)
