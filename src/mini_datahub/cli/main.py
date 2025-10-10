@@ -134,29 +134,21 @@ def handle_keymap_import(args):
         sys.exit(1)
 
 
-def handle_update(args):
-    """Handle the update subcommand with atomic update strategy."""
-    from pathlib import Path
-    from rich.console import Console
-    from rich.panel import Panel
-    from rich.align import Align
-    from mini_datahub.cli.update_manager import AtomicUpdateManager, UpdateError, format_error_panel
+def windows_update(args, console):
+    """Windows-specific update using external batch script to avoid file locks."""
     import sys
     import tempfile
-    import subprocess
+    import os
+    from rich.panel import Panel
 
-    console = Console()
+    console.print("\n[bold cyan]🪟 Windows Update Strategy[/bold cyan]\n")
+    console.print("[dim]Windows locks running executables, so we'll use an external script...[/dim]\n")
 
-    # On Windows, use external script to avoid file lock issues
-    if sys.platform == "win32":
-        console.print("\n[bold cyan]🪟 Windows Update Strategy[/bold cyan]\n")
-        console.print("[dim]Windows locks running executables, so we'll use an external script...[/dim]\n")
+    # Get branch parameter
+    branch = getattr(args, 'branch', None) or 'main'
 
-        # Get branch parameter
-        branch = getattr(args, 'branch', None) or 'main'
-
-        # Create temporary batch script
-        batch_content = f"""@echo off
+    # Create temporary batch script
+    batch_content = f"""@echo off
 echo.
 echo =====================================
 echo  Hei-DataHub Windows Update
@@ -194,36 +186,43 @@ echo.
 pause
 """
 
-        # Write to temp file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False) as f:
-            temp_batch = f.name
-            f.write(batch_content)
+    # Write to temp file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False) as f:
+        temp_batch = f.name
+        f.write(batch_content)
 
-        console.print(Panel(
-            "[bold green]✓ Update script created[/bold green]\n\n"
-            "The app will now:\n"
-            "  1. Exit to release the executable lock\n"
-            "  2. Run the update script in this window\n"
-            "  3. Update will complete automatically\n\n"
-            "[dim]Press any key to continue...[/dim]",
-            title="[bold cyan]🚀 Ready to Update[/bold cyan]",
-            border_style="cyan"
-        ))
+    console.print(Panel(
+        "[bold green]✓ Update script created[/bold green]\n\n"
+        "The app will now:\n"
+        "  1. Exit to release the executable lock\n"
+        "  2. Run the update script in this window\n"
+        "  3. Update will complete automatically\n\n"
+        "[dim]Press any key to continue...[/dim]",
+        title="[bold cyan]🚀 Ready to Update[/bold cyan]",
+        border_style="cyan"
+    ))
 
-        input()  # Wait for user confirmation
+    input()  # Wait for user confirmation
 
-        # Execute batch script in the same terminal
-        import os
-        console.print("\n[bold green]✓ Starting update...[/bold green]\n")
-        
-        # Use os.system to run the batch file directly, then exit
-        # This works on both native Windows and WSL
-        os.system(f'cmd.exe /c "{temp_batch}"')
-        
-        # Exit after the batch script completes
-        sys.exit(0)
+    # Execute batch script in the same terminal
+    console.print("\n[bold green]✓ Starting update...[/bold green]\n")
+    
+    # Use os.system to run the batch file directly, then exit
+    # This works on both native Windows and WSL
+    os.system(f'cmd.exe /c "{temp_batch}"')
+    
+    # Exit after the batch script completes
+    sys.exit(0)
 
-    # Initialize atomic update manager for non-Windows systems
+
+def linux_update(args, console):
+    """Linux-specific update using AtomicUpdateManager."""
+    from pathlib import Path
+    from rich.panel import Panel
+    from rich.align import Align
+    from mini_datahub.cli.update_manager import AtomicUpdateManager
+
+    # Initialize atomic update manager
     manager = AtomicUpdateManager(console=console)
 
     # Handle --check or --repair flags
@@ -266,6 +265,7 @@ pause
     console.print()
 
     # Get current version in a nice box
+    from mini_datahub import __version__
     current_version = __version__
     version_box = Panel(
         f"[bold yellow]{current_version}[/bold yellow]",
@@ -278,6 +278,9 @@ pause
 
     try:
         # Run the atomic update process
+        from mini_datahub.cli.update_manager import UpdateError, format_error_panel
+        import sys
+        
         manager.run_update(
             branch=getattr(args, 'branch', None),
             force=getattr(args, 'force', False)
@@ -334,6 +337,34 @@ pause
             border_style="red"
         ))
         sys.exit(1)
+
+
+def macos_update(args, console):
+    """macOS-specific update using AtomicUpdateManager (same as Linux for now)."""
+    # macOS can use the same logic as Linux
+    linux_update(args, console)
+
+
+def handle_update(args):
+    """Handle the update subcommand with atomic update strategy.
+    
+    Dispatches to OS-specific update functions based on the platform.
+    """
+    from rich.console import Console
+    import sys
+
+    console = Console()
+
+    # Detect OS and dispatch to appropriate update function
+    if sys.platform == "win32":
+        # Windows update
+        windows_update(args, console)
+    elif sys.platform == "darwin":
+        # macOS update
+        macos_update(args, console)
+    else:
+        # Linux and other Unix-like systems
+        linux_update(args, console)
 
 
 def handle_doctor(args):
