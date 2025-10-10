@@ -123,7 +123,41 @@ git checkout main
 
 ---
 
-## Installation Issues
+## Installation & Update Issues
+
+### Updating on Windows
+
+**As of v0.58.3:** Windows updates work automatically! 🎉
+
+Simply run:
+```powershell
+hei-datahub update
+```
+
+The app will:
+1. Create a temporary update script
+2. Launch it in a new window
+3. Exit to allow updates
+4. Complete automatically
+
+**If you encounter issues:**
+
+**Option 1: Manual Update**
+1. Close ALL Hei-DataHub windows
+2. Open a **new** PowerShell window
+3. Run:
+   ```powershell
+   uv tool install --force git+ssh://git@github.com/0xpix/Hei-DataHub.git@main
+   ```
+
+**Option 2: Use the Standalone Batch Script**
+1. Download [windows_update.bat](https://github.com/0xpix/Hei-DataHub/raw/main/scripts/windows_update.bat)
+2. Close ALL Hei-DataHub windows
+3. Run the batch file
+
+**Why the special handling?** Windows locks executable files while running, preventing self-update. The automatic script workaround makes updates seamless.
+
+---
 
 ### App Command Not Found
 
