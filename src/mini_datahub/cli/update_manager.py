@@ -191,7 +191,7 @@ class AtomicUpdateManager:
         try:
             # Note: On Windows, the CLI (main.py) handles updates via external script
             # to avoid file lock issues. This method is primarily for non-Windows systems.
-            
+
             # Phase 1: Preflight
             self.console.print("\n[bold cyan]Phase 1: Preflight Checks[/bold cyan]")
             preflight_results = self.run_preflight_checks(force=force)
