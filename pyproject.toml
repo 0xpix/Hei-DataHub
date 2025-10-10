@@ -79,6 +79,11 @@ mini_datahub = [
     "ui/styles/*.tcss",
     "ui/assets/ascii/*.txt"
 ]
+hei_datahub = [
+    "assets/icons/*.svg",
+    "assets/icons/*.png",
+    "assets/desktop/*.tmpl"
+]
 
 [tool.black]
 line-length = 100
