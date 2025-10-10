@@ -151,10 +151,10 @@ def handle_update(args):
     if sys.platform == "win32":
         console.print("\n[bold cyan]🪟 Windows Update Strategy[/bold cyan]\n")
         console.print("[dim]Windows locks running executables, so we'll use an external script...[/dim]\n")
-        
+
         # Get branch parameter
         branch = getattr(args, 'branch', None) or 'main'
-        
+
         # Create temporary batch script
         batch_content = f"""@echo off
 echo.
@@ -193,34 +193,33 @@ echo You can now run: hei-datahub
 echo.
 pause
 """
-        
+
         # Write to temp file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False) as f:
             temp_batch = f.name
             f.write(batch_content)
-        
+
         console.print(Panel(
             "[bold green]✓ Update script created[/bold green]\n\n"
             "The app will now:\n"
-            "  1. Launch the update script in a new window\n"
-            "  2. Exit to allow file updates\n"
-            "  3. The script will update automatically\n\n"
-            "[dim]Press any key when ready...[/dim]",
+            "  1. Exit to release the executable lock\n"
+            "  2. Run the update script in this window\n"
+            "  3. Update will complete automatically\n\n"
+            "[dim]Press any key to continue...[/dim]",
             title="[bold cyan]🚀 Ready to Update[/bold cyan]",
             border_style="cyan"
         ))
-        
+
         input()  # Wait for user confirmation
-        
-        # Launch batch script in new terminal
-        subprocess.Popen(['cmd', '/c', 'start', 'cmd', '/k', temp_batch], 
-                        creationflags=subprocess.CREATE_NEW_CONSOLE)
-        
-        console.print("\n[bold green]✓ Update script launched![/bold green]")
-        console.print("[dim]This window will now close. The update will continue in the new window.[/dim]\n")
-        
-        import time
-        time.sleep(2)
+
+        # Execute batch script in the same terminal using os.execv
+        import os
+        console.print("\n[bold green]✓ Starting update...[/bold green]\n")
+
+        # Use os.system to run in the same window (this will replace the current process)
+        os.execv('C:\\Windows\\System32\\cmd.exe', ['cmd', '/c', temp_batch])
+
+        # This line will never be reached because os.execv replaces the process
         sys.exit(0)
 
     # Initialize atomic update manager for non-Windows systems
