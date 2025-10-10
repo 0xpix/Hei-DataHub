@@ -1,9 +1,9 @@
-!!! info "Version Notice — Renovation"
-    **This manual tracks Hei-DataHub v0.57.x (beta).**
+!!! info "Version Notice — Streamline"
+    **This manual tracks Hei-DataHub v0.58.x (beta).**
 
-    **Release:** 0.58.1-beta (2025-10-08)
+    **Release:** 0.58.2-beta (2025-10-10)
     **Codename:** Streamline
 
-    Cross-platform data directories, doctor diagnostics, Windows filename sanitation
+    Automatic desktop integration on Linux - icons and launcher installed automatically.
 
     **Compatibility note:** Features and shortcuts may differ slightly from other versions.
