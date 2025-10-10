@@ -168,6 +168,39 @@ notepad $PROFILE
 
 ## 🔍 Troubleshooting
 
+### Updating on Windows
+
+**Good news!** As of v0.58.3, `hei-datahub update` works seamlessly on Windows! 🎉
+
+When you run `hei-datahub update` on Windows, it automatically:
+1. Creates a temporary update script
+2. Launches it in a new terminal window
+3. Exits the app to allow file updates
+4. The update completes in the new window
+
+**Just run:**
+```powershell
+hei-datahub update
+```
+
+The app will guide you through the process!
+
+**Alternative: Manual Update (Advanced Users)**
+If you prefer manual control:
+1. Close ALL Hei-DataHub windows
+2. Open a **new** PowerShell window
+3. Run:
+   ```powershell
+   uv tool install --force git+ssh://git@github.com/0xpix/Hei-DataHub.git@main
+   ```
+   Or with token:
+   ```powershell
+   uv tool install --force "git+https://$($env:GH_PAT)@github.com/0xpix/Hei-DataHub@main"
+   ```
+
+**Why the special handling?**
+Windows locks executable files while they're running, preventing self-update. The automatic script workaround makes updates seamless without requiring you to manually close and update.
+
 ### "uv: command not found"
 
 **Cause:** UV not in PATH.
