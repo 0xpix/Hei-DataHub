@@ -24,7 +24,11 @@ def _is_linux() -> bool:
 
 
 def _get_xdg_data_home() -> Path:
-    """Get XDG data home directory."""
+    """Get XDG data home directory (Linux-only)."""
+    if not _is_linux():
+        # Return a dummy path on non-Linux systems (should never be used)
+        return Path.home() / ".local" / "share"
+    
     xdg_data = os.environ.get("XDG_DATA_HOME")
     if xdg_data:
         return Path(xdg_data)
@@ -32,7 +36,11 @@ def _get_xdg_data_home() -> Path:
 
 
 def _get_app_data_dir() -> Path:
-    """Get application data directory for stamps and metadata."""
+    """Get application data directory for stamps and metadata (Linux-only)."""
+    if not _is_linux():
+        # Return a dummy path on non-Linux systems (should never be used)
+        return Path.home() / ".local" / "share" / "Hei-DataHub"
+    
     data_home = _get_xdg_data_home()
     app_dir = data_home / "Hei-DataHub"
     app_dir.mkdir(parents=True, exist_ok=True)
@@ -110,7 +118,7 @@ def _get_install_paths() -> Dict[str, Path]:
 
 def _get_executable_path() -> str:
     """
-    Get the full path to the hei-datahub executable.
+    Get the full path to the hei-datahub executable (Linux-only).
 
     This is necessary for desktop entries because they don't source shell
     environment files, so ~/.local/bin may not be in PATH.
@@ -118,6 +126,10 @@ def _get_executable_path() -> str:
     Returns:
         Absolute path to the executable, or 'hei-datahub' as fallback.
     """
+    if not _is_linux():
+        # Should never be called on non-Linux systems
+        return "hei-datahub"
+    
     # Try to find hei-datahub in PATH
     executable = shutil.which("hei-datahub")
     if executable:
