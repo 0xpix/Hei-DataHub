@@ -66,6 +66,117 @@ class AtomicUpdateManager:
         self.staging_dir: Optional[Path] = None
         self.already_up_to_date = False
 
+    def check_and_repair(self) -> bool:
+        """
+        Check if installation is broken and offer to repair it.
+
+        Returns:
+            True if installation is healthy or repaired, False if broken and user declined repair
+        """
+        if self.is_windows:
+            install_dir = Path(os.environ.get("LOCALAPPDATA", "")) / "uv" / "tools" / "hei-datahub"
+        else:
+            install_dir = Path.home() / ".local" / "share" / "uv" / "tools" / "hei-datahub"
+
+        if not install_dir.exists():
+            self.console.print("[yellow]⚠ No installation found[/yellow]")
+            return False
+
+        # Check for pyvenv.cfg
+        pyvenv_cfg = install_dir / "pyvenv.cfg"
+        if not pyvenv_cfg.exists():
+            self.console.print(Panel(
+                "[bold red]⚠ Broken Installation Detected[/bold red]\n\n"
+                f"The file [cyan]pyvenv.cfg[/cyan] is missing from:\n"
+                f"[dim]{install_dir}[/dim]\n\n"
+                "This usually happens when an update was interrupted.\n\n"
+                "[bold]Would you like to repair the installation?[/bold]",
+                title="[red]Installation Corrupted[/red]",
+                border_style="red"
+            ))
+
+            if not Confirm.ask("\n[bold]Repair installation?[/bold]", default=True):
+                self.console.print("[yellow]Repair cancelled[/yellow]")
+                return False
+
+            return self._repair_installation()
+
+        # Installation looks healthy
+        self.console.print("[green]✓ Installation is healthy[/green]")
+        return True
+
+    def _repair_installation(self) -> bool:
+        """
+        Attempt to repair a broken installation.
+
+        Returns:
+            True if repair succeeded, False otherwise
+        """
+        self.console.print("\n[bold cyan]Repairing installation...[/bold cyan]\n")
+
+        # Step 1: Clean uninstall
+        self.console.print("  [dim]1/3[/dim] Removing broken installation...")
+        try:
+            result = subprocess.run(
+                ["uv", "tool", "uninstall", "hei-datahub"],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            if result.returncode == 0:
+                self.console.print("  [green]✓ Removed broken installation[/green]")
+            else:
+                self.console.print(f"  [yellow]⚠ Uninstall warning: {result.stderr[:200]}[/yellow]")
+        except Exception as e:
+            self.console.print(f"  [yellow]⚠ Uninstall failed: {e}[/yellow]")
+
+        # Wait a bit for file system
+        time.sleep(2)
+
+        # Step 2: Detect auth
+        self.console.print("\n  [dim]2/3[/dim] Detecting authentication...")
+        auth_method = self._detect_auth_method()
+
+        if auth_method == "none":
+            self.console.print("  [red]✗ No authentication available[/red]")
+            self.console.print("\n[bold red]Repair failed: No authentication method[/bold red]")
+            self.console.print("\nSetup authentication first:")
+            self.console.print("  SSH: https://github.com/settings/keys")
+            self.console.print("  Token: Set GH_PAT environment variable")
+            return False
+
+        self.console.print(f"  [green]✓ Using {auth_method.upper()} authentication[/green]")
+
+        # Step 3: Reinstall
+        self.console.print("\n  [dim]3/3[/dim] Reinstalling from main branch...")
+
+        install_url = self._get_install_url("main", auth_strategy=auth_method)
+
+        try:
+            result = subprocess.run(
+                ["uv", "tool", "install", "--python-preference", "only-managed", install_url],
+                capture_output=True,
+                text=True,
+                timeout=300  # 5 minutes
+            )
+
+            if result.returncode == 0:
+                self.console.print("  [green]✓ Reinstallation complete[/green]")
+                self.console.print("\n[bold green]✨ Repair successful![/bold green]")
+                self.console.print("\nYou can now run: [cyan]hei-datahub[/cyan]")
+                return True
+            else:
+                self.console.print(f"  [red]✗ Reinstallation failed[/red]")
+                self.console.print(f"\n[dim]Error:[/dim] {result.stderr[:500]}")
+                return False
+
+        except subprocess.TimeoutExpired:
+            self.console.print("  [red]✗ Reinstallation timed out[/red]")
+            return False
+        except Exception as e:
+            self.console.print(f"  [red]✗ Reinstallation error: {e}[/red]")
+            return False
+
     def run_update(self, branch: Optional[str] = None, force: bool = False) -> None:
         """
         Run the complete update process.
@@ -181,6 +292,9 @@ class AtomicUpdateManager:
         # Check 6: Write permissions
         checks["write_permissions"] = self._check_write_permissions()
 
+        # Check 7: Installation locks
+        checks["installation_locks"] = self._check_installation_locks()
+
         # Windows-specific checks
         if self.is_windows:
             checks["long_paths_enabled"] = self._check_long_paths_enabled()
@@ -192,6 +306,7 @@ class AtomicUpdateManager:
             checks["git_available"]["passed"],
             checks["auth_method"] != "none",
             checks["write_permissions"]["passed"],
+            checks["installation_locks"]["passed"],
         ]
 
         # Running processes is a warning, not a blocker (we'll retry)
@@ -316,34 +431,71 @@ class AtomicUpdateManager:
             }
 
     def _check_write_permissions(self) -> Dict:
-        """Check write permissions to critical directories."""
-        test_paths = []
-
+        """Check write permissions to critical paths."""
         if self.is_windows:
-            # Windows: Check UV tools directory and shim location
-            uv_tools = Path(os.environ.get("LOCALAPPDATA", "")) / "uv" / "tools"
-            shim_dir = Path(os.environ.get("USERPROFILE", "")) / ".local" / "bin"
-            test_paths = [uv_tools, shim_dir]
+            paths_to_check = [
+                Path(os.environ.get("LOCALAPPDATA", "")) / "uv",
+                self.temp_dir
+            ]
         else:
-            # Unix: Check .local directories
-            local_share = Path.home() / ".local" / "share"
-            local_bin = Path.home() / ".local" / "bin"
-            test_paths = [local_share, local_bin]
+            paths_to_check = [
+                Path.home() / ".local" / "share" / "uv",
+                self.temp_dir
+            ]
 
-        results = []
-        for path in test_paths:
+        all_writable = True
+        checked = []
+
+        for path in paths_to_check:
+            if not path.exists():
+                continue
+
             try:
-                path.mkdir(parents=True, exist_ok=True)
-                test_file = path / f".write_test_{uuid.uuid4().hex[:8]}"
-                test_file.write_text("test")
+                test_file = path / f".hei-datahub-test-{uuid.uuid4().hex[:8]}"
+                test_file.touch()
                 test_file.unlink()
-                results.append({"path": str(path), "writable": True})
-            except Exception as e:
-                results.append({"path": str(path), "writable": False, "error": str(e)})
+                checked.append(str(path))
+            except Exception:
+                all_writable = False
+                checked.append(f"{path} (not writable)")
 
         return {
-            "passed": all(r["writable"] for r in results),
-            "paths": results
+            "passed": all_writable,
+            "paths": checked
+        }
+
+    def _check_installation_locks(self) -> Dict:
+        """Check if installation directory is locked or can be accessed."""
+        if self.is_windows:
+            install_dir = Path(os.environ.get("LOCALAPPDATA", "")) / "uv" / "tools" / "hei-datahub"
+        else:
+            install_dir = Path.home() / ".local" / "share" / "uv" / "tools" / "hei-datahub"
+
+        if not install_dir.exists():
+            return {"passed": True, "note": "No existing installation"}
+
+        # Try to access key files
+        locked_files = []
+        critical_files = [
+            install_dir / "pyvenv.cfg",
+            install_dir / "bin" / "python" if not self.is_windows else install_dir / "Scripts" / "python.exe",
+        ]
+
+        for file_path in critical_files:
+            if file_path.exists():
+                try:
+                    # Try to open file for reading to check if locked
+                    with open(file_path, 'rb') as f:
+                        pass
+                except PermissionError:
+                    locked_files.append(str(file_path))
+                except Exception as e:
+                    locked_files.append(f"{file_path} ({type(e).__name__})")
+
+        return {
+            "passed": len(locked_files) == 0,
+            "locked_files": locked_files,
+            "note": "Installation files accessible" if len(locked_files) == 0 else f"{len(locked_files)} files locked"
         }
 
     def _check_long_paths_enabled(self) -> Dict:
@@ -463,6 +615,14 @@ class AtomicUpdateManager:
             f"Checked {len(perms['paths'])} path(s)"
         )
 
+        # Installation locks
+        locks = results["installation_locks"]
+        table.add_row(
+            "Installation Locks",
+            "✓" if locks["passed"] else "✗",
+            locks.get("note", "")
+        )
+
         # Windows-specific
         if self.is_windows:
             if "long_paths_enabled" in results:
@@ -509,6 +669,25 @@ class AtomicUpdateManager:
                 f"Found {results['running_processes']['running_count']} running instance(s).",
                 border_style="yellow",
                 title="[yellow]Warning[/yellow]"
+            ))
+            self.console.print()
+
+        # Show warnings for installation locks
+        if not results["installation_locks"]["passed"]:
+            locked = results["installation_locks"].get("locked_files", [])
+            self.console.print(Panel(
+                "[bold red]⚠ Installation Files Locked[/bold red]\n\n"
+                "Some installation files are locked and cannot be updated.\n\n"
+                "[bold]Locked files:[/bold]\n" + 
+                "\n".join(f"  • {f}" for f in locked[:5]) +  # Show first 5
+                (f"\n  ... and {len(locked) - 5} more" if len(locked) > 5 else "") + "\n\n"
+                "[bold]To fix:[/bold]\n"
+                "  1. Close ALL Hei-DataHub windows\n"
+                "  2. Close any terminals/editors with Hei-DataHub running\n"
+                "  3. Wait 10 seconds for processes to fully exit\n"
+                "  4. Try the update again",
+                border_style="red",
+                title="[red]Critical Issue[/red]"
             ))
             self.console.print()
 
@@ -717,13 +896,32 @@ class AtomicUpdateManager:
                         recoverable=True,
                         details="Check internet connection and proxy settings"
                     )
+                elif "failed to remove directory" in error_msg.lower() or "directory not empty" in error_msg.lower():
+                    raise UpdateError(
+                        phase="DOWNLOAD",
+                        message="Failed to remove existing installation",
+                        recoverable=True,
+                        details=(
+                            "error: failed to remove directory\n\n"
+                            "The existing installation is locked or in use.\n\n"
+                            "CRITICAL: Your installation may now be corrupted.\n\n"
+                            "To fix:\n"
+                            "1. Close ALL Hei-DataHub windows and terminals\n"
+                            "2. Wait 30 seconds for processes to fully exit\n"
+                            "3. If the issue persists, restart your computer\n"
+                            "4. If still broken after restart, reinstall:\n"
+                            f"   {'PowerShell' if self.is_windows else 'Terminal'}: "
+                            "uv tool uninstall hei-datahub && uv tool install git+ssh://git@github.com/0xpix/Hei-DataHub.git@main\n\n"
+                            f"Original error:\n{error_msg[:500]}"
+                        )
+                    )
                 elif "already installed" in error_msg.lower() or "nothing to install" in error_msg.lower():
                     # Not an error - just already up to date
                     self.console.print("[green]✓ Already up to date[/green]")
                     return staging_dir
                 else:
                     raise UpdateError(
-                        phase="download",
+                        phase="DOWNLOAD",
                         message="Failed to download package",
                         recoverable=True,
                         details=error_msg
