@@ -108,11 +108,47 @@ def _get_install_paths() -> Dict[str, Path]:
     }
 
 
-def _atomic_write(source: Path, destination: Path) -> None:
+def _get_executable_path() -> str:
     """
-    Atomically write a file to destination.
+    Get the full path to the hei-datahub executable.
+
+    This is necessary for desktop entries because they don't source shell
+    environment files, so ~/.local/bin may not be in PATH.
+
+    Returns:
+        Absolute path to the executable, or 'hei-datahub' as fallback.
+    """
+    # Try to find hei-datahub in PATH
+    executable = shutil.which("hei-datahub")
+    if executable:
+        return executable
+
+    # Fallback: check common installation locations
+    possible_paths = [
+        Path.home() / ".local" / "bin" / "hei-datahub",  # UV tool install
+        Path.home() / ".cargo" / "bin" / "hei-datahub",   # Cargo
+        "/usr/local/bin/hei-datahub",                     # System-wide
+        "/usr/bin/hei-datahub",                           # System package
+    ]
+
+    for path in possible_paths:
+        if path.exists() and path.is_file():
+            return str(path)
+
+    # Last resort: return command name (will fail if not in PATH)
+    return "hei-datahub"
+
+
+def _atomic_write(source: Path, destination: Path, substitutions: dict = None) -> None:
+    """
+    Atomically write a file to destination with optional text substitutions.
 
     Writes to a .tmp file first, then replaces the target.
+
+    Args:
+        source: Source file path
+        destination: Destination file path
+        substitutions: Optional dict of {search_text: replacement_text} for substitution
     """
     destination.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = destination.with_suffix(destination.suffix + ".tmp")
@@ -121,11 +157,23 @@ def _atomic_write(source: Path, destination: Path) -> None:
         # Read from source (which might be inside a wheel/zip)
         if hasattr(source, "read_bytes"):
             content = source.read_bytes()
-            tmp_path.write_bytes(content)
         else:
             # For older importlib.resources versions
             with source.open("rb") as src:
-                tmp_path.write_bytes(src.read())
+                content = src.read()
+
+        # Apply text substitutions if provided
+        if substitutions:
+            try:
+                text = content.decode('utf-8')
+                for search_text, replacement in substitutions.items():
+                    text = text.replace(search_text, replacement)
+                content = text.encode('utf-8')
+            except Exception:
+                # If substitution fails, use original content
+                pass
+
+        tmp_path.write_bytes(content)
 
         # Atomic replace
         os.replace(tmp_path, destination)
@@ -322,10 +370,21 @@ def install_desktop_assets(
         _atomic_write(asset_paths["symbolic"], install_paths["icon_symbolic"])
         installed_files.append(install_paths["icon_symbolic"])
 
-        # Install desktop entry
+        # Install desktop entry with executable path substitution
         if verbose:
             print(f"  → Installing desktop entry: {install_paths['desktop_entry']}")
-        _atomic_write(asset_paths["desktop_template"], install_paths["desktop_entry"])
+
+        # Get the actual executable path (needed because desktop launchers don't source .bashrc)
+        exec_path = _get_executable_path()
+        if verbose and exec_path != "hei-datahub":
+            print(f"     Using executable: {exec_path}")
+
+        # Write desktop entry with path substitution
+        _atomic_write(
+            asset_paths["desktop_template"],
+            install_paths["desktop_entry"],
+            substitutions={"Exec=hei-datahub": f"Exec={exec_path}"}
+        )
         installed_files.append(install_paths["desktop_entry"])
 
     except Exception as e:
