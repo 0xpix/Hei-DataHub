@@ -9,11 +9,35 @@ from rich.panel import Panel
 def windows_update(args, console):
     """Windows-specific update using external batch script to avoid file locks."""
 
-    console.print("\n[bold cyan]🪟 Windows Update Strategy[/bold cyan]\n")
-    console.print("[dim]Windows locks running executables, so we'll use an external script...[/dim]\n")
+    console.print("\n[bold cyan]🪟 Windows Update[/bold cyan]\n")
 
-    # Get branch parameter
-    branch = getattr(args, 'branch', None) or 'main'
+    # Get branch parameter from args or ask user
+    branch = getattr(args, 'branch', None)
+
+    if not branch:
+        # Show branch options
+        console.print("[bold yellow]Select branch to update:[/bold yellow]")
+        console.print("  [cyan]1[/cyan]. main (stable)")
+        console.print("  [cyan]2[/cyan]. dev (development)")
+        console.print("  [cyan]3[/cyan]. fix/windows-update-bug (current fix)")
+        console.print()
+
+        branch_choice = input("Enter choice [1-3] (default: 1): ").strip() or "1"
+
+        branch_map = {
+            "1": "main",
+            "2": "dev",
+            "3": "fix/windows-update-bug"
+        }
+        branch = branch_map.get(branch_choice, "main")
+
+    # Confirm update
+    console.print(f"\n[bold]Update to branch:[/bold] [cyan]{branch}[/cyan]")
+    confirm = input("Continue? [Y/n]: ").strip().lower()
+
+    if confirm and confirm != 'y':
+        console.print("\n[yellow]Update cancelled.[/yellow]")
+        sys.exit(0)
 
     # Create temporary batch script
     batch_content = f"""@echo off
@@ -69,35 +93,18 @@ pause
         temp_batch = f.name
         f.write(batch_content)
 
-    console.print(Panel(
-        "[bold green]✓ Update script created[/bold green]\n\n"
-        "The app will now:\n"
-        "  1. Exit to release the executable lock\n"
-        "  2. Run the update script in this window\n"
-        "  3. Update will complete automatically\n\n"
-        "[dim]Press any key to continue...[/dim]",
-        title="[bold cyan]🚀 Ready to Update[/bold cyan]",
-        border_style="cyan"
-    ))
-
-    input()  # Wait for user confirmation
-
-    # Execute batch script in the same terminal using START command
-    # START /B runs it in the background, allowing Python to exit immediately
+    # Execute batch script using 'call' to run in the same window
     console.print("\n[bold green]✓ Starting update...[/bold green]")
-    console.print("[dim]The update will continue in 3 seconds...[/dim]\n")
+    console.print("[dim]The app will exit and update will continue automatically...[/dim]\n")
 
     import subprocess
-    # Use subprocess.Popen to start the batch script without waiting
-    # The batch script will wait for Python to exit before running uv
-    # On Windows, we don't create a new window - it runs in the same terminal
-    try:
-        # Try to use CREATE_NO_WINDOW flag (Windows only)
-        CREATE_NO_WINDOW = 0x08000000
-        subprocess.Popen(['cmd.exe', '/c', temp_batch], creationflags=CREATE_NO_WINDOW)
-    except:
-        # Fallback for non-Windows or if flag doesn't work
-        subprocess.Popen(['cmd.exe', '/c', temp_batch])
+    # Use 'call' command to run batch script in current terminal
+    # Using shell=True allows the batch to continue in the same window after Python exits
+    subprocess.Popen(f'call "{temp_batch}"', shell=True)
+
+    # Give subprocess a moment to start, then exit to release the file lock
+    import time
+    time.sleep(0.5)
 
     # Exit immediately to release the file lock
     # The batch script is now running independently and will check for process exit
