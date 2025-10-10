@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.58.2-beta"
-codename: "Streamline"
+version: "0.58.3-beta"
+codename: "Windows Warrior"
 release_date: "2025-10-10"
 compatibility: "Hei-DataHub v0.58.x (beta)"
-notes: "Beta release with automatic desktop integration on Linux - icons and launcher installed automatically."
+notes: "Critical Windows update fix - resolves 'Failed to install entrypoint' error with OS-specific update architecture and clean terminal management."
 
 # Additional metadata
 app_name: "Hei-DataHub"
