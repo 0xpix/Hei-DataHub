@@ -28,7 +28,7 @@ def _get_xdg_data_home() -> Path:
     if not _is_linux():
         # Return a dummy path on non-Linux systems (should never be used)
         return Path.home() / ".local" / "share"
-    
+
     xdg_data = os.environ.get("XDG_DATA_HOME")
     if xdg_data:
         return Path(xdg_data)
@@ -40,7 +40,7 @@ def _get_app_data_dir() -> Path:
     if not _is_linux():
         # Return a dummy path on non-Linux systems (should never be used)
         return Path.home() / ".local" / "share" / "Hei-DataHub"
-    
+
     data_home = _get_xdg_data_home()
     app_dir = data_home / "Hei-DataHub"
     app_dir.mkdir(parents=True, exist_ok=True)
@@ -129,7 +129,7 @@ def _get_executable_path() -> str:
     if not _is_linux():
         # Should never be called on non-Linux systems
         return "hei-datahub"
-    
+
     # Try to find hei-datahub in PATH
     executable = shutil.which("hei-datahub")
     if executable:
