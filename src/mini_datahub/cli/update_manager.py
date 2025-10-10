@@ -678,7 +678,7 @@ class AtomicUpdateManager:
             self.console.print(Panel(
                 "[bold red]⚠ Installation Files Locked[/bold red]\n\n"
                 "Some installation files are locked and cannot be updated.\n\n"
-                "[bold]Locked files:[/bold]\n" + 
+                "[bold]Locked files:[/bold]\n" +
                 "\n".join(f"  • {f}" for f in locked[:5]) +  # Show first 5
                 (f"\n  ... and {len(locked) - 5} more" if len(locked) > 5 else "") + "\n\n"
                 "[bold]To fix:[/bold]\n"
