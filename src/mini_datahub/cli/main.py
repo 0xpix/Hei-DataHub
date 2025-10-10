@@ -141,10 +141,89 @@ def handle_update(args):
     from rich.panel import Panel
     from rich.align import Align
     from mini_datahub.cli.update_manager import AtomicUpdateManager, UpdateError, format_error_panel
+    import sys
+    import tempfile
+    import subprocess
 
     console = Console()
 
-    # Initialize atomic update manager
+    # On Windows, use external script to avoid file lock issues
+    if sys.platform == "win32":
+        console.print("\n[bold cyan]🪟 Windows Update Strategy[/bold cyan]\n")
+        console.print("[dim]Windows locks running executables, so we'll use an external script...[/dim]\n")
+        
+        # Get branch parameter
+        branch = getattr(args, 'branch', None) or 'main'
+        
+        # Create temporary batch script
+        batch_content = f"""@echo off
+echo.
+echo =====================================
+echo  Hei-DataHub Windows Update
+echo =====================================
+echo.
+echo Updating to branch: {branch}
+echo.
+echo [1/2] Waiting for app to close...
+timeout /t 3 /nobreak >nul
+echo [2/2] Running update...
+echo.
+
+uv tool install --force --python-preference only-managed git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}
+
+if %ERRORLEVEL% neq 0 (
+    echo.
+    echo ERROR: Update failed!
+    echo.
+    echo Try using HTTPS with a token:
+    echo   1. Get token: https://github.com/settings/tokens
+    echo   2. Run: set GH_PAT=your_token
+    echo   3. Run: uv tool install --force git+https://%%GH_PAT%%@github.com/0xpix/Hei-DataHub@{branch}
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo =====================================
+echo  Update completed successfully!
+echo =====================================
+echo.
+echo You can now run: hei-datahub
+echo.
+pause
+"""
+        
+        # Write to temp file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False) as f:
+            temp_batch = f.name
+            f.write(batch_content)
+        
+        console.print(Panel(
+            "[bold green]✓ Update script created[/bold green]\n\n"
+            "The app will now:\n"
+            "  1. Launch the update script in a new window\n"
+            "  2. Exit to allow file updates\n"
+            "  3. The script will update automatically\n\n"
+            "[dim]Press any key when ready...[/dim]",
+            title="[bold cyan]🚀 Ready to Update[/bold cyan]",
+            border_style="cyan"
+        ))
+        
+        input()  # Wait for user confirmation
+        
+        # Launch batch script in new terminal
+        subprocess.Popen(['cmd', '/c', 'start', 'cmd', '/k', temp_batch], 
+                        creationflags=subprocess.CREATE_NEW_CONSOLE)
+        
+        console.print("\n[bold green]✓ Update script launched![/bold green]")
+        console.print("[dim]This window will now close. The update will continue in the new window.[/dim]\n")
+        
+        import time
+        time.sleep(2)
+        sys.exit(0)
+
+    # Initialize atomic update manager for non-Windows systems
     manager = AtomicUpdateManager(console=console)
 
     # Handle --check or --repair flags
