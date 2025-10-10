@@ -102,8 +102,8 @@ nav:
 extra:
   version:
     provider: mike
-  project_version: "0.58.1-beta"
-  project_codename: "Streamline"
+  project_version: "0.58.3-beta"
+  project_codename: "Streamline WIN-SUCKS"
   logo: assets/dark_logo.svg
   social:
     - icon: fontawesome/brands/github
