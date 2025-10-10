@@ -189,6 +189,22 @@ class AtomicUpdateManager:
             UpdateError: If update fails at any phase
         """
         try:
+            # Windows warning about self-update limitation
+            if self.is_windows:
+                self.console.print(Panel(
+                    "[bold yellow]⚠ Windows Update Note[/bold yellow]\n\n"
+                    "Windows locks running executables, which may prevent updating.\n\n"
+                    "If the update fails, use the batch script instead:\n"
+                    "  1. Download: [cyan]scripts/windows_update.bat[/cyan]\n"
+                    "  2. Close this window\n"
+                    "  3. Run the batch script\n\n"
+                    "Or use the PowerShell helper:\n"
+                    "  [cyan].\\scripts\\windows_update_helper.ps1[/cyan]",
+                    border_style="yellow",
+                    title="[yellow]ℹ Info[/yellow]"
+                ))
+                self.console.print()
+
             # Phase 1: Preflight
             self.console.print("\n[bold cyan]Phase 1: Preflight Checks[/bold cyan]")
             preflight_results = self.run_preflight_checks(force=force)
@@ -481,6 +497,12 @@ class AtomicUpdateManager:
             install_dir / "bin" / "python" if not self.is_windows else install_dir / "Scripts" / "python.exe",
         ]
 
+        # On Windows, also check the hei-datahub executable itself
+        if self.is_windows:
+            exe_path = install_dir / "Scripts" / "hei-datahub.exe"
+            if exe_path.exists():
+                critical_files.append(exe_path)
+
         for file_path in critical_files:
             if file_path.exists():
                 try:
@@ -709,7 +731,7 @@ class AtomicUpdateManager:
                 "label": "✅ [bold green]main[/bold green] [dim](stable)[/dim]",
             },
             "2": {
-                "name": "fix/update-fails-windows",
+                "name": "fix/windows-update-bug",
                 "label": "🧪 [bold yellow]v0.58.x[/bold yellow] [dim](beta)[/dim]",
             },
             "3": {
@@ -912,6 +934,30 @@ class AtomicUpdateManager:
                             "4. If still broken after restart, reinstall:\n"
                             f"   {'PowerShell' if self.is_windows else 'Terminal'}: "
                             "uv tool uninstall hei-datahub && uv tool install git+ssh://git@github.com/0xpix/Hei-DataHub.git@main\n\n"
+                            f"Original error:\n{error_msg[:500]}"
+                        )
+                    )
+                elif "failed to install entrypoint" in error_msg.lower() or "failed to copy file" in error_msg.lower():
+                    raise UpdateError(
+                        phase="DOWNLOAD",
+                        message="Failed to install package - executable is in use",
+                        recoverable=True,
+                        details=(
+                            "error: Failed to install entrypoint\n\n"
+                            "The hei-datahub executable is currently running and locked by Windows.\n\n"
+                            "⚠ Your existing installation is still intact and working.\n\n"
+                            "SOLUTION:\n"
+                            "1. Close this window\n"
+                            "2. Download and run this batch script:\n"
+                            "   https://github.com/0xpix/Hei-DataHub/raw/main/scripts/windows_update.bat\n"
+                            "   Right-click the file and select 'Run as administrator'\n\n"
+                            "OR manually:\n"
+                            "1. Close ALL Hei-DataHub windows\n"
+                            "2. Open a NEW Command Prompt or PowerShell\n"
+                            "3. Run: uv tool install --force git+ssh://git@github.com/0xpix/Hei-DataHub.git@main\n\n"
+                            "Why this happens:\n"
+                            "Windows locks executable files while they're running. You can't update\n"
+                            "an app from within itself on Windows. The batch script works around this.\n\n"
                             f"Original error:\n{error_msg[:500]}"
                         )
                     )
