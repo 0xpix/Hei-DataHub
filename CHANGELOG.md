@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.58.3-beta] - 2025-10-10
+
+### Added
+
+- **Update Repair Tool** - New `hei-datahub update --repair` command to fix broken installations
+- **Installation Health Check** - Pre-flight check for file locks before attempting update
+- **Better Error Recovery** - Specific error messages for "failed to remove directory" errors
+
+### Changed
+- **Update Preflight Checks** - Now includes installation lock detection
+
+### Fixed
+- Broken installations after failed updates (now detectable and repairable)
+- Better error messages when update fails due to file locks
+- Improved guidance for fixing corrupted installations
+
+### Documentation
+- Added update troubleshooting guide (`docs/help/update-troubleshooting.md`)
+
 ## [0.58.2-beta] - 2025-10-10
 
 ### Added
