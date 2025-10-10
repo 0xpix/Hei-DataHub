@@ -189,22 +189,9 @@ class AtomicUpdateManager:
             UpdateError: If update fails at any phase
         """
         try:
-            # Windows warning about self-update limitation
-            if self.is_windows:
-                self.console.print(Panel(
-                    "[bold yellow]⚠ Windows Update Note[/bold yellow]\n\n"
-                    "Windows locks running executables, which may prevent updating.\n\n"
-                    "If the update fails, use the batch script instead:\n"
-                    "  1. Download: [cyan]scripts/windows_update.bat[/cyan]\n"
-                    "  2. Close this window\n"
-                    "  3. Run the batch script\n\n"
-                    "Or use the PowerShell helper:\n"
-                    "  [cyan].\\scripts\\windows_update_helper.ps1[/cyan]",
-                    border_style="yellow",
-                    title="[yellow]ℹ Info[/yellow]"
-                ))
-                self.console.print()
-
+            # Note: On Windows, the CLI (main.py) handles updates via external script
+            # to avoid file lock issues. This method is primarily for non-Windows systems.
+            
             # Phase 1: Preflight
             self.console.print("\n[bold cyan]Phase 1: Preflight Checks[/bold cyan]")
             preflight_results = self.run_preflight_checks(force=force)
