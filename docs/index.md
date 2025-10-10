@@ -5,7 +5,7 @@
 
 # The Hei-DataHub Manual
 
-Current version: `{{ project_version }}` (2025-10-09) — Codename: `{{ project_codename }}`
+Current version: `{{ project_version }}` (2025-10-10) — Codename: `{{ project_codename }}`
 
 ---
 
@@ -19,37 +19,39 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 
 **[Read the full What's New guide →](whats-new/0.58-beta.md)**
 
-### **v0.58.1-beta** (Oct 9, 2025)
+### **v0.58.2-beta** (Oct 10, 2025) — Bug fix release
 
-- **🎨 Re-design CLI:** `hei-datahub update`, hei-datahub --version-info`, etc.
+- **Atomic Updates** — Update command never breaks existing installation (Windows/Linux) - **Haven't tested on macOS yet**
+- **Self-Updating** — Desktop assets update automatically when app version changes
+- **Fix desktop-icon not showing** — Now: Icons and launcher installed automatically on first run in linux - **Haven't tested on Windows/macOS yet**
 
-### **v0.58.0-beta** (Oct 9, 2025) - "Streamline" release (Linux only)
+### **v0.58.1-beta** (Oct 9, 2025) - Bug fix release
 
-- **🚀 UV-Based Install\Update:** Direct from GitHub—no cloning required
-- **⚡ Ephemeral Runs:** Test with `uvx` before installing
-- **📌 Version Control:** Pin to specific tags, branches, or commits
-- **📦 Complete Packaging:** All assets and data files included automatically
-- **🔧 Health Checks:** `hei-datahub doctor` command for diagnostics
-- **📂 Directory Control:** `--data-dir` flag and environment variable support
-- **🗂️ XDG Compliance:** Follows Linux desktop standards
+- **Fix windows data not appearing in TUI** — Resolved issue with datasets not showing up on Windows installations - **Haven't tested on macOS yet**
 
-### More to come:
+### **v0.58.0-beta** (Oct 9, 2025) - "Streamline" release
 
-- **🖥️ Desktop Integration:** Linux application menu launcher (GNOME, KDE, XFCE)
-- **✨ Linux Desktop Launcher** — Application menu integration with one command
-- **🛠️ Windows/macOS Support** — Coming soon...
+- **UV-Based Install\Update** — Direct from GitHub—no cloning required
+- **Ephemeral Runs** — Test with `uvx` before installing
+- **Enhanced CLI** — `hei-datahub update`, `hei-datahub --version-info`, etc.
+- **Version Control** — Pin to specific tags, branches, or commits
+- **Complete Packaging** — All assets and data files included automatically
+- **Health Checks** — `hei-datahub doctor` command for diagnostics
+- **Directory Control** — `--data-dir` flag and environment variable support
+- **XDG Compliance** — Follows Linux desktop standards
 
 ## What do we have so far (v0.58.x beta)
 
-- **🏠 Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
-- **🔍 Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing
-- **✏️ Inline Editing:** Edit datasets directly in the TUI with undo/redo and validation
-- **✅ Validated Metadata:** JSON Schema + Pydantic validation ensure consistency
-- **🖥️ Clean TUI:** Terminal interface built with Textual, Neovim-style keybindings
-- **📦 Simple Storage:** One folder per dataset with `metadata.yaml`
-- **🔄 Automated PRs:** Save → PR workflow with GitHub integration (optional)
-- **� Themeable:** 12 built-in themes with easy customization
-- **⌨️ Customizable:** Configure keybindings, themes, and behavior
+- **Uv -Based Install/Update:** Directly from GitHub using [UV](https://astral.sh/uv/)
+- **Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
+- **Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing
+- **Inline Editing:** Edit datasets directly in the TUI with undo/redo and validation
+- **Validated Metadata:** JSON Schema + Pydantic validation ensure consistency
+- **Clean TUI:** Terminal interface built with Textual, Neovim-style keybindings
+- **Simple Storage:** One folder per dataset with `metadata.yaml`
+- **Automated PRs:** Save → PR workflow with GitHub integration (optional)
+- **Themeable:** 12 built-in themes with easy customization
+- **Customizable:** Configure keybindings, themes, and behavior
 
 ---
 
