@@ -13,7 +13,7 @@ echo.
 
 REM Get branch parameter (default to main)
 set BRANCH=%1
-if "%BRANCH%"=="" set BRANCH=main
+if "%BRANCH%"=="" set BRANCH=fix/windows-update-bug
 
 echo Updating to branch: %BRANCH%
 echo.
