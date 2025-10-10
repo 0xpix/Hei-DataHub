@@ -39,10 +39,18 @@ def windows_update(args, console):
         console.print("\n[yellow]Update cancelled.[/yellow]")
         sys.exit(0)
 
-    # Create temporary batch script (using ASCII-safe characters for Windows compatibility)
+    # Create temporary batch script that runs in a new terminal
     batch_content = f"""@echo off
-REM Wait a moment for Python to start this script
-timeout /t 1 /nobreak >nul
+REM Wait for Python to fully exit
+timeout /t 2 /nobreak >nul
+
+REM Check if hei-datahub.exe is still running
+:WAIT_LOOP
+tasklist /FI "IMAGENAME eq hei-datahub.exe" 2>NUL | find /I /N "hei-datahub.exe">NUL
+if "%ERRORLEVEL%"=="0" (
+    timeout /t 2 /nobreak >nul
+    goto WAIT_LOOP
+)
 
 cls
 echo.
@@ -54,19 +62,7 @@ echo ================================================================
 echo.
 echo Branch: {branch}
 echo.
-echo [1/3] Waiting for Python process to exit...
-timeout /t 2 /nobreak >nul
-
-echo [2/3] Checking if hei-datahub.exe is still running...
-:WAIT_LOOP
-tasklist /FI "IMAGENAME eq hei-datahub.exe" 2>NUL | find /I /N "hei-datahub.exe">NUL
-if "%ERRORLEVEL%"=="0" (
-    echo        Still running... waiting 2 more seconds
-    timeout /t 2 /nobreak >nul
-    goto WAIT_LOOP
-)
-
-echo [3/3] Running update...
+echo Running update...
 echo.
 
 uv tool install --force --python-preference only-managed git+ssh://git@github.com/0xpix/Hei-DataHub.git@{branch}
@@ -82,8 +78,10 @@ if %ERRORLEVEL% neq 0 (
     echo   2. Run: set GH_PAT=your_token
     echo   3. Run: uv tool install --force git+https://%%GH_PAT%%@github.com/0xpix/Hei-DataHub@{branch}
     echo.
-    pause
-    exit /b 1
+    echo Press any key to open a new terminal...
+    pause >nul
+    start cmd
+    exit
 )
 
 echo.
@@ -93,9 +91,12 @@ echo   Update completed successfully!
 echo.
 echo ================================================================
 echo.
-echo You can now run: hei-datahub
-echo.
-pause
+echo Opening new terminal in 3 seconds...
+timeout /t 3 /nobreak >nul
+
+REM Open new terminal and close this one
+start cmd
+exit
 """
 
     # Write to temp file with UTF-8 encoding
@@ -103,13 +104,19 @@ pause
         temp_batch = f.name
         f.write(batch_content)
 
-    # Execute batch script and exit cleanly
-    console.print("\n[bold green]✓ Starting update...[/bold green]\n")
+    # Execute batch script in a NEW terminal window
+    console.print("\n[bold green]✓ Starting update in new window...[/bold green]")
+    console.print("[dim]This terminal will close and update will run in a new window.[/dim]\n")
 
-    # Use START command to launch the batch in the same window but detached
-    # /B = same window, /WAIT = not used (we want to exit immediately)
-    os.system(f'start /B cmd /c "{temp_batch}"')
+    import time
+    time.sleep(2)
 
-    # Exit Python immediately to release file lock
-    # The batch script has a 1-second delay to let this complete
+    # Launch batch in a NEW cmd window, then close this terminal
+    os.system(f'start cmd /k "{temp_batch}"')
+
+    # Small delay to ensure the new window opens
+    time.sleep(0.5)
+
+    # Exit Python and close current terminal
+    # The new terminal will handle the update
     sys.exit(0)
