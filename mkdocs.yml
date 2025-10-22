@@ -1,6 +1,6 @@
 # MkDocs Configuration for Hei-DataHub Manual
 site_name: Hei-DataHub Documentation
-site_description: 'Official documentation for Hei-DataHub v0.57.x (beta) - A local-first TUI for managing datasets with inline editing and structured search'
+site_description: 'Official documentation for Hei-DataHub v0.59.x (beta) - A local-first TUI for managing datasets with inline editing and structured search'
 site_author: Hei-DataHub Team
 site_url: https://0xpix.github.io/Hei-DataHub
 
@@ -78,6 +78,7 @@ nav:
     - Navigation: getting-started/02-navigation.md
     - The Basics: getting-started/03-the-basics.md
   - What's New:
+    - 0.59-beta "Privacy": whats-new/0.59-beta.md
     - 0.58-beta "Packaging": whats-new/0.58-beta.md
     - 0.57-beta "Renovation": whats-new/0.57-beta.md
   - How-to Guides:
@@ -102,8 +103,8 @@ nav:
 extra:
   version:
     provider: mike
-  project_version: "0.58.3-beta"
-  project_codename: "Streamline WIN-SUCKS"
+  project_version: "0.59.0-beta"
+  project_codename: "Privacy"
   logo: assets/dark_logo.svg
   social:
     - icon: fontawesome/brands/github

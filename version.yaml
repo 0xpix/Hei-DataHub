@@ -5,7 +5,7 @@ version: "0.59.0-beta"
 codename: "Privacy"
 release_date: "2025-10-10"
 compatibility: "Hei-DataHub v0.59.x (beta)"
-notes: "Privacy update - migrate from catalog in github repo to our own server"
+notes: "Privacy update - migrate from catalog in github repo to our own server (Linux only for now)"
 
 # Additional metadata
 app_name: "Hei-DataHub"
