@@ -78,10 +78,27 @@ class UIConfig(BaseModel):
     help_file: Optional[str] = None  # Optional external help file
 
 
-class UIConfig(BaseModel):
-    """UI customization configuration."""
-    logo: LogoConfig = Field(default_factory=LogoConfig)
-    help_file: Optional[str] = None  # Optional external help file
+class StorageConfig(BaseModel):
+    """Storage backend configuration for cloud/remote access."""
+    backend: str = Field(default="filesystem")  # "filesystem" | "webdav"
+    base_url: Optional[str] = None  # WebDAV base URL (e.g., https://heibox.uni-heidelberg.de/seafdav)
+    library: Optional[str] = None  # Library/folder name (e.g., testing-hei-datahub)
+    username: Optional[str] = None  # WebDAV username (empty = use env)
+    password_env: str = Field(default="HEIBOX_WEBDAV_TOKEN")  # Env var name for password/token
+    data_dir: Optional[str] = None  # Filesystem mode: local data directory
+    connect_timeout: int = Field(default=5, ge=1, le=30)  # Connection timeout in seconds
+    read_timeout: int = Field(default=60, ge=10, le=300)  # Read timeout in seconds
+    max_retries: int = Field(default=3, ge=0, le=10)  # Max retry attempts on 5xx errors
+
+    @field_validator("backend")
+    @classmethod
+    def validate_backend(cls, v: str) -> str:
+        """Validate storage backend type."""
+        allowed = {"filesystem", "webdav"}
+        if v not in allowed:
+            logger.warning(f"Unknown storage backend '{v}', falling back to 'filesystem'. Available: {', '.join(sorted(allowed))}")
+            return "filesystem"
+        return v
 
 
 def get_default_keybindings() -> Dict[str, list[str]]:
@@ -112,10 +129,9 @@ class UserConfig(BaseModel):
     This represents the full user config file structure.
     """
     config_version: int = Field(default=2)
-    config_version: int = Field(default=2)
     theme: ThemeConfig = Field(default_factory=ThemeConfig)
     ui: UIConfig = Field(default_factory=UIConfig)
-    ui: UIConfig = Field(default_factory=UIConfig)
+    storage: StorageConfig = Field(default_factory=StorageConfig)
     keybindings: Dict[str, list[str]] = Field(default_factory=get_default_keybindings)
     search: SearchDefaults = Field(default_factory=SearchDefaults)
     startup: StartupConfig = Field(default_factory=StartupConfig)
@@ -205,6 +221,20 @@ class ConfigManager:
                 if "tokens" not in data["theme"]:
                     data["theme"]["tokens"] = None
 
+            # Add storage section if not present
+            if "storage" not in data:
+                data["storage"] = {
+                    "backend": "filesystem",
+                    "base_url": None,
+                    "library": None,
+                    "username": None,
+                    "password_env": "HEIBOX_WEBDAV_TOKEN",
+                    "data_dir": None,
+                    "connect_timeout": 5,
+                    "read_timeout": 60,
+                    "max_retries": 3,
+                }
+
             # Update version
             data["config_version"] = 2
             logger.info("Migrated config from v1 to v2")
@@ -283,6 +313,20 @@ class ConfigManager:
                 f.write("startup:\n")
                 for k, v in data['startup'].items():
                     f.write(f"  {k}: {v}\n")
+                f.write("\n")
+
+                # Write storage section
+                f.write("# Storage backend (webdav for cloud, filesystem for local)\n")
+                f.write("storage:\n")
+                f.write(f"  backend: {data['storage']['backend']}  # filesystem | webdav\n")
+                f.write(f"  base_url: {data['storage'].get('base_url') or 'null'}  # WebDAV URL (e.g., https://heibox.uni-heidelberg.de/seafdav)\n")
+                f.write(f"  library: {data['storage'].get('library') or 'null'}  # Library/folder name\n")
+                f.write(f"  username: {data['storage'].get('username') or 'null'}  # WebDAV username (empty = use env)\n")
+                f.write(f"  password_env: {data['storage']['password_env']}  # Env var for token/password\n")
+                f.write(f"  data_dir: {data['storage'].get('data_dir') or 'null'}  # Filesystem mode only\n")
+                f.write(f"  connect_timeout: {data['storage']['connect_timeout']}  # seconds\n")
+                f.write(f"  read_timeout: {data['storage']['read_timeout']}  # seconds\n")
+                f.write(f"  max_retries: {data['storage']['max_retries']}  # retry attempts\n")
                 f.write("\n")
 
                 # Write telemetry section
