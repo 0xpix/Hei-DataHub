@@ -18,7 +18,7 @@
 
 # Hei-DataHub
 
-![WIN-SUCKS](https://img.shields.io/badge/WIN-SUCKS-0.58.3--beta-blue.svg)
+![WIN-SUCKS](https://img.shields.io/badge/WIN-SUCKS-0.59.0--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
@@ -43,7 +43,7 @@ More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
 ---
 
-## 🚀 Quick Install — UV Method (v0.58.x-beta)
+## 🚀 Quick Install — UV Method (v0.59.x-beta)
 
 **Linux users:** No cloning required! Install directly from the private repository with modern UV tooling.
 
