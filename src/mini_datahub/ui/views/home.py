@@ -212,41 +212,41 @@ class HomeScreen(Screen):
             import yaml
             import tempfile
             import os
-            
+
             storage = get_storage_backend()
             entries = storage.listdir("")
-            
+
             table = self.query_one("#results-table", DataTable)
             label = self.query_one("#results-label", Label)
-            
+
             # Filter only directories (datasets)
             datasets = [e for e in entries if e.is_dir]
             label.update(f"☁️ Cloud Datasets ({len(datasets)} total)")
-            
+
             # Load metadata.yaml from each directory
             for entry in datasets:
                 dataset_id = entry.name
-                
+
                 try:
                     # Try to download and parse metadata.yaml
                     metadata_path = f"{dataset_id}/metadata.yaml"
-                    
+
                     # Download to temp file
                     with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
                         storage.download(metadata_path, tmp.name)
                         tmp_path = tmp.name
-                    
+
                     # Parse metadata
                     try:
                         with open(tmp_path, 'r', encoding='utf-8') as f:
                             metadata = yaml.safe_load(f)
-                        
+
                         name = metadata.get('name', dataset_id)
                         description = metadata.get('description', 'No description')
-                        
+
                         # Truncate for display
                         description = description[:80] + "..." if len(description) > 80 else description
-                        
+
                         table.add_row(
                             dataset_id,
                             name[:40],
@@ -255,7 +255,7 @@ class HomeScreen(Screen):
                         )
                     finally:
                         os.unlink(tmp_path)
-                        
+
                 except Exception as e:
                     # If no metadata.yaml, show directory name only
                     logger.warning(f"Could not load metadata for {dataset_id}: {e}")
@@ -265,7 +265,7 @@ class HomeScreen(Screen):
                         "No metadata.yaml found",
                         key=dataset_id,
                     )
-                
+
         except Exception as e:
             self.app.notify(f"Error loading cloud files: {str(e)}", severity="error", timeout=5)
             import traceback
@@ -357,55 +357,55 @@ class HomeScreen(Screen):
             import yaml
             import tempfile
             import os
-            
+
             storage = get_storage_backend()
             entries = storage.listdir("")
-            
+
             # Filter only directories (datasets)
             datasets = [e for e in entries if e.is_dir]
-            
+
             # Search by name (case-insensitive)
             query_lower = query.lower()
             matches = []
-            
+
             for entry in datasets:
                 dataset_id = entry.name
-                
+
                 # Quick name match first
                 if query_lower in dataset_id.lower():
                     matches.append((dataset_id, entry))
                     continue
-                
+
                 # Try to load metadata for deeper search
                 try:
                     metadata_path = f"{dataset_id}/metadata.yaml"
                     with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
                         storage.download(metadata_path, tmp.name)
                         tmp_path = tmp.name
-                    
+
                     try:
                         with open(tmp_path, 'r', encoding='utf-8') as f:
                             metadata = yaml.safe_load(f)
-                        
+
                         # Search in name and description
                         name = metadata.get('name', '')
                         description = metadata.get('description', '')
-                        
+
                         if query_lower in name.lower() or query_lower in description.lower():
                             matches.append((dataset_id, entry))
                     finally:
                         os.unlink(tmp_path)
                 except:
                     pass  # Skip if metadata can't be loaded
-            
+
             table = self.query_one("#results-table", DataTable)
             label = self.query_one("#results-label", Label)
             label.update(f"☁️ Search Results ({len(matches)} found)")
-            
+
             if not matches:
                 label.update(f"No results for '{query}'")
                 return
-            
+
             # Display matches with metadata
             for dataset_id, entry in matches:
                 try:
@@ -413,15 +413,15 @@ class HomeScreen(Screen):
                     with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
                         storage.download(metadata_path, tmp.name)
                         tmp_path = tmp.name
-                    
+
                     try:
                         with open(tmp_path, 'r', encoding='utf-8') as f:
                             metadata = yaml.safe_load(f)
-                        
+
                         name = metadata.get('name', dataset_id)
                         description = metadata.get('description', 'No description')
                         description = description[:80] + "..." if len(description) > 80 else description
-                        
+
                         table.add_row(
                             dataset_id,
                             name[:40],
@@ -438,7 +438,7 @@ class HomeScreen(Screen):
                         "No metadata.yaml",
                         key=dataset_id,
                     )
-                
+
         except Exception as e:
             self.app.notify(f"Error searching cloud files: {str(e)}", severity="error", timeout=5)
 
@@ -1066,39 +1066,39 @@ class CloudDatasetDetailsScreen(Screen):
             return
 
         content = []
-        
+
         # Format metadata nicely
         if 'name' in self.metadata:
             content.append(f"[bold cyan]Name:[/bold cyan] {self.metadata['name']}")
-        
+
         if 'description' in self.metadata:
             content.append(f"\n[bold cyan]Description:[/bold cyan]\n{self.metadata['description']}")
-        
+
         if 'source' in self.metadata:
             content.append(f"\n[bold cyan]Source:[/bold cyan] {self.metadata['source']}")
-        
+
         if 'license' in self.metadata:
             content.append(f"\n[bold cyan]License:[/bold cyan] {self.metadata['license']}")
-        
+
         if 'temporal_coverage' in self.metadata:
             tc = self.metadata['temporal_coverage']
             if isinstance(tc, dict):
                 start = tc.get('start', 'N/A')
                 end = tc.get('end', 'N/A')
                 content.append(f"\n[bold cyan]Temporal Coverage:[/bold cyan] {start} to {end}")
-        
+
         if 'spatial_coverage' in self.metadata:
             content.append(f"\n[bold cyan]Spatial Coverage:[/bold cyan] {self.metadata['spatial_coverage']}")
-        
+
         if 'keywords' in self.metadata:
             keywords = ', '.join(self.metadata['keywords']) if isinstance(self.metadata['keywords'], list) else self.metadata['keywords']
             content.append(f"\n[bold cyan]Keywords:[/bold cyan] {keywords}")
-        
+
         # Show raw YAML at the end
         import yaml
         content.append("\n\n[bold cyan]Raw Metadata:[/bold cyan]")
         content.append(f"[dim]{yaml.dump(self.metadata, default_flow_style=False)}[/dim]")
-        
+
         details_widget = self.query_one("#details-content", Static)
         details_widget.update("\n".join(content))
 
