@@ -4,12 +4,12 @@
 </p>
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="250"/>
+  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo Inline v1" width="200"/>
+  <img src="assets/png/Hei-datahub-logo-H.png" alt="Logo Inline v1" width="200"/>
 </p>
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo Inline v1" width="200"/>
-  <img src="assets/png/Hei-datahub-logo-H.png" alt="Logo Inline v1" width="200"/>
+  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="250"/>
 </p>
 
 # Hei-DataHub
