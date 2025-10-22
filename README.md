@@ -1,15 +1,15 @@
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-main.png" alt="Hei-DataHub Logo Main" width="200"/>
+  <img src="assets/png/Hei-datahub-logo-main.png" alt="Logo Main" width="200"/>
 </p>
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo Inline v1" width="200"/>
-  <img src="assets/png/Hei-datahub-logo-H.png" alt="Logo Inline v1" width="200"/>
+  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo round" width="200"/>
+  <img src="assets/png/Hei-datahub-logo-H.png" alt="Logo H" width="200"/>
 </p>
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="250"/>
+  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="400"/>
 </p>
 
 # Hei-DataHub
