@@ -1,0 +1,78 @@
+/* Cloud Files Screen Styling */
+
+#cloud-container {
+    layout: vertical;
+    height: 100%;
+    padding: 1;
+}
+
+#cloud-title {
+    text-align: center;
+    text-style: bold;
+    color: $accent;
+    padding: 1 0;
+}
+
+#breadcrumb {
+    color: $text-muted;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+#storage-status {
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+#files-table {
+    height: 60%;
+    border: solid $primary;
+    margin: 0 1;
+}
+
+#preview-panel {
+    height: 35%;
+    border: solid $accent;
+    margin: 1;
+    padding: 1;
+}
+
+#preview-panel.hidden {
+    display: none;
+}
+
+#preview-label {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+#preview-scroll {
+    height: 100%;
+    border: none;
+}
+
+#preview-content {
+    padding: 1;
+    color: $text;
+}
+
+/* Table styling */
+DataTable > .datatable--cursor {
+    background: $accent 20%;
+    color: $text;
+}
+
+DataTable > .datatable--header {
+    background: $panel;
+    color: $text;
+    text-style: bold;
+}
+
+DataTable > .datatable--odd-row {
+    background: $surface;
+}
+
+DataTable > .datatable--even-row {
+    background: $panel;
+}
