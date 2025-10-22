@@ -351,9 +351,10 @@ class HomeScreen(Screen):
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
 
     def _search_cloud_files(self, query: str) -> None:
-        """Search cloud files by name."""
+        """Search cloud files by name and metadata fields."""
         try:
             from mini_datahub.services.storage_manager import get_storage_backend
+            from mini_datahub.core.queries import QueryParser
             import yaml
             import tempfile
             import os
@@ -364,19 +365,23 @@ class HomeScreen(Screen):
             # Filter only directories (datasets)
             datasets = [e for e in entries if e.is_dir]
 
-            # Search by name (case-insensitive)
+            # Parse query for field searches
+            try:
+                parser = QueryParser()
+                parsed = parser.parse(query)
+                has_field_queries = any(not term.is_free_text for term in parsed.terms)
+            except:
+                parsed = None
+                has_field_queries = False
+
             query_lower = query.lower()
             matches = []
 
             for entry in datasets:
                 dataset_id = entry.name
+                match_found = False
 
-                # Quick name match first
-                if query_lower in dataset_id.lower():
-                    matches.append((dataset_id, entry))
-                    continue
-
-                # Try to load metadata for deeper search
+                # Load metadata for search
                 try:
                     metadata_path = f"{dataset_id}/metadata.yaml"
                     with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
@@ -387,16 +392,28 @@ class HomeScreen(Screen):
                         with open(tmp_path, 'r', encoding='utf-8') as f:
                             metadata = yaml.safe_load(f)
 
-                        # Search in name and description
-                        name = metadata.get('name', '')
-                        description = metadata.get('description', '')
+                        if parsed and has_field_queries:
+                            # Field-based search
+                            match_found = self._matches_query_terms(metadata, parsed)
+                        else:
+                            # Simple text search in name, description, and keywords
+                            name = metadata.get('name', dataset_id)
+                            description = metadata.get('description', '')
+                            keywords = metadata.get('keywords', [])
+                            keywords_str = ' '.join(keywords) if isinstance(keywords, list) else str(keywords)
 
-                        if query_lower in name.lower() or query_lower in description.lower():
-                            matches.append((dataset_id, entry))
+                            searchable_text = f"{dataset_id} {name} {description} {keywords_str}".lower()
+                            match_found = query_lower in searchable_text
+
+                        if match_found:
+                            matches.append((dataset_id, entry, metadata))
+
                     finally:
                         os.unlink(tmp_path)
                 except:
-                    pass  # Skip if metadata can't be loaded
+                    # If metadata can't be loaded, do simple name match
+                    if query_lower in dataset_id.lower():
+                        matches.append((dataset_id, entry, None))
 
             table = self.query_one("#results-table", DataTable)
             label = self.query_one("#results-label", Label)
@@ -406,32 +423,21 @@ class HomeScreen(Screen):
                 label.update(f"No results for '{query}'")
                 return
 
-            # Display matches with metadata
-            for dataset_id, entry in matches:
-                try:
-                    metadata_path = f"{dataset_id}/metadata.yaml"
-                    with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
-                        storage.download(metadata_path, tmp.name)
-                        tmp_path = tmp.name
+            # Display matches
+            for dataset_id, entry, metadata in matches:
+                if metadata:
+                    name = metadata.get('name', dataset_id)
+                    description = metadata.get('description', 'No description')
+                    description = description[:80] + "..." if len(description) > 80 else description
 
-                    try:
-                        with open(tmp_path, 'r', encoding='utf-8') as f:
-                            metadata = yaml.safe_load(f)
-
-                        name = metadata.get('name', dataset_id)
-                        description = metadata.get('description', 'No description')
-                        description = description[:80] + "..." if len(description) > 80 else description
-
-                        table.add_row(
-                            dataset_id,
-                            name[:40],
-                            description,
-                            key=dataset_id,
-                        )
-                    finally:
-                        os.unlink(tmp_path)
-                except:
-                    # Fallback to just showing the directory name
+                    table.add_row(
+                        dataset_id,
+                        name[:40],
+                        description,
+                        key=dataset_id,
+                    )
+                else:
+                    # Fallback for entries without metadata
                     table.add_row(
                         dataset_id,
                         f"📁 {dataset_id}"[:40],
@@ -441,6 +447,61 @@ class HomeScreen(Screen):
 
         except Exception as e:
             self.app.notify(f"Error searching cloud files: {str(e)}", severity="error", timeout=5)
+
+    def _matches_query_terms(self, metadata: dict, parsed) -> bool:
+        """Check if metadata matches all query terms."""
+        for term in parsed.terms:
+            if term.is_free_text:
+                # Free text search in name, description, keywords
+                name = str(metadata.get('name', '')).lower()
+                description = str(metadata.get('description', '')).lower()
+                keywords = metadata.get('keywords', [])
+                keywords_str = ' '.join(keywords).lower() if isinstance(keywords, list) else str(keywords).lower()
+
+                searchable = f"{name} {description} {keywords_str}"
+                if term.value.lower() not in searchable:
+                    return False
+            else:
+                # Field-specific search
+                field = term.field.lower()
+                search_value = term.value.lower()
+
+                # Map common field names
+                field_map = {
+                    'name': 'name',
+                    'description': 'description',
+                    'desc': 'description',
+                    'source': 'source',
+                    'license': 'license',
+                    'keyword': 'keywords',
+                    'keywords': 'keywords',
+                    'project': 'used_in_projects',
+                    'projects': 'used_in_projects',
+                    'temporal': 'temporal_coverage',
+                    'spatial': 'spatial_coverage',
+                }
+
+                metadata_field = field_map.get(field, field)
+                metadata_value = metadata.get(metadata_field)
+
+                if metadata_value is None:
+                    return False
+
+                # Handle list fields
+                if isinstance(metadata_value, list):
+                    metadata_str = ' '.join(str(v).lower() for v in metadata_value)
+                    if search_value not in metadata_str:
+                        return False
+                # Handle dict fields (like temporal_coverage)
+                elif isinstance(metadata_value, dict):
+                    metadata_str = ' '.join(str(v).lower() for v in metadata_value.values())
+                    if search_value not in metadata_str:
+                        return False
+                else:
+                    if search_value not in str(metadata_value).lower():
+                        return False
+
+        return True
 
     def _get_badge_color_class(self, text: str) -> str:
         """Get a retro background color class for a badge based on text hash."""
