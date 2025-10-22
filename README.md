@@ -1,10 +1,10 @@
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-main.png" alt="Hei-DataHub Logo Main" width="250"/>
+  <img src="assets/png/Hei-datahub-logo-main.png" alt="Hei-DataHub Logo Main" width="200"/>
 </p>
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="120"/>
+  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="250"/>
 </p>
 
 <p align="center">
