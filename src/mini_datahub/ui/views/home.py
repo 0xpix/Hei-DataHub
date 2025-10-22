@@ -163,38 +163,113 @@ class HomeScreen(Screen):
             status_widget.update("[dim]○ GitHub Not Connected[/dim] [dim]Press S to configure[/dim]")
 
     def load_all_datasets(self) -> None:
-        """Load and display all available datasets."""
+        """Load and display all available datasets (from cloud or local)."""
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
         try:
-            results = list_all_datasets()
-            label = self.query_one("#results-label", Label)
-            label.update(f"All Datasets ({len(results)} total)")
+            # Check if we should load from cloud storage
+            config = get_config()
+            storage_backend = config.get("storage.backend", "filesystem")
 
-            for result in results:
-                # Get description from metadata or use snippet
-                snippet = result.get("snippet", "")
-                if not snippet or snippet.strip() == "":
-                    # Use description from metadata if snippet is empty
-                    description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:80] + "..." if len(description) > 80 else description
-                else:
-                    # Clean snippet of HTML tags for display
-                    snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+            if storage_backend == "webdav":
+                # Load from cloud storage
+                self._load_cloud_files()
+            else:
+                # Load from local database
+                results = list_all_datasets()
+                label = self.query_one("#results-label", Label)
+                label.update(f"All Datasets ({len(results)} total)")
 
-                table.add_row(
-                    result["id"],
-                    result["name"][:40],
-                    snippet,
-                    key=result["id"],
-                )
+                for result in results:
+                    # Get description from metadata or use snippet
+                    snippet = result.get("snippet", "")
+                    if not snippet or snippet.strip() == "":
+                        # Use description from metadata if snippet is empty
+                        description = result.get("metadata", {}).get("description", "No description")
+                        snippet = description[:80] + "..." if len(description) > 80 else description
+                    else:
+                        # Clean snippet of HTML tags for display
+                        snippet = snippet.replace("<b>", "").replace("</b>", "")
+                        snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+
+                    table.add_row(
+                        result["id"],
+                        result["name"][:40],
+                        snippet,
+                        key=result["id"],
+                    )
 
             # Don't steal focus - let user continue typing
 
         except Exception as e:
             self.app.notify(f"Error loading datasets: {str(e)}", severity="error", timeout=5)
+
+    def _load_cloud_files(self) -> None:
+        """Load files from cloud storage and display in table."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            import yaml
+            import tempfile
+            import os
+            
+            storage = get_storage_backend()
+            entries = storage.listdir("")
+            
+            table = self.query_one("#results-table", DataTable)
+            label = self.query_one("#results-label", Label)
+            
+            # Filter only directories (datasets)
+            datasets = [e for e in entries if e.is_dir]
+            label.update(f"☁️ Cloud Datasets ({len(datasets)} total)")
+            
+            # Load metadata.yaml from each directory
+            for entry in datasets:
+                dataset_id = entry.name
+                
+                try:
+                    # Try to download and parse metadata.yaml
+                    metadata_path = f"{dataset_id}/metadata.yaml"
+                    
+                    # Download to temp file
+                    with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
+                        storage.download(metadata_path, tmp.name)
+                        tmp_path = tmp.name
+                    
+                    # Parse metadata
+                    try:
+                        with open(tmp_path, 'r', encoding='utf-8') as f:
+                            metadata = yaml.safe_load(f)
+                        
+                        name = metadata.get('name', dataset_id)
+                        description = metadata.get('description', 'No description')
+                        
+                        # Truncate for display
+                        description = description[:80] + "..." if len(description) > 80 else description
+                        
+                        table.add_row(
+                            dataset_id,
+                            name[:40],
+                            description,
+                            key=dataset_id,
+                        )
+                    finally:
+                        os.unlink(tmp_path)
+                        
+                except Exception as e:
+                    # If no metadata.yaml, show directory name only
+                    logger.warning(f"Could not load metadata for {dataset_id}: {e}")
+                    table.add_row(
+                        dataset_id,
+                        f"📁 {dataset_id}"[:40],
+                        "No metadata.yaml found",
+                        key=dataset_id,
+                    )
+                
+        except Exception as e:
+            self.app.notify(f"Error loading cloud files: {str(e)}", severity="error", timeout=5)
+            import traceback
+            traceback.print_exc()
 
     def watch_search_mode(self, mode: bool) -> None:
         """Update mode indicator when search mode changes."""
@@ -234,37 +309,138 @@ class HomeScreen(Screen):
             # Update filter badges
             self._update_filter_badges(query)
 
-            results = search_datasets(query)
-            label = self.query_one("#results-label", Label)
-            label.update(f"Search Results ({len(results)} found)")
+            # Check if we should search cloud storage
+            config = get_config()
+            storage_backend = config.get("storage.backend", "filesystem")
 
-            if not results:
-                label.update(f"No results for '{query}'")
-                return
+            if storage_backend == "webdav":
+                # Search cloud files
+                self._search_cloud_files(query)
+            else:
+                # Search local database
+                results = search_datasets(query)
+                label = self.query_one("#results-label", Label)
+                label.update(f"Search Results ({len(results)} found)")
 
-            for result in results:
-                # Get description from metadata or use snippet
-                snippet = result.get("snippet", "")
-                if not snippet or snippet.strip() == "":
-                    # Use description from metadata if snippet is empty
-                    description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:80] + "..." if len(description) > 80 else description
-                else:
-                    # Clean snippet of HTML tags for display
-                    snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+                if not results:
+                    label.update(f"No results for '{query}'")
+                    return
 
-                table.add_row(
-                    result["id"],
-                    result["name"][:40],
-                    snippet,
-                    key=result["id"],
-                )
+                for result in results:
+                    # Get description from metadata or use snippet
+                    snippet = result.get("snippet", "")
+                    if not snippet or snippet.strip() == "":
+                        # Use description from metadata if snippet is empty
+                        description = result.get("metadata", {}).get("description", "No description")
+                        snippet = description[:80] + "..." if len(description) > 80 else description
+                    else:
+                        # Clean snippet of HTML tags for display
+                        snippet = snippet.replace("<b>", "").replace("</b>", "")
+                        snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+
+                    table.add_row(
+                        result["id"],
+                        result["name"][:40],
+                        snippet,
+                        key=result["id"],
+                    )
 
             # Don't steal focus from search input
 
         except Exception as e:
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
+
+    def _search_cloud_files(self, query: str) -> None:
+        """Search cloud files by name."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            import yaml
+            import tempfile
+            import os
+            
+            storage = get_storage_backend()
+            entries = storage.listdir("")
+            
+            # Filter only directories (datasets)
+            datasets = [e for e in entries if e.is_dir]
+            
+            # Search by name (case-insensitive)
+            query_lower = query.lower()
+            matches = []
+            
+            for entry in datasets:
+                dataset_id = entry.name
+                
+                # Quick name match first
+                if query_lower in dataset_id.lower():
+                    matches.append((dataset_id, entry))
+                    continue
+                
+                # Try to load metadata for deeper search
+                try:
+                    metadata_path = f"{dataset_id}/metadata.yaml"
+                    with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
+                        storage.download(metadata_path, tmp.name)
+                        tmp_path = tmp.name
+                    
+                    try:
+                        with open(tmp_path, 'r', encoding='utf-8') as f:
+                            metadata = yaml.safe_load(f)
+                        
+                        # Search in name and description
+                        name = metadata.get('name', '')
+                        description = metadata.get('description', '')
+                        
+                        if query_lower in name.lower() or query_lower in description.lower():
+                            matches.append((dataset_id, entry))
+                    finally:
+                        os.unlink(tmp_path)
+                except:
+                    pass  # Skip if metadata can't be loaded
+            
+            table = self.query_one("#results-table", DataTable)
+            label = self.query_one("#results-label", Label)
+            label.update(f"☁️ Search Results ({len(matches)} found)")
+            
+            if not matches:
+                label.update(f"No results for '{query}'")
+                return
+            
+            # Display matches with metadata
+            for dataset_id, entry in matches:
+                try:
+                    metadata_path = f"{dataset_id}/metadata.yaml"
+                    with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
+                        storage.download(metadata_path, tmp.name)
+                        tmp_path = tmp.name
+                    
+                    try:
+                        with open(tmp_path, 'r', encoding='utf-8') as f:
+                            metadata = yaml.safe_load(f)
+                        
+                        name = metadata.get('name', dataset_id)
+                        description = metadata.get('description', 'No description')
+                        description = description[:80] + "..." if len(description) > 80 else description
+                        
+                        table.add_row(
+                            dataset_id,
+                            name[:40],
+                            description,
+                            key=dataset_id,
+                        )
+                    finally:
+                        os.unlink(tmp_path)
+                except:
+                    # Fallback to just showing the directory name
+                    table.add_row(
+                        dataset_id,
+                        f"📁 {dataset_id}"[:40],
+                        "No metadata.yaml",
+                        key=dataset_id,
+                    )
+                
+        except Exception as e:
+            self.app.notify(f"Error searching cloud files: {str(e)}", severity="error", timeout=5)
 
     def _get_badge_color_class(self, text: str) -> str:
         """Get a retro background color class for a badge based on text hash."""
@@ -407,16 +583,35 @@ class HomeScreen(Screen):
         self.app.push_screen(AddDataScreen())
 
     def action_open_details(self) -> None:
-        """Open details for selected dataset."""
+        """Open details for selected dataset or cloud file."""
         table = self.query_one("#results-table", DataTable)
         if table.row_count > 0 and table.cursor_row < table.row_count:
             # Get the row key properly
             try:
                 row_key = table.get_row_at(table.cursor_row)[0]
                 if row_key:
-                    self.app.push_screen(DetailsScreen(str(row_key)))
+                    # Check if we're in cloud mode
+                    config = get_config()
+                    storage_backend = config.get("storage.backend", "filesystem")
+
+                    if storage_backend == "webdav":
+                        # Open cloud file preview
+                        self._open_cloud_file_preview(str(row_key))
+                    else:
+                        # Open local dataset details
+                        self.app.push_screen(DetailsScreen(str(row_key)))
             except Exception as e:
                 self.app.notify(f"Error opening details: {str(e)}", severity="error", timeout=3)
+
+    def _open_cloud_file_preview(self, filename: str) -> None:
+        """Open preview screen for cloud dataset."""
+        try:
+            # For directories (datasets), show the DetailsScreen-like view with metadata
+            self.app.push_screen(CloudDatasetDetailsScreen(filename))
+        except Exception as e:
+            self.app.notify(f"Error opening dataset: {str(e)}", severity="error", timeout=3)
+            import traceback
+            traceback.print_exc()
 
     @on(DataTable.RowSelected, "#results-table")
     def on_row_selected(self, event: DataTable.RowSelected) -> None:
@@ -424,8 +619,18 @@ class HomeScreen(Screen):
         try:
             # Get the ID from the first column of the selected row
             row = event.data_table.get_row_at(event.cursor_row)
-            dataset_id = str(row[0])
-            self.app.push_screen(DetailsScreen(dataset_id))
+            item_id = str(row[0])
+
+            # Check if we're in cloud mode
+            config = get_config()
+            storage_backend = config.get("storage.backend", "filesystem")
+
+            if storage_backend == "webdav":
+                # Open cloud file preview
+                self._open_cloud_file_preview(item_id)
+            else:
+                # Open local dataset details
+                self.app.push_screen(DetailsScreen(item_id))
         except Exception as e:
             self.app.notify(f"Error: {str(e)}", severity="error", timeout=3)
 
@@ -793,6 +998,218 @@ class DetailsScreen(Screen):
         except Exception as e:
             pr_status.update(f"[red]✗ Error: {str(e)}[/red]")
             self.app.notify(f"Error creating PR: {str(e)}", severity="error", timeout=10)
+
+
+class CloudDatasetDetailsScreen(Screen):
+    """Screen to view cloud dataset details (from metadata.yaml)."""
+
+    BINDINGS = [
+        ("escape", "back", "Back"),
+        ("q", "back", "Back"),
+        ("y", "copy_source", "Copy Source"),
+        ("d", "download_all", "Download All"),
+    ]
+
+    def __init__(self, dataset_id: str):
+        super().__init__()
+        self.dataset_id = dataset_id
+        self.metadata = None
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield VerticalScroll(
+            Label(f"☁️ Dataset: {self.dataset_id}", classes="title"),
+            Static(id="details-content"),
+            id="details-container",
+        )
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Load metadata when screen is mounted."""
+        self.load_metadata()
+
+    @work(thread=True)
+    def load_metadata(self) -> None:
+        """Load metadata.yaml from cloud storage."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            import yaml
+            import tempfile
+            import os
+
+            storage = get_storage_backend()
+            metadata_path = f"{self.dataset_id}/metadata.yaml"
+
+            # Download metadata.yaml
+            with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix='.yaml') as tmp:
+                storage.download(metadata_path, tmp.name)
+                tmp_path = tmp.name
+
+            try:
+                with open(tmp_path, 'r', encoding='utf-8') as f:
+                    self.metadata = yaml.safe_load(f)
+
+                # Update UI on main thread
+                self.app.call_from_thread(self._display_metadata)
+
+            finally:
+                os.unlink(tmp_path)
+
+        except Exception as e:
+            error_msg = f"Error loading metadata: {str(e)}"
+            self.app.call_from_thread(lambda: self.app.notify(error_msg, severity="error", timeout=5))
+            self.app.call_from_thread(lambda: self.query_one("#details-content", Static).update(f"[red]{error_msg}[/red]"))
+
+    def _display_metadata(self) -> None:
+        """Display formatted metadata in the details view."""
+        if not self.metadata:
+            return
+
+        content = []
+        
+        # Format metadata nicely
+        if 'name' in self.metadata:
+            content.append(f"[bold cyan]Name:[/bold cyan] {self.metadata['name']}")
+        
+        if 'description' in self.metadata:
+            content.append(f"\n[bold cyan]Description:[/bold cyan]\n{self.metadata['description']}")
+        
+        if 'source' in self.metadata:
+            content.append(f"\n[bold cyan]Source:[/bold cyan] {self.metadata['source']}")
+        
+        if 'license' in self.metadata:
+            content.append(f"\n[bold cyan]License:[/bold cyan] {self.metadata['license']}")
+        
+        if 'temporal_coverage' in self.metadata:
+            tc = self.metadata['temporal_coverage']
+            if isinstance(tc, dict):
+                start = tc.get('start', 'N/A')
+                end = tc.get('end', 'N/A')
+                content.append(f"\n[bold cyan]Temporal Coverage:[/bold cyan] {start} to {end}")
+        
+        if 'spatial_coverage' in self.metadata:
+            content.append(f"\n[bold cyan]Spatial Coverage:[/bold cyan] {self.metadata['spatial_coverage']}")
+        
+        if 'keywords' in self.metadata:
+            keywords = ', '.join(self.metadata['keywords']) if isinstance(self.metadata['keywords'], list) else self.metadata['keywords']
+            content.append(f"\n[bold cyan]Keywords:[/bold cyan] {keywords}")
+        
+        # Show raw YAML at the end
+        import yaml
+        content.append("\n\n[bold cyan]Raw Metadata:[/bold cyan]")
+        content.append(f"[dim]{yaml.dump(self.metadata, default_flow_style=False)}[/dim]")
+        
+        details_widget = self.query_one("#details-content", Static)
+        details_widget.update("\n".join(content))
+
+    def action_back(self) -> None:
+        """Go back to previous screen."""
+        self.app.pop_screen()
+
+    def action_copy_source(self) -> None:
+        """Copy source URL to clipboard."""
+        if self.metadata and 'source' in self.metadata:
+            try:
+                import pyperclip
+                pyperclip.copy(self.metadata['source'])
+                self.app.notify("✓ Source copied to clipboard", timeout=3)
+            except Exception as e:
+                self.app.notify(f"Failed to copy: {str(e)}", severity="error", timeout=3)
+
+    def action_download_all(self) -> None:
+        """Download entire dataset directory."""
+        self.app.notify("Download all not yet implemented", severity="warning", timeout=3)
+
+
+class CloudFilePreviewScreen(Screen):
+    """Screen to preview cloud file contents."""
+
+    BINDINGS = [
+        ("escape", "back", "Back"),
+        ("q", "back", "Back"),
+        ("d", "download", "Download"),
+    ]
+
+    def __init__(self, filename: str):
+        super().__init__()
+        self.filename = filename
+        self.content = ""
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield VerticalScroll(
+            Label(f"☁️ Cloud File: {self.filename}", classes="title"),
+            TextArea(id="file-content", read_only=True),
+            id="preview-container",
+        )
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Load file content when screen is mounted."""
+        self.load_file_content()
+
+    @work(thread=True)
+    def load_file_content(self) -> None:
+        """Load file content from cloud storage."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            import tempfile
+            import os
+
+            storage = get_storage_backend()
+
+            # Download to temp file
+            with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix=os.path.splitext(self.filename)[1]) as tmp:
+                storage.download(self.filename, tmp.name)
+                tmp_path = tmp.name
+
+            # Read content
+            try:
+                with open(tmp_path, 'r', encoding='utf-8') as f:
+                    self.content = f.read()
+
+                # Update UI on main thread
+                self.app.call_from_thread(self._update_content)
+
+            except UnicodeDecodeError:
+                self.app.call_from_thread(lambda: self.app.notify("Cannot preview binary file", severity="warning"))
+                self.app.call_from_thread(lambda: self.query_one("#file-content", TextArea).load_text("[Binary file - cannot display]"))
+            finally:
+                try:
+                    os.unlink(tmp_path)
+                except:
+                    pass
+
+        except Exception as e:
+            self.app.call_from_thread(lambda: self.app.notify(f"Error loading file: {str(e)}", severity="error", timeout=5))
+            self.app.call_from_thread(lambda: self.query_one("#file-content", TextArea).load_text(f"Error: {str(e)}"))
+
+    def _update_content(self) -> None:
+        """Update the text area with loaded content."""
+        text_area = self.query_one("#file-content", TextArea)
+        text_area.load_text(self.content)
+
+    def action_back(self) -> None:
+        """Go back to previous screen."""
+        self.app.pop_screen()
+
+    def action_download(self) -> None:
+        """Download file to local filesystem."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            from pathlib import Path
+
+            storage = get_storage_backend()
+            download_dir = Path.home() / "Downloads"
+            download_dir.mkdir(exist_ok=True)
+
+            output_path = download_dir / self.filename
+            storage.download(self.filename, str(output_path))
+
+            self.app.notify(f"✓ Downloaded to {output_path}", timeout=5)
+
+        except Exception as e:
+            self.app.notify(f"Download failed: {str(e)}", severity="error", timeout=5)
 
 
 class ConfirmCancelDialog(Screen):
@@ -1696,7 +2113,7 @@ class DataHubApp(App):
             from mini_datahub.services.autocomplete import refresh_autocomplete
             refresh_autocomplete()
 
-        # Push home screen first
+        # Push home screen (will automatically load from cloud or local based on config)
         self.push_screen(HomeScreen())
 
         # Check for updates (async) - after screen is mounted
