@@ -159,11 +159,17 @@ Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-gettin
 - **Clear precedence** — CLI > env var > OS default
 - **Migration detection** — Notifies about legacy path locations
 
-## Typical Workflow
+## Typical Workflows
 
-1. **Search** (`/`) → 2. **Add/Edit** (`A`, validated) → 3. **Save → PR** (`Ctrl+S`, auto-stash) → 4. **Outbox** (`P`) if offline.
+### Cloud-Based (Heibox/Seafile)
+1. **Configure** WebDAV storage → 2. **Browse** datasets from cloud → 3. **Add** datasets directly to Heibox → 4. **Team access** instantly
 
-Full guide: [PR Workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/).
+Guide: [Add Dataset to Cloud](https://0xpix.github.io/Hei-DataHub/how-to/add-dataset-to-cloud/)
+
+### GitHub-Based (Pull Requests)
+1. **Search** (`/`) → 2. **Add/Edit** (`A`, validated) → 3. **Save → PR** (`Ctrl+S`, auto-stash) → 4. **Outbox** (`P`) if offline
+
+Guide: [PR Workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
 
 ---
 
