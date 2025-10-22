@@ -4,6 +4,7 @@ TUI application using Textual framework with Neovim-style keybindings.
 import logging
 import webbrowser
 from datetime import date
+from pathlib import Path
 from typing import Any, Optional
 import random
 
@@ -2076,35 +2077,107 @@ class AddDataScreen(Screen):
             error_label.update(f"[red]Validation Error:\n{error_msg}[/red]")
             return
 
-        # Fix for issue #7: ALWAYS save to local data/ directory first
-        # This ensures changes persist even if PR workflow fails
-        success, msg = save_dataset(dataset_id, metadata)
-        if not success:
-            error_label.update(f"[red]{msg}[/red]")
-            return
+        # Check storage backend
+        storage_config = get_config()
+        storage_backend = storage_config.get("storage.backend", "filesystem")
 
-        # Try PR workflow if GitHub is configured (catalog repo is separate)
-        from mini_datahub.app.settings import get_github_config
-        from mini_datahub.services.publish import PRWorkflow
-
-        config = get_github_config()
-        if config.is_configured() and config.catalog_repo_path:
-            # Execute Save → PR workflow
-            self.create_pr(dataset_id, metadata)
+        if storage_backend == "webdav":
+            # Save to cloud storage
+            self.save_to_cloud(dataset_id, metadata)
         else:
-            # Just save locally and show success
-            self.app.notify(f"Dataset '{dataset_id}' saved successfully!", timeout=3)
-            # Show one-time nudge about GitHub integration
-            if not hasattr(self.app, '_github_nudge_shown'):
-                self.app.notify(
-                    "💡 Tip: Connect GitHub in Settings (S) to auto-create PRs",
-                    severity="information",
-                    timeout=5,
-                )
-                self.app._github_nudge_shown = True
+            # Fix for issue #7: ALWAYS save to local data/ directory first
+            # This ensures changes persist even if PR workflow fails
+            success, msg = save_dataset(dataset_id, metadata)
+            if not success:
+                error_label.update(f"[red]{msg}[/red]")
+                return
 
-        self.app.pop_screen()
-        self.app.push_screen(DetailsScreen(dataset_id))
+            # Try PR workflow if GitHub is configured (catalog repo is separate)
+            from mini_datahub.app.settings import get_github_config
+            from mini_datahub.services.publish import PRWorkflow
+
+            config = get_github_config()
+            if config.is_configured() and config.catalog_repo_path:
+                # Execute Save → PR workflow
+                self.create_pr(dataset_id, metadata)
+            else:
+                # Just save locally and show success
+                self.app.notify(f"Dataset '{dataset_id}' saved successfully!", timeout=3)
+                # Show one-time nudge about GitHub integration
+                if not hasattr(self.app, '_github_nudge_shown'):
+                    self.app.notify(
+                        "💡 Tip: Connect GitHub in Settings (S) to auto-create PRs",
+                        severity="information",
+                        timeout=5,
+                    )
+                    self.app._github_nudge_shown = True
+
+            self.app.pop_screen()
+            self.app.push_screen(DetailsScreen(dataset_id))
+
+    @work(thread=True)
+    def save_to_cloud(self, dataset_id: str, metadata: dict) -> None:
+        """Save dataset to cloud storage (WebDAV)."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            import yaml
+            import tempfile
+            import os
+
+            self.app.call_from_thread(self.app.notify, "Uploading to cloud...", timeout=2)
+
+            storage = get_storage_backend()
+
+            # Create dataset directory
+            remote_dir = dataset_id
+            try:
+                storage.mkdir(remote_dir)
+            except Exception as e:
+                # Directory might already exist, that's okay
+                pass
+
+            # Create metadata.yaml in temp file
+            with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.yaml', encoding='utf-8') as tmp:
+                # Convert metadata to YAML-friendly format
+                yaml_metadata = {}
+                for key, value in metadata.items():
+                    # Convert dataset_name to name for consistency
+                    if key == 'dataset_name':
+                        yaml_metadata['name'] = value
+                    elif key != 'id':  # Skip id field, it's implicit from directory name
+                        yaml_metadata[key] = value
+
+                yaml.dump(yaml_metadata, tmp, sort_keys=False, allow_unicode=True)
+                tmp_path = tmp.name
+
+            try:
+                # Upload metadata.yaml
+                remote_path = f"{dataset_id}/metadata.yaml"
+                storage.upload(Path(tmp_path), remote_path)
+
+                self.app.call_from_thread(
+                    self.app.notify,
+                    f"✓ Dataset '{dataset_id}' uploaded to cloud!",
+                    timeout=5
+                )
+
+                # Close form and show details
+                self.app.call_from_thread(self.app.pop_screen)
+                self.app.call_from_thread(self.app.push_screen, CloudDatasetDetailsScreen(dataset_id))
+
+            finally:
+                # Cleanup temp file
+                os.unlink(tmp_path)
+
+        except Exception as e:
+            self.app.call_from_thread(
+                self.app.notify,
+                f"Error uploading to cloud: {str(e)}",
+                severity="error",
+                timeout=5
+            )
+            import traceback
+            traceback.print_exc()
 
     @work(exclusive=True)
     async def create_pr(self, dataset_id: str, metadata: dict) -> None:
