@@ -107,6 +107,98 @@ def handle_keymap_import(args):
     """Handle keymap import command."""
     import yaml
     from mini_datahub.services.config import get_config
+    from mini_datahub.infra.config_paths import get_keybindings_export_path
+
+    config = get_config()
+    input_path = args.input
+
+    try:
+        with open(input_path, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+
+        keybindings = data.get('keybindings', {})
+        if not keybindings:
+            print(f"⚠ No keybindings found in {input_path}")
+            sys.exit(1)
+
+        # Validate and import
+        config.update_keybindings(keybindings)
+        print(f"✓ Imported keybindings from: {input_path}")
+        print(f"✓ Applied {len(keybindings)} keybinding sets")
+        sys.exit(0)
+
+    except Exception as e:
+        print(f"❌ Failed to import keybindings: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+
+def handle_auth_setup(args):
+    """Handle auth setup command."""
+    from mini_datahub.auth.setup import run_setup_wizard
+
+    exit_code = run_setup_wizard(
+        url=args.url,
+        username=args.username,
+        token=args.token,
+        password=args.password,
+        library=getattr(args, 'library', None),
+        store=args.store,
+        no_validate=args.no_validate,
+        overwrite=args.overwrite,
+        timeout=args.timeout,
+        non_interactive=args.non_interactive,
+    )
+    sys.exit(exit_code)
+
+
+def handle_auth_status(args):
+    """Handle auth status command."""
+    from mini_datahub.infra.config_paths import get_config_path
+    from pathlib import Path
+
+    config_path = get_config_path()
+
+    if not config_path.exists():
+        print("❌ No authentication configured.")
+        print(f"   Config file not found: {config_path}")
+        print("\nRun: hei-datahub auth setup")
+        sys.exit(1)
+
+    try:
+        # Python 3.11+ has tomllib built-in
+        try:
+            import tomllib as tomli
+        except ImportError:
+            import tomli
+
+        with open(config_path, "rb") as f:
+            config = tomli.load(f)
+
+        auth_config = config.get("auth", {})
+
+        if not auth_config:
+            print("❌ No [auth] section in config")
+            sys.exit(1)
+
+        print("🔐 WebDAV Authentication Status\n")
+        print(f"Method:     {auth_config.get('method', 'unknown')}")
+        print(f"URL:        {auth_config.get('url', 'unknown')}")
+        print(f"Username:   {auth_config.get('username', '-')}")
+        print(f"Storage:    {auth_config.get('stored_in', 'unknown')}")
+        print(f"Key ID:     {auth_config.get('key_id', 'unknown')}")
+        print(f"\nConfig:     {config_path}")
+
+        sys.exit(0)
+
+    except Exception as e:
+        print(f"❌ Error reading config: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def handle_keymap_import(args):
+    """Handle keymap import command."""
+    import yaml
+    from mini_datahub.services.config import get_config
     from pathlib import Path
 
     input_path = Path(args.input)
@@ -514,6 +606,135 @@ def main():
     )
     parser_keymap_import.set_defaults(func=handle_keymap_import)
 
+    # Auth commands (Linux only)
+    parser_auth = subparsers.add_parser(
+        "auth",
+        help="Manage WebDAV authentication (Linux only)"
+    )
+    auth_subparsers = parser_auth.add_subparsers(dest="auth_command")
+
+    parser_auth_setup = auth_subparsers.add_parser(
+        "setup",
+        help="Interactive setup wizard for WebDAV credentials",
+        aliases=["config"]
+    )
+    parser_auth_setup.add_argument(
+        "--url",
+        type=str,
+        help="WebDAV URL"
+    )
+    parser_auth_setup.add_argument(
+        "--username",
+        type=str,
+        help="Username (optional for token auth)"
+    )
+    parser_auth_setup.add_argument(
+        "--token",
+        type=str,
+        help="WebDAV token"
+    )
+    parser_auth_setup.add_argument(
+        "--password",
+        type=str,
+        help="WebDAV password"
+    )
+    parser_auth_setup.add_argument(
+        "--library",
+        type=str,
+        help="Library/folder name in WebDAV (e.g., Testing-hei-datahub)"
+    )
+    parser_auth_setup.add_argument(
+        "--store",
+        choices=["keyring", "env"],
+        help="Force storage backend (keyring or env)"
+    )
+    parser_auth_setup.add_argument(
+        "--no-validate",
+        action="store_true",
+        help="Skip credential validation"
+    )
+    parser_auth_setup.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing config without prompting"
+    )
+    parser_auth_setup.add_argument(
+        "--timeout",
+        type=int,
+        default=8,
+        help="Validation timeout in seconds (default: 8)"
+    )
+    parser_auth_setup.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Non-interactive mode (requires --url and --token or --password)"
+    )
+    parser_auth_setup.set_defaults(func=handle_auth_setup)
+
+    parser_auth_status = auth_subparsers.add_parser(
+        "status",
+        help="Show current authentication status"
+    )
+    parser_auth_status.set_defaults(func=handle_auth_status)
+
+    # Add 'setup' as top-level alias for 'auth setup'
+    parser_setup = subparsers.add_parser(
+        "setup",
+        help="Alias for 'auth setup' - configure WebDAV authentication (Linux)"
+    )
+    parser_setup.add_argument(
+        "--url",
+        type=str,
+        help="WebDAV URL"
+    )
+    parser_setup.add_argument(
+        "--username",
+        type=str,
+        help="Username (optional for token auth)"
+    )
+    parser_setup.add_argument(
+        "--token",
+        type=str,
+        help="WebDAV token"
+    )
+    parser_setup.add_argument(
+        "--password",
+        type=str,
+        help="WebDAV password"
+    )
+    parser_setup.add_argument(
+        "--library",
+        type=str,
+        help="Library/folder name in WebDAV (e.g., Testing-hei-datahub)"
+    )
+    parser_setup.add_argument(
+        "--store",
+        choices=["keyring", "env"],
+        help="Force storage backend (keyring or env)"
+    )
+    parser_setup.add_argument(
+        "--no-validate",
+        action="store_true",
+        help="Skip credential validation"
+    )
+    parser_setup.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing config without prompting"
+    )
+    parser_setup.add_argument(
+        "--timeout",
+        type=int,
+        default=8,
+        help="Validation timeout in seconds (default: 8)"
+    )
+    parser_setup.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Non-interactive mode (requires --url and --token or --password)"
+    )
+    parser_setup.set_defaults(func=handle_auth_setup)
+
     # Parse arguments
     args = parser.parse_args()
 
@@ -560,6 +781,13 @@ def main():
             sys.exit(1)
     # Handle keymap subcommands
     elif args.command == "keymap":
+        if hasattr(args, 'func'):
+            args.func(args)
+        else:
+            parser.print_help()
+            sys.exit(1)
+    # Handle auth subcommands
+    elif args.command == "auth":
         if hasattr(args, 'func'):
             args.func(args)
         else:
