@@ -62,11 +62,48 @@ def _create_webdav_backend(config) -> WebDAVStorage:
     username = config.get("storage.username")
     password_env = config.get("storage.password_env", "HEIBOX_WEBDAV_TOKEN")
 
-    # Read credentials from environment
-    if not username:
-        username = os.getenv("HEIBOX_USERNAME")
+    # Try to load from auth setup first (keyring or ENV)
+    try:
+        from mini_datahub.infra.config_paths import get_config_path
+        from mini_datahub.auth.credentials import get_auth_store
 
-    password = os.getenv(password_env)
+        auth_config_path = get_config_path()
+        if auth_config_path.exists():
+            # Load auth config
+            try:
+                import tomllib as tomli
+            except ImportError:
+                import tomli
+
+            with open(auth_config_path, "rb") as f:
+                auth_config = tomli.load(f)
+
+            auth_section = auth_config.get("auth", {})
+            if auth_section:
+                # Use auth config values
+                base_url = auth_section.get("url") or base_url
+                library = auth_section.get("library") or library
+                username = auth_section.get("username") or username
+                key_id = auth_section.get("key_id")
+                stored_in = auth_section.get("stored_in")
+
+                # Load credential from keyring or ENV
+                if key_id and stored_in:
+                    auth_store = get_auth_store(prefer_keyring=(stored_in == "keyring"))
+                    password = auth_store.load_secret(key_id)
+                    if not password:
+                        logger.warning(f"Could not load credential from {stored_in}: {key_id}")
+                else:
+                    password = None
+    except Exception as e:
+        logger.debug(f"Could not load auth config: {e}")
+        password = None
+
+    # Fallback to old config.yaml + ENV method
+    if not password:
+        if not username:
+            username = os.getenv("HEIBOX_USERNAME")
+        password = os.getenv(password_env)
 
     # Validate required fields
     errors = []
@@ -77,16 +114,18 @@ def _create_webdav_backend(config) -> WebDAVStorage:
     if not username:
         errors.append("storage.username is not set (config or HEIBOX_USERNAME env)")
     if not password:
-        errors.append(f"{password_env} environment variable is not set")
+        errors.append(f"Credential not found. Run: hei-datahub auth setup")
 
     if errors:
         error_msg = "WebDAV backend misconfigured:\n  " + "\n  ".join(errors)
         logger.error(error_msg)
         raise StorageError(
-            f"WebDAV backend requires configuration. Please set:\n"
-            f"  - storage.base_url (e.g., https://heibox.uni-heidelberg.de/seafdav)\n"
-            f"  - storage.library (e.g., testing-hei-datahub)\n"
-            f"  - HEIBOX_USERNAME environment variable\n"
+            f"WebDAV backend requires configuration.\n\n"
+            f"Quick setup:\n"
+            f"  hei-datahub auth setup\n\n"
+            f"Or manually set:\n"
+            f"  - storage.base_url in config.yaml\n"
+            f"  - storage.library in config.yaml\n"
             f"  - {password_env} environment variable\n\n"
             f"Or switch to filesystem backend in config.yaml"
         )
