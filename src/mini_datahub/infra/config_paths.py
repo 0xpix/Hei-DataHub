@@ -53,6 +53,16 @@ def get_user_config_file() -> Path:
     return ensure_user_config_dir() / "config.yaml"
 
 
+def get_config_path() -> Path:
+    """
+    Get the path to the TOML config file for auth and other settings.
+
+    Returns:
+        Path to ~/.config/hei-datahub/config.toml (or XDG_CONFIG_HOME/hei-datahub/config.toml)
+    """
+    return ensure_user_config_dir() / "config.toml"
+
+
 def get_keybindings_export_path(filename: Optional[str] = None) -> Path:
     """
     Get the path for exporting/importing keybindings.
