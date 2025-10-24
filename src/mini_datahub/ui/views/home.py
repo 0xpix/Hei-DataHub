@@ -164,42 +164,51 @@ class HomeScreen(Screen):
             status_widget.update("[dim]○ GitHub Not Connected[/dim] [dim]Press S to configure[/dim]")
 
     def load_all_datasets(self) -> None:
-        """Load and display all available datasets (from cloud or local)."""
+        """Load and display all available datasets from index (FAST - local only)."""
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
         try:
-            # Check if we should load from cloud storage
-            config = get_config()
-            storage_backend = config.get("storage.backend", "filesystem")
+            # ALWAYS use indexed search for fast loading
+            from mini_datahub.services.fast_search import get_all_indexed
 
-            if storage_backend == "webdav":
-                # Load from cloud storage
-                self._load_cloud_files()
+            results = get_all_indexed()
+            label = self.query_one("#results-label", Label)
+
+            # Show indexer status if warming
+            from mini_datahub.services.indexer import get_indexer
+            indexer = get_indexer()
+            if not indexer.is_ready():
+                label.update(f"🔄 Indexing… All Datasets ({len(results)} total)")
             else:
-                # Load from local database
-                results = list_all_datasets()
-                label = self.query_one("#results-label", Label)
                 label.update(f"All Datasets ({len(results)} total)")
 
-                for result in results:
-                    # Get description from metadata or use snippet
-                    snippet = result.get("snippet", "")
-                    if not snippet or snippet.strip() == "":
-                        # Use description from metadata if snippet is empty
-                        description = result.get("metadata", {}).get("description", "No description")
-                        snippet = description[:80] + "..." if len(description) > 80 else description
-                    else:
-                        # Clean snippet of HTML tags for display
-                        snippet = snippet.replace("<b>", "").replace("</b>", "")
-                        snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+            for result in results:
+                # Get description from metadata or use snippet
+                snippet = result.get("snippet", "")
+                if not snippet or snippet.strip() == "":
+                    # Use description from metadata if snippet is empty
+                    description = result.get("metadata", {}).get("description", "No description")
+                    snippet = description[:80] + "..." if len(description) > 80 else description
+                else:
+                    # Clean snippet of HTML tags for display
+                    snippet = snippet.replace("<b>", "").replace("</b>", "")
+                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
-                    table.add_row(
-                        result["id"],
-                        result["name"][:40],
-                        snippet,
-                        key=result["id"],
-                    )
+                # Show cloud/local indicator
+                is_remote = result.get("metadata", {}).get("is_remote", False)
+                name_prefix = "☁️ " if is_remote else ""
+
+                table.add_row(
+                    result["id"],
+                    (name_prefix + result["name"])[:40],
+                    snippet,
+                    key=result["id"],
+                )
+
+        except Exception as e:
+            logger.error(f"Error loading datasets from index: {e}", exc_info=True)
+            self.app.notify(f"Error loading datasets: {str(e)}", severity="error", timeout=5)
 
             # Don't steal focus - let user continue typing
 
@@ -287,16 +296,15 @@ class HomeScreen(Screen):
         if self._debounce_timer:
             self._debounce_timer.stop()
 
-        # Get debounce from config or use default
-        debounce_ms = 150  # default
-        if hasattr(self.app, 'config') and self.app.config:
-            debounce_ms = self.app.config.get("search.debounce_ms", 150)
+        # Get debounce from config or use default (200ms for fast typing)
+        import os
+        debounce_ms = int(os.environ.get("HEI_DATAHUB_SEARCH_DEBOUNCE_MS", "200"))
 
         # Set new timer for debounced search
         self._debounce_timer = self.set_timer(debounce_ms / 1000.0, lambda: self.perform_search(event.value))
 
     def perform_search(self, query: str) -> None:
-        """Execute search and update results table."""
+        """Execute search and update results table (FAST - never hits network)."""
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
@@ -310,45 +318,51 @@ class HomeScreen(Screen):
             # Update filter badges
             self._update_filter_badges(query)
 
-            # Check if we should search cloud storage
-            config = get_config()
-            storage_backend = config.get("storage.backend", "filesystem")
+            # ALWAYS use indexed search (never hit network on keystroke)
+            from mini_datahub.services.fast_search import search_indexed
 
-            if storage_backend == "webdav":
-                # Search cloud files
-                self._search_cloud_files(query)
+            results = search_indexed(query)
+            label = self.query_one("#results-label", Label)
+
+            # Show indexer status if warming
+            from mini_datahub.services.indexer import get_indexer
+            indexer = get_indexer()
+            if not indexer.is_ready():
+                label.update(f"🔄 Indexing… Search Results ({len(results)} found)")
             else:
-                # Search local database
-                results = search_datasets(query)
-                label = self.query_one("#results-label", Label)
                 label.update(f"Search Results ({len(results)} found)")
 
-                if not results:
-                    label.update(f"No results for '{query}'")
-                    return
+            if not results:
+                label.update(f"No results for '{query}'")
+                return
 
-                for result in results:
-                    # Get description from metadata or use snippet
-                    snippet = result.get("snippet", "")
-                    if not snippet or snippet.strip() == "":
-                        # Use description from metadata if snippet is empty
-                        description = result.get("metadata", {}).get("description", "No description")
-                        snippet = description[:80] + "..." if len(description) > 80 else description
-                    else:
-                        # Clean snippet of HTML tags for display
-                        snippet = snippet.replace("<b>", "").replace("</b>", "")
-                        snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+            for result in results:
+                # Get description from metadata or use snippet
+                snippet = result.get("snippet", "")
+                if not snippet or snippet.strip() == "":
+                    # Use description from metadata if snippet is empty
+                    description = result.get("metadata", {}).get("description", "No description")
+                    snippet = description[:80] + "..." if len(description) > 80 else description
+                else:
+                    # Clean snippet of HTML tags for display
+                    snippet = snippet.replace("<b>", "").replace("</b>", "")
+                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
-                    table.add_row(
-                        result["id"],
-                        result["name"][:40],
-                        snippet,
-                        key=result["id"],
-                    )
+                # Show cloud/local indicator
+                is_remote = result.get("metadata", {}).get("is_remote", False)
+                name_prefix = "☁️ " if is_remote else ""
+
+                table.add_row(
+                    result["id"],
+                    (name_prefix + result["name"])[:40],
+                    snippet,
+                    key=result["id"],
+                )
 
             # Don't steal focus from search input
 
         except Exception as e:
+            logger.error(f"Search error: {e}", exc_info=True)
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
 
     def _search_cloud_files(self, query: str) -> None:
@@ -2155,6 +2169,34 @@ class AddDataScreen(Screen):
                 remote_path = f"{dataset_id}/metadata.yaml"
                 storage.upload(Path(tmp_path), remote_path)
 
+                # Update fast search index for cloud dataset
+                try:
+                    from mini_datahub.services.index_service import get_index_service
+
+                    index_service = get_index_service()
+
+                    # Extract fields
+                    name = metadata.get('dataset_name', dataset_id)
+                    description = metadata.get('description', '')
+                    keywords = metadata.get('keywords', [])
+                    tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
+                    used_in_projects = metadata.get('used_in_projects', [])
+                    project = used_in_projects[0] if used_in_projects else None
+
+                    index_service.upsert_item(
+                        path=dataset_id,
+                        name=name,
+                        project=project,
+                        tags=tags,
+                        description=description,
+                        format=metadata.get('file_format'),
+                        source=metadata.get('source'),
+                        is_remote=True,  # This is a cloud dataset
+                    )
+                except Exception as idx_err:
+                    # Don't fail upload if index update fails
+                    logger.warning(f"Failed to update search index: {idx_err}")
+
                 self.app.call_from_thread(
                     self.app.notify,
                     f"✓ Dataset '{dataset_id}' uploaded to cloud!",
@@ -2234,6 +2276,15 @@ class DataHubApp(App):
                     self.notify(f"Indexed {count} datasets with {len(errors)} errors", severity="warning", timeout=5)
         except Exception as e:
             self.notify(f"Database initialization error: {str(e)}", severity="error", timeout=10)
+
+        # Start background indexer (FAST - non-blocking)
+        import asyncio
+        from mini_datahub.services.indexer import start_background_indexer
+        try:
+            asyncio.create_task(start_background_indexer())
+            logger.info("Background indexer started")
+        except Exception as e:
+            logger.warning(f"Failed to start background indexer: {e}")
 
         # Check GitHub connection status
         self.check_github_connection()
