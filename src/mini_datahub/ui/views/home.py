@@ -126,26 +126,60 @@ class HomeScreen(Screen):
         # Update GitHub status indicator
         self.update_github_status()
 
-        # Load all datasets initially (might be empty if indexer not ready)
+        # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
 
-        # Set up a timer to reload when indexer becomes ready
-        self.set_interval(0.5, self._check_indexer_and_reload, name="indexer_check")
+        # Set up a very fast timer to reload when indexer finishes (100ms checks)
+        self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
     def _check_indexer_and_reload(self) -> None:
-        """Check if indexer is ready and reload data once."""
+        """Check if indexer is ready and add new datasets incrementally."""
         from mini_datahub.services.indexer import get_indexer
+        from mini_datahub.services.fast_search import get_all_indexed
 
         indexer = get_indexer()
-        if indexer.is_ready():
-            # Indexer is ready - reload the table if it's currently empty
-            table = self.query_one("#results-table", DataTable)
-            if table.row_count == 0:
-                logger.info("Indexer ready - reloading datasets")
-                self.load_all_datasets()
-            # Stop the timer once we've loaded
+        table = self.query_one("#results-table", DataTable)
+        label = self.query_one("#results-label", Label)
+
+        # Get current datasets from index
+        results = get_all_indexed()
+        cloud_results = [r for r in results if r.get("metadata", {}).get("is_remote", False)]
+
+        # Get existing row keys to check what's already displayed
+        existing_keys = set()
+        for row_key in table.rows.keys():
+            existing_keys.add(row_key.value)  # Use .value to get actual key string
+
+        # Add only NEW datasets that aren't already in the table
+        for result in cloud_results:
+            if result["id"] not in existing_keys:
+                # New dataset found - add it to the table immediately
+                display_name = result["name"]
+                snippet = result.get("snippet", "")
+                if not snippet or snippet.strip() == "":
+                    description = result.get("metadata", {}).get("description", "No description")
+                    snippet = description[:80] + "..." if len(description) > 80 else description
+                else:
+                    snippet = snippet.replace("<b>", "").replace("</b>", "")
+                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+
+                table.add_row(
+                    display_name,
+                    ("☁️ " + display_name)[:40],
+                    snippet,
+                    key=result["id"],
+                )
+                logger.info(f"Added dataset to table: {display_name}")
+
+        # Update label with progress
+        if not indexer.is_ready():
+            label.update(f"🔄 Loading... ☁️ {len(cloud_results)} of ? datasets")
+        else:
+            label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
+            # Stop timer once indexer is done
             try:
                 self.remove_timer("indexer_check")
+                logger.info(f"Indexing complete - {table.row_count} datasets")
             except:
                 pass
 
@@ -203,9 +237,11 @@ class HomeScreen(Screen):
             from mini_datahub.services.fast_search import get_all_indexed
 
             results = get_all_indexed()
+            logger.info(f"get_all_indexed returned {len(results)} results")
 
             # CLOUD-ONLY: Filter to show only remote datasets
             cloud_results = [r for r in results if r.get("metadata", {}).get("is_remote", False)]
+            logger.info(f"After filtering for remote: {len(cloud_results)} cloud datasets")
 
             label = self.query_one("#results-label", Label)
 
@@ -213,7 +249,11 @@ class HomeScreen(Screen):
             from mini_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
-                label.update(f"🔄 Indexing… ☁️ Cloud Datasets ({len(cloud_results)} total)")
+                label.update(f"🔄 Loading cloud datasets... ☁️ 0 of ? datasets")
+                # Don't populate table yet - timer will do it incrementally
+                return
+            elif len(cloud_results) == 0:
+                label.update(f"☁️ No cloud datasets found - Add one with Ctrl+A")
             else:
                 label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
 
