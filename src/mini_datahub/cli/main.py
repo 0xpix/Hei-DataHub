@@ -195,6 +195,29 @@ def handle_auth_status(args):
         sys.exit(1)
 
 
+def handle_auth_doctor(args):
+    """Handle auth doctor command."""
+    from mini_datahub.auth.doctor import run_doctor
+
+    exit_code = run_doctor(
+        output_json=args.json,
+        skip_write=args.no_write,
+        timeout=getattr(args, 'timeout', 8),
+    )
+    sys.exit(exit_code)
+
+
+def handle_auth_clear(args):
+    """Handle auth clear command."""
+    from mini_datahub.auth.clear import run_clear
+
+    exit_code = run_clear(
+        force=args.force,
+        clear_all=args.all,
+    )
+    sys.exit(exit_code)
+
+
 def handle_keymap_import(args):
     """Handle keymap import command."""
     import yaml
@@ -676,6 +699,44 @@ def main():
         help="Show current authentication status"
     )
     parser_auth_status.set_defaults(func=handle_auth_status)
+
+    parser_auth_doctor = auth_subparsers.add_parser(
+        "doctor",
+        help="Run WebDAV authentication diagnostics"
+    )
+    parser_auth_doctor.add_argument(
+        "--json",
+        action="store_true",
+        help="Output results as JSON"
+    )
+    parser_auth_doctor.add_argument(
+        "--no-write",
+        action="store_true",
+        help="Skip write permission tests"
+    )
+    parser_auth_doctor.add_argument(
+        "--timeout",
+        type=int,
+        default=8,
+        help="Network timeout in seconds (default: 8)"
+    )
+    parser_auth_doctor.set_defaults(func=handle_auth_doctor)
+
+    parser_auth_clear = auth_subparsers.add_parser(
+        "clear",
+        help="Clear stored WebDAV credentials"
+    )
+    parser_auth_clear.add_argument(
+        "--force",
+        action="store_true",
+        help="Skip interactive confirmation"
+    )
+    parser_auth_clear.add_argument(
+        "--all",
+        action="store_true",
+        help="Also remove cached session files"
+    )
+    parser_auth_clear.set_defaults(func=handle_auth_clear)
 
     # Add 'setup' as top-level alias for 'auth setup'
     parser_setup = subparsers.add_parser(
