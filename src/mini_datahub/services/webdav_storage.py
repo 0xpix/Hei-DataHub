@@ -335,6 +335,9 @@ class WebDAVStorage(StorageBackend):
                 response = self.session.put(
                     url,
                     data=f,
+                    headers={
+                        "If-Match": "*",  # Allow overwriting existing files
+                    },
                     timeout=(self.connect_timeout, self.read_timeout),
                 )
 
@@ -342,6 +345,15 @@ class WebDAVStorage(StorageBackend):
                 raise StorageAuthError("Authentication failed")
             elif response.status_code == 403:
                 raise StorageAuthError("Access forbidden")
+            elif response.status_code == 412:
+                # Precondition failed - file doesn't exist, retry without If-Match
+                logger.debug("File doesn't exist, retrying without If-Match header")
+                with open(local_path, "rb") as f:
+                    response = self.session.put(
+                        url,
+                        data=f,
+                        timeout=(self.connect_timeout, self.read_timeout),
+                    )
 
             response.raise_for_status()
             logger.info(f"Uploaded {local_path} to {remote_path}")
@@ -396,6 +408,52 @@ class WebDAVStorage(StorageBackend):
                 raise StorageError(f"MKCOL failed for {partial_path}: {str(e)}")
 
         logger.info(f"Created directory: {remote_path}")
+
+    def move(self, src_path: str, dest_path: str) -> None:
+        """
+        Move/rename a file or directory via WebDAV MOVE method.
+
+        Args:
+            src_path: Source path
+            dest_path: Destination path
+        """
+        src_url = self._get_url(src_path)
+        dest_url = self._get_url(dest_path)
+
+        try:
+            response = self.session.request(
+                "MOVE",
+                src_url,
+                headers={
+                    "Destination": dest_url,
+                    "Overwrite": "F",  # Don't overwrite existing
+                },
+                timeout=(self.connect_timeout, self.read_timeout),
+            )
+
+            if response.status_code == 201:
+                logger.info(f"Moved {src_path} to {dest_path}")
+            elif response.status_code == 204:
+                logger.info(f"Moved {src_path} to {dest_path} (destination existed)")
+            elif response.status_code == 401:
+                raise StorageAuthError("Authentication failed")
+            elif response.status_code == 403:
+                raise StorageAuthError("Access forbidden")
+            elif response.status_code == 404:
+                raise StorageNotFoundError(f"Source path not found: {src_path}")
+            elif response.status_code == 412:
+                raise StorageError(f"Destination already exists: {dest_path}")
+            else:
+                response.raise_for_status()
+
+        except requests.exceptions.Timeout:
+            raise StorageConnectionError(f"MOVE timeout for {src_path}")
+        except requests.exceptions.ConnectionError as e:
+            raise StorageConnectionError(f"Connection failed: {str(e)}")
+        except StorageError:
+            raise
+        except Exception as e:
+            raise StorageError(f"MOVE failed: {str(e)}")
 
     def exists(self, remote_path: str) -> bool:
         """
