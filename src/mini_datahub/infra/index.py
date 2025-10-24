@@ -10,6 +10,7 @@ from mini_datahub.infra.db import get_connection, ensure_database
 def upsert_dataset(dataset_id: str, metadata: dict) -> None:
     """
     Upsert a dataset into both the store and FTS index.
+    Also updates the fast search index for instant search.
 
     Args:
         dataset_id: Dataset ID
@@ -56,10 +57,43 @@ def upsert_dataset(dataset_id: str, metadata: dict) -> None:
     finally:
         conn.close()
 
+    # Also update the fast search index
+    try:
+        from mini_datahub.services.index_service import get_index_service
+
+        index_service = get_index_service()
+
+        # Extract fields for fast search
+        keywords = metadata.get("keywords", [])
+        tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
+        project = used_in_projects.split()[0] if used_in_projects else None  # First project
+
+        # Determine if it's a remote dataset (from WebDAV)
+        # Check if it's in the data directory (local) or not
+        from mini_datahub.infra.paths import DATA_DIR
+        dataset_path = DATA_DIR / dataset_id
+        is_remote = not dataset_path.exists()
+
+        index_service.upsert_item(
+            path=dataset_id,
+            name=name,
+            project=project,
+            tags=tags,
+            description=description,
+            format=file_format,
+            source=source,
+            is_remote=is_remote,
+        )
+    except Exception as e:
+        # Don't fail the whole operation if fast index update fails
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to update fast search index: {e}")
+
 
 def delete_dataset(dataset_id: str) -> None:
     """
     Delete a dataset from both store and FTS index.
+    Also removes from the fast search index.
 
     Args:
         dataset_id: Dataset ID
@@ -73,6 +107,17 @@ def delete_dataset(dataset_id: str) -> None:
         conn.commit()
     finally:
         conn.close()
+
+    # Also delete from fast search index
+    try:
+        from mini_datahub.services.index_service import get_index_service
+
+        index_service = get_index_service()
+        index_service.delete_item(dataset_id)
+    except Exception as e:
+        # Don't fail the whole operation if fast index update fails
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to delete from fast search index: {e}")
 
 
 def get_dataset_from_store(dataset_id: str) -> Dict[str, Any]:
