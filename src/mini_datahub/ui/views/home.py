@@ -163,27 +163,41 @@ class HomeScreen(Screen):
         else:
             status_widget.update("[dim]○ GitHub Not Connected[/dim] [dim]Press S to configure[/dim]")
 
-    def load_all_datasets(self) -> None:
-        """Load and display all available datasets from index (FAST - local only)."""
+
+    def load_all_datasets(self, force_refresh: bool = False) -> None:
+        """Load and display all available datasets from index (CLOUD ONLY)."""
+        logger.info(f"load_all_datasets called (force_refresh={force_refresh})")
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
         try:
+            # Force cache clear if requested (e.g., after edit)
+            if force_refresh:
+                from mini_datahub.services.index_service import get_index_service
+                index_service = get_index_service()
+                index_service._query_cache.clear()
+                index_service._cache_timestamps.clear()
+                logger.info("✓ Cleared index cache for fresh data")
+
             # ALWAYS use indexed search for fast loading
             from mini_datahub.services.fast_search import get_all_indexed
 
             results = get_all_indexed()
+
+            # CLOUD-ONLY: Filter to show only remote datasets
+            cloud_results = [r for r in results if r.get("metadata", {}).get("is_remote", False)]
+
             label = self.query_one("#results-label", Label)
 
             # Show indexer status if warming
             from mini_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
-                label.update(f"🔄 Indexing… All Datasets ({len(results)} total)")
+                label.update(f"🔄 Indexing… ☁️ Cloud Datasets ({len(cloud_results)} total)")
             else:
-                label.update(f"All Datasets ({len(results)} total)")
+                label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
 
-            for result in results:
+            for result in cloud_results:
                 # Get description from metadata or use snippet
                 snippet = result.get("snippet", "")
                 if not snippet or snippet.strip() == "":
@@ -195,9 +209,8 @@ class HomeScreen(Screen):
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
                     snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
-                # Show cloud/local indicator
-                is_remote = result.get("metadata", {}).get("is_remote", False)
-                name_prefix = "☁️ " if is_remote else ""
+                # All datasets are cloud now, but keep the indicator
+                name_prefix = "☁️ "
 
                 table.add_row(
                     result["id"],
@@ -211,9 +224,6 @@ class HomeScreen(Screen):
             self.app.notify(f"Error loading datasets: {str(e)}", severity="error", timeout=5)
 
             # Don't steal focus - let user continue typing
-
-        except Exception as e:
-            self.app.notify(f"Error loading datasets: {str(e)}", severity="error", timeout=5)
 
     def _load_cloud_files(self) -> None:
         """Load files from cloud storage and display in table."""
@@ -322,21 +332,25 @@ class HomeScreen(Screen):
             from mini_datahub.services.fast_search import search_indexed
 
             results = search_indexed(query)
+
+            # CLOUD-ONLY: Filter to show only remote datasets
+            cloud_results = [r for r in results if r.get("metadata", {}).get("is_remote", False)]
+
             label = self.query_one("#results-label", Label)
 
             # Show indexer status if warming
             from mini_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
-                label.update(f"🔄 Indexing… Search Results ({len(results)} found)")
+                label.update(f"🔄 Indexing… ☁️ Cloud Results ({len(cloud_results)} found)")
             else:
-                label.update(f"Search Results ({len(results)} found)")
+                label.update(f"☁️ Cloud Results ({len(cloud_results)} found)")
 
-            if not results:
-                label.update(f"No results for '{query}'")
+            if not cloud_results:
+                label.update(f"No cloud results for '{query}'")
                 return
 
-            for result in results:
+            for result in cloud_results:
                 # Get description from metadata or use snippet
                 snippet = result.get("snippet", "")
                 if not snippet or snippet.strip() == "":
@@ -348,9 +362,8 @@ class HomeScreen(Screen):
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
                     snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
-                # Show cloud/local indicator
-                is_remote = result.get("metadata", {}).get("is_remote", False)
-                name_prefix = "☁️ " if is_remote else ""
+                # All datasets are cloud now
+                name_prefix = "☁️ "
 
                 table.add_row(
                     result["id"],
@@ -364,7 +377,6 @@ class HomeScreen(Screen):
         except Exception as e:
             logger.error(f"Search error: {e}", exc_info=True)
             self.app.notify(f"Search error: {str(e)}", severity="error", timeout=5)
-
     def _search_cloud_files(self, query: str) -> None:
         """Search cloud files by name and metadata fields."""
         try:
@@ -666,16 +678,8 @@ class HomeScreen(Screen):
             try:
                 row_key = table.get_row_at(table.cursor_row)[0]
                 if row_key:
-                    # Check if we're in cloud mode
-                    config = get_config()
-                    storage_backend = config.get("storage.backend", "filesystem")
-
-                    if storage_backend == "webdav":
-                        # Open cloud file preview
-                        self._open_cloud_file_preview(str(row_key))
-                    else:
-                        # Open local dataset details
-                        self.app.push_screen(DetailsScreen(str(row_key)))
+                    # ALWAYS open cloud dataset details (cloud-only workflow)
+                    self._open_cloud_file_preview(str(row_key))
             except Exception as e:
                 self.app.notify(f"Error opening details: {str(e)}", severity="error", timeout=3)
 
@@ -697,16 +701,8 @@ class HomeScreen(Screen):
             row = event.data_table.get_row_at(event.cursor_row)
             item_id = str(row[0])
 
-            # Check if we're in cloud mode
-            config = get_config()
-            storage_backend = config.get("storage.backend", "filesystem")
-
-            if storage_backend == "webdav":
-                # Open cloud file preview
-                self._open_cloud_file_preview(item_id)
-            else:
-                # Open local dataset details
-                self.app.push_screen(DetailsScreen(item_id))
+            # ALWAYS use cloud mode (cloud-only workflow)
+            self._open_cloud_file_preview(item_id)
         except Exception as e:
             self.app.notify(f"Error: {str(e)}", severity="error", timeout=3)
 
@@ -1082,6 +1078,7 @@ class CloudDatasetDetailsScreen(Screen):
     BINDINGS = [
         ("escape", "back", "Back"),
         ("q", "back", "Back"),
+        ("e", "edit_cloud_dataset", "Edit"),
         ("y", "copy_source", "Copy Source"),
         ("d", "download_all", "Download All"),
     ]
@@ -1195,6 +1192,24 @@ class CloudDatasetDetailsScreen(Screen):
     def action_download_all(self) -> None:
         """Download entire dataset directory."""
         self.app.notify("Download all not yet implemented", severity="warning", timeout=3)
+
+    def action_edit_cloud_dataset(self) -> None:
+        """Edit cloud dataset (e key)."""
+        if not self.metadata:
+            self.app.notify("No metadata loaded", severity="error", timeout=3)
+            return
+
+        # Convert cloud metadata format to match local format
+        # Cloud metadata has 'name' but local expects 'dataset_name'
+        local_format_metadata = self.metadata.copy()
+        if 'name' in local_format_metadata and 'dataset_name' not in local_format_metadata:
+            local_format_metadata['dataset_name'] = local_format_metadata['name']
+
+        # Add id field from dataset_id
+        local_format_metadata['id'] = self.dataset_id
+
+        # Push cloud edit screen
+        self.app.push_screen(CloudEditDetailsScreen(self.dataset_id, local_format_metadata.copy()))
 
 
 class CloudFilePreviewScreen(Screen):
@@ -1791,6 +1806,342 @@ class EditDetailsScreen(Screen):
         self._update_metadata_from_field(field_name, str(value))
 
 
+class CloudEditDetailsScreen(Screen):
+    """Screen for editing cloud dataset metadata with WebDAV storage."""
+
+    CSS = """
+    #edit-scroll {
+        height: 1fr;
+        overflow-y: auto;
+    }
+
+    #edit-form-container {
+        height: auto;
+        padding: 1 2;
+    }
+
+    #edit-form-container Label {
+        margin-top: 1;
+    }
+
+    #edit-form-container Input, #edit-form-container TextArea {
+        margin-bottom: 0;
+    }
+
+    .field-error {
+        color: $error;
+        margin-bottom: 1;
+    }
+
+    .edit-status {
+        margin-top: 2;
+        padding: 1;
+        background: $surface;
+        text-align: center;
+    }
+
+    #edit-description {
+        height: 8;
+    }
+    """
+
+    BINDINGS = [
+        ("ctrl+s", "save_edits", "Save"),
+        ("escape", "cancel_edits", "Cancel"),
+    ]
+
+    def __init__(self, dataset_id: str, metadata: dict):
+        super().__init__()
+        self.dataset_id = dataset_id
+        self.original_metadata = metadata.copy()
+        self.metadata = metadata.copy()
+        self._dirty_fields = set()
+        self._field_errors = {}
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield VerticalScroll(
+            Label(f"☁️ Editing Cloud Dataset: {self.dataset_id}  |  [italic]Ctrl+S to save, Esc to cancel[/italic]", classes="title"),
+            Container(
+                Label("Dataset Name:"),
+                Input(value=self.metadata.get('dataset_name', self.metadata.get('name', '')), id="edit-name"),
+                Static(id="error-name", classes="field-error"),
+
+                Label("Description:"),
+                TextArea(id="edit-description"),
+                Static(id="error-description", classes="field-error"),
+
+                Label("Source:"),
+                Input(value=self.metadata.get('source', ''), id="edit-source"),
+                Static(id="error-source", classes="field-error"),
+
+                Label("Storage Location:"),
+                Input(value=self.metadata.get('storage_location', ''), id="edit-storage"),
+                Static(id="error-storage", classes="field-error"),
+
+                Label("Date Created (YYYY-MM-DD):"),
+                Input(value=str(self.metadata.get('date_created', '')), id="edit-date"),
+                Static(id="error-date", classes="field-error"),
+
+                Label("File Format:"),
+                Input(value=self.metadata.get('file_format', ''), id="edit-format"),
+                Static(id="error-format", classes="field-error"),
+
+                Label("Size:"),
+                Input(value=self.metadata.get('size', ''), id="edit-size"),
+                Static(id="error-size", classes="field-error"),
+
+                Label("Keywords (comma-separated):"),
+                Input(value=', '.join(self.metadata.get('keywords', [])) if isinstance(self.metadata.get('keywords'), list) else str(self.metadata.get('keywords', '')), id="edit-keywords"),
+                Static(id="error-keywords", classes="field-error"),
+
+                Label("License:"),
+                Input(value=self.metadata.get('license', ''), id="edit-license"),
+                Static(id="error-license", classes="field-error"),
+
+                Static(id="edit-status", classes="edit-status"),
+
+                id="edit-form-container",
+            ),
+            id="edit-scroll",
+        )
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Initialize field values after mounting."""
+        desc_area = self.query_one("#edit-description", TextArea)
+        desc_area.text = self.metadata.get('description', '')
+        self.query_one("#edit-name", Input).focus()
+        self._update_status()
+
+    @on(Input.Changed)
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Track field changes and mark as dirty."""
+        if not event.input.id or not event.input.id.startswith('edit-'):
+            return
+
+        field_name = event.input.id.replace('edit-', '')
+        self._mark_dirty(field_name)
+        self._update_metadata_from_field(field_name, event.value)
+        self._update_status()
+
+    @on(TextArea.Changed, "#edit-description")
+    def on_textarea_changed(self, event: TextArea.Changed) -> None:
+        """Track TextArea changes."""
+        self._mark_dirty('description')
+        self.metadata['description'] = event.text_area.text
+        self._update_status()
+
+    def _update_metadata_from_field(self, field_name: str, value: str) -> None:
+        """Update metadata dict from field value."""
+        field_map = {
+            'name': 'name',  # Cloud uses 'name' not 'dataset_name'
+            'description': 'description',
+            'source': 'source',
+            'storage': 'storage_location',
+            'date': 'date_created',
+            'format': 'file_format',
+            'size': 'size',
+            'keywords': 'keywords',
+            'license': 'license',
+        }
+
+        meta_field = field_map.get(field_name, field_name)
+
+        # Handle list fields
+        if field_name in ('keywords',):
+            if value.strip():
+                self.metadata[meta_field] = [v.strip() for v in value.split(',') if v.strip()]
+            else:
+                self.metadata[meta_field] = []
+        else:
+            self.metadata[meta_field] = value
+
+        # Also update dataset_name for compatibility
+        if field_name == 'name':
+            self.metadata['dataset_name'] = value
+
+    def _mark_dirty(self, field_name: str) -> None:
+        """Mark a field as modified."""
+        self._dirty_fields.add(field_name)
+
+    def _update_status(self) -> None:
+        """Update status bar with dirty field count."""
+        status = self.query_one("#edit-status", Static)
+        dirty_count = len(self._dirty_fields)
+        error_count = len(self._field_errors)
+
+        parts = []
+        if dirty_count > 0:
+            parts.append(f"[yellow]• {dirty_count} field(s) modified[/yellow]")
+        if error_count > 0:
+            parts.append(f"[red]⚠ {error_count} error(s)[/red]")
+
+        if not parts:
+            parts.append("[dim]No changes[/dim]")
+
+        status.update("  |  ".join(parts))
+
+    def action_save_edits(self) -> None:
+        """Save changes to cloud storage (Ctrl+S)."""
+        # Basic validation
+        if not self.metadata.get('name') and not self.metadata.get('dataset_name'):
+            self.app.notify("Dataset name is required", severity="error", timeout=3)
+            return
+
+        if not self.metadata.get('description'):
+            self.app.notify("Description is required", severity="error", timeout=3)
+            return
+
+        # Save to cloud
+        self.save_to_cloud()
+
+    @work(thread=True)
+    def save_to_cloud(self) -> None:
+        """Save dataset to cloud storage (WebDAV)."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            import yaml
+            import tempfile
+            import os
+
+            self.app.call_from_thread(self.app.notify, "Uploading changes to cloud...", timeout=2)
+
+            storage = get_storage_backend()
+
+            logger.info(f"CloudEditDetailsScreen: Saving {self.dataset_id} to cloud")
+            logger.debug(f"Metadata to save: {self.metadata}")
+
+            # Create metadata.yaml in temp file
+            with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.yaml', encoding='utf-8') as tmp:
+                # Convert metadata to cloud YAML format
+                yaml_metadata = {}
+                for key, value in self.metadata.items():
+                    # Use 'name' instead of 'dataset_name' for cloud
+                    if key == 'dataset_name':
+                        yaml_metadata['name'] = value
+                        logger.debug(f"Converting dataset_name '{value}' to name field")
+                    elif key != 'id':  # Skip id field
+                        yaml_metadata[key] = value
+
+                yaml.dump(yaml_metadata, tmp, sort_keys=False, allow_unicode=True)
+                tmp_path = tmp.name
+                logger.debug(f"Created temp file: {tmp_path}")
+
+            try:
+                # Note: We do NOT rename the folder itself - only update metadata
+                # The folder name stays the same, but the "name" field in metadata.yaml changes
+                # This is simpler and safer for WebDAV operations
+
+                # Upload metadata.yaml
+                remote_path = f"{self.dataset_id}/metadata.yaml"
+                logger.info(f"Uploading to: {remote_path}")
+
+                storage.upload(Path(tmp_path), remote_path)
+
+                logger.info(f"✓ Successfully uploaded {remote_path}")
+
+                # Update fast search index for cloud dataset
+                try:
+                    from mini_datahub.services.index_service import get_index_service
+
+                    index_service = get_index_service()
+
+                    # Extract fields
+                    name = self.metadata.get('dataset_name') or self.metadata.get('name', self.dataset_id)
+                    description = self.metadata.get('description', '')
+                    keywords = self.metadata.get('keywords', [])
+                    tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
+
+                    logger.info(f"Updating index for '{self.dataset_id}': name='{name}', description='{description[:50]}...'")
+
+                    index_service.upsert_item(
+                        path=self.dataset_id,
+                        name=name,
+                        project=None,
+                        tags=tags,
+                        description=description,
+                        format=self.metadata.get('file_format'),
+                        source=self.metadata.get('source'),
+                        is_remote=True,
+                    )
+                    logger.info(f"✓ Search index updated successfully for '{self.dataset_id}'")
+                except Exception as idx_err:
+                    logger.warning(f"Failed to update search index: {idx_err}")
+
+                self.app.call_from_thread(
+                    self.app.notify,
+                    f"✓ Dataset '{name}' updated in cloud!",
+                    timeout=5
+                )
+
+                # Close form and refresh details
+                self.app.call_from_thread(self.app.pop_screen)
+
+                # Refresh the parent CloudDatasetDetailsScreen
+                def refresh_parent():
+                    # Small delay to ensure index cache is cleared
+                    import time
+                    time.sleep(0.1)
+
+                    logger.info(f"Screen stack has {len(self.app.screen_stack)} screens")
+                    for i, screen in enumerate(self.app.screen_stack):
+                        logger.info(f"  [{i}] {type(screen).__name__}")
+
+                    for screen in self.app.screen_stack:
+                        if isinstance(screen, CloudDatasetDetailsScreen) and screen.dataset_id == self.dataset_id:
+                            # Reload metadata from cloud
+                            logger.info(f"Refreshing CloudDatasetDetailsScreen for {self.dataset_id}")
+                            screen.load_metadata()
+                            break
+
+                    # Also refresh the HomeScreen table to show updated name (force cache clear)
+                    home_found = False
+                    for screen in self.app.screen_stack:
+                        if isinstance(screen, HomeScreen):
+                            logger.info("✓ Found HomeScreen, refreshing table with updated dataset (force refresh)")
+                            screen.load_all_datasets(force_refresh=True)
+                            home_found = True
+                            break
+
+                    if not home_found:
+                        logger.warning("✗ HomeScreen not found in screen stack!")
+
+                self.app.call_from_thread(refresh_parent)
+
+            finally:
+                # Cleanup temp file
+                os.unlink(tmp_path)
+                logger.debug(f"Cleaned up temp file: {tmp_path}")
+
+        except Exception as e:
+            logger.error(f"Error uploading to cloud: {e}", exc_info=True)
+            self.app.call_from_thread(
+                self.app.notify,
+                f"Error uploading to cloud: {str(e)}",
+                severity="error",
+                timeout=5
+            )
+            import traceback
+            traceback.print_exc()
+
+    def action_cancel_edits(self) -> None:
+        """Cancel editing and discard changes (Esc)."""
+        if len(self._dirty_fields) > 0:
+            self.app.push_screen(
+                ConfirmCancelDialog(self.dataset_id, len(self._dirty_fields)),
+                self._handle_cancel_confirmation
+            )
+        else:
+            self.app.pop_screen()
+
+    def _handle_cancel_confirmation(self, confirmed: bool) -> None:
+        """Handle confirmation dialog response."""
+        if confirmed:
+            self.app.notify("Changes discarded", timeout=2)
+            self.app.pop_screen()
+
+
 class AddDataScreen(Screen):
     """Screen to add a new dataset with scrolling support and Neovim keys."""
 
@@ -2091,43 +2442,9 @@ class AddDataScreen(Screen):
             error_label.update(f"[red]Validation Error:\n{error_msg}[/red]")
             return
 
-        # Check storage backend
-        storage_config = get_config()
-        storage_backend = storage_config.get("storage.backend", "filesystem")
-
-        if storage_backend == "webdav":
-            # Save to cloud storage
-            self.save_to_cloud(dataset_id, metadata)
-        else:
-            # Fix for issue #7: ALWAYS save to local data/ directory first
-            # This ensures changes persist even if PR workflow fails
-            success, msg = save_dataset(dataset_id, metadata)
-            if not success:
-                error_label.update(f"[red]{msg}[/red]")
-                return
-
-            # Try PR workflow if GitHub is configured (catalog repo is separate)
-            from mini_datahub.app.settings import get_github_config
-            from mini_datahub.services.publish import PRWorkflow
-
-            config = get_github_config()
-            if config.is_configured() and config.catalog_repo_path:
-                # Execute Save → PR workflow
-                self.create_pr(dataset_id, metadata)
-            else:
-                # Just save locally and show success
-                self.app.notify(f"Dataset '{dataset_id}' saved successfully!", timeout=3)
-                # Show one-time nudge about GitHub integration
-                if not hasattr(self.app, '_github_nudge_shown'):
-                    self.app.notify(
-                        "💡 Tip: Connect GitHub in Settings (S) to auto-create PRs",
-                        severity="information",
-                        timeout=5,
-                    )
-                    self.app._github_nudge_shown = True
-
-            self.app.pop_screen()
-            self.app.push_screen(DetailsScreen(dataset_id))
+        # ALWAYS save to cloud storage (WebDAV)
+        # No more local filesystem option - cloud-only workflow
+        self.save_to_cloud(dataset_id, metadata)
 
     @work(thread=True)
     def save_to_cloud(self, dataset_id: str, metadata: dict) -> None:
@@ -2206,6 +2523,16 @@ class AddDataScreen(Screen):
                 # Close form and show details
                 self.app.call_from_thread(self.app.pop_screen)
                 self.app.call_from_thread(self.app.push_screen, CloudDatasetDetailsScreen(dataset_id))
+
+                # Refresh the HomeScreen table to show new dataset
+                def refresh_home():
+                    for screen in self.app.screen_stack:
+                        if isinstance(screen, HomeScreen):
+                            logger.info("Refreshing HomeScreen table with new dataset (force refresh)")
+                            screen.load_all_datasets(force_refresh=True)
+                            break
+
+                self.app.call_from_thread(refresh_home)
 
             finally:
                 # Cleanup temp file
