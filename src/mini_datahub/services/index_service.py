@@ -63,7 +63,7 @@ class IndexService:
                 )
             """)
 
-            # Create FTS5 virtual table
+            # Create FTS5 virtual table (content-full for trigger support)
             conn.execute("""
                 CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(
                     name,
@@ -71,7 +71,6 @@ class IndexService:
                     project,
                     tags,
                     description,
-                    content='',
                     tokenize = 'porter ascii'
                 )
             """)
@@ -92,13 +91,9 @@ class IndexService:
 
             conn.execute("""
                 CREATE TRIGGER IF NOT EXISTS items_au AFTER UPDATE ON items BEGIN
-                    UPDATE items_fts SET
-                        name = new.name,
-                        path = new.path,
-                        project = new.project,
-                        tags = new.tags,
-                        description = new.description
-                    WHERE rowid = new.id;
+                    DELETE FROM items_fts WHERE rowid = old.id;
+                    INSERT INTO items_fts(rowid, name, path, project, tags, description)
+                    VALUES (new.id, new.name, new.path, new.project, new.tags, new.description);
                 END
             """)
 
