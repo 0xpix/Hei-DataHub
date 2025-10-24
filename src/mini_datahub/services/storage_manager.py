@@ -62,6 +62,9 @@ def _create_webdav_backend(config) -> WebDAVStorage:
     username = config.get("storage.username")
     password_env = config.get("storage.password_env", "HEIBOX_WEBDAV_TOKEN")
 
+    # Initialize password as None
+    password = None
+
     # Try to load from auth setup first (keyring or ENV)
     try:
         from mini_datahub.infra.config_paths import get_config_path
@@ -93,11 +96,8 @@ def _create_webdav_backend(config) -> WebDAVStorage:
                     password = auth_store.load_secret(key_id)
                     if not password:
                         logger.warning(f"Could not load credential from {stored_in}: {key_id}")
-                else:
-                    password = None
     except Exception as e:
         logger.debug(f"Could not load auth config: {e}")
-        password = None
 
     # Fallback to old config.yaml + ENV method
     if not password:
