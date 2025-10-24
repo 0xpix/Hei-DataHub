@@ -18,7 +18,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
-> Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
+> Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → HeiBox".
 
 - **Latest:** 0.59-beta "Privacy" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.59-beta/)
 - **Docs:** Start with [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation/README/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
