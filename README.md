@@ -21,7 +21,7 @@
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → HeiBox".
 
 - **Latest:** 0.59-beta "Privacy" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.59-beta/)
-- **Docs:** Start with [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation/README/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
+- **Docs:** Start with [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation/README/) and then the [User Guide](https://0xpix.github.io/Hei-DataHub/)
 
 ---
 
@@ -89,14 +89,8 @@ uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.59.0-beta"
 uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@release/0.59-beta"
 ```
 
-**📚 Need help?** See [docs/installation](docs/installation/README.md) for:
-- SSH key and PAT setup
-- WebDAV authentication setup
-- Troubleshooting authentication
-- Updating and uninstalling
-- Windows/macOS support (coming soon)
+**📚 WebDAV Setup (for cloud storage):**
 
-**� WebDAV Setup (for cloud storage):**
 Configure Heibox/Seafile integration with the interactive wizard:
 ```bash
 hei-datahub auth setup  # Interactive WebDAV setup
@@ -104,13 +98,6 @@ hei-datahub auth status # Check configuration
 hei-datahub auth doctor # Diagnose connection issues
 ```
 See [WebDAV Setup Guide](docs/installation/auth-setup-linux.md) for details.
-
-**�🖥️ Desktop Integration (Linux):**
-After installation, desktop integration is automatically set up on first run. You can also manage it manually:
-```bash
-hei-datahub desktop install   # Install desktop launcher
-hei-datahub desktop uninstall # Remove desktop integration
-```
 
 ---
 
@@ -163,7 +150,7 @@ Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-gettin
 - **Smart caching** — Incremental sync with ETag-based validation
 
 ## Cloud-Based (Heibox/Seafile) — New in 0.59! ✨
-1. **Setup** WebDAV credentials → 2. **Browse** cloud datasets (instant search) → 3. **Add** datasets directly to Heibox → 4. **Team access** immediately
+**Setup** WebDAV credentials → **Browse** cloud datasets (instant search) → **Add** datasets directly to Heibox → **Team access** immediately
 
 ```bash
 # One-time setup
