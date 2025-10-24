@@ -1,8 +1,0 @@
-id: testing-the-beta-version
-dataset_name: Test v5
-description: this is just a test to see if there are any issues left with the PR publishing
-source: test.new
-date_created: '2025-10-05'
-storage_location: local
-used_in_projects:
-- Test
