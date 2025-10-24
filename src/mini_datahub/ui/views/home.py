@@ -126,8 +126,28 @@ class HomeScreen(Screen):
         # Update GitHub status indicator
         self.update_github_status()
 
-        # Load all datasets initially
+        # Load all datasets initially (might be empty if indexer not ready)
         self.load_all_datasets()
+
+        # Set up a timer to reload when indexer becomes ready
+        self.set_interval(0.5, self._check_indexer_and_reload, name="indexer_check")
+
+    def _check_indexer_and_reload(self) -> None:
+        """Check if indexer is ready and reload data once."""
+        from mini_datahub.services.indexer import get_indexer
+
+        indexer = get_indexer()
+        if indexer.is_ready():
+            # Indexer is ready - reload the table if it's currently empty
+            table = self.query_one("#results-table", DataTable)
+            if table.row_count == 0:
+                logger.info("Indexer ready - reloading datasets")
+                self.load_all_datasets()
+            # Stop the timer once we've loaded
+            try:
+                self.remove_timer("indexer_check")
+            except:
+                pass
 
     def _setup_search_autocomplete(self) -> None:
         """Setup autocomplete suggester for search input."""
@@ -211,12 +231,13 @@ class HomeScreen(Screen):
 
                 # All datasets are cloud now, but keep the indicator
                 name_prefix = "☁️ "
+                display_name = result["name"]  # Use metadata name, not folder path
 
                 table.add_row(
-                    result["id"],
-                    (name_prefix + result["name"])[:40],
+                    display_name,  # Show name in ID column
+                    (name_prefix + display_name)[:40],  # Show name with cloud icon
                     snippet,
-                    key=result["id"],
+                    key=result["id"],  # Use folder path as internal key
                 )
 
         except Exception as e:
@@ -364,12 +385,13 @@ class HomeScreen(Screen):
 
                 # All datasets are cloud now
                 name_prefix = "☁️ "
+                display_name = result["name"]  # Use metadata name, not folder path
 
                 table.add_row(
-                    result["id"],
-                    (name_prefix + result["name"])[:40],
+                    display_name,  # Show name in ID column
+                    (name_prefix + display_name)[:40],  # Show name with cloud icon
                     snippet,
-                    key=result["id"],
+                    key=result["id"],  # Use folder path as internal key
                 )
 
             # Don't steal focus from search input
@@ -697,12 +719,12 @@ class HomeScreen(Screen):
     def on_row_selected(self, event: DataTable.RowSelected) -> None:
         """Handle row selection in results table."""
         try:
-            # Get the ID from the first column of the selected row
-            row = event.data_table.get_row_at(event.cursor_row)
-            item_id = str(row[0])
+            # Get the row key which is the folder path (result["id"])
+            # NOT the first column which is the display name
+            row_key = event.row_key.value if hasattr(event.row_key, 'value') else str(event.row_key)
 
             # ALWAYS use cloud mode (cloud-only workflow)
-            self._open_cloud_file_preview(item_id)
+            self._open_cloud_file_preview(row_key)
         except Exception as e:
             self.app.notify(f"Error: {str(e)}", severity="error", timeout=3)
 
@@ -1103,8 +1125,42 @@ class CloudDatasetDetailsScreen(Screen):
 
     @work(thread=True)
     def load_metadata(self) -> None:
-        """Load metadata.yaml from cloud storage."""
+        """Load metadata from index (fast) or cloud storage (fallback)."""
         try:
+            # First try to get metadata from the index (much faster)
+            from mini_datahub.services.index_service import get_index_service
+
+            index_service = get_index_service()
+
+            # Search for this specific dataset in the index
+            results = index_service.search(query_text="", project_filter=None, limit=1000)
+
+            # Find the dataset by path
+            dataset_item = None
+            for item in results:
+                if item.get('path') == self.dataset_id:
+                    dataset_item = item
+                    break
+
+            if dataset_item:
+                # Build metadata from index data (no network call!)
+                logger.info(f"Loading metadata for '{self.dataset_id}' from index (fast)")
+                self.metadata = {
+                    'name': dataset_item.get('name', self.dataset_id),
+                    'description': dataset_item.get('description', ''),
+                    'tags': dataset_item.get('tags', '').split() if dataset_item.get('tags') else [],
+                    'format': dataset_item.get('format'),
+                    'source': dataset_item.get('source'),
+                    'size': dataset_item.get('size'),
+                    # Note: Some fields might not be in index, but that's OK for preview
+                }
+
+                # Update UI on main thread
+                self.app.call_from_thread(self._display_metadata)
+                return
+
+            # Fallback: If not in index, download from cloud (slower)
+            logger.info(f"Dataset not in index, downloading metadata from cloud")
             from mini_datahub.services.storage_manager import get_storage_backend
             import yaml
             import tempfile
@@ -1884,11 +1940,11 @@ class CloudEditDetailsScreen(Screen):
                 Static(id="error-date", classes="field-error"),
 
                 Label("File Format:"),
-                Input(value=self.metadata.get('file_format', ''), id="edit-format"),
+                Input(value=str(self.metadata.get('file_format', '')), id="edit-format"),
                 Static(id="error-format", classes="field-error"),
 
                 Label("Size:"),
-                Input(value=self.metadata.get('size', ''), id="edit-size"),
+                Input(value=str(self.metadata.get('size', '')), id="edit-size"),
                 Static(id="error-size", classes="field-error"),
 
                 Label("Keywords (comma-separated):"),
@@ -1896,7 +1952,7 @@ class CloudEditDetailsScreen(Screen):
                 Static(id="error-keywords", classes="field-error"),
 
                 Label("License:"),
-                Input(value=self.metadata.get('license', ''), id="edit-license"),
+                Input(value=str(self.metadata.get('license', '')), id="edit-license"),
                 Static(id="error-license", classes="field-error"),
 
                 Static(id="edit-status", classes="edit-status"),
@@ -2029,12 +2085,34 @@ class CloudEditDetailsScreen(Screen):
                 logger.debug(f"Created temp file: {tmp_path}")
 
             try:
-                # Note: We do NOT rename the folder itself - only update metadata
-                # The folder name stays the same, but the "name" field in metadata.yaml changes
-                # This is simpler and safer for WebDAV operations
+                # Check if name changed - rename the folder on HeiBox to match
+                new_name = self.metadata.get('dataset_name') or self.metadata.get('name')
+                old_folder_path = self.dataset_id
 
-                # Upload metadata.yaml
-                remote_path = f"{self.dataset_id}/metadata.yaml"
+                # Folder rename: if name changed, rename folder to match the new name
+                if new_name and new_name != old_folder_path:
+                    logger.info(f"Name changed to '{new_name}' - renaming folder from '{old_folder_path}'")
+
+                    try:
+                        # Rename the folder on HeiBox
+                        storage.move(old_folder_path, new_name)
+                        logger.info(f"✓ Renamed folder from '{old_folder_path}' to '{new_name}'")
+                        new_folder_path = new_name
+                    except Exception as rename_err:
+                        logger.error(f"Failed to rename folder: {rename_err}")
+                        self.app.call_from_thread(
+                            self.app.notify,
+                            f"Warning: Folder rename failed: {str(rename_err)}. Updating metadata only.",
+                            severity="warning",
+                            timeout=5
+                        )
+                        # Continue with upload to old folder if rename failed
+                        new_folder_path = old_folder_path
+                else:
+                    new_folder_path = old_folder_path
+
+                # Upload metadata.yaml to the (possibly renamed) folder
+                remote_path = f"{new_folder_path}/metadata.yaml"
                 logger.info(f"Uploading to: {remote_path}")
 
                 storage.upload(Path(tmp_path), remote_path)
@@ -2048,15 +2126,21 @@ class CloudEditDetailsScreen(Screen):
                     index_service = get_index_service()
 
                     # Extract fields
-                    name = self.metadata.get('dataset_name') or self.metadata.get('name', self.dataset_id)
+                    name = self.metadata.get('dataset_name') or self.metadata.get('name', new_folder_path)
                     description = self.metadata.get('description', '')
                     keywords = self.metadata.get('keywords', [])
                     tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
 
-                    logger.info(f"Updating index for '{self.dataset_id}': name='{name}', description='{description[:50]}...'")
+                    logger.info(f"Updating index for '{new_folder_path}': name='{name}', description='{description[:50]}...'")
+
+                    # If folder was renamed, delete the old index entry first
+                    if new_folder_path != old_folder_path:
+                        logger.info(f"Folder renamed: deleting old index entry for '{old_folder_path}'")
+                        index_service.delete_item(old_folder_path)
+                        logger.info(f"✓ Deleted old index entry for '{old_folder_path}'")
 
                     index_service.upsert_item(
-                        path=self.dataset_id,
+                        path=new_folder_path,  # Use new folder path
                         name=name,
                         project=None,
                         tags=tags,
@@ -2065,7 +2149,7 @@ class CloudEditDetailsScreen(Screen):
                         source=self.metadata.get('source'),
                         is_remote=True,
                     )
-                    logger.info(f"✓ Search index updated successfully for '{self.dataset_id}'")
+                    logger.info(f"✓ Search index updated successfully for '{new_folder_path}'")
                 except Exception as idx_err:
                     logger.warning(f"Failed to update search index: {idx_err}")
 
@@ -2606,10 +2690,19 @@ class DataHubApp(App):
 
         # Start background indexer (FAST - non-blocking)
         import asyncio
-        from mini_datahub.services.indexer import start_background_indexer
+        from mini_datahub.services.indexer import start_background_indexer, get_indexer
         try:
+            # Force a fresh index on every startup for cloud datasets
+            logger.info("Forcing fresh reindex on startup")
+
+            # Reset the indexer flags to force reindexing
+            indexer = get_indexer()
+            indexer._remote_indexed = False
+            indexer._local_indexed = False
+
+            # Start the background indexer which will rebuild the index
             asyncio.create_task(start_background_indexer())
-            logger.info("Background indexer started")
+            logger.info("Background indexer started with forced reindex")
         except Exception as e:
             logger.warning(f"Failed to start background indexer: {e}")
 
