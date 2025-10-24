@@ -14,26 +14,27 @@
 
 # Hei-DataHub
 
-![WIN-SUCKS](https://img.shields.io/badge/WIN-SUCKS-0.59.0--beta-blue.svg)
+![Version](https://img.shields.io/badge/Version-0.59.0--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → PR".
 
-- **Latest:** 0.58.3-beta "Streamline `Windows SUCKS`" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.58-beta/)
+- **Latest:** 0.59-beta "Privacy" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.59-beta/)
 - **Docs:** Start with [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation/README/), then the [User Guide](https://0xpix.github.io/Hei-DataHub/) and [PR workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
 
 ---
 
 ## Why Hei-DataHub?
 
-- **Search fast:** SQLite FTS5 (BM25)
-- **Stay consistent:** JSON Schema + Pydantic
-- **Work local:** YAML on disk, no servers
-- **Publish safely:** Auto-stash → branch → PR
-- **Team-friendly:** Outbox retries, simple token setup
-- **Easy install:** Direct from GitHub with UV—no cloning needed
-- **Desktop ready:** Linux launcher for application menu integration
+- **Lightning fast:** <80ms search with SQLite FTS5, <300ms startup
+- **Cloud-native:** WebDAV integration for Heibox/Seafile collaboration
+- **Secure auth:** Linux keyring storage, interactive setup wizard
+- **Stay consistent:** JSON Schema + Pydantic validation
+- **Work local:** YAML on disk, background sync, zero network on search
+- **Publish easily:** Direct cloud upload or auto-stash → branch → PR
+- **Team-friendly:** Instant dataset sharing, no GitHub required
+- **Easy install:** Direct from GitHub with UV - no cloning needed
 
 More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
@@ -74,29 +75,42 @@ uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
 
 # Run the application
 hei-datahub  # or mini-datahub
+
+# Configure WebDAV for cloud storage (optional, interactive wizard)
+hei-datahub auth setup
 ```
 
 ### Version Pinning
 ```bash
 # Install specific version
-uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.58.1-beta"
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.59.0-beta"
 
 # Install from feature branch
-uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@chore/uv-install-data-desktop-v0.58.x"
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@release/0.59-beta"
 ```
 
 **📚 Need help?** See [docs/installation](docs/installation/README.md) for:
 - SSH key and PAT setup
+- WebDAV authentication setup
 - Troubleshooting authentication
 - Updating and uninstalling
 - Windows/macOS support (coming soon)
 
-**🖥️ Desktop Integration (Linux):**
-After installation, create a desktop launcher to access from your application menu:
+**� WebDAV Setup (for cloud storage):**
+Configure Heibox/Seafile integration with the interactive wizard:
 ```bash
-bash scripts/create_desktop_entry.sh
+hei-datahub auth setup  # Interactive WebDAV setup
+hei-datahub auth status # Check configuration
+hei-datahub auth doctor # Diagnose connection issues
 ```
-This creates a `.desktop` entry compatible with GNOME, KDE, XFCE, and other desktop environments.
+See [WebDAV Setup Guide](docs/installation/auth-setup-linux.md) for details.
+
+**�🖥️ Desktop Integration (Linux):**
+After installation, desktop integration is automatically set up on first run. You can also manage it manually:
+```bash
+hei-datahub desktop install   # Install desktop launcher
+hei-datahub desktop uninstall # Remove desktop integration
+```
 
 ---
 
@@ -127,91 +141,56 @@ Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-gettin
 
 ---
 
-## ✨ Key Features in v0.58-beta
+## ✨ Key Features in v0.59-beta "Privacy"
 
-### 🎯 Modern Installation
-- **UV-based installation** — Install directly from GitHub without cloning
-- **Ephemeral runs** — Test with `uvx` before committing to installation
-- **Version pinning** — Lock to specific tags, branches, or commits
-- **Dual authentication** — SSH keys or HTTPS with Personal Access Tokens
+### 🔐 WebDAV Authentication System
+- **Interactive setup wizard** — `hei-datahub auth setup` with guided prompts
+- **Secure credential storage** — Linux keyring integration, no plaintext secrets
+- **Comprehensive diagnostics** — `hei-datahub auth doctor` for troubleshooting
+- **Multiple auth methods** — Token or password-based authentication
+- **ENV fallback** — Environment variable support when keyring unavailable
 
-### 🗂️ Data Management
-- **XDG-compliant paths** — Linux uses `~/.local/share/Hei-DataHub`
-- **Auto-initialization** — First run creates workspace with sample datasets
-- **Complete packaging** — All data files, configs, and assets included
-- **Persistent storage** — UV installs always use home directory workspace
+### ☁️ Cloud-First Data Management
+- **Heibox/Seafile integration** — Direct WebDAV storage for team collaboration
+- **Add to cloud** — Upload datasets directly, no GitHub required
+- **Instant sharing** — Team members see changes immediately
+- **Better privacy** — No Git history, data stays in your institution's cloud
 
-### 🖥️ Desktop Integration (Linux)
-- **Application menu entry** — Launch from GNOME, KDE, XFCE, etc.
-- **XDG desktop integration** — Follows Linux desktop standards
-- **Auto-detection** — Finds installed executable automatically
-- **One-command setup** — Simple script creates launcher
+### 🚀 Performance Overhaul
+- **Lightning-fast startup** — UI appears in <300ms (warm cache)
+- **Instant search** — <80ms response time, zero network calls on keystroke
+- **Background indexing** — SQLite FTS5 with automatic updates
+- **Smart caching** — Incremental sync with ETag-based validation
 
-### 🔧 System Diagnostics
-- **`hei-datahub doctor`** — Comprehensive health checks
-- **Exit codes** — Clear status for scripting (0=healthy, 1-3=issues)
-- **Actionable output** — Specific suggestions for fixing problems
-- **Cross-platform** — Detects OS-specific data directories
+## Cloud-Based (Heibox/Seafile) — New in 0.59! ✨
+1. **Setup** WebDAV credentials → 2. **Browse** cloud datasets (instant search) → 3. **Add** datasets directly to Heibox → 4. **Team access** immediately
 
-### 📊 Data Directory Control
-- **`--data-dir` flag** — Override workspace location from CLI
-- **Environment variable** — Set `HEIDATAHUB_DATA_DIR` for persistence
-- **Clear precedence** — CLI > env var > OS default
-- **Migration detection** — Notifies about legacy path locations
+```bash
+# One-time setup
+hei-datahub auth setup
 
-## Typical Workflows
+# Launch and search (fast!)
+hei-datahub
+# Press '/' to search, 'A' to add
+```
 
-### Cloud-Based (Heibox/Seafile)
-1. **Configure** WebDAV storage → 2. **Browse** datasets from cloud → 3. **Add** datasets directly to Heibox → 4. **Team access** instantly
-
-Guide: [Add Dataset to Cloud](https://0xpix.github.io/Hei-DataHub/how-to/add-dataset-to-cloud/)
-
-### GitHub-Based (Pull Requests)
-1. **Search** (`/`) → 2. **Add/Edit** (`A`, validated) → 3. **Save → PR** (`Ctrl+S`, auto-stash) → 4. **Outbox** (`P`) if offline
-
-Guide: [PR Workflow](https://0xpix.github.io/Hei-DataHub/how-to/05-first-dataset/)
+Guides:
+- [WebDAV Setup](docs/installation/auth-setup-linux.md)
+- [Add Dataset to Cloud](docs/how-to/add-dataset-to-cloud.md)
 
 ---
 
 ## Core Concepts
 
-* `data/<id>/metadata.yaml` on disk
-* Local SQLite FTS5 index
+* `data/<id>/metadata.yaml` on cloud via WebDAV
+* Local SQLite FTS5 index with background sync
+* Fast search: <80ms response, zero network on keystroke
 * Validation via JSON Schema + Pydantic
 * Textual TUI (keyboard-first)
+* Secure credentials: Linux keyring storage
 
 Details: [Basics](https://0xpix.github.io/Hei-DataHub/getting-started/03-the-basics/)
 
----
-
-## Troubleshooting
-
-* Empty results? `hei-datahub reindex`
-* DB issues? remove `db.sqlite` then reindex
-* PR fails? check token & repo path, retry from **Outbox** (`P`)
-
-See [TROUBLESHOOTING](https://0xpix.github.io/Hei-DataHub/help/troubleshooting/).
-
----
-
-## Contributing & License
-
-PRs welcome—style (black + ruff), tests, docs. See [Contributing](docs/contributing.md).
-MIT — see [LICENSE](LICENSE).
-
-<details>
-  <summary>Repo layout (optional)</summary>
-
-```
-src/mini_datahub/  # app (UI, services, infra, core)
-data/              # datasets with metadata.yaml
-schema.json        # validation schema
-.github/workflows/ # CI
-```
-
-More: Coming soon...
-
-</details>
 
 ---
 
