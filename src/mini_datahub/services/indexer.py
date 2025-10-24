@@ -206,7 +206,7 @@ class BackgroundIndexer:
             entries = await asyncio.to_thread(storage.listdir, "")
             datasets = [e for e in entries if e.is_dir]
 
-            items = []
+            count = 0
             for entry in datasets:
                 try:
                     # Get metadata.yaml if it exists
@@ -229,7 +229,7 @@ class BackgroundIndexer:
                         file_format = None
                         source = None
 
-                    items.append({
+                    item = {
                         "path": entry.name,
                         "name": name,
                         "is_remote": True,
@@ -240,23 +240,40 @@ class BackgroundIndexer:
                         "description": description,
                         "format": file_format,
                         "source": source,
-                    })
+                    }
+
+                    # Insert immediately so it shows up in UI right away
+                    self.index_service.upsert_item(
+                        path=item["path"],
+                        name=item["name"],
+                        project=item.get("project"),
+                        tags=item["tags"],
+                        description=item["description"],
+                        format=item.get("format"),
+                        source=item.get("source"),
+                        is_remote=item["is_remote"],
+                        size=item.get("size"),
+                        mtime=item.get("mtime"),
+                    )
+                    count += 1
+                    logger.info(f"Indexed dataset {count}/{len(datasets)}: {name}")
 
                 except Exception as e:
                     logger.warning(f"Failed to index remote dataset {entry.name}: {e}")
                     # Index with basic info
-                    items.append({
-                        "path": entry.name,
-                        "name": entry.name,
-                        "is_remote": True,
-                        "size": entry.size or 0,
-                        "mtime": int(entry.modified.timestamp()) if entry.modified else None,
-                    })
+                    try:
+                        self.index_service.upsert_item(
+                            path=entry.name,
+                            name=entry.name,
+                            is_remote=True,
+                            size=entry.size or 0,
+                            mtime=int(entry.modified.timestamp()) if entry.modified else None,
+                        )
+                        count += 1
+                    except:
+                        pass
 
-            # Bulk insert
-            if items:
-                count = self.index_service.bulk_upsert(items)
-                logger.info(f"Indexed {count} remote datasets")
+            logger.info(f"Indexed {count} remote datasets")
 
         except Exception as e:
             logger.error(f"Remote indexing failed: {e}", exc_info=True)
