@@ -19,21 +19,19 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| ++/++ | Focus Search | Enter insert mode in search box |
-| ++j++ | Move Down | Select next dataset in results |
-| ++k++ | Move Up | Select previous dataset in results |
-| ++g+g++ | Jump to Top | First dataset in list |
-| ++shift+g++ | Jump to Bottom | Last dataset in list |
-| ++enter++ | Open Details | View selected dataset |
-| ++o++ | Open Details | Alternative to Enter |
-| ++a++ | Add Dataset | Open Add Dataset form |
-| ++s++ | Settings | Configure GitHub, preferences |
-| ++p++ | Outbox | View pending/failed PR tasks |
-| ++u++ | Pull Updates | Sync from remote (if configured) |
-| ++r++ | Refresh | Reload dataset list |
-| ++Ctrl+q++ | Quit | Exit Hei-DataHub |
-| ++escape++ | Clear/Exit | Clear search or exit insert mode |
-| ++?++ | Help | Show keyboard shortcuts |
+| / | Focus Search | Enter insert mode in search box |
+| j | Move Down | Select next dataset in results |
+| k | Move Up | Select previous dataset in results |
+| g+g | Jump to Top | First dataset in list |
+| shift+g | Jump to Bottom | Last dataset in list |
+| enter / o | Open Details | View selected dataset |
+| a | Add Dataset | Open Add Dataset form |
+| s | Settings | Configure WebDAV|
+| u | Updates | Update the app |
+| r | Refresh | Reload dataset list |
+| Ctrl+q | Quit | Exit Hei-DataHub |
+| escape | Clear/Exit | Clear search or exit insert mode |
+| ? | Help | Show keyboard shortcuts |
 
 ---
 
@@ -41,12 +39,11 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| ++escape/b++ | Back | Return to Home screen |
-| ++e++ | Edit | Edit a dataset |
-| ++Shift+P++ | Publish as Pull Request (PR) | Publish the dataset |
-| ++c++ | Copy Source | Copy source URL/snippet to clipboard |
-| ++o++ | Open URL | Open source URL in browser (if valid URL) |
-| ++q++ | Quit | Exit Hei-DataHub |
+| escape/b | Back | Return to Home screen |
+| e | Edit | Edit a dataset |
+| c | Copy Source | Copy source URL/snippet to clipboard |
+| o | Open URL | Open source URL in browser (if valid URL) |
+| q | Quit | Exit Hei-DataHub |
 
 ---
 
@@ -54,10 +51,10 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| ++tab++ | Next Field | Move to next input field |
-| ++shift+tab++ | Previous Field | Move to previous input field |
-| ++ctrl+s++ | Save | Save dataset and return to Home |
-| ++escape++ | Cancel | Discard changes and return to Home |
+| tab | Next Field | Move to next input field |
+| shift+tab | Previous Field | Move to previous input field |
+| ctrl+s | Save | Save dataset and return to Home |
+| escape | Cancel | Discard changes and return to Home |
 
 ---
 
@@ -65,20 +62,10 @@ Hei-DataHub is built for **keyboard-first workflows**. If you're familiar with V
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| ++tab++ | Next Field | Move to next setting |
-| ++shift+tab++ | Previous Field | Move to previous setting |
-| ++ctrl+s++ | Save | Save configuration |
-| ++escape++ | Cancel | Discard changes |
-
----
-
-### Outbox Screen
-
-| Key | Action | Description |
-|-----|--------|-------------|
-| ++r++ | Retry Task | Retry failed PR task |
-| ++d++ | Delete Task | Remove task from outbox |
-| ++escape++ | Back | Return to Home screen |
+| tab | Next Field | Move to next setting |
+| shift+tab | Previous Field | Move to previous setting |
+| ctrl+s | Save | Save configuration |
+| escape | Cancel | Discard changes |
 
 ---
 
@@ -90,20 +77,20 @@ Understanding the navigation flow helps you move efficiently:
 Home Screen (Search)
   ↓ (Enter or o)
 Details Screen
-  ↓ (Escape or b)
+  ↓ (Escape)
 Home Screen
 ```
 
 **Example flow:**
 
 ```
-Home → Search → Details → Edit → Save → PR
+Home → Search → Details → Edit → Save
 ```
 
 For detailed instructions, see:
 
 - **[The Basics](03-the-basics.md)** — Understanding datasets and search
-- **[Tutorial: Configure GitHub integration](../how-to/04-settings.md)** — Enable PR workflow
+- **[Tutorial: Configure WebDAV integration](../how-to/04-settings.md)** — Enable HeiBox integration
 - **[Tutorial: Create your first dataset](../how-to/05-first-dataset.md)** — Learn how to create a dataset
 
 ---
@@ -127,17 +114,9 @@ For detailed instructions, see:
 2. Press Escape again → Clear search results
 ```
 
-### Search Tips
-
-- **Partial matching:** "clim" finds "climate", "climatic"
-- **Multi-word:** "burned area" finds datasets with both words
-- **Project search:** Searches `used_in_projects` field
-- **Field matching:** Searches name, description, source, data types
-- **Case-insensitive:** "MODIS" and "modis" are equivalent
-
 ---
 
-## Add Dataset Workflow
+## Add Dataset Workflow - (Will be changed in future releases)
 
 Fast path to add a new dataset:
 
@@ -200,8 +179,8 @@ Hei-DataHub has a single-column layout:
 
 Hei-DataHub uses a **stack-based navigation model**:
 
-- **Push screen:** ++a++ (Add), ++s++ (Settings), ++p++ (Outbox)
-- **Pop screen:** ++escape++, ++b++, or action completion (e.g., Save)
+- **Push screen:** a (Add), s (Settings)
+- **Pop screen:** escape or action completion (e.g., Save)
 
 **Example:**
 
@@ -234,26 +213,25 @@ Use this pattern to quickly review multiple datasets.
 
 The search debounce (150ms) means you can type fast without lag. Results update smoothly as you type.
 
-### Copy Source for Quick Reference
+### Copy/open Source for Quick Reference
 
 On Details Screen:
 
 ```
 c → Copies source URL/snippet to clipboard
+o -> Opens the source in the browser
 ```
-
-Paste into your terminal, notebook, or documentation.
 
 ---
 
 ## Customization
 
-Currently, keybindings are **hardcoded** but follow Vim conventions. Future versions may support custom keymaps.
+- **[Tutorial: Customize your Keybinds](../how-to/08-customize-keybindings.md) - Customize your keybinds
 
 ---
 
 ## Next Steps
 
 - **[Learn the basics](03-the-basics.md)** — Understand datasets, fields, and metadata
-- **[Tutorial: Configure GitHub integration](../how-to/04-settings.md)** — Enable PR workflow
+- **[Tutorial: Configure WebDAV integration](../how-to/04-settings.md)** — Enable HeiBox integration
 - **[Tutorial: Create your first dataset](../how-to/05-first-dataset.md)** — Learn how to create a dataset
