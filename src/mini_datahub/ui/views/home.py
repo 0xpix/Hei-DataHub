@@ -1164,7 +1164,7 @@ class CloudDatasetDetailsScreen(Screen):
         ("q", "back", "Back"),
         ("e", "edit_cloud_dataset", "Edit"),
         ("y", "copy_source", "Copy Source"),
-        ("d", "download_all", "Download All"),
+        ("d", "delete_dataset", "Delete"),
     ]
 
     def __init__(self, dataset_id: str):
@@ -1306,6 +1306,93 @@ class CloudDatasetDetailsScreen(Screen):
                 self.app.notify("✓ Source copied to clipboard", timeout=3)
             except Exception as e:
                 self.app.notify(f"Failed to copy: {str(e)}", severity="error", timeout=3)
+
+    def action_delete_dataset(self) -> None:
+        """Delete dataset (d key) - shows confirmation dialog."""
+        self.app.push_screen(
+            ConfirmDeleteDialog(self.dataset_id),
+            self._handle_delete_confirmation
+        )
+
+    def _handle_delete_confirmation(self, confirmed: bool) -> None:
+        """Handle delete confirmation dialog response."""
+        if confirmed:
+            self.delete_from_cloud()
+
+    @work(thread=True)
+    def delete_from_cloud(self) -> None:
+        """Delete dataset from cloud storage and local index."""
+        try:
+            from mini_datahub.services.storage_manager import get_storage_backend
+            from mini_datahub.services.index_service import get_index_service
+            from mini_datahub.infra.index import delete_dataset
+
+            self.app.call_from_thread(
+                lambda: self.app.notify(f"Deleting {self.dataset_id} from cloud...", timeout=3)
+            )
+
+            # Delete from cloud storage (WebDAV)
+            storage = get_storage_backend()
+
+            # Delete the entire dataset folder
+            folder_path = f"{self.dataset_id}/"
+            try:
+                # List and delete all files in the dataset folder
+                items = storage.list(folder_path)
+                for item in items:
+                    storage.delete(item)
+
+                # Also try to delete the folder itself (may not be necessary depending on backend)
+                try:
+                    storage.delete(folder_path)
+                except:
+                    pass  # Folder deletion might not be supported
+
+                logger.info(f"Deleted dataset folder from cloud: {folder_path}")
+            except Exception as e:
+                logger.warning(f"Error deleting from cloud: {e}")
+                # Continue with local deletion even if cloud deletion fails
+
+            # Delete from local SQLite index (datasets_store and datasets_fts)
+            try:
+                delete_dataset(self.dataset_id)
+                logger.info(f"Deleted dataset from local index: {self.dataset_id}")
+            except Exception as e:
+                logger.warning(f"Error deleting from local index: {e}")
+
+            # Delete from fast search index
+            try:
+                index_service = get_index_service()
+                index_service.delete_item(self.dataset_id)
+                logger.info(f"Deleted dataset from search index: {self.dataset_id}")
+            except Exception as e:
+                logger.warning(f"Error deleting from search index: {e}")
+
+            # Success notification
+            self.app.call_from_thread(
+                lambda: self.app.notify(f"✓ Dataset '{self.dataset_id}' deleted successfully!", timeout=5)
+            )
+
+            # Go back to home screen
+            self.app.call_from_thread(lambda: self.app.pop_screen())
+
+            # Refresh the home screen table
+            def refresh_home():
+                for screen in self.app.screen_stack:
+                    if isinstance(screen, HomeScreen):
+                        screen.refresh_data()
+                        break
+
+            self.app.call_from_thread(refresh_home)
+
+        except Exception as e:
+            error_msg = f"Error deleting dataset: {str(e)}"
+            logger.error(error_msg)
+            import traceback
+            traceback.print_exc()
+            self.app.call_from_thread(
+                lambda: self.app.notify(error_msg, severity="error", timeout=5)
+            )
 
     def action_download_all(self) -> None:
         """Download entire dataset directory."""
@@ -1480,6 +1567,68 @@ class ConfirmCancelDialog(Screen):
 
     def action_cancel(self) -> None:
         """User canceled - keep editing."""
+        self.dismiss(False)
+
+
+class ConfirmDeleteDialog(Screen):
+    """Modal dialog to confirm dataset deletion."""
+
+    CSS = """
+    #dialog-overlay {
+        align: center middle;
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .dialog-box {
+        width: 60;
+        height: auto;
+        background: $surface;
+        border: thick $primary;
+        padding: 2;
+    }
+
+    .dialog-title {
+        text-align: center;
+        width: 100%;
+    }
+
+    .dialog-text {
+        text-align: center;
+        width: 100%;
+        padding: 1;
+    }
+    """
+
+    BINDINGS = [
+        ("y", "confirm", "Yes"),
+        ("n", "cancel", "No"),
+        ("escape", "cancel", "No"),
+    ]
+
+    def __init__(self, dataset_id: str):
+        super().__init__()
+        self.dataset_id = dataset_id
+
+    def compose(self) -> ComposeResult:
+        from textual.containers import Container, Vertical
+        yield Container(
+            Vertical(
+                Static(f"[bold red]Delete Dataset?[/bold red]", classes="dialog-title"),
+                Static(f"\nAre you sure you want to delete [cyan]{self.dataset_id}[/cyan]?\n", classes="dialog-text"),
+                Static("[bold red]This action cannot be undone![/bold red]", classes="dialog-text"),
+                Static("\nPress [bold]Y[/bold] to delete or [bold]N[/bold] to cancel.", classes="dialog-text"),
+                id="confirm-dialog",
+                classes="dialog-box",
+            ),
+            id="dialog-overlay",
+        )
+
+    def action_confirm(self) -> None:
+        """User confirmed - delete dataset."""
+        self.dismiss(True)
+
+    def action_cancel(self) -> None:
+        """User canceled - don't delete."""
         self.dismiss(False)
 
 
@@ -1893,6 +2042,61 @@ class EditDetailsScreen(Screen):
 
     def _restore_field_value(self, field_name: str, value: Any) -> None:
         """Restore a field's value in the UI and metadata."""
+        # Update the UI widget
+        input_id = f"edit-{field_name}"
+
+        try:
+            if field_name == 'description':
+                text_area = self.query_one("#edit-description", TextArea)
+                text_area.text = str(value)
+            else:
+                input_widget = self.query_one(f"#{input_id}", Input)
+                input_widget.value = str(value)
+        except Exception as e:
+            logger.warning(f"Could not restore field {field_name}: {e}")
+
+        # Update metadata
+        self._update_metadata_from_field(field_name, str(value))
+
+        # Update the previous value cache so next change is tracked correctly
+        self._previous_values[field_name] = str(value)
+
+    def action_undo_edit(self) -> None:
+        """Undo last edit (Ctrl+Z)."""
+        if not self._undo_stack:
+            self.app.notify("Nothing to undo", timeout=2)
+            return
+
+        # Pop from undo stack
+        field, old_value, new_value = self._undo_stack.pop()
+
+        # Push to redo stack
+        self._redo_stack.append((field, old_value, new_value))
+
+        # Restore old value
+        self._restore_field_value(field, old_value)
+        self._update_status()
+        self.app.notify(f"Undid change to {field}", timeout=2)
+
+    def action_redo_edit(self) -> None:
+        """Redo last undone edit (Ctrl+Shift+Z)."""
+        if not self._redo_stack:
+            self.app.notify("Nothing to redo", timeout=2)
+            return
+
+        # Pop from redo stack
+        field, old_value, new_value = self._redo_stack.pop()
+
+        # Push back to undo stack
+        self._undo_stack.append((field, old_value, new_value))
+
+        # Restore new value
+        self._restore_field_value(field, new_value)
+        self._update_status()
+        self.app.notify(f"Redid change to {field}", timeout=2)
+
+    def _restore_field_value(self, field_name: str, value: Any) -> None:
+        """Restore a field's value in the UI and metadata."""
         field_id_map = {
             'name': 'edit-name',
             'description': 'edit-description',
@@ -1966,6 +2170,8 @@ class CloudEditDetailsScreen(Screen):
     BINDINGS = [
         ("ctrl+s", "save_edits", "Save"),
         ("escape", "cancel_edits", "Cancel"),
+        ("ctrl+z", "undo_edit", "Undo"),
+        ("ctrl+shift+z", "redo_edit", "Redo"),
     ]
 
     def __init__(self, dataset_id: str, metadata: dict):
@@ -1973,6 +2179,15 @@ class CloudEditDetailsScreen(Screen):
         self.dataset_id = dataset_id
         self.original_metadata = metadata.copy()
         self.metadata = metadata.copy()
+
+        # Undo/redo stacks
+        self._undo_stack = []  # List of (field, old_value, new_value)
+        self._redo_stack = []
+        self._max_undo = 50
+
+        # Track previous field values for undo
+        self._previous_values = {}
+
         self._dirty_fields = set()
         self._field_errors = {}
 
@@ -2039,16 +2254,53 @@ class CloudEditDetailsScreen(Screen):
             return
 
         field_name = event.input.id.replace('edit-', '')
-        self._mark_dirty(field_name)
-        self._update_metadata_from_field(field_name, event.value)
-        self._update_status()
+        new_value = event.value
+
+        # Get previous value from cache or metadata
+        if field_name not in self._previous_values:
+            # First time changing this field
+            self._previous_values[field_name] = self._get_field_value(field_name)
+
+        old_value = self._previous_values[field_name]
+
+        # Only track if actually changed from previous value
+        if old_value != new_value:
+            # Push to undo stack
+            self._push_undo(field_name, old_value, new_value)
+
+            # Update cache with new value
+            self._previous_values[field_name] = new_value
+
+            # Update metadata
+            self._update_metadata_from_field(field_name, new_value)
+            self._mark_dirty(field_name)
+            self._update_status()
 
     @on(TextArea.Changed, "#edit-description")
     def on_textarea_changed(self, event: TextArea.Changed) -> None:
         """Track TextArea changes."""
-        self._mark_dirty('description')
-        self.metadata['description'] = event.text_area.text
-        self._update_status()
+        field_name = 'description'
+        new_value = event.text_area.text
+
+        # Get previous value from cache or metadata
+        if field_name not in self._previous_values:
+            # First time changing this field
+            self._previous_values[field_name] = self.metadata.get(field_name, '')
+
+        old_value = self._previous_values[field_name]
+
+        # Only track if actually changed from previous value
+        if old_value != new_value:
+            # Push to undo stack
+            self._push_undo(field_name, old_value, new_value)
+
+            # Update cache with new value
+            self._previous_values[field_name] = new_value
+
+            # Update metadata
+            self.metadata[field_name] = new_value
+            self._mark_dirty(field_name)
+            self._update_status()
 
     def _update_metadata_from_field(self, field_name: str, value: str) -> None:
         """Update metadata dict from field value."""
@@ -2083,17 +2335,57 @@ class CloudEditDetailsScreen(Screen):
         """Mark a field as modified."""
         self._dirty_fields.add(field_name)
 
+    def _get_field_value(self, field_name: str) -> Any:
+        """Get current field value from metadata."""
+        field_map = {
+            'name': 'name',
+            'description': 'description',
+            'source': 'source',
+            'storage': 'storage_location',
+            'date': 'date_created',
+            'format': 'file_format',
+            'size': 'size',
+            'keywords': 'keywords',
+            'license': 'license',
+        }
+
+        meta_field = field_map.get(field_name, field_name)
+        value = self.metadata.get(meta_field, '')
+
+        # Handle list fields
+        if field_name == 'keywords' and isinstance(value, list):
+            return ', '.join(value)
+
+        return str(value) if value else ''
+
+    def _push_undo(self, field: str, old_value: Any, new_value: Any) -> None:
+        """Push change to undo stack."""
+        self._undo_stack.append((field, old_value, new_value))
+
+        # Trim stack if too large
+        if len(self._undo_stack) > self._max_undo:
+            self._undo_stack.pop(0)
+
+        # Clear redo stack on new change
+        self._redo_stack.clear()
+
     def _update_status(self) -> None:
-        """Update status bar with dirty field count."""
+        """Update status bar with dirty field count and undo/redo availability."""
         status = self.query_one("#edit-status", Static)
         dirty_count = len(self._dirty_fields)
         error_count = len(self._field_errors)
+        undo_available = len(self._undo_stack) > 0
+        redo_available = len(self._redo_stack) > 0
 
         parts = []
         if dirty_count > 0:
             parts.append(f"[yellow]• {dirty_count} field(s) modified[/yellow]")
         if error_count > 0:
             parts.append(f"[red]⚠ {error_count} error(s)[/red]")
+        if undo_available:
+            parts.append("[dim]Ctrl+Z: Undo[/dim]")
+        if redo_available:
+            parts.append("[dim]Ctrl+Shift+Z: Redo[/dim]")
 
         if not parts:
             parts.append("[dim]No changes[/dim]")
@@ -2286,6 +2578,61 @@ class CloudEditDetailsScreen(Screen):
         if confirmed:
             self.app.notify("Changes discarded", timeout=2)
             self.app.pop_screen()
+
+    def action_undo_edit(self) -> None:
+        """Undo last edit (Ctrl+Z)."""
+        if not self._undo_stack:
+            self.app.notify("Nothing to undo", timeout=2)
+            return
+
+        # Pop from undo stack
+        field, old_value, new_value = self._undo_stack.pop()
+
+        # Push to redo stack
+        self._redo_stack.append((field, old_value, new_value))
+
+        # Restore old value
+        self._restore_field_value(field, old_value)
+        self._update_status()
+        self.app.notify(f"Undid change to {field}", timeout=2)
+
+    def action_redo_edit(self) -> None:
+        """Redo last undone edit (Ctrl+Shift+Z)."""
+        if not self._redo_stack:
+            self.app.notify("Nothing to redo", timeout=2)
+            return
+
+        # Pop from redo stack
+        field, old_value, new_value = self._redo_stack.pop()
+
+        # Push back to undo stack
+        self._undo_stack.append((field, old_value, new_value))
+
+        # Restore new value
+        self._restore_field_value(field, new_value)
+        self._update_status()
+        self.app.notify(f"Redid change to {field}", timeout=2)
+
+    def _restore_field_value(self, field_name: str, value: Any) -> None:
+        """Restore a field's value in the UI and metadata."""
+        # Update the UI widget
+        input_id = f"edit-{field_name}"
+
+        try:
+            if field_name == 'description':
+                text_area = self.query_one("#edit-description", TextArea)
+                text_area.text = str(value)
+            else:
+                input_widget = self.query_one(f"#{input_id}", Input)
+                input_widget.value = str(value)
+        except Exception as e:
+            logger.warning(f"Could not restore field {field_name}: {e}")
+
+        # Update metadata
+        self._update_metadata_from_field(field_name, str(value))
+
+        # Update the previous value cache so next change is tracked correctly
+        self._previous_values[field_name] = str(value)
 
 
 class AddDataScreen(Screen):
