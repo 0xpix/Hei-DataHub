@@ -1,20 +1,93 @@
 # Contributor Workflow
 
-## End-to-End Contribution Process
+## Overview
 
-This guide walks you through contributing code to Hei-DataHub, from picking an issue to getting your PR merged.
+This guide covers **code contributions** to Hei-DataHub. There are two types of contributions:
+
+1. **Code Contributions** (this guide) — Bug fixes, features, documentation via GitHub PRs
+2. **Dataset Contributions** (see below) — Adding/editing datasets via WebDAV cloud storage
 
 ---
 
-## Prerequisites
+## Two Contribution Paths
 
-Before you start:
+### Visual Overview
+
+```mermaid
+graph TB
+    Start["🤝 Want to Contribute?"]
+    
+    Start --> CodeQ{"Code or Datasets?"}
+    
+    CodeQ -->|"Code: Bugs, Features, Docs"| CodePath["📝 Code Contribution"]
+    CodeQ -->|"Datasets: Add/Edit Data"| DataPath["☁️ Dataset Contribution"]
+    
+    CodePath --> Fork["Fork Repository"]
+    Fork --> Branch["Create Feature Branch"]
+    Branch --> Code["Write Code + Tests"]
+    Code --> PR["Open Pull Request"]
+    PR --> Review["Code Review"]
+    Review --> Merge["Merge to Main"]
+    
+    DataPath --> Auth["Authenticate WebDAV<br/>(hei-datahub auth setup)"]
+    Auth --> TUI["Launch TUI<br/>(hei-datahub)"]
+    TUI --> Edit["Create/Edit Datasets"]
+    Edit --> AutoSync["Auto-Sync to Cloud"]
+    AutoSync --> Done["✓ Available to Others"]
+    
+    style CodePath fill:#e1f5ff
+    style DataPath fill:#fff4e1
+    style Merge fill:#d4edda
+    style Done fill:#d4edda
+```
+
+### Path 1: Code Contributions (GitHub)
+
+**For:** Bug fixes, new features, tests, documentation improvements
+
+**Process:** Fork → Branch → Code → Test → PR → Review → Merge
+
+**Tools:** Git, GitHub, Python, uv, pytest
+
+**See:** This document (full workflow below)
+
+### Path 2: Dataset Contributions (WebDAV)
+
+**For:** Adding or editing datasets in the cloud library
+
+**Process:** Authenticate → Edit YAML → Save → Auto-sync
+
+**Tools:** Hei-DataHub TUI, WebDAV, HeiBox
+
+**How it works:**
+
+1. Configure WebDAV authentication: `hei-datahub auth setup`
+2. Launch TUI: `hei-datahub`
+3. Create/edit datasets in the interface
+4. Changes auto-sync to cloud (HeiBox/Seafile)
+5. Other users see changes after sync
+
+**No GitHub required** — Dataset changes sync directly to cloud storage.
+
+**See:** [Authentication & Sync Guide](../architecture/auth-and-sync.md)
+
+---
+
+## Code Contribution Prerequisites
+
+Before contributing code:
 
 - ✅ Read [System Overview](../architecture/overview.md) to understand the architecture
-- ✅ Read [Module Map](../architecture/module-map.md) to know where code lives
-- ✅ Have Python 3.9+ installed
+- ✅ Read [Codebase Overview](../codebase/overview.md) to know where code lives
+- ✅ Have Python 3.10+ installed
 - ✅ Have `uv` installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - ✅ Have Git configured with your name and email
+
+---
+
+## Code Contribution Workflow
+
+The following steps apply to **code contributions only** (bug fixes, features, documentation). Dataset contributions follow a different workflow via WebDAV (see above).
 
 ---
 
@@ -115,10 +188,11 @@ hei-datahub
 
 ```bash
 # Format: <type>/<short-description>
-git checkout -b feature/add-dataset-export
+git checkout -b feature/add-csv-export
 git checkout -b fix/search-crash-on-empty-query
-git checkout -b docs/api-reference-for-search
-git checkout -b refactor/extract-git-operations
+git checkout -b docs/update-auth-guide
+git checkout -b refactor/extract-webdav-client
+git checkout -b test/add-sync-tests
 ```
 
 **Branch prefixes:**
@@ -127,7 +201,16 @@ git checkout -b refactor/extract-git-operations
 - `docs/` — Documentation only
 - `refactor/` — Code refactoring (no behavior change)
 - `test/` — Adding/fixing tests
-- `chore/` — Maintenance (deps, tooling, etc.)
+- `chore/` — Maintenance (dependencies, tooling, CI/CD)
+- `security/` — Security fixes
+- `perf/` — Performance improvements
+
+**Examples:**
+- `feature/webdav-connection-pooling`
+- `fix/keyring-timeout-on-slow-unlock`
+- `docs/auth-troubleshooting-section`
+- `refactor/split-sync-service`
+- `security/sanitize-log-credentials`
 
 ---
 
@@ -137,39 +220,55 @@ git checkout -b refactor/extract-git-operations
 
 Before coding:
 
-1. **Find the relevant module:** Check [Module Map](../architecture/module-map.md)
-2. **Read the API reference:** See [API Reference](../api-reference/overview.md)
-3. **Trace data flow:** See [Data Flow](../architecture/data-flow.md)
-4. **Check tests:** Look at existing tests in `tests/`
+1. **Find the relevant module:** Check [Codebase Overview](../codebase/overview.md)
+2. **Read the architecture:** See [Architecture Overview](../architecture/overview.md)
+3. **Check existing implementations:** Look for similar code in the module
+4. **Review related documentation:**
+   - [Authentication & Sync](../architecture/auth-and-sync.md) — WebDAV integration
+   - [Search & Autocomplete](../architecture/search-and-autocomplete.md) — FTS5 search
+   - [Security & Privacy](../architecture/security-privacy.md) — Security best practices
+5. **Check tests:** Look at existing tests in `tests/`
 
 ### Write Code
 
 **Follow these principles:**
 
 - ✅ **Follow Clean Architecture:** Core has no I/O, Services orchestrate, Infrastructure handles I/O
-- ✅ **Type hints:** Use type annotations for all functions
+- ✅ **Type hints:** Use type annotations for all functions (Python 3.10+ syntax)
 - ✅ **Docstrings:** Document public functions (Google style)
 - ✅ **Error handling:** Use explicit exceptions or Result types
 - ✅ **Immutability:** Prefer immutable data structures (Pydantic models)
+- ✅ **Security first:** Follow [Security & Privacy](../architecture/security-privacy.md) guidelines
+- ✅ **Test coverage:** Aim for 80%+ code coverage
 
 **Example:**
 
 ```python
 # Good
-def search_datasets(query: str, filters: Optional[Dict[str, Any]] = None) -> List[Dataset]:
+from typing import Optional
+from mini_datahub.core.models import Dataset
+
+def search_datasets(
+    query: str,
+    filters: Optional[dict[str, Any]] = None
+) -> list[Dataset]:
     """
-    Search datasets using FTS5 full-text search.
+    Search datasets using SQLite FTS5 full-text search.
 
     Args:
-        query: Search query string (FTS5 syntax)
+        query: Search query string (FTS5 syntax supported)
         filters: Optional filters (tags, date range, etc.)
 
     Returns:
-        List of matching datasets, sorted by relevance
+        List of matching datasets, sorted by BM25 relevance
 
     Raises:
         SearchError: If query syntax is invalid
         DatabaseError: If database connection fails
+    
+    Example:
+        >>> results = search_datasets("climate precipitation")
+        >>> results = search_datasets("tag:weather", {"date_after": "2024-01-01"})
     """
     # Implementation...
 ```
@@ -182,9 +281,10 @@ def search_datasets(query: str, filters: Optional[Dict[str, Any]] = None) -> Lis
 
 | Layer | Test Type | Example |
 |-------|-----------|---------|
-| Core | Unit tests (pure functions) | `test_validate_dataset_name()` |
+| Core | Unit tests (pure functions) | `test_validate_dataset_schema()` |
 | Services | Integration tests (with mocks) | `test_search_service_with_filters()` |
-| Infrastructure | Integration tests (with fixtures) | `test_db_connection()` |
+| Infrastructure | Integration tests (with fixtures) | `test_webdav_sync()`, `test_db_connection()` |
+| Auth | Integration tests (keyring mocked) | `test_credential_storage()` |
 | UI | Integration tests (Textual pilot) | `test_home_view_navigation()` |
 
 #### Running Tests
@@ -208,7 +308,7 @@ pytest -m "not integration"
 ```python
 # tests/services/test_search.py
 import pytest
-from mini_datahub.services import search
+from mini_datahub.services import fast_search
 from mini_datahub.core.models import Dataset
 
 def test_search_with_query_returns_matching_datasets():
@@ -217,16 +317,16 @@ def test_search_with_query_returns_matching_datasets():
     query = "precipitation"
 
     # Act
-    results = search.search_datasets(query)
+    results = fast_search.search_datasets(query)
 
     # Assert
     assert len(results) > 0
     assert all("precipitation" in d.title.lower() for d in results)
 
-def test_search_with_invalid_query_raises_error():
-    """Test that invalid query syntax raises SearchError."""
-    with pytest.raises(search.SearchError):
-        search.search_datasets("invalid: query:")
+def test_search_with_invalid_fts5_syntax_raises_error():
+    """Test that invalid FTS5 query syntax raises SearchError."""
+    with pytest.raises(fast_search.SearchError):
+        fast_search.search_datasets("NEAR(invalid 999999)")
 ```
 
 ---
@@ -274,15 +374,28 @@ We use **Conventional Commits**:
 - `style`: Formatting (no code change)
 - `refactor`: Code refactoring
 - `test`: Adding/fixing tests
-- `chore`: Maintenance
+- `chore`: Maintenance (dependencies, tooling, CI/CD)
+- `security`: Security fixes
+- `perf`: Performance improvements
+
+**Scopes (optional but recommended):**
+- `auth` — Authentication/WebDAV
+- `search` — Search/FTS5/autocomplete
+- `sync` — Background sync
+- `ui` — TUI/interface
+- `db` — Database/persistence
+- `cli` — Command-line interface
+- `config` — Configuration
 
 **Examples:**
 
 ```bash
 # Good commits
-git commit -m "feat(search): add support for date range filters"
-git commit -m "fix(db): prevent connection leak on error"
-git commit -m "docs(api): add reference for services.publish"
+git commit -m "feat(search): add date range filters for FTS5 queries"
+git commit -m "fix(auth): prevent keyring timeout on slow unlock"
+git commit -m "docs(cli): add examples for auth doctor command"
+git commit -m "refactor(sync): extract WebDAV client to separate module"
+git commit -m "security(logging): mask credentials in error messages"
 
 # With body and footer
 git commit -m "feat(ui): add dataset export to CSV
@@ -307,10 +420,10 @@ Closes #123"
 
 ```bash
 # Push your branch
-git push origin feature/add-dataset-export
+git push origin feature/add-csv-export
 
 # If you've already pushed and need to update
-git push origin feature/add-dataset-export --force-with-lease
+git push origin feature/add-csv-export --force-with-lease
 ```
 
 ---
@@ -324,9 +437,9 @@ git push origin feature/add-dataset-export --force-with-lease
 3. Click **compare across forks**
 4. Select:
    - **Base repository:** `0xpix/Hei-DataHub`
-   - **Base branch:** `main`
+   - **Base branch:** `main` (or appropriate branch)
    - **Head repository:** `YOUR_USERNAME/Hei-DataHub`
-   - **Compare branch:** `feature/add-dataset-export`
+   - **Compare branch:** `feature/add-csv-export`
 5. Click **Create Pull Request**
 
 ### PR Title and Description
@@ -334,7 +447,7 @@ git push origin feature/add-dataset-export --force-with-lease
 **Title format:** Same as commit convention
 
 ```
-feat(search): add support for date range filters
+feat(search): add date range filters for FTS5 queries
 ```
 
 **Description template:**
@@ -382,7 +495,7 @@ Closes #123
 
 ```bash
 # Make requested changes
-git checkout feature/add-dataset-export
+git checkout feature/add-csv-export
 
 # Edit code
 # Run tests
@@ -392,7 +505,7 @@ make test
 git commit -m "refactor: extract date parsing logic"
 
 # Push updates
-git push origin feature/add-dataset-export
+git push origin feature/add-csv-export
 ```
 
 **PR will auto-update with new commits.**
@@ -411,8 +524,8 @@ Once approved:
 2. **Your contribution is live!** 🎉
 3. **Delete your branch:**
    ```bash
-   git branch -d feature/add-dataset-export
-   git push origin --delete feature/add-dataset-export
+   git branch -d feature/add-csv-export
+   git push origin --delete feature/add-csv-export
    ```
 
 ---
@@ -436,12 +549,12 @@ git push origin main
 If `main` has moved forward while you were working:
 
 ```bash
-git checkout feature/add-dataset-export
+git checkout feature/add-csv-export
 git rebase main
 
 # Resolve conflicts if any
 # Then force-push (safe because it's your branch)
-git push origin feature/add-dataset-export --force-with-lease
+git push origin feature/add-csv-export --force-with-lease
 ```
 
 ---
@@ -495,18 +608,36 @@ git push origin feature/my-branch
 
 ## Getting Help
 
-- **Stuck on setup?** → [Installation Guide](../../docs/20-tutorials/01-installation.md)
-- **Confused about architecture?** → [System Overview](../architecture/overview.md)
-- **Not sure where code goes?** → [Module Map](../architecture/module-map.md)
+### Code Contributions
+
+- **Stuck on setup?** → [Installation Guide](../../docs/installation/index.md)
+- **Confused about architecture?** → [Architecture Overview](../architecture/overview.md)
+- **Not sure where code goes?** → [Codebase Overview](../codebase/overview.md)
+- **Need API reference?** → [CLI Commands Reference](../api-reference/cli-commands.md)
 - **Questions?** → [GitHub Discussions](https://github.com/0xpix/Hei-DataHub/discussions)
+
+### Dataset Contributions
+
+- **Authentication issues?** → [Authentication & Sync](../architecture/auth-and-sync.md)
+- **WebDAV connection problems?** → Run `hei-datahub auth doctor`
+- **Sync not working?** → Check [Troubleshooting](../architecture/auth-and-sync.md#troubleshooting)
+- **Security questions?** → [Security & Privacy](../architecture/security-privacy.md)
 
 ---
 
 ## Next Steps
 
-- Read [Code Review Guide](code-review.md) to understand review criteria
-- Check [Definition of Done](definition-of-done.md) to know when a feature is complete
-- Review [Commit Conventions](commits.md) for detailed commit message guidelines
+### For Code Contributors
+
+- Read [Codebase Overview](../codebase/overview.md) to understand module structure
+- Review [Architecture Overview](../architecture/overview.md) for system design
+- Check [Security & Privacy](../architecture/security-privacy.md) for security best practices
+
+### For Dataset Contributors
+
+- Read [Authentication & Sync](../architecture/auth-and-sync.md) for WebDAV setup
+- Learn [Search & Autocomplete](../architecture/search-and-autocomplete.md) to optimize discoverability
+- Review dataset schema in user documentation
 
 ---
 
