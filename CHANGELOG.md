@@ -9,6 +9,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.59.0-beta] - 2025-10-10 - Privacy
+
+**WebDAV migration complete!** This release replaces GitHub-based catalog with direct WebDAV (HeiBox) cloud storage for datasets.
+
+### Added
+
+- **WebDAV Cloud Storage** - Direct integration with HeiBox/WebDAV servers
+  - Configure URL, library, username, and token in settings
+  - Cloud-only workflow (no local git repo required)
+  - Secure credential storage via Linux keyring
+- **New Settings Screen** - WebDAV configuration interface (replaced GitHub settings)
+  - Press `s` to configure WebDAV connection
+  - Direct access (no intermediate menu)
+  - Credentials stored securely in system keyring
+- **Auth Management Commands**:
+  - `hei-datahub auth setup` - Configure WebDAV credentials
+  - `hei-datahub auth doctor` - Diagnose auth issues
+  - `hei-datahub auth clear` - Remove stored credentials
+- **Smart Autocomplete** - Intelligent search suggestions
+  - Column name completion
+  - Value completion from index
+  - Operator suggestions
+- **Enhanced Filter Badges** - Visual query representation
+  - Better visual hierarchy
+  - Easier to understand complex queries
+- **New Logo Design** - HeiPlanet brand colors
+  - Main, H, inline, and round variants
+  - Gradient and solid color versions
+
+### Changed
+
+- **"Pull" renamed to "Update"** - Press `U` to update datasets from cloud
+- **Cloud-Only Architecture** - No more local git repository requirement
+- **Simplified Settings** - Focused on WebDAV configuration only
+
+### Removed
+
+- **GitHub Integration** - Replaced with WebDAV
+- **Outbox Feature** - No longer needed with direct WebDAV workflow
+- **Theme Settings UI** - Still configurable via config.yaml
+
+### Fixed
+
+- Cloud dataset synchronization with WebDAV
+- Settings screen now loads configuration correctly
+- Direct settings access (no intermediate menu)
+
+### Documentation
+
+- Added comprehensive v0.59-beta release notes
+- Updated all installation and configuration guides
+- Added WebDAV setup documentation
+
+---
+
 ## [0.58.3-beta] - 2025-10-10 - Windows Update Fix
 
 **The Windows update nightmare is finally over!** This release completely solves the "Failed to install entrypoint" error that plagued Windows users.
@@ -104,6 +159,7 @@ Initial release of 0.58.x series "Streamline".
 
 ---
 
+[0.59.0-beta]: https://github.com/0xpix/Hei-DataHub/compare/v0.58.3-beta...v0.59.0-beta
 [0.58.2-beta]: https://github.com/0xpix/Hei-DataHub/compare/v0.58.1-beta...v0.58.2-beta
 [0.58.1-beta]: https://github.com/0xpix/Hei-DataHub/compare/v0.58.0-beta...v0.58.1-beta
 [0.58.0-beta]: https://github.com/0xpix/Hei-DataHub/releases/tag/v0.58.0-beta
