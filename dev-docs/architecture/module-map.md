@@ -428,34 +428,13 @@ Hei-DataHub/
 
 ---
 
-### `services/publish.py`
-
-**Purpose:** Publish datasets as GitHub PRs
-
-**Responsibilities:**
-- Save dataset to YAML
-- Auto-stash changes
-- Commit and push
-- Create PR via GitHub API
-- Rollback on failure
-
-**Key Functions:**
-- `publish_dataset(dataset: Dataset, message: str) -> Result[PRInfo]`
-
-**Dependencies:**
-- `services.catalog`
-- `infra.git`, `infra.github_api`
-
-**Extension Point:** ✅ Can add pre-publish hooks
-
----
-
 ### `services/sync.py`
 
-**Purpose:** Pull changes from remote and reindex
+**Purpose:** Sync datasets with cloud storage via WebDAV
 
 **Responsibilities:**
-- Git pull from remote
+- Download datasets from WebDAV
+- Upload local changes to cloud
 - Reindex all YAML files
 - Handle merge conflicts
 
