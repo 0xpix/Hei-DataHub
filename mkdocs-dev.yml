@@ -39,9 +39,6 @@ plugins:
   - search:
       lang: en
       separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
-  - git-revision-date-localized:
-      enable_creation_date: true
-      type: timeago
 
 # Extensions
 markdown_extensions:
