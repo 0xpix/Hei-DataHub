@@ -12,9 +12,26 @@ from typing import Literal, Optional
 logger = logging.getLogger(__name__)
 
 
+def _clear_index_database() -> None:
+    """Clear the search index database."""
+    try:
+        from mini_datahub.services.index_service import INDEX_DB_PATH
+
+        if INDEX_DB_PATH.exists():
+            INDEX_DB_PATH.unlink()
+            print(f"ℹ️  Removed search index: {INDEX_DB_PATH}")
+            logger.info(f"Removed index database: {INDEX_DB_PATH}")
+        else:
+            print(f"ℹ️  Index database not found at {INDEX_DB_PATH}")
+
+    except Exception as e:
+        logger.warning(f"Error clearing index database: {e}")
+        print(f"⚠️  Could not remove index database: {e}")
+
+
 def run_clear(force: bool = False, clear_all: bool = False) -> int:
     """
-    Clear stored WebDAV authentication credentials.
+    Clear stored WebDAV authentication credentials and search index.
 
     Args:
         force: Skip interactive confirmation
@@ -33,6 +50,8 @@ def run_clear(force: bool = False, clear_all: bool = False) -> int:
 
     # Check if config exists
     if not config_path.exists():
+        # Even if no config, still clear index
+        _clear_index_database()
         print("Nothing to clear.")
         return 0
 
@@ -49,6 +68,8 @@ def run_clear(force: bool = False, clear_all: bool = False) -> int:
         auth_config = config.get("auth", {})
 
         if not auth_config:
+            # No auth config, but still clear index
+            _clear_index_database()
             print("Nothing to clear.")
             return 0
 
@@ -134,7 +155,10 @@ def run_clear(force: bool = False, clear_all: bool = False) -> int:
         except Exception as e:
             logger.warning(f"Error clearing cached files: {e}")
 
-    print("✅ Cleared WebDAV credentials.")
+    # Always clear index.db when clearing auth
+    _clear_index_database()
+
+    print("✅ Cleared WebDAV credentials and search index.")
     return 0
 
 
