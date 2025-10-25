@@ -1,157 +1,333 @@
-# How to Customize Keybindings
+# Customize Keybindings
 
-**Requirements**: Hei-DataHub 0.56-beta or later
+**Requirements:** Hei-DataHub 0.56-beta or later
 
-**Goal:** Change keyboard shortcuts to match your preferences.
+**Goal:** Personalize keyboard shortcuts to match your workflow and preferences.
 
 **Time:** 5-10 minutes
 
 ---
 
-## Step-by-Step
+## Why Customize Keybindings?
 
-### 1. Find Your Config File
+- ⌨️ **Match your muscle memory** - Use shortcuts from Vim, Emacs, VS Code, etc.
+- 🚀 **Boost productivity** - Optimize for actions you use most
+- ♿ **Accessibility** - Remap keys to avoid difficult combinations
+- 🎯 **Reduce conflicts** - Avoid clashes with terminal or tmux shortcuts
+
+---
+
+## Quick Start
+
+### TL;DR
+
+1. Edit config file: `~/.config/hei-datahub/config.yaml`
+2. Add keybindings section with your custom shortcuts
+3. Save and restart Hei-DataHub
+4. Enjoy your personalized workflow!
+
+---
+
+## Step-by-Step Guide
+
+### 1. Locate Your Config File
 
 The configuration file is located at:
 
-```
-~/.config/hei-datahub/config.yaml
-```
-
-**On Linux/macOS:**
+**Linux/macOS:**
 ```bash
 ~/.config/hei-datahub/config.yaml
 ```
 
-**On Windows:**
+**Windows:**
 ```
 C:\Users\YourName\.config\hei-datahub\config.yaml
 ```
+
+**Quick check if file exists:**
+```bash
+# Linux/macOS
+ls -l ~/.config/hei-datahub/config.yaml
+
+# Windows PowerShell
+Test-Path "$env:USERPROFILE\.config\hei-datahub\config.yaml"
+```
+
+**Note:** If the file doesn't exist, Hei-DataHub creates it with defaults on first run.
 
 ---
 
 ### 2. Open the Config File
 
-If the file doesn't exist, the app will create it with defaults on first run.
+Choose your preferred editor:
 
-**Using NeoVim:**
+**NeoVim/Vim:**
 ```bash
 nvim ~/.config/hei-datahub/config.yaml
+# or
+vim ~/.config/hei-datahub/config.yaml
 ```
 
-**Using VS Code:**
+**VS Code:**
 ```bash
 code ~/.config/hei-datahub/config.yaml
 ```
 
+**Nano (beginner-friendly):**
+```bash
+nano ~/.config/hei-datahub/config.yaml
+```
+
+**Any text editor:**
+```bash
+# Linux
+xdg-open ~/.config/hei-datahub/config.yaml
+
+# macOS
+open ~/.config/hei-datahub/config.yaml
+```
+
 ---
 
-### 3. Add Keybinding Section
+### 3. Add or Modify Keybindings Section
 
-If not already present, add a `keybindings:` section:
+If not already present, add a `keybindings:` section to your config:
 
 ```yaml
 # Hei-DataHub Configuration
 
 keybindings:
   # Your custom keybindings go here
+  # Format: action_name: "key_combination"
 
 theme: "gruvbox"
 ```
 
+**Important:**
+- Indentation matters in YAML (use 2 spaces)
+- Always use quotes around key values: `"ctrl+s"` not `ctrl+s`
+- Action names are case-sensitive: `add_dataset` not `Add_Dataset`
+
 ---
 
-### 4. Add Your Custom Bindings
+### 4. Define Your Custom Bindings
 
-**Format:**
+**Basic format:**
 ```yaml
 keybindings:
   action_name: "key"
 ```
 
-**Example:**
+**Common examples:**
 ```yaml
 keybindings:
-  edit_dataset: "ctrl+e"      # Change from 'e' to Ctrl+E
-  search: "ctrl+f"             # Change from '/' to Ctrl+F
-  quit: "ctrl+q"               # Change from 'q' to Ctrl+Q
+  # Change edit from 'e' to Ctrl+E
+  edit_dataset: "ctrl+e"
+
+  # Change search from '/' to Ctrl+F (like VS Code)
+  search: "ctrl+f"
+
+  # Change quit from 'q' to Ctrl+Q
+  quit: "ctrl+q"
+
+  # Use function keys
+  help: "f1"
+  refresh: "f5"
+
+  # Add dataset with Ctrl+N (like "new file")
+  add_dataset: "ctrl+n"
+```
+
+**Pro tip:** Comment out the default first, then add your custom binding:
+```yaml
+keybindings:
+  # edit_dataset: "e"        # Default (commented)
+  edit_dataset: "ctrl+e"     # My custom binding
 ```
 
 ---
 
-### 5. Save and Restart
+### 5. Save and Test
 
-1. Save the file (`Ctrl+s` in most editors, `:wq` in Nvim)
-2. Restart Hei-DataHub:
+1. **Save the file:**
+   - Vim/NeoVim: `:wq` or `:w` then `:q`
+   - Nano: `Ctrl+O` (save), `Ctrl+X` (exit)
+   - VS Code: `Ctrl+S`
+
+2. **Restart Hei-DataHub:**
    ```bash
    hei-datahub
    ```
 
-Your new keybindings are now active! 🎉
+3. **Test your new keybindings:**
+   - Try each custom shortcut
+   - If something doesn't work, check for typos in the config
+   - Press `?` to see current keybindings help
+
+4. **Verify changes took effect:**
+   - The help screen (`?`) should show your custom bindings
+   - Test the actual shortcuts to confirm they work
+
+Your personalized keybindings are now active! 🎉
 
 ---
 
-## Available Actions
+## Available Actions Reference
 
-Here are common actions you can customize:
 
-### Global Actions (Work Everywhere)
-
-| Action | Default Key | What it does |
-|--------|-------------|-------------|
-| `quit` | `q` or `Ctrl+C` | Exit app |
-| `help` | `?` | Show help overlay |
-| `search` | `/` | Focus search box |
-| `settings` | `s` | Open settings |
-| `refresh` | `r` | Refresh data |
-| `pull_updates` | `u` | Pull Git updates |
-
----
 
 ### Home Screen Actions
 
-| Action | Default Key | What it does |
-|--------|-------------|-------------|
-| `add_dataset` | `a` | Add new dataset |
-| `open_dataset` | `Enter` | Open selected dataset |
-| `vim_down` | `j` | Move down one row |
-| `vim_up` | `k` | Move up one row |
-| `vim_top` | `g g` | Jump to top |
-| `vim_bottom` | `G` | Jump to bottom |
+Dataset catalog navigation and management:
+
+| Action | Default Key | Description | When to use |
+|--------|-------------|-------------|-------------|
+| `add_dataset` | `a` | Add new dataset | Create dataset entry |
+| `open_dataset` | `Enter` | Open selected dataset | View full details |
+| `delete_dataset` | `d` | Delete dataset | Remove from catalog |
+| `vim_down` | `j` | Move down one row | Navigate list (Vim-style) |
+| `vim_up` | `k` | Move up one row | Navigate list (Vim-style) |
+| `vim_top` | `g g` | Jump to top | Go to first dataset |
+| `vim_bottom` | `G` | Jump to bottom | Go to last dataset |
+| `page_down` | `Ctrl+d` | Scroll down half page | Fast navigation |
+| `page_up` | `Ctrl+u` | Scroll up half page | Fast navigation |
+
+**Popular customizations:**
+- Change `add_dataset` to `Ctrl+N` (like "new file" in editors)
+- Use arrow keys instead of `j/k` (already works by default)
 
 ---
 
 ### Details Screen Actions
 
-| Action | Default Key | What it does |
-|--------|-------------|-------------|
-| `edit_dataset` | `e` | Enter edit mode |
-| `publish_dataset` | `p` | Create PR |
-| `copy_source` | `c` | Copy source URL |
-| `open_url` | `o` | Open URL in browser |
-| `back` | `Esc` | Return to home |
+When viewing a dataset's full information:
+
+| Action | Default Key | Description | Use case |
+|--------|-------------|-------------|----------|
+| `edit_dataset` | `e` | Enter edit mode | Modify metadata |
+| `copy_source` | `c` | Copy source URL | Quick copy to clipboard |
+| `open_url` | `o` | Open URL in browser | View external source |
+| `back` | `Esc` or `b` | Return to home screen | Exit details view |
+| `delete_dataset` | `d` | Delete this dataset | Remove from catalog |
+
+**Workflow tip:** Common pattern is `e` (edit) → make changes → `Ctrl+S` (save) → `Esc` (back)
 
 ---
 
 ### Edit Screen Actions
 
-| Action | Default Key | What it does |
-|--------|-------------|-------------|
-| `save` | `ctrl+s` | Save changes |
-| `cancel` | `escape` | Cancel editing |
-| `undo` | `ctrl+z` | Undo last change |
-| `redo` | `ctrl+shift+z` | Redo change |
+When modifying dataset metadata:
+
+| Action | Default Key | Description | Notes |
+|--------|-------------|-------------|-------|
+| `save` | `Ctrl+s` | Save changes | Syncs to Heibox if connected |
+| `cancel` | `Esc` | Cancel editing | Confirms if unsaved changes |
+| `undo` | `Ctrl+z` | Undo last change | Works within edit session |
+| `redo` | `Ctrl+Shift+z` | Redo change | Restore undone change |
+| `next_field` | `Tab` | Move to next field | Navigate form |
+| `prev_field` | `Shift+Tab` | Move to previous field | Navigate backwards |
+
+**Customization idea:** Some users prefer `Ctrl+Y` for redo (Windows-style):
+```yaml
+keybindings:
+  redo: "ctrl+y"
+```
 
 ---
 
-## Key Syntax
+## Key Syntax Reference
 
-### Single Keys
+### Single Character Keys
+
+Simple letter or symbol keys:
+
 ```yaml
 keybindings:
   quit: "q"
   help: "?"
+  add_dataset: "a"
+  search: "/"
 ```
+
+**Tip:** Use lowercase for letters. Uppercase requires shift (see below).
+
+---
+
+### Modifier Keys
+
+Combine modifiers with keys using `ctrl+`, `shift+`, `alt+`:
+
+```yaml
+keybindings:
+  save: "ctrl+s"
+  delete: "ctrl+d"
+  copy: "ctrl+c"
+  uppercase_letter: "shift+a"  # Capital A
+  alternate: "alt+f"
+```
+
+**Available Modifiers:**
+
+- `ctrl+` - Control key (most common)
+- `shift+` - Shift key (use for uppercase or shifted symbols)
+- `alt+` - Alt/Option key (less common in terminals)
+
+**Common Patterns:**
+
+- `ctrl+<letter>` - Primary shortcuts (save, quit, delete)
+- `shift+<letter>` - Uppercase letters or shifted symbols
+- `ctrl+shift+<letter>` - Advanced operations
+- `alt+<letter>` - Alternative actions
+
+**Note:** Not all terminal emulators support `alt+` combinations reliably. Test in your terminal first.
+
+---
+
+### Function Keys
+
+Use F1-F12 for quick actions:
+
+```yaml
+keybindings:
+  help: "f1"        # Common convention for help
+  refresh: "f5"     # Like browser refresh
+  settings: "f9"
+  custom: "f12"
+```
+
+**Tip:** Function keys are ideal for frequently-used actions since they don't conflict with text editing shortcuts.
+
+---
+
+### Special Keys
+
+Named keys for common special characters:
+
+```yaml
+keybindings:
+  back: "escape"
+  confirm: "enter"
+  delete: "delete"
+  tab_next: "tab"
+  tab_prev: "shift+tab"
+```
+
+**Available special keys:** `escape`, `enter`, `delete`, `backspace`, `tab`, `space`
+
+---
+
+### Multi-Key Combinations
+
+Combine multiple modifiers:
+
+```yaml
+keybindings:
+  redo: "ctrl+shift+z"          # Standard redo shortcut
+  advanced_search: "ctrl+alt+f"
+  vim_quit: "shift+z shift+z"   # Vim-style ZZ
+```
+
+**Tip:** Keep combinations to 2 modifiers max for usability. `ctrl+alt+shift+x` is hard to remember!
 
 ---
 
@@ -208,219 +384,620 @@ keybindings:
 
 ---
 
-## Examples
+## Real-World Examples
 
-### Example 1: Vim-Style Keybindings
+### Example 1: Vim Purist Setup
 
-Make navigation more Vim-like:
+For Vim users who want maximum consistency:
 
 ```yaml
 keybindings:
-  quit: "shift+z shift+z"       # :q → ZZ
-  search: "slash"               # Already default
+  # Navigation (already default, shown for reference)
+  vim_down: "j"                 # Move down
+  vim_up: "k"                   # Move up
+  vim_top: "g g"                # Jump to top
+  vim_bottom: "shift+g"         # Jump to bottom
+
+  # Actions with Vim-style keys
+  quit: "shift+z shift+z"       # ZZ to quit (Vim style)
+  search: "/"                   # Already default
   back: "escape"                # Already default
-  vim_down: "j"                 # Already default
-  vim_up: "k"                   # Already default
+  edit_dataset: "i"             # i for "insert mode" (edit)
+  delete_dataset: "d d"         # dd for delete (Vim style)
 ```
+
+**Why this works:** Muscle memory from Vim transfers directly to Hei-DataHub.
 
 ---
 
-### Example 2: Emacs-Style Keybindings
+### Example 2: VS Code Migration
 
-Prefer Emacs shortcuts:
-
-```yaml
-keybindings:
-  search: "ctrl+s"              # Emacs search
-  quit: "ctrl+x ctrl+c"         # Emacs quit
-  save: "ctrl+x ctrl+s"         # Emacs save
-```
-
----
-
-### Example 3: VS Code-Style Keybindings
-
-Match VS Code shortcuts:
+Match your editor shortcuts for seamless workflow:
 
 ```yaml
 keybindings:
-  search: "ctrl+f"              # VS Code search
+  # File operations
   add_dataset: "ctrl+n"         # New file
-  settings: "ctrl+comma"        # Settings
-  quit: "ctrl+q"                # Quit
+  save: "ctrl+s"                # Save (already default)
+  quit: "ctrl+q"                # Quit app
+
+  # Navigation & search
+  search: "ctrl+f"              # Find in file
+  open_dataset: "ctrl+o"        # Open file
+  back: "escape"                # Close panel
+
+  # Advanced
+  settings: "ctrl+comma"        # Open settings
+  help: "ctrl+shift+p"          # Command palette style
 ```
+
+**Tip:** Add comments in your config to remember why you chose each binding.
 
 ---
 
-### Example 4: Custom Function Keys
+### Example 3: Productivity Power User
 
-Use F-keys for quick actions:
+Optimize for speed with function keys:
 
 ```yaml
 keybindings:
-  help: "f1"
+  # Quick access via F-keys
+  help: "f1"                    # Standard help key
+  add_dataset: "f2"             # Quick create
+  edit_dataset: "f3"            # Quick edit
+  publish_dataset: "f4"         # Quick publish
+  refresh: "f5"                 # Refresh (like browsers)
+  search: "f6"                  # Quick search
+  settings: "f9"                # Settings
+
+  # Keep common shortcuts
+  save: "ctrl+s"
+  quit: "ctrl+q"
+  copy_source: "ctrl+c"
+```
+
+**Why function keys?** One-handed access, no conflicts with text editing, easy to remember numbers.
+
+---
+
+### Example 4: Accessibility-Focused
+
+Reduce hand strain with comfortable key placements:
+
+```yaml
+keybindings:
+  # Avoid pinky stretches
+  save: "ctrl+s"                # Already comfortable
+  quit: "ctrl+w"                # Close window (easier than ctrl+q)
+
+  # Use right-hand side for common actions
+  edit_dataset: "l"             # Right hand (instead of e)
+  help: "semicolon"             # Right hand
+
+  # Function keys for one-hand use
   add_dataset: "f2"
-  edit_dataset: "f3"
-  publish_dataset: "f4"
+  search: "f3"
   refresh: "f5"
 ```
 
----
-
-## Tips & Tricks
-
-### ✅ Start Small
-Change one or two keys first, get comfortable, then add more.
+**Principle:** Minimize hand movement and awkward key combinations.
 
 ---
 
-### ✅ Keep Defaults for Less-Used Actions
-You don't need to customize everything. Focus on actions you use often.
+## Pro Tips & Best Practices
+
+### 💡 Start Small, Iterate Often
+
+**Don't rebind everything at once!** Change 1-2 shortcuts, use them for a day, then add more.
+
+**Why:** Your muscle memory needs time to adapt. Too many changes at once leads to confusion.
+
+**Recommended progression:**
+1. Week 1: Change your most-used action (e.g., `add_dataset`)
+2. Week 2: Add 2-3 navigation shortcuts
+3. Week 3: Customize advanced features
 
 ---
 
-### ✅ Write Down Your Changes
-Keep a note of your custom keybindings until you memorize them.
+### 💡 Mirror Your Primary Editor
+
+**Match the shortcuts from your main code editor** (VS Code, Vim, Emacs, etc.)
+
+**Why:** Context switching is smoother when shortcuts are consistent across tools.
+
+**Example:** If you use VS Code, set `search: "ctrl+f"` and `add_dataset: "ctrl+n"` to match "Find" and "New File".
 
 ---
 
-### ✅ Test After Each Change
-Restart the app after editing to make sure your new bindings work.
+### 💡 Use Mnemonic Keys
+
+**Choose keys that remind you of the action:**
+
+- `e` for **E**dit
+- `d` for **D**elete
+- `p` for **P**ublish
+- `s` for **S**earch
+- `a` for **A**dd
+
+**Why:** Easier to remember than arbitrary assignments.
+
+---
+
+### 💡 Reserve Ctrl for Important Actions
+
+**Use `ctrl+<key>` combinations for critical, frequent operations:**
+
+```yaml
+keybindings:
+  save: "ctrl+s"          # Critical: saving work
+  quit: "ctrl+q"          # Important: exiting
+  search: "ctrl+f"        # Frequent: finding datasets
+```
+
+**Keep single-letter keys for less destructive actions:**
+```yaml
+keybindings:
+  help: "?"               # Safe: just viewing help
+  edit_dataset: "e"       # Reversible: can cancel edits
+```
+
+**Why:** Harder to accidentally trigger `ctrl+` combinations.
+
+---
+
+### 💡 Document Your Custom Setup
+
+**Keep a cheat sheet until you memorize your bindings.**
+
+**Quick method:** Add comments in your config file:
+```yaml
+keybindings:
+  # EDITING SHORTCUTS
+  edit_dataset: "f3"      # Quick edit (like Excel)
+  save: "ctrl+s"          # Save changes
+
+  # NAVIGATION
+  search: "ctrl+f"        # Find datasets (like browsers)
+  vim_down: "j"           # Down (Vim muscle memory)
+```
+
+**Advanced method:** Create a markdown file in `~/.config/hei-datahub/my-shortcuts.md`
+
+---
+
+### 💡 Test in Isolation
+
+**After adding a new binding, test it immediately:**
+
+1. Save config file
+2. Restart Hei-DataHub
+3. Press `?` to view help (confirms binding registered)
+4. Try the actual shortcut in context
+
+**Why:** Catches typos and conflicts early, before you forget what you changed.
+
+---
+
+### 💡 Keep a Backup
+
+**Before major changes, save a copy of your working config:**
+
+```bash
+cp ~/.config/hei-datahub/config.yaml ~/.config/hei-datahub/config.yaml.backup
+```
+
+**To restore if something breaks:**
+```bash
+cp ~/.config/hei-datahub/config.yaml.backup ~/.config/hei-datahub/config.yaml
+```
+
+---
+
+### 💡 Don't Customize Everything
+
+**You don't need to rebind every action.** Focus on:
+
+✅ **High-frequency actions** you do 20+ times per day
+✅ **Awkward defaults** that slow you down
+✅ **Conflicts** with your editor or terminal
+
+❌ **Don't change** actions you rarely use
+❌ **Don't change** shortcuts that already feel natural
+
+**Pareto principle:** 20% of shortcuts handle 80% of your workflow.
 
 ---
 
 ## Troubleshooting
 
-### Keybinding Doesn't Work
+### ⚠️ Keybinding Doesn't Work
 
-**Problem:** You changed a keybinding but it doesn't respond.
+**Symptoms:** You press your custom shortcut but nothing happens.
+
+**Common causes & solutions:**
+
+1. **Typo in action name**
+   ```yaml
+   # ❌ Wrong (typo)
+   edit_datset: "ctrl+e"
+
+   # ✅ Correct
+   edit_dataset: "ctrl+e"
+   ```
+   Action names are case-sensitive and must match exactly.
+
+2. **Missing quotes around key value**
+   ```yaml
+   # ❌ Wrong (no quotes)
+   save: ctrl+s
+
+   # ✅ Correct
+   save: "ctrl+s"
+   ```
+
+3. **Wrong indentation**
+   ```yaml
+   # ❌ Wrong (not indented under keybindings)
+   keybindings:
+   quit: "q"
+
+   # ✅ Correct (2 spaces indent)
+   keybindings:
+     quit: "q"
+   ```
+
+4. **Forgot to restart Hei-DataHub**
+   - Changes only apply after restart
+   - Exit and relaunch the app
+
+5. **Key combination not supported by your terminal**
+   - Some terminals don't support all key combos (especially `alt+`)
+   - Test the key in the terminal first
+   - Try a different key combination
+
+**Debugging steps:**
+```bash
+# 1. Validate YAML syntax
+yamllint ~/.config/hei-datahub/config.yaml
+
+# 2. Check config file exists and is readable
+cat ~/.config/hei-datahub/config.yaml
+
+# 3. Launch with debug output
+hei-datahub --debug
+```
+
+---
+
+### ⚠️ Multiple Actions Have Same Key (Conflict)
+
+**Problem:** You accidentally assigned the same key to two different actions.
+
+**Current behavior:** The last binding in the file wins, with no warning shown.
+
+**Example of conflict:**
+```yaml
+keybindings:
+  edit_dataset: "e"
+  export_data: "e"      # ❌ Conflict! Only this one will work
+```
 
 **Solutions:**
 
-1. **Check spelling:** Action names are case-sensitive
-2. **Check syntax:** Use quotes around keys (`"ctrl+s"` not `ctrl+s`)
-3. **Restart app:** Changes require a restart
-4. **Check logs:** Look for errors in debug mode
+1. **Manual audit:** Search your config file for duplicate key values
+2. **Use unique keys:** Assign different keys to each action
+3. **Wait for conflict detection:** Planned for v0.57-beta
+
+**Temporary workaround script:**
+```bash
+# Find duplicate keybindings
+grep -A 100 "keybindings:" ~/.config/hei-datahub/config.yaml | \
+  grep -E '^\s+\w+:' | \
+  awk -F': ' '{print $2}' | \
+  sort | \
+  uniq -d
+```
 
 ---
 
-### Multiple Keys Conflict
+### ⚠️ Config File Changes Ignored
 
-**Problem:** Two actions have the same keybinding.
+**Symptoms:** You edit the config but changes don't take effect.
 
-**Current behavior:** Last one in the file wins (but no warning shown).
+**Common causes:**
 
-**Workaround:** Manually check for conflicts until conflict detection is added (planned for 0.57-beta).
+1. **Wrong file location**
+   ```bash
+   # Must be exactly this path:
+   ~/.config/hei-datahub/config.yaml
+
+   # Verify location:
+   ls -la ~/.config/hei-datahub/config.yaml
+   ```
+
+2. **Invalid YAML syntax**
+   - One syntax error breaks the entire file
+   - App silently falls back to defaults
+
+   **Validation:**
+   ```bash
+   # Install YAML linter
+   pip install yamllint
+
+   # Check your config
+   yamllint ~/.config/hei-datahub/config.yaml
+   ```
+
+3. **File permissions issue**
+   ```bash
+   # Check if file is readable
+   ls -l ~/.config/hei-datahub/config.yaml
+
+   # Fix permissions if needed
+   chmod 644 ~/.config/hei-datahub/config.yaml
+   ```
+
+4. **Cached settings**
+   - Rarely, old settings stick around
+
+   **Clear cache:**
+   ```bash
+   # Remove cache (safe, will regenerate)
+   rm -rf ~/.cache/hei-datahub/
+   ```
 
 ---
 
-### App Ignores Config File
+### ⚠️ How to Reset to Defaults
 
-**Problem:** Changes don't take effect.
+**Option 1: Remove custom keybindings section**
 
-**Solutions:**
+Edit `~/.config/hei-datahub/config.yaml` and delete the `keybindings:` section:
+```yaml
+# Before
+theme: "gruvbox"
+keybindings:
+  quit: "ctrl+q"
+  search: "ctrl+f"
 
-1. **Check file location:** Must be `~/.config/hei-datahub/config.yaml`
-2. **Check YAML syntax:** Invalid YAML is silently ignored
-3. **Validate YAML:** Use an online YAML validator
-4. **Check file permissions:** File must be readable
+# After (keybindings removed)
+theme: "gruvbox"
+```
 
----
-
-### How to Reset to Defaults
-
-**Option 1:** Delete custom bindings from config file
-
-**Option 2:** Delete the entire config file and restart (app recreates defaults)
+**Option 2: Delete entire config file**
 
 ```bash
-rm ~/.config/hei-datahub/config.yaml
+# Backup first (recommended)
+mv ~/.config/hei-datahub/config.yaml ~/.config/hei-datahub/config.yaml.old
+
+# Restart app - it will create fresh default config
 hei-datahub
 ```
 
----
-
-## Limitations
-
-### No Conflict Detection (Yet)
-
-If you accidentally assign the same key to two actions, the app won't warn you. Conflict detection is planned for version 0.57-beta.
-
-**Workaround:** Keep a checklist of your bindings.
+**Option 3: Comment out specific bindings**
+```yaml
+keybindings:
+  # quit: "ctrl+q"      # Commented out - reverts to default "q"
+  search: "ctrl+f"      # Still active
+```
 
 ---
 
-### Restart Required
+### ⚠️ Terminal Intercepts My Keybinding
 
-Changes don't take effect until you restart. Hot-reloading is planned for a future release.
+**Problem:** Your terminal or shell intercepts the keybinding before Hei-DataHub sees it.
+
+**Common conflicts:**
+
+| Key | Often Intercepted By | Solution |
+|-----|----------------------|----------|
+| `Ctrl+S` | Terminal flow control (XOFF) | Disable with `stty -ixon` |
+| `Ctrl+Q` | Terminal flow control (XON) | Disable with `stty -ixon` |
+| `Ctrl+C` | Terminal interrupt signal | Use different key |
+| `Ctrl+Z` | Suspend process | Use different key or `Ctrl+Shift+Z` |
+| `Alt+<key>` | Window manager shortcuts | Check WM config |
+
+**To disable flow control permanently:**
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+stty -ixon
+```
+
+**Debugging:** Try the key in a different terminal emulator to isolate the issue.
 
 ---
 
-### Some Keys Can't Be Rebound
+### ⚠️ Special Characters Don't Work
 
-System keys (like `Ctrl+c` in some terminals) may not be rebindable.
+**Problem:** Keys like `[`, `]`, `,` don't register properly.
 
----
-
-## Full Example Config
-
-Here's a complete config file with custom keybindings:
+**Solution:** Some special characters need to be spelled out:
 
 ```yaml
-# Hei-DataHub Configuration
-# ~/.config/hei-datahub/config.yaml
+keybindings:
+  action1: "left_bracket"   # Instead of "["
+  action2: "right_bracket"  # Instead of "]"
+  action3: "comma"          # Instead of ","
+```
 
-# Theme (choose from 12 built-in themes)
+**Tip:** Check the Textual framework documentation for special character names.
+
+---
+
+## Limitations & Future Features
+
+### ⏳ No Conflict Detection (Yet)
+
+**Current behavior:** If you assign the same key to two actions, the last one wins. No warning shown.
+
+**Workaround:** Manually audit your config file for duplicate keys.
+
+**Coming in v0.57-beta:** Automatic conflict detection with warnings.
+
+---
+
+### ⏳ Restart Required for Changes
+
+**Current behavior:** Changes to `config.yaml` only apply after restarting Hei-DataHub.
+
+**Workaround:** Quick restart after editing (takes only 300ms with warm cache).
+
+**Future improvement:** Hot-reloading configuration without restart (planned).
+
+---
+
+### ⚠️ Some Keys Can't Be Rebound
+
+**System-level keys** may be intercepted by your terminal or window manager:
+
+- `Ctrl+C` - Terminal interrupt signal
+- `Ctrl+Z` - Suspend process
+- `Ctrl+S` / `Ctrl+Q` - Flow control (unless disabled)
+- `Alt+Tab` - Window switching (OS-level)
+
+**Workaround:** Use alternative key combinations (e.g., `Ctrl+Shift+C` instead of `Ctrl+C`).
+
+---
+
+### 🔍 Limited Multi-Key Sequences
+
+**Current support:** Two-key sequences like `g g` (jump to top) work.
+
+**Not yet supported:** Complex sequences like `d i w` (Vim "delete inner word").
+
+**Workaround:** Use modifier combinations instead (`ctrl+shift+d`).
+
+---
+
+### 📝 No GUI Configuration
+
+**Current method:** Manual YAML editing.
+
+**Coming later:** Interactive keybinding configuration UI within the app.
+
+---
+
+## Complete Example Configuration
+
+Here's a production-ready config file showing best practices:
+
+```yaml
+# ~/.config/hei-datahub/config.yaml
+# Hei-DataHub Configuration File
+# Last updated: 2024
+
+# ============================================================
+# THEME
+# ============================================================
+# Choose from: catppuccin, dracula, gruvbox, monokai, nord,
+#              one-dark, rose-pine, solarized, tokyo-night, etc.
 theme: "gruvbox"
 
-# Custom keybindings
+# ============================================================
+# CUSTOM KEYBINDINGS
+# ============================================================
 keybindings:
-  # Global
-  quit: "ctrl+q"
-  help: "f1"
-  search: "ctrl+f"
-  settings: "ctrl+comma"
-  refresh: "f5"
+  # -------------------- GLOBAL ACTIONS --------------------
+  quit: "ctrl+q"              # Quit app (instead of 'q')
+  help: "f1"                  # Help screen (function key is standard)
+  search: "ctrl+f"            # Search datasets (like browsers/editors)
+  settings: "ctrl+comma"      # Open settings (VS Code style)
+  refresh: "f5"               # Refresh data (like browser refresh)
 
-  # Home screen
-  add_dataset: "ctrl+n"
-  open_dataset: "enter"
+  # -------------------- HOME SCREEN --------------------
+  add_dataset: "ctrl+n"       # New dataset (like "new file")
+  open_dataset: "enter"       # Open selected (already default)
+  delete_dataset: "ctrl+d"    # Delete (with confirmation)
 
-  # Details screen
-  edit_dataset: "f3"
-  publish_dataset: "ctrl+p"
-  copy_source: "ctrl+c"
-  open_url: "ctrl+o"
+  # Vim-style navigation (keep defaults, shown for reference)
+  vim_down: "j"               # Move down
+  vim_up: "k"                 # Move up
+  vim_top: "g g"              # Jump to top
+  vim_bottom: "shift+g"       # Jump to bottom
 
-  # Edit screen
-  save: "ctrl+s"
-  cancel: "escape"
-  undo: "ctrl+z"
-  redo: "ctrl+shift+z"
+  # Fast scrolling
+  page_down: "ctrl+d"         # Half-page down (Vim style)
+  page_up: "ctrl+u"           # Half-page up (Vim style)
 
-# GitHub integration (optional)
-github:
-  auto_open_pr: true
+  # -------------------- DETAILS SCREEN --------------------
+  edit_dataset: "f3"          # Quick edit (function key for speed)
+  publish_dataset: "ctrl+p"   # Publish to Heibox
+  copy_source: "ctrl+c"       # Copy source URL
+  open_url: "ctrl+o"          # Open URL in browser
+  back: "escape"              # Return to home (already default)
 
-# UI preferences
+  # -------------------- EDIT SCREEN --------------------
+  save: "ctrl+s"              # Save changes (universal convention)
+  cancel: "escape"            # Cancel editing (already default)
+  undo: "ctrl+z"              # Undo change (standard)
+  redo: "ctrl+y"              # Redo (Windows style, easier than ctrl+shift+z)
+  next_field: "tab"           # Move to next field (already default)
+  prev_field: "shift+tab"     # Move to previous field (already default)
+
+# ============================================================
+# HEIBOX INTEGRATION
+# ============================================================
+heibox:
+  server_url: "https://heibox.uni-heidelberg.de"
+  library_id: "your-library-uuid-here"
+  auto_sync: true             # Sync on save
+  sync_interval: 15           # Minutes between background syncs
+
+# ============================================================
+# UI PREFERENCES
+# ============================================================
 ui:
-  enable_critter_parade: false   # Disable animated critters (0.57+)
-  reduce_motion: false           # Accessibility setting
+  enable_critter_parade: true     # Animated critters on load
+  reduce_motion: false            # Accessibility: disable animations
+  startup_message: true           # Show welcome message
+  confirm_delete: true            # Confirm before deleting datasets
+
+# ============================================================
+# SEARCH SETTINGS
+# ============================================================
+search:
+  fuzzy_matching: true            # Allow typos in search
+  auto_complete: true             # Show suggestions as you type
+  max_results: 100                # Maximum search results to show
+  highlight_matches: true         # Highlight matched terms
+
+# ============================================================
+# PERFORMANCE
+# ============================================================
+performance:
+  cache_size_mb: 50               # Search index cache size
+  background_indexing: true       # Index while app runs
+  preload_datasets: true          # Load dataset list on startup
 ```
+
+**What makes this a good config?**
+
+✅ **Well-organized:** Sections with clear headers
+✅ **Commented:** Explains why each binding was chosen
+✅ **Consistent patterns:** All `ctrl+` for important actions
+✅ **Muscle memory friendly:** Matches common conventions (VS Code, browsers)
+✅ **Backwards compatible:** Doesn't override defaults that work well
+✅ **Documented:** Easy to understand and modify later
 
 ---
 
 ## Next Steps
 
-- **[Change your theme](09-change-theme.md)** to match your terminal
-- **[Configure GitHub integration](../reference/12-config.md#github-configuration)** for publishing
-- **[See all configuration options](../reference/12-config.md)** for more customization
+**Now that you've customized your keybindings:**
+
+- 🎨 **[Customize your theme](09-change-theme.md)** - Match your terminal color scheme with 12+ built-in themes
+- 📖 **[View complete settings reference](../reference/12-config.md)** - All configuration options documented
 
 ---
 
-## Related
+## Related Documentation
 
-- [Configuration reference](../reference/12-config.md)
-- [Keyboard shortcuts reference](../reference/keybindings.md)
-- [Theme customization](09-change-theme.md)
-- [FAQ](../help/90-faq.md)
+- **[Settings Guide](04-settings.md)** - Complete configuration walkthrough
+- **[Change Theme](09-change-theme.md)** - Visual customization
+- **[Advanced Search](07-search-advanced.md)** - Search techniques and shortcuts
+- **[Configuration Reference](../reference/12-config.md)** - Full config file specification
+- **[FAQ](../help/90-faq.md)** - Common questions and troubleshooting
+
+---
+
+**Questions or issues?** Check the [FAQ](../help/90-faq.md) or open an issue on our repository.
