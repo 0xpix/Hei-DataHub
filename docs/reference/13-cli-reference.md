@@ -1,5 +1,7 @@
 # CLI Reference
 
+**(req. Hei-DataHub 0.59-beta or later)**
+
 Complete reference for Hei-DataHub command-line interface.
 
 ---
@@ -20,7 +22,7 @@ Show version number and exit.
 
 ```bash
 hei-datahub --version
-# Output: Hei-DataHub 0.58.1-beta
+# Output: Hei-DataHub 0.59.0-beta
 ```
 
 ### `--version-info`
@@ -37,10 +39,10 @@ hei-datahub --version-info
 ║               Hei-DataHub Version Info                   ║
 ╚══════════════════════════════════════════════════════════╝
 
-Version:        0.58.1-beta
-Codename:       Streamline
-Release Date:   2025-10-08
-Compatibility:  Hei-DataHub v0.58.x (beta)
+Version:        0.59.0-beta
+Codename:       Privacy
+Release Date:   2025-10-25
+Compatibility:  Hei-DataHub v0.59.x (beta)
 
 Python:         3.11.5
 Platform:       Linux-6.5.0-15-generic-x86_64
@@ -92,6 +94,8 @@ hei-datahub --set search.debounce_ms=200 --set ui.theme=dark
 
 ---
 
+---
+
 ## Commands
 
 ### `hei-datahub` (default)
@@ -100,35 +104,184 @@ Launch the TUI (Terminal User Interface).
 
 ```bash
 hei-datahub
-# or with data directory override:
-hei-datahub --data-dir ~/my-data
 ```
 
 **What it does:**
-- Initializes workspace (creates directories if needed)
-- Ensures database is created and indexed
+- Initializes local cache directory (~/.cache/hei-datahub/)
+- Syncs index from Heibox cloud storage
 - Launches interactive TUI
 
 **Keyboard shortcuts:**
-- See [Navigation Guide](02-navigation.md) for full keybindings
+- See [Customize Keybindings](../how-to/08-customize-keybindings.md) for full reference
 
 ---
 
-### `hei-datahub doctor` ⭐ New in v0.58.1
+### `hei-datahub auth` ⭐ New in v0.59-beta
+
+Manage Heibox/WebDAV authentication credentials.
+
+#### `hei-datahub auth setup`
+
+Interactive wizard to configure Heibox/WebDAV credentials.
+
+```bash
+hei-datahub auth setup
+```
+
+**Prompts:**
+
+1. 📍 **Server URL:** `https://heibox.uni-heidelberg.de`
+2. 👤 **Username:** Your Heibox username
+3. 🔐 **Password:** Your WebDAV password
+4. 📁 **Library ID:** UUID from Heibox library settings
+
+**Example session:**
+
+```
+📍 Enter your Heibox/WebDAV server URL
+   Example: https://heibox.uni-heidelberg.de
+   → https://heibox.uni-heidelberg.de
+
+👤 Enter your Heibox username
+   → john.doe
+
+🔐 Enter your WebDAV password
+   (This is your WebDAV-specific password, not your web login password)
+   → ••••••••••••
+
+📁 Enter your Heibox library ID
+   Find this in: Library Settings → Advanced
+   → abc123-def456-ghi789
+
+🔍 Testing connection...
+✅ Connection successful!
+✅ Credentials saved to system keyring
+
+🎯 Setup complete! You can now use hei-datahub to sync with Heibox.
+```
+
+**What it does:**
+- Validates each input
+- Tests WebDAV connection
+- Saves credentials to system keyring (encrypted)
+- Updates config file with server URL and library ID
+
+#### `hei-datahub auth status`
+
+Check current Heibox connection status.
+
+```bash
+hei-datahub auth status
+```
+
+**Output examples:**
+
+```
+✅ Connected to Heibox
+   Server: https://heibox.uni-heidelberg.de
+   Username: john.doe
+   Library: abc123-def456-ghi789
+   Status: Online
+```
+
+```
+⚠ Heibox configured but connection failed
+   Server: https://heibox.uni-heidelberg.de
+   Username: john.doe
+   Error: Authentication failed (401)
+
+   Run 'hei-datahub auth doctor' for troubleshooting
+```
+
+```
+○ Heibox not configured
+   Run 'hei-datahub auth setup' to configure
+```
+
+#### `hei-datahub auth doctor`
+
+Troubleshoot Heibox connection issues.
+
+```bash
+hei-datahub auth doctor
+```
+
+**What it checks:**
+
+- ✓ Credentials present in keyring
+- ✓ Server URL reachable
+- ✓ Authentication successful
+- ✓ Library ID valid
+- ✓ Read/write permissions
+- ✓ Network connectivity
+- ✓ TLS/SSL certificate valid
+
+**Example output:**
+
+```
+╔══════════════════════════════════════════════════════════╗
+║          Heibox Connection Diagnostics                   ║
+╚══════════════════════════════════════════════════════════╝
+
+✓ Credentials: Found in system keyring
+✓ Server: https://heibox.uni-heidelberg.de reachable
+✓ Authentication: Successful (200 OK)
+✓ Library: abc123-def456-ghi789 accessible
+✓ Permissions: Read and write OK
+✓ Network: HTTPS connection established
+✓ Certificate: Valid until 2026-01-15
+
+────────────────────────────────────────────────────────────
+✓ All checks passed — connection healthy
+```
+
+**Exit codes:**
+- `0`: Connection healthy
+- `1`: Credentials missing
+- `2`: Server unreachable
+- `3`: Authentication failed
+- `4`: Library not accessible
+- `5`: Permission denied
+
+#### `hei-datahub auth clear`
+
+Remove Heibox credentials from system keyring.
+
+```bash
+hei-datahub auth clear
+```
+
+**Prompts for confirmation:**
+
+```
+⚠ This will remove your Heibox credentials from the system keyring.
+   You will need to run 'hei-datahub auth setup' again to reconnect.
+
+Continue? [y/N]: y
+
+✅ Credentials cleared successfully
+```
+
+**Use cases:**
+- Switching to different account
+- Troubleshooting authentication issues
+- Uninstalling/cleanup
+
+---
+
+### `hei-datahub doctor`
 
 Run comprehensive system diagnostics and health checks.
 
 ```bash
 hei-datahub doctor
-# or with data directory override:
-hei-datahub doctor --data-dir ~/my-data
 ```
 
 **Exit codes:**
 - `0`: System healthy
 - `1`: Directory missing or cannot be created
 - `2`: Permission error
-- `3`: Data present but unreadable/invalid
+- `3`: Heibox connection failed
 
 **Sample output:**
 
@@ -142,25 +295,20 @@ hei-datahub doctor --data-dir ~/my-data
   Python: 3.11.5
   Platform: linux
 
-✓ Data Directory: Data directory accessible
-  /home/user/.local/share/Hei-DataHub (OS default (linux))
+✓ Cache Directory: Cache directory accessible
+  /home/user/.cache/hei-datahub/ (OS default)
   ✓ Directory exists
   ✓ Read access
   ✓ Write access
 
-✓ Datasets: 4 dataset(s) available
-  Found 4 dataset(s):
-  ✓ burned-area
-  ✓ land-cover
-  ✓ precipitation
-  ✓ testing-the-beta-version
+✓ Heibox Connection: Connected and synced
+  Server: https://heibox.uni-heidelberg.de
+  Library: abc123-def456-ghi789
+  Status: ☁ Synced (12 datasets)
 
-✓ Database: Initialized (48.5 KB)
-  4 indexed dataset(s)
-
-✓ Migration: Not applicable (Linux)
-
-✓ Filename Sanitation: Not applicable (not Windows)
+✓ Database: Initialized (156.3 KB)
+  12 indexed dataset(s)
+  Last sync: 2 minutes ago
 
 ────────────────────────────────────────────────────────────
 ✓ All checks passed — system healthy
@@ -168,33 +316,32 @@ hei-datahub doctor --data-dir ~/my-data
 
 **What it checks:**
 - OS and Python runtime information
-- Data directory resolution and access (read/write/create)
-- Dataset count and metadata health
+- Cache directory access (read/write/create)
+- Heibox connection status
 - Database initialization and indexed count
-- Legacy path migration needs (Windows/macOS)
-- Windows filename sanitation issues
+- Last sync timestamp
 
 **Use cases:**
-- Troubleshooting "data not found" issues
+- Troubleshooting connection issues
 - Verifying installation after setup
-- Checking permissions before team deployment
-- Diagnosing cross-platform issues
+- Checking permissions
+- Diagnosing sync problems
 
 ---
 
 ### `hei-datahub reindex`
 
-Rebuild the search index from YAML metadata files.
+Rebuild the search index from Heibox cloud storage.
 
 ```bash
 hei-datahub reindex
 ```
 
 **When to use:**
-- After manually editing `metadata.yaml` files outside the TUI
-- After git pull/merge that changed datasets
+- After team members add/edit datasets in Heibox
 - If search results seem stale or incorrect
 - Database corruption recovery
+- Force full sync from cloud
 
 **Output example:**
 
