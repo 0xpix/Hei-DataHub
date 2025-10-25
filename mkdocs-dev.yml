@@ -120,6 +120,30 @@ extra:
 nav:
   - Home: index.md
 
+  - 🎓 Learning Guide:
+    - Start Here: learn/README.md
+    - Welcome:
+      - Overview & Roadmap: learn/00-overview.md
+      - What Is Hei-DataHub?: learn/01-what-is-hei-datahub.md
+      - How It Works (Architecture): learn/01-architecture.md
+      - Installing & Running Locally: learn/02-setup.md
+
+    - Build the TUI:
+      - 01. Layout Basics: learn/tui/01-layout-basics.md
+      - 02. Creating Views & Widgets: learn/tui/02-widgets.md
+      - 03. Styling & Themes: learn/tui/03-styling.md
+      - 04. Keyboard Shortcuts & Events: learn/tui/04-keybindings.md
+      - 05. Adding Your Own Screen: learn/tui/05-custom-view.md
+
+    - Add Functionality:
+      - 01. Linking UI to Data: learn/logic/01-ui-actions.md
+
+    - Deep Dive:
+      - 01. Directory Structure: learn/deep/01-directory-structure.md
+
+    - Advanced Topics:
+      - 01. Adding New Features: learn/advanced/01-extending.md
+
   - Quick Start:
     - Getting Started: quickstart/getting-started.md
     - First Contribution: quickstart/first-contribution.md
