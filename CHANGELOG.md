@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.59.0-beta] - 2025-10-10 - Privacy
+## [0.59.0-beta] - 2025-10-25 - Privacy
 
 **WebDAV migration complete!** This release replaces GitHub-based catalog with direct WebDAV (HeiBox) cloud storage for datasets.
 
