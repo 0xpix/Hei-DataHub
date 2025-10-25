@@ -377,29 +377,7 @@ Hei-DataHub/
 
 **Extension Point:** ⚠️ Limited (hardcoded git commands)
 
----
-
-### `infra/github_api.py`
-
-**Purpose:** GitHub API client for creating PRs
-
-**Responsibilities:**
-- Authenticate with GitHub (PAT from keyring)
-- Create pull requests
-- Get PR status
-- Handle API errors
-
-**Key Functions:**
-- `create_pr(title, body, base, head) -> PRInfo`: Create a pull request
-- `get_pr(pr_number) -> PRInfo`: Get PR details
-- `authenticate()`: Load PAT from keyring
-
-**Dependencies:**
-- `requests`
-- `keyring`
-- `core.models` (PRInfo)
-
-**Extension Point:** ✅ Can swap for GitLab, Bitbucket, etc.
+**Note:** Git integration removed in v0.59.0-beta. Use WebDAV sync instead.
 
 ---
 
