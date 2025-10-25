@@ -305,6 +305,6 @@ telemetry:
 
 ## Getting Help
 
-- Check the [FAQ](../help/faq.md)
+- Check the [FAQ](../help/90-faq.md)
 - Report issues: [GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)
 - Examples: See `~/.config/hei-datahub/config.yaml` for inline documentation
