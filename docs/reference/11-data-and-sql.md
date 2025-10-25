@@ -1,27 +1,38 @@
 # Data & SQL Reference
 
+**(req. Hei-DataHub 0.59-beta or later)**
+
 ## Data Storage Architecture
 
-Hei-DataHub uses a **dual-storage model**:
+Hei-DataHub v0.59-beta uses a **cloud-first storage model**:
 
-1. **YAML files** — Source of truth for metadata (one per dataset)
-2. **SQLite database** — Search index + full payload cache
+1. **Heibox/WebDAV Cloud Storage** — Source of truth for dataset YAML files (team-shared)
+2. **Local SQLite Index** — Cached search index for fast queries (user-specific)
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  YAML Files (data/)                             │  ← Source of Truth
-│  - Human-readable                               │
-│  - Version-controlled (Git)                     │
-│  - Portable                                     │
+│  Heibox Cloud Storage (WebDAV)                  │  ← Source of Truth
+│  - YAML files stored in Seafile library         │
+│  - Shared across team via cloud                 │
+│  - Accessed via HTTPS (encrypted in transit)    │
 └─────────────────────────────────────────────────┘
-              ↓ (indexed by)
+              ↓ (synced & indexed)
 ┌─────────────────────────────────────────────────┐
-│  SQLite Database (db.sqlite)                    │  ← Search Index
+│  Local SQLite Index (~/.cache/hei-datahub/)     │  ← Search Cache
 │  - FTS5 full-text search                        │
-│  - BM25 ranking                                 │
-│  - Fast querying                                │
+│  - BM25 ranking algorithm                       │
+│  - Background sync every 15 minutes             │
+│  - Fast queries (<80ms average)                 │
 └─────────────────────────────────────────────────┘
 ```
+
+**Key differences from v0.58 and earlier:**
+
+❌ **No local YAML files** - Datasets are NOT stored in `data/` directory
+❌ **No Git workflow** - No PRs, branches, or local Git repository needed
+✅ **Cloud-only storage** - All datasets live in Heibox (Seafile)
+✅ **Instant team sync** - Changes visible immediately to all team members
+✅ **Local index only** - SQLite database is just a search cache
 
 ---
 
@@ -101,31 +112,37 @@ CREATE VIRTUAL TABLE IF NOT EXISTS datasets_fts USING fts5(
 
 ---
 
-## Data Location (Beta)
+## Data Location
 
-In **v0.55.x beta**, data lives **inside the app repository**:
+In **v0.59-beta**, datasets are stored in **Heibox cloud storage only**:
 
 ```
-Hei-DataHub/                 ← App repo
-├── data/                    ← All datasets
-│   ├── weather-q1/
-│   │   └── metadata.yaml
-│   ├── burned-area/
-│   │   └── metadata.yaml
-│   └── ...
-├── db.sqlite                ← Search index
+Heibox Library (cloud)       ← Source of Truth
+├── weather-q1.yaml          ← Dataset files stored in Seafile
+├── burned-area.yaml
+├── climate-model.yaml
+└── ...
+
+~/.cache/hei-datahub/        ← Local cache (user-specific)
+├── index.db                 ← SQLite search index
 └── ...
 ```
 
-**Why?**
+**Important notes:**
 
-- **Simple setup:** Clone and go
-- **Version control:** Metadata changes tracked in Git
-- **Easy sharing:** Fork repo to share datasets
+❌ **No `data/` directory** - Datasets are NOT stored locally
+✅ **Cloud-first** - YAML files live in Heibox (accessed via WebDAV)
+✅ **SQLite is cache** - Local index rebuilds from cloud if cleared
+✅ **Background sync** - Index updates every 15 minutes automatically
 
-**Future (post-beta):**
+**Configuration required:**
 
-Separate data repo or configurable data directory via `catalog_repo_path` setting.
+```bash
+# Set up WebDAV credentials
+hei-datahub auth setup
+```
+
+See [Configure Heibox Integration](../how-to/04-settings.md) for details.
 
 ---
 
@@ -133,7 +150,7 @@ Separate data repo or configurable data directory via `catalog_repo_path` settin
 
 ### Required Fields (Schema Enforced)
 
-These must be present in every `metadata.yaml`:
+These must be present in every dataset YAML file:
 
 | Field | Type | Constraint | Example |
 |-------|------|------------|---------|
