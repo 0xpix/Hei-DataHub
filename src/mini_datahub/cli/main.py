@@ -724,7 +724,7 @@ def main():
 
     parser_auth_clear = auth_subparsers.add_parser(
         "clear",
-        help="Clear stored WebDAV credentials"
+        help="Clear stored WebDAV credentials and search index"
     )
     parser_auth_clear.add_argument(
         "--force",
