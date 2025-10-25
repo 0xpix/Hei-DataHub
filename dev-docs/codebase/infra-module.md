@@ -327,54 +327,6 @@ def get_platform_config_dir() -> Path:
 
 ---
 
-### Git Operations (Legacy)
-
-#### `git.py` - Git Repository Operations
-
-**Purpose:** Git operations for catalog repository (legacy from GitHub-based workflow)
-
-**Status:** 🔴 **Deprecated** - Being phased out in favor of WebDAV sync
-
-**Key Functions:**
-
-```python
-def clone_catalog(repo_url: str, target_dir: Path) -> None:
-    """Clone catalog repository"""
-
-def pull_catalog(repo_dir: Path) -> None:
-    """Pull latest changes from remote"""
-
-def has_local_changes(repo_dir: Path) -> bool:
-    """Check if local changes exist"""
-```
-
-**Migration Note:**
-
-```python
-# OLD (v0.57 and earlier):
-clone_catalog("https://github.com/user/catalog.git", DATA_DIR)
-pull_catalog(DATA_DIR)
-
-# NEW (v0.58+):
-from mini_datahub.services.sync import sync_now
-sync_now()  # Uses WebDAV instead
-```
-
----
-
-#### `github_api.py` - GitHub API Client
-
-**Purpose:** GitHub API operations (legacy)
-
-**Status:** 🔴 **Deprecated** - No longer used in cloud-first architecture
-
-**Historical Context:**
-- Used in v0.57.x for catalog sync
-- Replaced by WebDAV in v0.58.x
-- Kept for backward compatibility only
-
----
-
 ### SQL Schema Files
 
 #### `sql/schema.sql` - Database Schema
