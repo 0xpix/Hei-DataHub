@@ -1,22 +1,20 @@
 # Add Your First Dataset
 
-**Requirements:** Hei-DataHub 0.56-beta or later
+**Requirements:** Hei-DataHub 0.59-beta or later, WebDAV configured
 
 Learn how to add a dataset to Hei-DataHub, understand the metadata fields, and follow best practices for creating high-quality catalog entries.
-
-**Note :** This is just a beta version of the feature, will add more form fields in future releases.
 
 ---
 
 ## Overview
 
-Adding a dataset in Hei-DataHub creates a metadata record that helps you and your team find, understand, and use data assets. This guide covers:
+Adding a dataset in Hei-DataHub creates a metadata record that is **instantly synced to Heibox** (if configured), making it available to your team immediately. This guide covers:
 
 - Opening the Add Dataset form
 - Understanding required vs. optional fields
-- What happens when you save
+- What happens when you save (cloud sync)
 - Best practices for each field
-- Saving and verifying your dataset
+- Verifying your dataset
 
 **Time:** 5-10 minutes per dataset
 
@@ -27,17 +25,19 @@ Adding a dataset in Hei-DataHub creates a metadata record that helps you and you
 ### 1. Launch Hei-DataHub
 
 ```bash
-# Navigate to your Hei-DataHub directory
-cd /path/to/Hei-DataHub
-
-# Activate virtual environment (if needed)
-source .venv/bin/activate
-
-# Launch the TUI
 hei-datahub
 ```
 
-**Expected:** Home screen with search bar and dataset list.
+**Expected:** Home screen with search bar and Heibox status indicator:
+- ` Synced to Hei-box` (green) - Ready to add datasets
+- `⚠ Hei-box Configured (connection failed)` (yellow) - Check auth
+- `○ Hei-box Not Connected` (gray) - Run `hei-datahub auth setup`
+
+**First time?** Configure WebDAV:
+```bash
+hei-datahub auth setup  # Interactive wizard (3 minutes)
+```
+See [Settings Guide](04-settings.md) for detailed setup instructions.
 
 ---
 
@@ -50,12 +50,19 @@ Press **`a`** to open the Add Dataset form.
 **Keyboard shortcuts:**
 
 - `Tab` / `Shift+Tab` - Move between fields
-- `Ctrl+s` - Save dataset and publish
+- `Ctrl+s` - Save dataset and upload to Heibox
 - `Escape` - Cancel and close form
+
+**What happens when you save:**
+1. Metadata saved locally as `metadata.yaml`
+2. **Instantly uploaded to Heibox** (if connected)
+3. Search index updated automatically
+4. Dataset appears in team's catalog immediately
+5. No pull requests or approvals needed!
 
 ---
 
-## Understanding the Form Fields
+## Understanding the Form Fields - Everything will change in future releases (probably in v0.60-beta)
 
 ### Required Fields (*)
 
@@ -313,8 +320,13 @@ Let's add a real dataset together.
 **Expected:**
 
 - ✅ "Dataset saved successfully!" notification
+- ✅ "Uploading to Heibox..." progress indicator
+- ✅ "✓ Synced to Hei-box" confirmation
 - ✅ Form closes, returns to Home screen
 - ✅ New dataset appears in results
+- ✅ **Team members see it immediately** (no waiting for PR merge)
+
+**Note:** If Heibox is not configured, dataset is saved locally only. Configure with `hei-datahub auth setup`.
 
 ---
 
@@ -354,20 +366,32 @@ All Datasets (45 total)
 
 **Expected:** Full metadata displayed with all fields you entered.
 
-3. Press `Escape` or `b` to go back
+3. Press `Escape` to go back
 
 ---
 
-### 4. Find the YAML File
+### 4. View Dataset in Heibox
 
-Hei-DataHub stores metadata as YAML files in the `data/` directory.
+Hei-DataHub stores metadata **directly in Heibox** (cloud-only, no local copies).
 
-```bash
-# View the metadata file
-cat data/global-weather-stations-2024/metadata.yaml
+**Heibox location:**
+```
+https://heibox.uni-heidelberg.de/library/your-library-name/global-weather-stations-2024/metadata.yaml
 ```
 
-**Expected output:**
+**To view locally, you can download it:**
+```bash
+# Download from Heibox via WebDAV
+curl -u "username@auth.local:your-webdav-password" \
+  https://heibox.uni-heidelberg.de/seafdav/your-library/global-weather-stations-2024/metadata.yaml
+```
+
+**Or use the TUI:**
+1. Navigate to the dataset
+2. Press `Enter` or `o` to view full details
+3. All metadata is displayed from cloud storage
+
+**Expected YAML format:**
 
 ```yaml
 id: global-weather-stations-2024
@@ -402,7 +426,7 @@ notes: |
   See quality report: https://example.com/qc-report.pdf
 ```
 
-**Tip:** You can also edit this file directly and reindex to update the dataset.
+**Tip:** Datasets are stored **cloud-only** in Heibox. The local SQLite index caches metadata for fast search, but the source of truth is always in the cloud. Edits made in Heibox will sync automatically when you launch the TUI.
 
 ---
 
@@ -517,61 +541,27 @@ used_in_projects:
 
 ### 8. Storage Location Best Practices
 
+**Cloud-first workflow (v0.59+):**
+
+All datasets are automatically synced to Heibox when you save. The storage location field describes where your **actual data files** are stored (not the metadata).
+
 **Be specific:**
 
+- ✅ `heibox://library-name/folder/` (stored in your Heibox library)
 - ✅ `s3://my-bucket/climate/temperature/v2/`
 - ✅ `/mnt/data/projects/climate/processed/`
 - ✅ `Google Earth Engine: MODIS/061/MCD64A1`
+- ❌ Avoid vague locations like "server" or "cloud"
 
 **Add context in Notes if needed:**
 ```
-Storage: s3://my-bucket/climate/
-Access: Requires AWS credentials (see team wiki)
+Storage: heibox://climate-data/temperature/
+Access: Team members with library access
 Structure: /YYYY/MM/DD/filename_YYYYMMDD.tif
+Metadata: Auto-synced to Heibox
 ```
 
----
-
-## Common Issues & Solutions
-
-### "Required field missing"
-
-**Cause:** One or more required fields (*) left empty.
-
-**Solution:** Fill in all fields marked with asterisk: Name, Description, Source, Storage Location.
-
----
-
-### "ID must match pattern [a-z0-9-_]+"
-
-**Cause:** Dataset ID contains uppercase letters or special characters.
-
-**Solution:** Leave the ID field **empty** to auto-generate from name, or use only lowercase letters, numbers, dashes, and underscores.
-
----
-
-### Dataset not appearing in search
-
-**Cause:** Search index not updated after manual edits.
-
-**Solution:**
-```bash
-hei-datahub reindex
-```
-
-Then relaunch the TUI.
-
----
-
-### Duplicate dataset error
-
-**Cause:** A dataset with the same ID already exists.
-
-**Solution:**
-
-1. Choose a more specific name (e.g., add year or version)
-2. Or delete the existing dataset first
-3. Or provide a custom ID
+**Note:** Metadata is always synced to Heibox. Storage location refers to your data files.
 
 ---
 
@@ -585,19 +575,22 @@ You can edit datasets directly in the TUI using inline editing:
 
 ## Deleting Datasets
 
-### Option 1: Via File System
+### Option 1: Via TUI (Recommended)
 
-```bash
-# Remove the dataset directory
-rm -rf data/global-weather-stations-2024/
+1. Navigate to the dataset
+2. Press `d` to delete
+3. Confirm deletion
+4. **Metadata removed from Heibox immediately**
 
-# Update the search index
-hei-datahub reindex
-```
+### Option 2: Via Heibox Web Interface
 
-### Option 2: Via TUI (Future Feature)
+1. Log in to Heibox
+2. Navigate to your library
+3. Find the dataset folder
+4. Delete it
+5. **Changes sync automatically** on next TUI launch
 
-Delete functionality in the TUI is planned for v0.58-beta.
+**Note:** There are no local files to delete. All data is stored in Heibox cloud storage only. The local SQLite index updates automatically.
 
 ---
 
@@ -626,17 +619,17 @@ Try adding another dataset to build muscle memory:
 
 ✅ **You can now add datasets!** Here's what to explore next:
 
-1. **[Search & Filters](07-search-advanced.md)** — Find datasets with field-specific queries
-2. **[Edit Datasets](06-edit-datasets.md)** — Modify metadata using inline editing (v0.56+)
-3. **[Configure GitHub](04-settings.md)** — Enable PR workflow for team collaboration
-4. **[Customize Keybindings](08-customize-keybindings.md)** — Optimize your workflow
-5. **[Change Theme](09-change-theme.md)** — Personalize the interface
+1. **[Edit Datasets](06-edit-datasets.md)** — Modify metadata using inline editing
+2. **[Search & Filters](07-search-advanced.md)** — Find datasets with field-specific queries
+3. **[Search Autocomplete](08-search-autocomplete.md)** - Autocomplete feature
 
 ---
 
 ## Related Documentation
 
+- **[Settings Guide](04-settings.md)** - Configure Heibox/WebDAV integration
 - **[The Basics](../getting-started/03-the-basics.md)** - Core concepts and workflows
 - **[Search Syntax Reference](../reference/search-syntax.md)** - Complete query grammar
+- **[Privacy & Security](../privacy-and-security.md)** - How credentials are stored
 - **[FAQ](../help/90-faq.md#dataset-management)** - Common dataset questions
 - **[Troubleshooting](../help/troubleshooting.md)** - Solve common issues
