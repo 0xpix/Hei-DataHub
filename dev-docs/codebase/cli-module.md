@@ -534,7 +534,7 @@ hei-datahub update install
 
 ```python
 def handle_update_check(args):
-    """Check for newer version on GitHub"""
+    """Check for newer version"""
     from mini_datahub.services.update_check import check_for_updates
 
     print("Checking for updates...")
@@ -607,23 +607,21 @@ def run_diagnostics(verbose=False):
 
 **Purpose:** Check and install updates
 
-**GitHub Release Checking:**
+**Version Checking:**
 
 ```python
 def check_for_updates() -> UpdateInfo | None:
-    """Check GitHub releases for newer version"""
-    url = "https://api.github.com/repos/0xpix/Hei-DataHub/releases/latest"
+    """Check for newer version"""
+    # Implementation varies based on distribution method
+    # May check package repository, download server, etc.
 
-    response = requests.get(url)
-    data = response.json()
-
-    latest_version = data["tag_name"].lstrip("v")
+    latest_version = get_latest_version()
 
     if version.parse(latest_version) > version.parse(__version__):
         return UpdateInfo(
             version=latest_version,
-            url=data["html_url"],
-            release_notes=data["body"]
+            url=get_download_url(latest_version),
+            release_notes=get_release_notes(latest_version)
         )
 
     return None
