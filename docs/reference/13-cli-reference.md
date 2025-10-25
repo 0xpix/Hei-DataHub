@@ -627,7 +627,7 @@ hei-datahub keymap import keybindings.yaml
 
 ## See Also
 
-- [Getting Started](01-getting-started.md) — Installation guide
-- [Navigation](02-navigation.md) — Keyboard shortcuts in TUI
-- [Troubleshooting](installation/troubleshooting.md) — Common issues and solutions
+- [Getting Started](../getting-started/01-getting-started.md) — Installation guide
+- [Navigation](../getting-started/02-navigation.md) — Keyboard shortcuts in TUI
+- [Troubleshooting](../installation/troubleshooting.md) — Common issues and solutions
 - [Data & SQL](11-data-and-sql.md) — Understanding the data model
