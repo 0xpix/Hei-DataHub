@@ -258,7 +258,7 @@ If you want to customize icons:
 
 ## API Reference
 
-See [`hei_datahub.desktop_install`](../src/hei_datahub/desktop_install.py) for the full Python API.
+The desktop integration is managed through the `hei-datahub desktop install` command.
 
 ### Key Functions
 
