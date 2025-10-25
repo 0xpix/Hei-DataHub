@@ -1,5 +1,8 @@
 # Hei-DataHub Developer Documentation
 
+!!! tip "🎓 New Learning Guide Available!"
+    **Want to understand how to build Hei-DataHub from scratch?** Check out our new [**Step-by-Step Learning Guide**](learn/README.md) — a comprehensive tutorial that teaches you the TUI, architecture, and how every piece works. Perfect for new contributors!
+
 !!! warning "Developer Documentation Site"
     **You are viewing the developer documentation.** This site is for contributors, maintainers, and integrators.
     Looking for user documentation? → [**User Manual**](https://0xpix.github.io/Hei-DataHub)
@@ -15,6 +18,7 @@
 
 This is the **comprehensive technical reference** for Hei-DataHub internals. Whether you're:
 
+- 🎓 **Learning how to build** a TUI app with Textual → [**Start the Learning Guide**](learn/README.md)
 - 🔧 **Contributing code** to the project
 - 🏗️ **Understanding the architecture** before diving in
 - 🐛 **Debugging an issue** deep in the stack
@@ -26,13 +30,32 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 ---
 
+## 🎓 New to the Project?
+
+**Start with the Learning Guide** — a step-by-step tutorial that teaches you how to build Hei-DataHub from scratch:
+
+- [**Learning Guide Home**](learn/README.md) — Master index and roadmap
+- [**What is Hei-DataHub?**](learn/01-what-is-hei-datahub.md) — Problem, solution, and overview
+- [**How It Works (Architecture)**](learn/01-architecture.md) — System design deep dive
+- [**Installing & Running Locally**](learn/02-setup.md) — Get it running in 5 minutes
+- [**Building the TUI**](learn/tui/01-layout-basics.md) — Create beautiful terminal interfaces
+- [**Adding Functionality**](learn/logic/01-ui-actions.md) — Connect UI to backend logic
+
+**Estimated time:** 2-3 hours for core concepts, 12-16 hours for full mastery.
+
+---
+
 ## Site Navigation Quick Start
 
 <div class="grid cards" markdown>
 
+-   **[🎓 Learning Guide](learn/README.md)**
+
+    **NEW!** Step-by-step tutorials teaching you how to build Hei-DataHub from scratch. Perfect for beginners!
+
 -   **[Architecture Overview](architecture/overview.md)**
 
-    Start here! Cloud-first system design, WebDAV integration, data flow, and component diagrams.
+    Cloud-first system design, WebDAV integration, data flow, and component diagrams.
 
 -   **[Authentication & Sync](architecture/auth-and-sync.md)**
 
