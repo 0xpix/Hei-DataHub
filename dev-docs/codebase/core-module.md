@@ -356,7 +356,7 @@ parsed = parser.parse(query)
 
 | Field | Alias | Example | Description |
 |-------|-------|---------|-------------|
-| `source` | - | `source:github` | Filter by data source |
+| `source` | - | `source:webdav` | Filter by data source |
 | `format` | - | `format:csv` | Filter by file format |
 | `type` | - | `type:temperature` | Filter by data type |
 | `tag` | `tags` | `tag:climate` | Filter by tag |
