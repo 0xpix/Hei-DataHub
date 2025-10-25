@@ -63,8 +63,7 @@ def _build_bindings_from_config() -> list[Binding]:
             Binding("s", "settings", "Settings", key_display="s"),
             Binding("o", "open_details", "Open", show=False),
             Binding("enter", "open_details", "View Details", show=False),
-            Binding("p", "outbox", "Outbox", key_display="p"),
-            Binding("u", "pull_updates", "Pull", key_display="u"),
+            Binding("u", "pull_updates", "Update", key_display="u"),
             Binding("r", "refresh_data", "Refresh", key_display="r"),
             Binding("q", "quit", "Quit", key_display="^q"),
             Binding("j", "move_down", "Down", show=False),
@@ -837,13 +836,8 @@ class HomeScreen(Screen):
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
-        from mini_datahub.ui.views.settings_menu import SettingsMenuScreen
-        self.app.push_screen(SettingsMenuScreen())
-
-    def action_outbox(self) -> None:
-        """Open outbox screen (P key)."""
-        from mini_datahub.ui.views.outbox import OutboxScreen
-        self.app.push_screen(OutboxScreen())
+        from mini_datahub.ui.views.settings import SettingsScreen
+        self.app.push_screen(SettingsScreen())
 
     def action_pull_updates(self) -> None:
         """Start pull updates task."""
@@ -882,8 +876,7 @@ class HelpScreen(Screen):
   [cyan]G[/cyan]           Jump to last dataset
   [cyan]o / Enter[/cyan]   Open selected dataset details
   [cyan]A[/cyan]           Add new dataset
-  [cyan]S[/cyan]           Settings (GitHub config)
-  [cyan]P[/cyan]           Outbox (retry failed PRs)
+  [cyan]S[/cyan]           Settings
   [cyan]Esc[/cyan]         Exit Insert mode / Clear search
   [cyan]q[/cyan]           Quit application
   [cyan]?[/cyan]           Show this help
@@ -3110,7 +3103,7 @@ class AddDataScreen(Screen):
             # Fallback case (shouldn't reach here)
             pass
         else:
-            self.app.notify(f"⚠ PR failed (saved to outbox): {message}", severity="warning", timeout=5)
+            self.app.notify(f"⚠ PR failed: {message}", severity="warning", timeout=5)
 
 
 class DataHubApp(App):
@@ -3326,7 +3319,7 @@ class DataHubApp(App):
                             try:
                                 update_status = screen.query_one("#update-status", Static)
                                 update_status.update(
-                                    f"[bold]⬇ {commits_behind} Update{plural} Available[/bold]  •  Press [bold]U[/bold] to pull updates"
+                                    f"[bold]⬇ {commits_behind} Update{plural} Available[/bold]  •  Press [bold]U[/bold] to update"
                                 )
                                 update_status.remove_class("hidden")
                             except Exception:
@@ -3337,7 +3330,7 @@ class DataHubApp(App):
 
                 # Show persistent notification (no timeout)
                 self.notify(
-                    f"⬇ {commits_behind} update{plural} available. Press [bold]U[/bold] to pull.",
+                    f"⬇ {commits_behind} update{plural} available. Press [bold]U[/bold] to update.",
                     severity="information"
                 )
         except Exception:
