@@ -148,9 +148,7 @@ src/mini_datahub/              # Main Python package
 │   ├── config_paths.py        # XDG Base Directory config resolution
 │   ├── platform_paths.py      # Cross-platform path handling
 │   ├── index.py               # Search index operations (FTS5)
-│   ├── store.py               # YAML/JSON file I/O
-│   ├── git.py                 # Git operations (legacy, optional)
-│   └── github_api.py          # GitHub API client (legacy, optional)
+│   └── store.py               # YAML/JSON file I/O
 │
 ├── services/                  # Business logic layer
 │   ├── __init__.py
