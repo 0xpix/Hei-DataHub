@@ -2,15 +2,14 @@
 
 ## What is Hei-DataHub?
 
-**Hei-DataHub** is a terminal-based application (TUI) designed to help researchers, data engineers, and teams **organize, search, and share datasets** without the overhead of complex data catalog infrastructure.
+**Hei-DataHub** is a cloud-based terminal application (TUI) designed to help **US** (researchers, data engineers, and teams) organize, search, and share datasets through seamless integration with HeiBox (WebDAV).
 
 It's built for people who:
 
-- Work with multiple datasets across projects
-- Need fast search and metadata consistency
-- Prefer local-first tools that don't require cloud services
-- Want a keyboard-driven workflow (Vim/Neovim users will feel at home)
-- Need optional GitHub integration for collaborative workflows
+- Work with multiple datasets across projects and institutions
+- Need fast, unified search and consistent metadata
+- Want secure cloud access without managing servers or APIs
+- Need to browse and manage data directly from HeiBox
 
 ---
 
@@ -18,54 +17,32 @@ It's built for people who:
 
 ### Before Hei-DataHub
 
-- Datasets scattered across folders, wikis, and README files
-- Inconsistent metadata formats—everyone documents differently
-- No fast search—grep and manual hunting through files
-- Sharing datasets means copy-pasting metadata into Slack/emails
-- No validation—typos, missing fields, broken URLs
+- Datasets scattered across folders, drives, wikis, and mysterious final_final_v3.zip files
+- Metadata written in everyone’s own special dialect of YAML and chaos
+- Searching means `CLICK -> CLICK -> CLICK -> ...` and pray
+- Sharing datasets involves forwarding 12 email threads
+- Validation? None. Just vibes, typos, and broken links everywhere
 
 ### With Hei-DataHub
 
-- **Single source of truth:** All datasets in `data/` with consistent `metadata.yaml` files
-- **Fast search:** Full-text search (FTS5) finds datasets by name, description, or project
-- **Validated metadata:** JSON Schema ensures all required fields are present
-- **Keyboard-first:** Add, search, edit, and publish without touching the mouse
-- **Optional PR workflow:** Save → Commit → Push → Open PR in one keystroke
-- **Local-first:** Everything works offline; sync with GitHub when ready
-
----
-
-## Who It's For
-
-### Data Engineers & Scientists
-
-- Manage dataset inventory across multiple projects
-- Quickly find datasets by keyword or project name
-- Validate metadata before sharing with team
-
-### Research Teams
-
-- Maintain a shared catalog of research datasets
-- Collaborate via GitHub Pull Requests
-- Track dataset provenance and usage
-
-### Solo Practitioners
-
-- Personal dataset library with fast search
-- No account signup or cloud dependencies
-- Export to YAML for portability
+- One catalog to rule them all: Every dataset neatly listed with consistent metadata.yaml files
+- Lightning-fast search: Type a keyword and boom — results faster than you can blink
+- Schema-powered sanity: JSON Schema makes sure no field gets left behind
+- Keyboard zen: No clicking, no scrolling — just you, your terminal, and full control
+- Seamless HeiBox sync: Add, browse, and share directly from the cloud
+- Always works: No server drama, no setup headaches — just open and go
 
 ---
 
 ## Design Principles
 
-1. **Local-first:** Your data lives in plain text (YAML) and SQLite—no vendor lock-in
-2. **Keyboard-driven:** Vim-style keybindings (`j/k` to navigate, `/` to search, `a` to add)
-3. **Fast by default:** Search is instant; no network round-trips
-4. **Validate early:** Schema validation catches errors before they spread
-5. **Collaboration:** Use GitHub PRs to add datasets and expand the catalog
-6. **Easy deployment:** *(New in v0.58-beta)* Install with one command—no cloning needed
-7. **Desktop integration:** *(Coming in v0.58.x-beta)* Linux launcher for seamless access
+1. **Cloud-first**: Everything runs directly on HeiBox (WebDAV) — no local data storage
+2. **Keyboard-driven**: Vim-style navigation (j/k to move, / to search, a to add)
+3. **Fast by design**: Full-text search optimized for large HeiBox directories
+4. **Schema validation**: Prevents broken metadata before upload
+5. **Secure & simple**: Authentication handled via `hei-datahub auth setup`
+6. **Easy installation**: (New in v0.59-beta) Install and connect in seconds
+7. **Cross-platform ready**: Linux-first; macOS and Windows support coming soon
 
 ---
 
@@ -73,7 +50,7 @@ It's built for people who:
 
 Ready to get started?
 
-1. **[Installation Guide](../installation/README.md)** — Quick start with UV (v0.58)
+1. **[Installation Guide](../installation/README.md)** — Quick start with UV (>= v0.58)
 2. **[Getting Started](01-getting-started.md)** — First launch and commands
 3. **[Navigation](02-navigation.md)** — Learn the keyboard shortcuts
 4. **[Tutorial: Your First Dataset](../how-to/05-first-dataset.md)** — Add your first dataset
