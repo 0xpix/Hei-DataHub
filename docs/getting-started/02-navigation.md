@@ -159,7 +159,7 @@ Hei-DataHub has a single-column layout:
 │  Header: HEI DATAHUB                │  ← App title
 ├─────────────────────────────────────┤
 │  Banner: ASCII logo                 │
-│  Status: GitHub connection          │
+│  Status: Cloud connection           │
 │  Mode: Normal/Insert                │
 ├─────────────────────────────────────┤
 │  Search Input                       │  ← Press / to focus
