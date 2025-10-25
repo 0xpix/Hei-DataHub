@@ -4,12 +4,12 @@ Welcome! This guide assumes you've **never seen this codebase before** and will 
 
 ## What is Hei-DataHub?
 
-Hei-DataHub is a **Terminal User Interface (TUI) application** for managing and exploring geospatial datasets. Think of it like a file manager, but specifically designed for scientific data with metadata, search capabilities, and GitHub integration.
+Hei-DataHub is a **Terminal User Interface (TUI) application** for managing and exploring geospatial datasets. Think of it like a file manager, but specifically designed for scientific data with metadata, search capabilities, and cloud sync.
 
 ### Key Features
 - 📁 **Catalog Management**: Browse and organize datasets locally
 - 🔍 **Search**: Fast full-text search across datasets
-- 🌐 **GitHub Integration**: Sync datasets from GitHub repositories
+- 🌐 **WebDAV Sync**: Sync datasets from cloud storage (HeiBox/Seafile)
 - 🎨 **TUI Interface**: Beautiful terminal interface using Textual framework
 - ⚡ **SQLite Backend**: Fast, local-first data storage
 
@@ -25,7 +25,7 @@ Before you start, make sure you have:
 
 # Optional but recommended
 - VSCode or PyCharm
-- GitHub account (for testing sync features)
+- WebDAV account (HeiBox/Seafile for testing sync features)
 ```
 
 ## Installation Steps
@@ -88,7 +88,7 @@ Hei-DataHub/
 │   ├── app/                # Application runtime & settings
 │   ├── cli/                # Command-line interface entry point
 │   ├── core/               # Domain models, rules, queries
-│   ├── infra/              # Infrastructure (DB, Git, GitHub API)
+│   ├── infra/              # Infrastructure (DB, WebDAV)
 │   ├── services/           # Business logic (search, catalog, sync)
 │   ├── ui/                 # TUI screens, widgets, theme
 │   └── utils/              # Helper functions
