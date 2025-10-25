@@ -274,8 +274,7 @@ User sees updated list in terminal
 ### Infrastructure Layer (External Integrations)
 - **Database operations** (SQLite)
 - **File system** operations
-- **External APIs** (GitHub)
-- **Git operations**
+- **WebDAV sync** (cloud storage)
 - Can be mocked in tests
 
 ### Services Layer (Orchestration)
@@ -360,7 +359,7 @@ The catalog is:
 
 ### 3. Sync
 Syncing means:
-- **Clone** GitHub repo with datasets
+- **Download** catalog from WebDAV
 - **Parse** metadata files
 - **Index** into local database
 - **Track** updates
@@ -369,7 +368,7 @@ Syncing means:
 Search uses:
 - **FTS5** (Full-Text Search) in SQLite
 - **BM25** ranking algorithm
-- **Structured queries** (source:github, format:csv)
+- **Structured queries** (source:webdav, format:csv)
 - **Prefix matching** (autocomplete)
 
 ## 🔍 Where to Look for...
@@ -382,7 +381,7 @@ Search uses:
 | Add a new screen | `ui/views/` (new file) |
 | Add a CLI command | `cli/main.py` |
 | Change theme colors | `ui/theme.py` |
-| Add GitHub API call | `infra/github_api.py` |
+| Add WebDAV sync logic | `infra/webdav.py` |
 | Add business rule | `core/rules.py` |
 | Add utility function | `utils/` |
 
