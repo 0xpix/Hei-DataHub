@@ -84,7 +84,6 @@ nav:
   - How-to Guides:
     - Configure GitHub Settings: how-to/04-settings.md
     - Your First Dataset: how-to/05-first-dataset.md
-    - Add Dataset to Cloud: how-to/add-dataset-to-cloud.md
     - Edit Datasets: how-to/06-edit-datasets.md
     - Advanced Search: how-to/07-search-advanced.md
     - Customize Keybindings: how-to/08-customize-keybindings.md
