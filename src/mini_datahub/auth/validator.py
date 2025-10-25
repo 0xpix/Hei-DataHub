@@ -24,22 +24,25 @@ class WebDAVValidator:
 
         Args:
             url: WebDAV endpoint URL
-            username: Username (optional for token-based auth)
-            credential: Token or password
+            username: Username (required for Seafile/WebDAV)
+            credential: API token or WebDAV password
             timeout: Request timeout in seconds
         """
         self.url = url.rstrip("/")
-        self.username = username or ""
+        self.username = username
         self.credential = credential
         self.timeout = timeout
         self.session = requests.Session()
 
-        # Set auth
+        # Seafile WebDAV authentication:
+        # - With username: Basic Auth (username, token/password)
+        # - Without username: Token header (rare, for API tokens only)
         if username:
+            # Standard: Basic Auth with username + (token OR password)
             self.session.auth = (username, credential)
         else:
-            # Token-only: try Authorization header
-            self.session.headers["Authorization"] = f"Bearer {credential}"
+            # Alternative: Token-only auth via custom header
+            self.session.headers["Authorization"] = f"Token {credential}"
 
     def validate(self) -> ValidationResult:
         """
