@@ -203,20 +203,6 @@ class HomeScreen(Screen):
         except Exception as e:
             logger.warning(f"Failed to setup search autocomplete: {e}")
 
-    def update_github_status(self) -> None:
-        """Update GitHub connection status display."""
-        from mini_datahub.app.settings import get_github_config
-
-        status_widget = self.query_one("#github-status", Static)
-        config = get_github_config()
-
-        if config.has_credentials() and self.app.github_connected:
-            status_widget.update(f"[green]● GitHub Connected[/green] ({config.username}@{config.owner}/{config.repo})")
-        elif config.has_credentials():
-            status_widget.update("[yellow]⚠ GitHub Configured (connection failed)[/yellow] [dim]Press S for Settings[/dim]")
-        else:
-            status_widget.update("[dim]○ GitHub Not Connected[/dim] [dim]Press S to configure[/dim]")
-
     def update_heibox_status(self) -> None:
         """Update Heibox/WebDAV connection status display."""
         try:
@@ -2730,8 +2716,6 @@ class AddDataScreen(Screen):
 class DataHubApp(App):
     """Main TUI application with Neovim-style keybindings."""
 
-    # Track GitHub connection status
-    github_connected = reactive(False)
     # Track WebDAV/Heibox connection status
     heibox_connected = reactive(False)
 
@@ -2784,9 +2768,6 @@ class DataHubApp(App):
         except Exception as e:
             logger.warning(f"Failed to start background indexer: {e}")
 
-        # Check GitHub connection status
-        self.check_github_connection()
-
         # Check WebDAV/Heibox connection status
         self.check_heibox_connection()
 
@@ -2808,30 +2789,6 @@ class DataHubApp(App):
 
         # Startup pull prompt (async) - after screen is mounted
         self.startup_pull_check()
-
-    def check_github_connection(self) -> None:
-        """Check GitHub connection status on startup."""
-        from mini_datahub.app.settings import get_github_config
-        from mini_datahub.infra.github_api import GitHubIntegration
-
-        try:
-            config = get_github_config()
-
-            if not config.has_credentials():
-                self.github_connected = False
-                return
-
-            # Test connection quickly
-            github = GitHubIntegration(config)
-            success, message = github.test_connection()
-            self.github_connected = success
-
-            if not success:
-                # Subtle notification about disconnected state
-                self.notify(f"GitHub: {message} (configure in Settings)", severity="warning", timeout=5)
-
-        except Exception:
-            self.github_connected = False
 
     def check_heibox_connection(self) -> None:
         """Check WebDAV/Heibox connection status on startup."""
@@ -2910,18 +2867,6 @@ class DataHubApp(App):
             for screen in self.screen_stack:
                 if isinstance(screen, HomeScreen):
                     screen.update_heibox_status()
-        except Exception:
-            pass
-
-    def refresh_github_status(self) -> None:
-        """Refresh GitHub connection status (called after settings save)."""
-        self.check_github_connection()
-
-        # Update home screen if it exists
-        try:
-            for screen in self.screen_stack:
-                if isinstance(screen, HomeScreen):
-                    screen.update_github_status()
         except Exception:
             pass
 
