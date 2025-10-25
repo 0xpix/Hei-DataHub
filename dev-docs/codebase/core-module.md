@@ -220,11 +220,11 @@ class QueryTerm:
 **Examples:**
 
 ```python
-# Field query: source:github
+# Field query: source:webdav
 QueryTerm(
     field="source",
     operator=QueryOperator.CONTAINS,
-    value="github",
+    value="webdav",
     is_free_text=False
 )
 
@@ -270,7 +270,7 @@ The main parser class.
 
 **Input Query:**
 ```
-source:github format:csv "climate data" temperature
+source:webdav format:csv "climate data" temperature
 ```
 
 **Parsing Steps:**
@@ -279,7 +279,7 @@ source:github format:csv "climate data" temperature
 ```python
 # Regex: (\w+):(>=|<=|>|<)?"([^"]+)"|(\w+):(>=|<=|>|<)?(\S+)
 # Matches:
-# - source:github
+# - source:webdav
 # - format:csv
 ```
 
@@ -299,7 +299,7 @@ source:github format:csv "climate data" temperature
 ```python
 ParsedQuery(
     terms=[
-        QueryTerm(field="source", value="github"),
+        QueryTerm(field="source", value="webdav"),
         QueryTerm(field="format", value="csv"),
         QueryTerm(value="climate data", is_free_text=True),
         QueryTerm(value="temperature", is_free_text=True),
@@ -316,11 +316,11 @@ ParsedQuery(
 from mini_datahub.core.queries import QueryParser
 
 parser = QueryParser()
-parsed = parser.parse("source:github format:csv climate")
+parsed = parser.parse("source:webdav format:csv climate")
 
 print(parsed.terms)
 # [
-#   QueryTerm(field='source', value='github'),
+#   QueryTerm(field='source', value='webdav'),
 #   QueryTerm(field='format', value='csv'),
 #   QueryTerm(value='climate', is_free_text=True)
 # ]
@@ -528,8 +528,7 @@ Exception (Python built-in)
     ├── ValidationError (data validation failures)
     ├── StorageError (file I/O failures)
     ├── IndexError (database failures)
-    ├── GitError (Git operation failures)
-    ├── GitHubError (GitHub API failures)
+    ├── SyncError (sync/cloud storage failures)
     └── ConfigError (configuration problems)
 ```
 
@@ -571,25 +570,14 @@ except sqlite3.Error as e:
     raise DataHubIndexError(f"Database operation failed: {e}")
 ```
 
-#### GitError
+#### SyncError
 ```python
-from mini_datahub.core.errors import GitError
+from mini_datahub.core.errors import SyncError
 
 try:
-    repo.git.pull()
-except git.GitCommandError as e:
-    raise GitError(f"Git pull failed: {e}")
-```
-
-#### GitHubError
-```python
-from mini_datahub.core.errors import GitHubError
-
-try:
-    response = httpx.get("https://api.github.com/repos/...")
-    response.raise_for_status()
+    webdav_client.download(remote_path)
 except httpx.HTTPError as e:
-    raise GitHubError(f"GitHub API request failed: {e}")
+    raise SyncError(f"WebDAV sync failed: {e}")
 ```
 
 #### ConfigError
@@ -627,7 +615,7 @@ from mini_datahub.core.errors import DataHubError
 try:
     dataset = catalog.load_dataset("my-dataset")
     result = search.search_datasets("climate")
-    sync.sync_from_github("https://github.com/...")
+    sync.sync_from_webdav()
 except DataHubError as e:
     # Catch any application error
     logger.error(f"Operation failed: {e}")
