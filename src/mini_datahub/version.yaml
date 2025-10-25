@@ -4,10 +4,10 @@
 # Last updated: 2025-10-25
 
 version: "0.59.0-beta"
-codename: "PRIVACY"
-release_date: "2025-10-25"
+codename: "Privacy"
+release_date: "2025-10-10"
 compatibility: "Hei-DataHub v0.59.x (beta)"
-notes: "Automatic desktop integration on Linux - icons and launcher installed automatically."
+notes: "Privacy update - migrate from catalog in github repo to our own server (Linux only for now)"
 
 # Additional metadata
 app_name: "Hei-DataHub"
