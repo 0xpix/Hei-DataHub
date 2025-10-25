@@ -4,30 +4,35 @@ This is your complete guide to understanding the Hei-DataHub codebase. We'll sta
 
 ## 🎯 What Does This Project Do?
 
-Hei-DataHub is a **Terminal User Interface (TUI)** application that helps users:
+Hei-DataHub is a **cloud-first Terminal User Interface (TUI)** application that helps users:
 
-1. **Catalog** datasets with metadata (like a library card catalog)
-2. **Search** through datasets quickly (using SQLite full-text search)
-3. **Sync** datasets from GitHub repositories
-4. **View** dataset details in a beautiful terminal interface
+1. **Catalog** datasets with metadata in HeiBox/Seafile cloud storage
+2. **Search** through datasets instantly using SQLite FTS5 (full-text search)
+3. **Sync** datasets between cloud (WebDAV) and local cache
+4. **Authenticate** securely with credentials stored in OS keyring
+5. **Collaborate** with teams via shared cloud libraries
+6. **View** dataset details in a beautiful terminal interface
 
 Think of it as a combination of:
-- File manager (browse datasets)
-- Search engine (find datasets quickly)
-- GitHub client (sync from repos)
-- Data viewer (inspect metadata)
+- Cloud file manager (WebDAV client for HeiBox/Seafile)
+- Search engine (instant FTS5 search over thousands of datasets)
+- Sync client (background synchronization)
+- Secure credential manager (Linux keyring integration)
+- Data viewer (inspect and edit metadata)
 
 ## 📦 Technology Stack
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | **UI** | [Textual](https://textual.textualize.io/) | Terminal interface framework |
-| **Database** | SQLite + FTS5 | Local storage with full-text search |
-| **CLI** | Typer | Command-line interface |
-| **Validation** | Pydantic | Data validation and schemas |
-| **Git Integration** | GitPython | Git operations |
-| **HTTP** | httpx | GitHub API calls |
-| **Config** | YAML + Pydantic | Configuration management |
+| **Database** | SQLite + FTS5 | Local search index with full-text search |
+| **Cloud Storage** | WebDAV (HeiBox/Seafile) | Primary dataset storage and team collaboration |
+| **CLI** | argparse | Command-line argument parsing |
+| **Validation** | Pydantic v2 + JSON Schema | Data validation and schemas |
+| **Authentication** | keyring + Secret Service | Secure credential storage |
+| **HTTP** | requests | WebDAV client with retry logic |
+| **Config** | TOML | Configuration file format |
+| **Package Manager** | uv | Fast, reproducible package installation |
 
 ## 🗂️ High-Level Architecture
 
@@ -39,33 +44,42 @@ Think of it as a combination of:
                  │
 ┌────────────────▼────────────────────────────────┐
 │              CLI Layer                          │
-│  (src/mini_datahub/cli/main.py)               │
-│  • Parse commands                               │
-│  • Initialize app                               │
+│  (src/mini_datahub/cli/main.py)                │
+│  • Parse commands (auth, reindex, doctor, etc.) │
+│  • Initialize workspace & logging               │
+└────────────────┬────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────┐
+│          Authentication Layer                   │
+│  (src/mini_datahub/auth/)                      │
+│  • WebDAV credential management                 │
+│  • Keyring integration                          │
+│  • Connection validation                        │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │            UI/TUI Layer                         │
 │  (src/mini_datahub/ui/)                        │
-│  • Screens & Views                              │
-│  • Widgets & Components                         │
+│  • Screens & Views (home, search, settings)     │
+│  • Widgets & Components (autocomplete, etc.)    │
 │  • Keybindings & Theme                          │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │          Services Layer                         │
 │  (src/mini_datahub/services/)                  │
-│  • search: Query datasets                       │
-│  • catalog: Manage datasets                     │
-│  • sync: GitHub integration                     │
-│  • config: Settings management                  │
+│  • search: FTS5 queries & autocomplete          │
+│  • catalog: CRUD for datasets                   │
+│  • sync: Cloud ↔ Local synchronization         │
+│  • webdav_storage: WebDAV client                │
+│  • storage_backend: Abstract storage interface  │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │            Core Layer                           │
 │  (src/mini_datahub/core/)                      │
 │  • models: Data structures (Pydantic)           │
-│  • queries: Query parsing                       │
+│  • queries: Query parsing & filters             │
 │  • rules: Business logic validation             │
 │  • errors: Custom exceptions                    │
 └────────────────┬────────────────────────────────┘
@@ -73,18 +87,20 @@ Think of it as a combination of:
 ┌────────────────▼────────────────────────────────┐
 │       Infrastructure Layer                      │
 │  (src/mini_datahub/infra/)                     │
-│  • db: SQLite operations                        │
-│  • git: Git operations                          │
-│  • github_api: GitHub REST API                  │
-│  • paths: File system paths                     │
-│  • store: Data persistence                      │
+│  • db: SQLite FTS5 operations                   │
+│  • paths: XDG Base Directory paths              │
+│  • config_paths: Config file resolution         │
+│  • store: YAML/JSON file I/O                    │
+│  • index: Search index management               │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │           Data Storage                          │
-│  • SQLite database (db.sqlite)                  │
-│  • YAML metadata files (data/*/metadata.yaml)   │
-│  • Config files (~/.config/hei-datahub/)        │
+│  • Cloud: HeiBox/Seafile (WebDAV) [Primary]     │
+│  • Local Cache: ~/.cache/hei-datahub/datasets/  │
+│  • Search Index: ~/.local/share/.../db.sqlite   │
+│  • Config: ~/.config/hei-datahub/config.toml    │
+│  • Keyring: OS-managed encrypted credentials    │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -94,17 +110,29 @@ Think of it as a combination of:
 src/mini_datahub/              # Main Python package
 │
 ├── __init__.py                # Package initialization
-├── _version.py                # Auto-generated version file
-├── version.py                 # Version utility functions
+├── version.py                 # Version info and display
 │
 ├── app/                       # Application runtime & lifecycle
 │   ├── __init__.py
 │   ├── runtime.py             # App initialization, startup/shutdown
 │   └── settings.py            # Global settings & configuration
 │
+├── auth/                      # ⭐ Authentication management (NEW v0.57+)
+│   ├── __init__.py
+│   ├── setup.py               # Interactive WebDAV setup wizard
+│   ├── credentials.py         # Keyring integration for secure storage
+│   ├── validator.py           # WebDAV connection validation
+│   ├── doctor.py              # Diagnostic tool for auth troubleshooting
+│   └── clear.py               # Clear credentials and reset auth
+│
 ├── cli/                       # Command-line interface
 │   ├── __init__.py
-│   └── main.py                # Entry point (hei-datahub command)
+│   ├── main.py                # Entry point (hei-datahub command)
+│   ├── doctor.py              # System health diagnostics
+│   ├── linux_update.py        # Linux update manager
+│   ├── windows_update.py      # Windows update manager
+│   ├── macos_update.py        # macOS update manager
+│   └── update_manager.py      # Cross-platform update logic
 │
 ├── core/                      # Core domain logic (framework-agnostic)
 │   ├── __init__.py
@@ -115,48 +143,64 @@ src/mini_datahub/              # Main Python package
 │
 ├── infra/                     # Infrastructure layer (external integrations)
 │   ├── __init__.py
-│   ├── db.py                  # SQLite connection & queries
-│   ├── paths.py               # File system paths & constants
-│   ├── config_paths.py        # Config file locations
-│   ├── git.py                 # Git operations (GitPython)
-│   ├── github_api.py          # GitHub REST API client
-│   ├── index.py               # Search index operations
-│   └── store.py               # Persistent storage operations
+│   ├── db.py                  # SQLite connection & FTS5 queries
+│   ├── paths.py               # File system paths & workspace init
+│   ├── config_paths.py        # XDG Base Directory config resolution
+│   ├── platform_paths.py      # Cross-platform path handling
+│   ├── index.py               # Search index operations (FTS5)
+│   ├── store.py               # YAML/JSON file I/O
+│   ├── git.py                 # Git operations (legacy, optional)
+│   └── github_api.py          # GitHub API client (legacy, optional)
 │
 ├── services/                  # Business logic layer
 │   ├── __init__.py
-│   ├── search.py              # Search queries (FTS5)
-│   ├── catalog.py             # Dataset catalog operations
-│   ├── sync.py                # GitHub sync operations
-│   ├── publish.py             # Publish datasets to GitHub
-│   ├── autocomplete.py        # Search autocomplete
-│   ├── actions.py             # User actions (open, view, etc.)
-│   ├── config.py              # Config file management
+│   ├── search.py              # FTS5 search queries
+│   ├── fast_search.py         # Optimized search with caching
+│   ├── autocomplete.py        # Tag/field autocomplete suggestions
+│   ├── suggestion_service.py  # Context-aware autocomplete
+│   ├── catalog.py             # Dataset CRUD operations
+│   ├── sync.py                # Cloud ↔ Local synchronization
+│   ├── webdav_storage.py      # ⭐ WebDAV storage backend (HeiBox/Seafile)
+│   ├── filesystem_storage.py  # Local filesystem storage backend
+│   ├── storage_backend.py     # Abstract storage interface (Protocol)
+│   ├── storage_manager.py     # Multi-backend storage coordinator
+│   ├── indexer.py             # Background indexing service
+│   ├── index_service.py       # Index management and optimization
+│   ├── actions.py             # Complex user workflows
+│   ├── config.py              # Config file management (TOML)
 │   ├── state.py               # Application state
-│   ├── storage.py             # Storage operations
-│   ├── outbox.py              # Outbox pattern (async ops)
-│   └── update_check.py        # Check for app updates
+│   ├── storage.py             # Atomic file writes, backup/restore
+│   ├── outbox.py              # Failed operation retry queue
+│   ├── update_check.py        # App version checking
+│   └── performance.py         # Performance monitoring
 │
 ├── ui/                        # Terminal user interface
 │   ├── __init__.py
 │   ├── theme.py               # Color schemes & styling
+│   ├── keybindings.py         # Keybinding management
 │   ├── views/                 # Complete screens
 │   │   ├── __init__.py
-│   │   ├── main_view.py       # Main catalog view
-│   │   ├── search_view.py     # Search interface
-│   │   ├── detail_view.py     # Dataset details
-│   │   └── help_screen.py     # Help & keybindings
-│   └── widgets/               # Reusable UI components
-│       ├── __init__.py
-│       ├── dataset_list.py    # Dataset list widget
-│       ├── search_bar.py      # Search input widget
-│       ├── notification.py    # Toast notifications
-│       └── ...
+│   │   ├── home.py            # Main TUI launcher
+│   │   ├── cloud_files.py     # Cloud file browser
+│   │   ├── outbox.py          # Outbox/queue viewer
+│   │   ├── settings.py        # Settings screen
+│   │   ├── settings_menu.py   # Settings menu
+│   │   └── user_config.py     # User config editor
+│   ├── widgets/               # Reusable UI components
+│   │   ├── __init__.py
+│   │   ├── autocomplete.py    # Autocomplete widget
+│   │   ├── command_palette.py # Command palette
+│   │   ├── console.py         # Debug console
+│   │   └── help_overlay.py    # Help overlay
+│   └── assets/                # UI assets
+│       └── loader.py          # Asset loading
 │
-└── utils/                     # Utility functions & helpers
-    ├── __init__.py
-    ├── text.py                # Text formatting
-    ├── dates.py               # Date handling
+├── utils/                     # Utility functions & helpers
+│   ├── __init__.py
+│   ├── text.py                # Text formatting utilities
+│   └── async_utils.py         # Async/await helpers
+│
+└── internal/                  # Internal utilities (not public API)
     └── ...
 ```
 
@@ -168,34 +212,39 @@ Let's trace what happens when a user searches for "climate":
 ```
 User types "climate" in search bar
 ↓
-ui/widgets/search_bar.py → on_input() event
+ui/widgets/autocomplete.py → on_input() event
+↓
+Triggers autocomplete suggestions
 ↓
 Emits "search_requested" message
 ```
 
 ### 2. View Handles Event (UI Layer)
 ```
-ui/views/main_view.py → on_search_requested()
+ui/views/home.py → on_search_requested()
 ↓
-Calls services.search.search_datasets("climate")
+Calls services.fast_search.search_datasets("climate")
 ```
 
 ### 3. Business Logic (Services Layer)
 ```
-services/search.py → search_datasets()
+services/fast_search.py → search_datasets()
 ↓
 1. Parse query using core.queries.QueryParser
-2. Build SQL query with FTS5
-3. Call infra.db.execute_query()
+2. Check cache for recent identical query
+3. Build FTS5 SQL query with filters
+4. Call infra.index.fts_search()
 ```
 
 ### 4. Database Query (Infrastructure Layer)
 ```
-infra/db.py → execute_query()
+infra/index.py → fts_search()
 ↓
-SELECT * FROM datasets_fts WHERE datasets_fts MATCH 'climate*'
+infra/db.py → get_connection() [singleton]
 ↓
-Returns raw SQLite rows
+Execute SQL: SELECT * FROM datasets_fts WHERE datasets_fts MATCH 'climate*'
+↓
+Returns raw SQLite rows with relevance scores
 ```
 
 ### 5. Transform Results (Services Layer)
