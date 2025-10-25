@@ -610,7 +610,7 @@ Try adding another dataset to build muscle memory:
 - **Used In Projects:** `Wildfire Analysis 2024, Global Fire Trends`
 
 **Time:** ~5 minutes
-
+ 
 **Goal:** Practice filling out the form efficiently and following best practices.
 
 ---
