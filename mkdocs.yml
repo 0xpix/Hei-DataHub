@@ -24,8 +24,8 @@ theme:
   sidebar: true
   navigation_depth: 2
   custom_dir: docs/
-  logo: assets/dark_logo_H_large.svg
-  favicon: assets/dark_logo_H_large.svg
+  logo: assets/Hei-datahub-logo-H.svg
+  favicon: assets/Hei-datahub-logo-H.svg
 
 # Plugins
 plugins:
