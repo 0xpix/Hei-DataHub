@@ -108,28 +108,31 @@ def run_setup_wizard(
 
     else:
         # Interactive prompts
-        url = input(f"WebDAV URL [{DEFAULT_WEBDAV_URL}]: ").strip()
+        print("📍 Enter WebDAV base URL")
+        print(f"   Default: {DEFAULT_WEBDAV_URL}")
+        url = input("   > ").strip()
         if not url:
             url = DEFAULT_WEBDAV_URL
 
-        # Extract library name suggestion from URL
+        print("\n👤 Enter username")
+        print("   (e.g., username@auth.local)")
+        username = input("   > ").strip()
+        if not username:
+            print("❌ Username is required", file=sys.stderr)
+            return 2
+
+        print("\n🔑 Enter WebDAV password")
+        print("   (from Heibox Settings → WebDAV Password)")
+        credential = getpass.getpass("   > ")
+        method = "password"
+
+        # Library name - ask after authentication method
         library_suggestion = "Testing-hei-datahub"
-        library = input(f"Library/folder name [{library_suggestion}]: ").strip()
+        print(f"\n📁 Library/folder name")
+        print(f"   Default: {library_suggestion}")
+        library = input("   > ").strip()
         if not library:
             library = library_suggestion
-
-        has_token = input("Do you have a WebDAV token? [Y/n]: ").strip().lower()
-        if has_token in ("", "y", "yes"):
-            method = "token"
-            username = input("Username (optional): ").strip() or None
-            credential = getpass.getpass("Token: ")
-        else:
-            method = "password"
-            username = input("Username: ").strip()
-            if not username:
-                print("❌ Username is required for password authentication", file=sys.stderr)
-                return 2
-            credential = getpass.getpass("Password: ")
 
     if not credential:
         print("❌ Credential cannot be empty", file=sys.stderr)
@@ -148,30 +151,42 @@ def run_setup_wizard(
             return 2
         use_keyring = True
     else:
-        # Auto-detect
-        auth_store = get_auth_store(prefer_keyring=True)
-        use_keyring = auth_store.strategy == "keyring"
-
-    # Warn about keyring fallback
-    if not use_keyring and not non_interactive:
-        print("\n⚠️  Linux keyring backend unavailable.")
-        print("    Falling back to environment variables (less secure).")
-        accept = input("    Continue with ENV storage? [y/N]: ").strip().lower()
-        if accept not in ("y", "yes"):
-            print("Aborted.")
-            return 1
+        # Interactive mode: ask user
+        if non_interactive:
+            # Auto-detect in non-interactive mode
+            auth_store = get_auth_store(prefer_keyring=True)
+            use_keyring = auth_store.strategy == "keyring"
+        else:
+            # Ask user in interactive mode
+            print("\n🔐 Store credentials in Linux keyring?")
+            print("   Recommended for security (encrypted storage)")
+            keyring_choice = input("   [Y/n] > ").strip().lower()
+            if keyring_choice in ("", "y", "yes"):
+                auth_store = get_auth_store(prefer_keyring=True)
+                use_keyring = auth_store.strategy == "keyring"
+                if not use_keyring:
+                    print("\n⚠️  Linux keyring backend unavailable.")
+                    print("    Falling back to environment variables (less secure).")
+                    accept = input("    Continue with ENV storage? [y/N]: ").strip().lower()
+                    if accept not in ("y", "yes"):
+                        print("Aborted.")
+                        return 1
+                    auth_store = EnvAuthStore()
+            else:
+                auth_store = EnvAuthStore()
+                use_keyring = False
 
     # Validate credentials
     if not no_validate:
-        print("\nValidating...")
+        print("\n🔍 Testing connection...")
         from mini_datahub.auth.validator import validate_credentials
 
         success, message, status_code = validate_credentials(url, username, credential, timeout)
 
         if not success:
-            print(f"\n❌ Validation failed: {message}")
+            print(f"\n❌ {message}")
             if not non_interactive:
-                retry = input("Retry? [y/N]: ").strip().lower()
+                retry = input("\n🔄 Retry? [y/N]: ").strip().lower()
                 if retry in ("y", "yes"):
                     # Recursive retry
                     return run_setup_wizard(
@@ -186,6 +201,9 @@ def run_setup_wizard(
                         non_interactive=False,
                     )
             return 1
+        else:
+            print("   ✓ Successfully connected to WebDAV server")
+            print("   ✓ Write permissions verified")
     else:
         print("\n⚠️  Skipping validation (--no-validate). Future operations may fail.")
 
@@ -216,27 +234,33 @@ def run_setup_wizard(
         return 1
 
     # Success message
-    if not no_validate:
-        print("\n✅ WebDAV credentials verified and stored securely in your Linux keyring.")
+    print(f"\n✅ Configuration saved")
+    print(f"   📄 {config_path}")
+    if use_keyring:
+        print(f"   🔐 Credentials stored in Linux keyring")
     else:
-        print(f"\n✅ Credentials stored in {auth_store.strategy}.")
+        print(f"   💾 Credentials stored in environment variables")
 
-    # Status line
-    username_display = username or "-"
-    print(f"URL: {url} · Method: {method} · User: {username_display} · Storage: {auth_store.strategy} · Key: {key_id}")
+    # Status line for debugging (optional)
+    if non_interactive:
+        username_display = username or "-"
+        print(f"\n📊 Details: {url} · {method} · {username_display} · {auth_store.strategy} · {key_id}")
 
     # ENV export commands if needed
     if auth_store.strategy == "env":
         print("\n📋 Add these to your shell profile (~/.bashrc or ~/.zshrc):")
         env_store = auth_store  # type: EnvAuthStore
         for cmd in env_store.get_export_commands():
-            print(f"  {cmd}")
-        print(f"  export HEIDATAHUB_WEBDAV_URL='{url}'")
+            print(f"   {cmd}")
+        print(f"   export HEIDATAHUB_WEBDAV_URL='{url}'")
         if username:
-            print(f"  export HEIDATAHUB_WEBDAV_USERNAME='{username}'")
+            print(f"   export HEIDATAHUB_WEBDAV_USERNAME='{username}'")
 
     # Next steps
-    print("\nNext: run `hei-datahub auth status` or start using WebDAV operations.")
+    print("\n🎯 Next steps:")
+    print("   • Run: hei-datahub auth status")
+    print("   • Run: hei-datahub auth doctor")
+    print("   • Launch TUI: hei-datahub")
 
     return 0
 
