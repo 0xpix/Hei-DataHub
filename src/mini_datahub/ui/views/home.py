@@ -186,22 +186,30 @@ class HomeScreen(Screen):
     def _setup_search_autocomplete(self) -> None:
         """Setup autocomplete suggester for search input."""
         try:
-            from mini_datahub.ui.widgets.autocomplete import SearchSuggester
+            from mini_datahub.ui.widgets.autocomplete import SmartSearchSuggester
 
             search_input = self.query_one("#search-input", Input)
-            search_input.suggester = SearchSuggester()
+            search_input.suggester = SmartSearchSuggester()
         except Exception as e:
             logger.warning(f"Failed to setup search autocomplete: {e}")
 
-    def _setup_search_autocomplete(self) -> None:
-        """Setup autocomplete suggester for search input."""
+    def _track_search_usage(self, query: str) -> None:
+        """Track search filter usage for autocomplete ranking."""
         try:
-            from mini_datahub.ui.widgets.autocomplete import SearchSuggester
+            from mini_datahub.core.queries import QueryParser
+            from mini_datahub.services.suggestion_service import get_suggestion_service
 
-            search_input = self.query_one("#search-input", Input)
-            search_input.suggester = SearchSuggester()
+            parser = QueryParser()
+            parsed = parser.parse(query)
+            service = get_suggestion_service()
+
+            # Track each field filter used
+            for term in parsed.terms:
+                if not term.is_free_text:
+                    service.track_usage(term.field, term.value)
+                    logger.debug(f"Tracked usage: {term.field}:{term.value}")
         except Exception as e:
-            logger.warning(f"Failed to setup search autocomplete: {e}")
+            logger.debug(f"Failed to track search usage: {e}")
 
     def update_heibox_status(self) -> None:
         """Update Heibox/WebDAV connection status display."""
@@ -411,6 +419,9 @@ class HomeScreen(Screen):
             # Update filter badges
             self._update_filter_badges(query)
 
+            # Track usage of filters for autocomplete ranking
+            self._track_search_usage(query)
+
             # ALWAYS use indexed search (never hit network on keystroke)
             from mini_datahub.services.fast_search import search_indexed
 
@@ -614,24 +625,34 @@ class HomeScreen(Screen):
 
         return True
 
-    def _get_badge_color_class(self, text: str) -> str:
-        """Get a retro background color class for a badge based on text hash."""
-        # Use hash for consistent color per term
-        color_seed = hash(text) % 100
+    def _get_badge_color_class(self, key: str) -> str:
+        """
+        Get a consistent color class for a badge based on its key type.
 
-        # Retro color palette (muted, vintage colors)
-        color_classes = [
-            "badge-retro-teal",
-            "badge-retro-coral",
-            "badge-retro-sage",
-            "badge-retro-mauve",
-            "badge-retro-amber",
-            "badge-retro-slate",
-        ]
-        return color_classes[color_seed % len(color_classes)]
+        Maps filter keys to specific colors for visual consistency:
+        - project: Blue
+        - source: Purple
+        - tag: Teal
+        - owner: Orange
+        - size: Gray
+        - format/type: Coral
+        - default: Neutral
+        """
+        key_colors = {
+            "project": "badge-blue",
+            "source": "badge-purple",
+            "tag": "badge-teal",
+            "owner": "badge-orange",
+            "size": "badge-gray",
+            "format": "badge-coral",
+            "file_format": "badge-coral",
+            "type": "badge-sage",
+            "data_type": "badge-sage",
+        }
+        return key_colors.get(key.lower(), "badge-neutral")
 
     def _update_filter_badges(self, query: str) -> None:
-        """Update visual badges showing active search filters."""
+        """Update visual badges showing active search filters with uniform key-based styling."""
         from mini_datahub.core.queries import QueryParser
 
         badges_container = self.query_one("#filter-badges-container", Horizontal)
@@ -644,9 +665,10 @@ class HomeScreen(Screen):
             parser = QueryParser()
             parsed = parser.parse(query)
 
-            # Show badges for field filters
+            # Show badges for field filters with uniform key-based styling
             for term in parsed.terms:
                 if not term.is_free_text:
+                    # Operator symbols for display
                     operator_symbols = {
                         'CONTAINS': ':',
                         'GT': '>',
@@ -656,20 +678,37 @@ class HomeScreen(Screen):
                         'EQ': '='
                     }
                     op_symbol = operator_symbols.get(term.operator.name, ':')
+
+                    # Uniform badge text: key:value or key>value etc
                     badge_text = f"{term.field}{op_symbol}{term.value}"
-                    color_class = self._get_badge_color_class(badge_text)
-                    badges_container.mount(Static(f"🏷 {badge_text}", classes=f"filter-badge {color_class}"))
+
+                    # Get color based on key type (not operator)
+                    color_class = self._get_badge_color_class(term.field)
+
+                    # Create badge with key emoji for visual grouping
+                    key_emoji = {
+                        "project": "📁",
+                        "source": "🔗",
+                        "tag": "🏷️",
+                        "owner": "👤",
+                        "size": "📏",
+                        "format": "📄",
+                        "type": "📊",
+                    }.get(term.field.lower(), "🔍")
+
+                    badge_display = f"{key_emoji} {badge_text}"
+                    badges_container.mount(Static(badge_display, classes=f"filter-badge {color_class}"))
 
             # Show individual badges for each free text term
-            # Fix for Bug #10: Display separate tags instead of one combined token
             free_text_terms = [term for term in parsed.terms if term.is_free_text]
-            logger.debug(f"DEBUG Bug #10: Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
+            logger.debug(f"Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
 
             for term in free_text_terms:
-                color_class = self._get_badge_color_class(term.value)
+                # Free text uses neutral gray color
+                color_class = "badge-neutral"
                 badge = Static(f"📝 {term.value}", classes=f"filter-badge {color_class}")
                 badges_container.mount(badge)
-                logger.debug(f"DEBUG Bug #10: Mounted badge for term: {term.value}")
+                logger.debug(f"Mounted badge for term: {term.value}")
 
         except Exception as e:
             # If parsing fails, just show the raw query
@@ -1164,6 +1203,7 @@ class CloudDatasetDetailsScreen(Screen):
         ("q", "back", "Back"),
         ("e", "edit_cloud_dataset", "Edit"),
         ("y", "copy_source", "Copy Source"),
+        ("o", "open_url", "Open URL"),
         ("d", "delete_dataset", "Delete"),
     ]
 
@@ -1306,6 +1346,19 @@ class CloudDatasetDetailsScreen(Screen):
                 self.app.notify("✓ Source copied to clipboard", timeout=3)
             except Exception as e:
                 self.app.notify(f"Failed to copy: {str(e)}", severity="error", timeout=3)
+
+    def action_open_url(self) -> None:
+        """Open source URL in browser if it's a URL (o key)."""
+        if self.metadata and 'source' in self.metadata:
+            source = self.metadata['source']
+            if source.startswith('http://') or source.startswith('https://'):
+                try:
+                    webbrowser.open(source)
+                    self.app.notify("Opening URL in browser...", timeout=2)
+                except Exception as e:
+                    self.app.notify(f"Failed to open URL: {str(e)}", severity="error", timeout=3)
+            else:
+                self.app.notify("Source is not a URL", severity="warning", timeout=2)
 
     def action_delete_dataset(self) -> None:
         """Delete dataset (d key) - shows confirmation dialog."""
