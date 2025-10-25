@@ -219,13 +219,13 @@ Hei-DataHub **does not collect any telemetry or analytics data**:
 ```python
 def check_for_updates():
     """
-    Check GitHub releases for new versions.
+    Check for new versions.
 
-    Privacy: Only sends HTTP GET to GitHub API.
+    Privacy: Only sends HTTP GET to version check endpoint.
     No user identification or tracking.
     """
     response = requests.get(
-        "https://api.github.com/repos/0xpix/Hei-DataHub/releases/latest",
+        get_update_check_url(),
         headers={"User-Agent": f"Hei-DataHub/{__version__}"}
     )
     # Only version comparison, no data sent
