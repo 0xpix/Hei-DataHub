@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="/Hei-DataHub/assets/Hei-datahub_logo_inline.svg" alt="Hei-DataHub Logo" width="500"/>
+    <img src="/Hei-DataHub/assets/Hei-datahub-logo-inline.svg" alt="Hei-DataHub Logo" width="500"/>
 </p>
 
 # The Hei-DataHub Manual
@@ -11,9 +11,9 @@ Current version: `{{ project_version }}` (Oct 25, 2025) — Codename: `{{ projec
 
 ## Welcome to Hei-DataHub
 
-**Hei-DataHub** is a local-first TUI (Terminal User Interface) for managing datasets with consistent metadata, fast full-text search, and automated PR workflows. Think of it as a lightweight data catalog for teams who want to organize datasets without complex infrastructure.
+**Hei-DataHub** is a cloud-based TUI (Terminal User Interface) for managing and organizing datasets with consistent metadata, fast full-text search, and direct integration with HeiBox (WebDAV).
 
-Everything runs locally—YAML files + SQLite database—no network required except for optional GitHub integration.
+It provides a lightweight, command-line data catalog that connects directly to your HeiBox storage — allowing you to browse, search, and manage datasets securely.
 
 ## What's New in v0.59-beta 📚
 
