@@ -243,8 +243,8 @@ LOG_LEVEL=DEBUG
 HEI_DATAHUB_CONFIG=~/.config/hei-datahub/dev-config.yaml
 HEI_DATAHUB_DB=./dev-db.sqlite
 
-# GitHub token (optional, for sync features)
-GITHUB_TOKEN=ghp_your_token_here
+# WebDAV credentials (optional, for sync features)
+# Stored in system keyring - use `hei-datahub auth setup`
 ```
 
 Load in your shell:
