@@ -5,9 +5,9 @@
     Looking for user documentation? → [**User Manual**](https://0xpix.github.io/Hei-DataHub)
 
 !!! info "Version Compatibility"
-    **Developer Docs for v0.56.0-beta "Precision"**
-    Compatible with app releases v0.56.x
-    Branch: `docs/devs` | Released: October 5, 2025
+    **Developer Docs for v0.59.0-beta "Privacy"**
+    Compatible with app releases v0.59.x
+    Branch: `renovation/dev-docs-0.57-beta` | Updated: October 25, 2025
 
 ---
 
@@ -32,47 +32,63 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 -   **[Architecture Overview](architecture/overview.md)**
 
-    Start here! System design, module map, data flow, and component diagrams.
+    Start here! Cloud-first system design, WebDAV integration, data flow, and component diagrams.
 
--   **[Codebase Tour](codebase/navigation.md)**
+-   **[Authentication & Sync](architecture/auth-and-sync.md)**
 
-    Every file and directory explained: purpose, ownership, extension points.
+    WebDAV authentication, keyring storage, background sync, and error recovery.
+
+-   **[Search & Autocomplete](architecture/search-and-autocomplete.md)**
+
+    FTS5 search engine, autocomplete ranking, filter badges, and performance tuning.
+
+-   **[Security & Privacy](architecture/security-privacy.md)**
+
+    Credential handling, data privacy, secure design principles, and threat model.
+
+-   **[Codebase Overview](codebase/overview.md)**
+
+    Every module and directory explained: purpose, responsibilities, and key functions.
+
+-   **[Module Walkthrough](codebase/module-walkthrough.md)**
+
+    File-by-file deep dive with function-level explanations and line-by-line commentary.
+
+-   **[CLI Commands](api-reference/cli-commands.md)**
+
+    Complete command reference: auth, search, sync, update, and diagnostics.
 
 -   **[API Reference](api-reference/overview.md)**
 
     Function-by-function documentation with signatures, errors, and performance notes.
 
--   **[Configuration](config/overview.md)**
+-   **[Configuration](codebase/configuration.md)**
 
-    All config files, environment variables, defaults, and precedence rules.
+    Config files, TOML structure, environment variables, and user preferences.
 
--   **[Data Layer](data/storage.md)**
+-   **[Data Layer](codebase/data-layer.md)**
 
-    Schemas, migrations, indexing strategy, and adding new datasets.
+    SQLite database, FTS5 indexing, dataset metadata, and schema validation.
 
--   **[UI/TUI Layer](ui/architecture.md)**
+-   **[UI/TUI Layer](codebase/ui-architecture.md)**
 
-    View architecture, state management, keybindings, and theming.
+    Textual views, widgets, state management, keybindings, and theming.
 
--   **[Extensibility](extensibility/extension-points.md)**
+-   **[Build & Release](maintenance/release-process.md)**
 
-    Official extension points, plugin architecture, and adapter patterns.
+    Release process, version management, and changelog policy.
 
--   **[Build & Release](build/pipeline.md)**
+-   **[Testing](maintenance/testing.md)**
 
-    CI/CD jobs, release process, SemVer, and changelog policy.
+    Testing strategy, fixtures, running tests, and coverage tracking.
 
--   **[Quality Assurance](qa/testing-strategy.md)**
+-   **[Performance](architecture/performance.md)**
 
-    Testing strategy, fixtures, logging, metrics, and coverage.
+    Profiling, benchmarks, optimization strategies, and performance SLAs.
 
--   **[Performance](performance/overview.md)**
+-   **[Security](architecture/security-privacy.md)**
 
-    Profiling, hotspots, optimization playbooks, and SLAs.
-
--   **[Security](security/secrets.md)**
-
-    Secrets management, data privacy, and supply chain security.
+    Credential storage, WebDAV security, data privacy, and threat mitigation.
 
 -   **[Contributing](contributing/workflow.md)**
 
@@ -92,7 +108,7 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 -   *[Glossary & Appendices](appendices/glossary.md)**
 
-    Terminology, file index, function index, and quick reference cards.
+    Terminology, abbreviations, and quick reference cards.
 
 </div>
 
@@ -103,9 +119,9 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 | **User Docs** (main branch)                      | **Developer Docs** (this site)                    |
 |--------------------------------------------------|---------------------------------------------------|
 | How to install and use Hei-DataHub               | How Hei-DataHub works internally                  |
-| Features, tutorials, UI navigation               | Architecture, APIs, data flows, extension points  |
+| Features, tutorials, UI navigation               | Architecture, APIs, data flows, WebDAV integration |
 | "What can I do with this tool?"                  | "How do I change/extend/debug this tool?"         |
-| Published from `main` branch                     | Published from `docs/devs` branch                 |
+| Published from `main` branch                     | Published from `renovation/dev-docs-0.57-beta`    |
 | MkDocs config: `mkdocs.yml`                      | MkDocs config: `mkdocs-dev.yml`                   |
 | Audience: end users, data analysts, admins       | Audience: contributors, maintainers, integrators  |
 
@@ -114,19 +130,19 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 ## Quick Wins for New Contributors
 
 1. **Understand the big picture in 15 minutes:**
-   Read → [System Overview](architecture/overview.md) + [Data Flow](architecture/data-flow.md)
+   Read → [Architecture Overview](architecture/overview.md) + [Auth & Sync](architecture/auth-and-sync.md)
 
 2. **Trace a feature from UI to data:**
-   Follow → [UI Architecture](ui/architecture.md) → [Services](api-reference/services/search.md) → [Data Layer](data/storage.md)
+   Follow → [Codebase Overview](codebase/overview.md) → [Search & Autocomplete](architecture/search-and-autocomplete.md) → [Data Layer](codebase/data-layer.md)
 
-3. **Add a new dataset with confidence:**
-   Guide → [Adding Datasets](data/adding-datasets.md) + [Schema Definition](data/schema.md)
+3. **Understand cloud authentication:**
+   Guide → [Auth & Sync](architecture/auth-and-sync.md) + [Security & Privacy](architecture/security-privacy.md)
 
-4. **Add a new UI panel without breaking keybindings:**
-   Guide → [Adding New Views](ui/adding-views.md) + [Keybindings](ui/keybindings.md)
+4. **Add a new UI feature:**
+   Guide → [UI Architecture](codebase/ui-architecture.md) + [Module Walkthrough](codebase/module-walkthrough.md)
 
-5. **Run tests and interpret failures:**
-   Reference → [Testing Strategy](qa/testing-strategy.md) + [Test Data](qa/test-data.md)
+5. **Run tests and diagnostics:**
+   Reference → [Testing](maintenance/testing.md) + [CLI Commands](api-reference/cli-commands.md) (`hei-datahub doctor`)
 
 ---
 
@@ -136,24 +152,24 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 ```mermaid
 graph LR
-    A[Read Overview] --> B[Codebase Tour]
-    B --> C[API Reference for your module]
-    C --> D[Contributing Workflow]
-    D --> E[Submit PR]
-    E --> F[Code Review]
+    A[Read Architecture Overview] --> B[Auth & Sync]
+    B --> C[Codebase Overview]
+    C --> D[Module Walkthrough]
+    D --> E[Contributing Workflow]
+    E --> F[Submit Changes]
 ```
 
 ### For Maintainers
 
-- **Before merging a PR:** Check [Definition of Done](contributing/definition-of-done.md)
-- **Release process:** Follow [Release Process](build/releases.md) + update **both** changelogs
-- **Adding new features:** Update [Module Map](architecture/module-map.md), [API Reference](api-reference/overview.md), and [Changelog](build/changelog.md)
+- **Before merging changes:** Check [Contributing Workflow](contributing/workflow.md)
+- **Release process:** Follow [Release Process](maintenance/release-process.md) + update changelog
+- **Adding new features:** Update [Module Map](architecture/module-map.md) and relevant docs
 
-### For Integrators
+### For Integration & Extension
 
-- **Extension points:** See [Extensibility](extensibility/extension-points.md)
-- **Plugin architecture:** Read [Plugin Architecture](extensibility/plugins.md)
-- **Adapters:** Guide at [Creating Adapters](extensibility/adapters.md)
+- **CLI integration:** See [CLI Commands](api-reference/cli-commands.md)
+- **Storage backends:** Read [Storage Architecture](codebase/module-walkthrough.md#storage-backends)
+- **Custom views:** Guide at [UI Architecture](codebase/ui-architecture.md)
 
 ---
 
@@ -166,14 +182,14 @@ Found a gap? Want to improve an explanation? Awesome!
 
 2. **Local development:**
    ```bash
-   git checkout docs/devs
+   git checkout renovation/dev-docs-0.57-beta
    pip install -r dev-docs/requirements.txt
    mkdocs serve -f mkdocs-dev.yml
    # Open http://localhost:8000
    ```
 
 3. **Submit a PR:**
-   Target branch: `docs/devs`
+   Target branch: `renovation/dev-docs-0.57-beta`
    Follow [Contributing to Docs](overview/contributing-docs.md)
 
 ---
@@ -189,10 +205,10 @@ Found a gap? Want to improve an explanation? Awesome!
 
 ## Compatibility Matrix
 
-| **Developer Docs Version** | **App Version** | **Branch**    | **Status** |
-|----------------------------|-----------------|---------------|------------|
-| **0.56.0-beta**            | v0.56.x         | `docs/devs`   | ✅ Current |
-| 0.55.2-beta                | v0.55.x         | (archived)    | 📦 Stable  |
+| **Developer Docs Version** | **App Version** | **Branch**                         | **Status** |
+|----------------------------|-----------------|-------------------------------------|------------|
+| **0.59.0-beta**            | v0.59.x         | `renovation/dev-docs-0.57-beta`     | ✅ Current |
+| 0.56.0-beta                | v0.56.x         | `docs/devs`                         | 📦 Archived|
 
 ---
 
@@ -200,7 +216,7 @@ Found a gap? Want to improve an explanation? Awesome!
 
 <div class="site-switcher" markdown>
 
-**You are on:** 🔧 **Developer Docs** (branch: `docs/devs`)
+**You are on:** 🔧 **Developer Docs** (branch: `renovation/dev-docs-0.57-beta`)
 
 Switch to:
 → [📖 **User Manual**](https://0xpix.github.io/Hei-DataHub) (main branch)
