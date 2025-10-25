@@ -495,7 +495,7 @@ Hei-DataHub/
 **Purpose:** Check for new app versions
 
 **Responsibilities:**
-- Query GitHub API for latest release
+- Query for latest release
 - Compare with current version
 - Notify user if update available
 
@@ -507,6 +507,8 @@ Hei-DataHub/
 - `version.py`
 
 **Extension Point:** ❌ Not extensible
+
+```
 
 ---
 
