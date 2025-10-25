@@ -19,17 +19,6 @@ It provides a lightweight, command-line data catalog that connects directly to y
 
 **[Read the full What's New guide →](whats-new/0.59-beta.md)**
 
-## [0.59.0-beta] - Oct 25, 2025 - "Privacy" release
-
-- **UV-Based Install\Update** — Direct from GitHub—no cloning required
-- **Ephemeral Runs** — Test with `uvx` before installing
-- **Enhanced CLI** — `hei-datahub update`, `hei-datahub --version-info`, etc.
-- **Version Control** — Pin to specific tags, branches, or commits
-- **Complete Packaging** — All assets and data files included automatically
-- **Health Checks** — `hei-datahub doctor` command for diagnostics
-- **Directory Control** — `--data-dir` flag and environment variable support
-- **XDG Compliance** — Follows Linux desktop standards
-
 ## What do we have so far (v0.59.x beta)
 
 - **Uv -Based Install/Update:** Directly from GitHub using [UV](https://astral.sh/uv/)
@@ -63,14 +52,11 @@ uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 # Launch the TUI (use either command)
 hei-datahub
 
+# Connect to the cloud (new in v0.59)
+hei-datahub auth setup
+
 # Run system diagnostics (new from v0.58)
 hei-datahub doctor
-
-# Reindex from YAML files
-hei-datahub reindex
-
-# Show diagnostic paths
-hei-datahub paths
 
 # Show version
 hei-datahub --version
@@ -96,11 +82,12 @@ This manual is organized to get you productive quickly:
 4. **[The Basics](getting-started/03-the-basics.md)** — Projects, datasets, fields, search, filters
 
 ### What's New
+- **[0.59-beta "Privacy"](whats-new/0.59-beta.md)** — Migrate to the cloud
 - **[0.58-beta "Streamline"](whats-new/0.58-beta.md)** — UV installation + Desktop integration + Data directory control (Oct 2025)
 - **[0.57-beta "Renovation"](whats-new/0.57-beta.md)** — Documentation overhaul + bug fixes (Oct 2025)
 
 ### How-to Guides
-- **[GitHub Workflow Guide](how-to/04-settings.md)** — Detailed PR workflow docs
+- **[HeiBox Guide](how-to/04-settings.md)** — Detailed HeiBox workflow docs
 - **[Your First Dataset](how-to/05-first-dataset.md)** — Create and manage data
 - **[Edit Datasets](how-to/06-edit-datasets.md)** — Change metadata inline
 - **[Advanced Search](how-to/07-search-advanced.md)** — Use filters and operators
