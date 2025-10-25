@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
-
 ## [0.59.0-beta] - 2025-10-10 - Privacy
 
 **WebDAV migration complete!** This release replaces GitHub-based catalog with direct WebDAV (HeiBox) cloud storage for datasets.
@@ -156,10 +154,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.58.0-beta] - 2025-10-XX
 
 Initial release of 0.58.x series "Streamline".
-
----
-
-[0.59.0-beta]: https://github.com/0xpix/Hei-DataHub/compare/v0.58.3-beta...v0.59.0-beta
-[0.58.2-beta]: https://github.com/0xpix/Hei-DataHub/compare/v0.58.1-beta...v0.58.2-beta
-[0.58.1-beta]: https://github.com/0xpix/Hei-DataHub/compare/v0.58.0-beta...v0.58.1-beta
-[0.58.0-beta]: https://github.com/0xpix/Hei-DataHub/releases/tag/v0.58.0-beta
