@@ -270,5 +270,9 @@ site/
 .hei-datahub/
 # Benchmark results
 bench/
-tests/
+# Note: tests/ directory should NOT be ignored - it contains the test suite
+# Only ignore test output files instead:
+tests/__pycache__/
+tests/.pytest_cache/
+tests/*.pyc
 /dev-site/
