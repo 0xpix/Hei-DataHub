@@ -426,8 +426,7 @@ Currently no support for:
 - ⌨️ **[Customize keybindings](08-customize-keybindings.md)** - Change search hotkey from `/`
 - 🎨 **[Change theme](09-change-theme.md)** - Personalize the interface
 
-**Performance tuning:**
-- 📊 **[Performance guide](../performance/README.md)** - Optimize index and search speed
+**Need help?**
 - 🔍 **[Troubleshooting](../help/troubleshooting.md)** - Solve search issues
 
 ---
