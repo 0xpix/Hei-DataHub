@@ -41,10 +41,9 @@ Hei-DataHub/
 **Purpose:** Package initialization, version exports
 
 **Exports:**
-- `__version__`: Version string (e.g., "0.56.0-beta")
+- `__version__`: Version string (e.g., "0.59.0-beta")
 - `__app_name__`: Application name ("Hei-DataHub")
-- `GITHUB_REPO`: Repository URL
-- `UPDATE_CHECK_URL`: URL for checking updates
+- `UPDATE_CHECK_URL`: URL for checking updates (optional)
 
 **Dependencies:** `version.py`
 
