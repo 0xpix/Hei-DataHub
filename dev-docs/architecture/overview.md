@@ -243,8 +243,6 @@ class Dataset(BaseModel):
 | `db.py` | SQLite connection management (singleton pattern) |
 | `index.py` | FTS5 full-text search operations and index management |
 | `store.py` | YAML/JSON file I/O (load/save metadata) |
-| `git.py` | Git operations (legacy, mostly unused in cloud-first model) |
-| `github_api.py` | GitHub API client (legacy, optional integration) |
 
 **Design:**
 
@@ -489,26 +487,24 @@ graph TB
         DB[Database]
         Index[FTS Index]
         Store[YAML Store]
-        Git[Git Ops]
-        GitHub[GitHub API]
+        WebDAV[WebDAV Client]
     end
 
     Views --> Search
     Views --> Catalog
-    Views --> Publish
+    Views --> Sync
     Widgets --> Search
 
     Search --> Models
     Catalog --> Models
     Catalog --> Rules
-    Publish --> Store
-    Publish --> Git
-    Publish --> GitHub
     Sync --> Store
     Sync --> Index
+    Sync --> WebDAV
 
     Index --> DB
     Store --> Models
+    WebDAV --> Store
 ```
 
 ---
