@@ -16,25 +16,25 @@ This guide covers **code contributions** to Hei-DataHub. There are two types of 
 ```mermaid
 graph TB
     Start["🤝 Want to Contribute?"]
-    
+
     Start --> CodeQ{"Code or Datasets?"}
-    
+
     CodeQ -->|"Code: Bugs, Features, Docs"| CodePath["📝 Code Contribution"]
     CodeQ -->|"Datasets: Add/Edit Data"| DataPath["☁️ Dataset Contribution"]
-    
+
     CodePath --> Fork["Fork Repository"]
     Fork --> Branch["Create Feature Branch"]
     Branch --> Code["Write Code + Tests"]
     Code --> PR["Open Pull Request"]
     PR --> Review["Code Review"]
     Review --> Merge["Merge to Main"]
-    
+
     DataPath --> Auth["Authenticate WebDAV<br/>(hei-datahub auth setup)"]
     Auth --> TUI["Launch TUI<br/>(hei-datahub)"]
     TUI --> Edit["Create/Edit Datasets"]
     Edit --> AutoSync["Auto-Sync to Cloud"]
     AutoSync --> Done["✓ Available to Others"]
-    
+
     style CodePath fill:#e1f5ff
     style DataPath fill:#fff4e1
     style Merge fill:#d4edda
@@ -265,7 +265,7 @@ def search_datasets(
     Raises:
         SearchError: If query syntax is invalid
         DatabaseError: If database connection fails
-    
+
     Example:
         >>> results = search_datasets("climate precipitation")
         >>> results = search_datasets("tag:weather", {"date_after": "2024-01-01"})
