@@ -180,15 +180,15 @@ Once installed, you can:
    ```
 
 4. **Read the tutorials:**
-   - [First Steps](../20-tutorials/01-installation.md)
-   - [Adding Your First Dataset](../20-tutorials/02-first-dataset.md)
-   - [Search and Filters](../20-tutorials/03-search-and-filters.md)
+   - [Adding Your First Dataset](../how-to/05-first-dataset.md)
+   - [Editing Datasets](../how-to/06-edit-datasets.md)
+   - [Advanced Search](../how-to/07-search-advanced.md)
 
 ---
 
 ## Need Help?
 
-- 📖 Check the [FAQ](../90-faq.md)
+- 📖 Check the [FAQ](../help/90-faq.md)
 - 🐛 Report issues: [GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)
 - 💬 Ask questions in your team's communication channel
 
