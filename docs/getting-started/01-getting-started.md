@@ -142,15 +142,6 @@ When you run `hei-datahub` for the first time (v0.59+), the app will:
 - **macOS:** `~/Library/Application Support/Hei-DataHub/` (coming in v0.61)
 - **Windows:** `%LOCALAPPDATA%\Hei-DataHub\` (coming soon in v0.61)
 
-**Override workspace location:**
-```bash
-# Temporary
-hei-datahub --data-dir ~/my-custom-workspace
-
-# Persistent (add to ~/.bashrc or ~/.zshrc)
-export HEIDATAHUB_DATA_DIR=~/my-custom-workspace
-```
-
 **Expected output:**
 
 <p align="center">
@@ -176,8 +167,8 @@ export HEIDATAHUB_DATA_DIR=~/my-custom-workspace
 
 ```
 1. Navigate to any dataset in the results
-2. Press Enter or o to open details
-3. Press Escape or b to go back
+2. Press Enter or 'o' to open details
+3. Press Escape to go back
 ```
 
 ✅ **Expected:** Details screen shows all metadata fields
