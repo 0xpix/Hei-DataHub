@@ -1,4 +1,4 @@
-# The basics
+# The basics - Will be changed in future releases
 
 This guide covers the core concepts of Hei-DataHub: projects, datasets, fields, search, and metadata management.
 
@@ -16,14 +16,6 @@ A **dataset** is the fundamental unit in Hei-DataHub. Each dataset represents a 
 - **Metadata:** Stored in `data/<dataset-id>/metadata.yaml`
 - **Searchable:** Indexed in SQLite FTS5 for fast full-text search
 - **Validated:** JSON Schema ensures consistency
-
-**Example dataset structure:**
-
-```
-data/
-└── global-temperature-2024/
-    ├── metadata.yaml       ← Required metadata file
-```
 
 ---
 
