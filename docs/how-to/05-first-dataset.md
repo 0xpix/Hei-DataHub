@@ -610,7 +610,7 @@ Try adding another dataset to build muscle memory:
 - **Used In Projects:** `Wildfire Analysis 2024, Global Fire Trends`
 
 **Time:** ~5 minutes
- 
+
 **Goal:** Practice filling out the form efficiently and following best practices.
 
 ---
@@ -621,7 +621,6 @@ Try adding another dataset to build muscle memory:
 
 1. **[Edit Datasets](06-edit-datasets.md)** — Modify metadata using inline editing
 2. **[Search & Filters](07-search-advanced.md)** — Find datasets with field-specific queries
-3. **[Search Autocomplete](08-search-autocomplete.md)** - Autocomplete feature
 
 ---
 
