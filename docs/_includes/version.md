@@ -1,9 +1,9 @@
-!!! info "Version Notice — Streamline"
-    **This manual tracks Hei-DataHub v0.58.x (beta).**
+!!! info "Version Notice — Privacy"
+    **This manual tracks Hei-DataHub v0.59.x (beta).**
 
-    **Release:** 0.58.3-beta (2025-10-10)
-    **Codename:** Streamline WIN-SUCKS
+    **Release:** 0.59.0-beta (2025-10-10)
+    **Codename:** Privacy
 
-    Automatic desktop integration on Linux - icons and launcher installed automatically.
+    Privacy update - migrate from catalog in github repo to our own server (Linux only for now)
 
     **Compatibility note:** Features and shortcuts may differ slightly from other versions.
