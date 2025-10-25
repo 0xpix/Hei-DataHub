@@ -456,7 +456,7 @@ elif _is_dev_mode():
 
 - [UV Installation](./uv-install.md) - Install Hei-DataHub
 - [Troubleshooting](./troubleshooting.md) - Common issues
-- [Configuration](../12-config.md) - Configure the app
+- [Configuration](../reference/12-config.md) - Configure the app
 
 ## FAQ
 
