@@ -414,7 +414,7 @@ jobs:
 
       - name: Install Hei-DataHub
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${% raw %}{{ secrets.GH_PAT }}{% endraw %}
         run: |
           uv tool install "git+https://${GITHUB_TOKEN}@github.com/0xpix/Hei-DataHub.git#egg=hei-datahub"
 
