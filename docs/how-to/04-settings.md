@@ -326,35 +326,10 @@ hei-datahub auth setup
 
 ---
 
-## Understanding WebDAV Workflow
-
-### What happens when you add a dataset?
-
-1. **Metadata created locally** (optional buffer)
-2. **Upload to Heibox:**
-
-   - Create directory: `dataset-name/`
-   - Upload file: `dataset-name/metadata.yaml`
-   - Set permissions (inherit from library)
-3. **Index updated** - Fast search index refreshed
-4. **Team access** - Changes visible immediately to everyone with Heibox access
-5. **No Pull Requests** - Direct cloud storage, instant collaboration
-
-### Cloud vs Local Storage
-
-**v0.59 uses cloud-only storage:**
-
-- All datasets saved directly to Heibox
-- No local `data/` directory needed
-- Instant team collaboration
-- Better privacy (no Git commits)
-
----
-
 ## Related Documentation
 
-- [**Search for Datasets**](07-search-advanced.md) - Find and filter datasets in your catalog
-- [**Edit Datasets**](06-edit-datasets.md) - Modify existing dataset metadata (creates PRs)
+- [**First Dataset**](05-first-dataset.md) - Add dataset metadata
+- [**Edit Datasets**](06-edit-datasets.md) - Modify existing dataset metadata
 - [**FAQ**](../help/90-faq.md) - Common questions about GitHub integration
 - [**Troubleshooting**](../help/troubleshooting.md) - Resolve common issues
 
@@ -365,7 +340,6 @@ hei-datahub auth setup
 ✅ **WebDAV configured!** You're ready to:
 
 - Press `a` to add your first dataset
-- Press `/` to search and filter datasets
 - Press `s` anytime to update settings
 
 **Learn more:**
