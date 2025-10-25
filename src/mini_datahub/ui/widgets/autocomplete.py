@@ -1,147 +1,102 @@
 """
-Search autocomplete suggester for Textual Input widget.
-Provides inline suggestions for search field and operators.
+Smart autocomplete suggestions for Hei-DataHub search.
+
+Provides context-aware autocomplete with:
+- Field-specific suggestions (source:, project:, tag:, owner:, size:)
+- Ranked by frequency, recency, and prefix match
 """
+
+import logging
 from typing import Optional
 from textual.suggester import Suggester
 
-from mini_datahub.core.queries import QueryParser, suggest_field_completions
+logger = logging.getLogger(__name__)
 
 
-class SearchSuggester(Suggester):
-    """
-    Suggester for search input with field-aware autocomplete.
-
-    Provides suggestions for:
-    - Field names (source:, format:, type:, etc.)
-    - Field values (based on existing datasets)
-    """
+class SmartSearchSuggester(Suggester):
+    """Context-aware search suggester using metadata from index."""
 
     def __init__(self, case_sensitive: bool = False):
-        """
-        Initialize search suggester.
-
-        Args:
-            case_sensitive: Whether suggestions are case-sensitive
-        """
         super().__init__(case_sensitive=case_sensitive)
-        self._load_autocomplete_data()
+        self._suggestion_service = None
 
-    def _load_autocomplete_data(self) -> None:
-        """Load autocomplete data from existing datasets."""
-        try:
-            from mini_datahub.services.autocomplete import get_autocomplete_manager
+    def _get_service(self):
+        if self._suggestion_service is None:
+            try:
+                from mini_datahub.services.suggestion_service import get_suggestion_service
+                self._suggestion_service = get_suggestion_service()
+            except Exception as e:
+                logger.warning(f"Failed to load suggestion service: {e}")
+        return self._suggestion_service
 
-            self.manager = get_autocomplete_manager()
-            # Ensure manager has loaded data
-            if not self.manager.file_formats and not self.manager.data_types:
-                self.manager.load_from_catalog()
-        except Exception:
-            self.manager = None
-
-    async def get_suggestion(self, value: str) -> Optional[str]:
+    def _parse_input(self, value: str):
         """
-        Get autocomplete suggestion for the current input value.
-
-        Args:
-            value: Current input value
+        Parse input to detect if we're typing a field name or field value.
 
         Returns:
-            Suggested completion or None
+            tuple: (field_key, partial_value, is_typing_field_name)
+            - field_key: "project", "source", etc., or None if typing field name
+            - partial_value: the partial text being typed
+            - is_typing_field_name: True if typing field name, False if typing value
         """
         if not value or not value.strip():
-            return None
-
-        # Get the last token being typed
+            return (None, "", True)
         tokens = value.split()
         if not tokens:
-            return None
-
+            return (None, "", True)
         last_token = tokens[-1]
 
-        # Check if we're typing a field name (ends with :)
-        if ":" not in last_token:
-            # Suggest field name
-            matches = suggest_field_completions(last_token)
-            if matches:
-                # Return the full value with the first match
-                rest_of_input = " ".join(tokens[:-1])
-                if rest_of_input:
-                    return f"{rest_of_input} {matches[0]}:"
-                return f"{matches[0]}:"
-
-        # Check if we're typing a value after a colon
-        elif ":" in last_token:
+        # Check if typing a field value (has colon with something after it)
+        if ":" in last_token:
             parts = last_token.split(":", 1)
             if len(parts) == 2:
-                field, partial_value = parts
+                field = parts[0].lower()
+                partial_value = parts[1]
+                supported_fields = {"source", "project", "tag", "owner", "size", "format", "type"}
+                if field in supported_fields:
+                    # Typing field value
+                    return (field, partial_value, False)
 
-                if not self.manager:
-                    return None
+        # Typing field name (no colon yet, or unrecognized field)
+        return (None, last_token, True)
 
-                # Get suggestions for this field
-                suggestions = []
-                if field in ("format", "file_format"):
-                    suggestions = self.manager.suggest_file_formats(partial_value, limit=5)
-                elif field in ("type", "data_type"):
-                    suggestions = self.manager.suggest_data_types(partial_value, limit=5)
-                elif field == "project":
-                    suggestions = self.manager.suggest_projects(partial_value, limit=5)
-
-                if suggestions:
-                    # Return the full value with the first match
-                    rest_of_input = " ".join(tokens[:-1])
-                    if rest_of_input:
-                        return f"{rest_of_input} {field}:{suggestions[0]}"
-                    return f"{field}:{suggestions[0]}"
-
-        return None
-
-
-class FieldNameSuggester(Suggester):
-    """
-    Simple suggester that only suggests field names.
-    Lightweight alternative to SearchSuggester.
-    """
-
-    def __init__(self, case_sensitive: bool = False):
-        """Initialize field name suggester."""
-        super().__init__(case_sensitive=case_sensitive)
-
-        # Pre-compute all field suggestions
-        self.fields = sorted(QueryParser.SUPPORTED_FIELDS)
-
-    async def get_suggestion(self, value: str) -> Optional[str]:
-        """
-        Get field name suggestion.
-
-        Args:
-            value: Current input value
-
-        Returns:
-            Suggested field name or None
-        """
-        if not value or not value.strip():
+    async def get_suggestion(self, value: str):
+        service = self._get_service()
+        if not service or not value or not value.strip():
             return None
+        try:
+            field_key, partial_value, is_typing_field = self._parse_input(value)
 
-        # Get the last token
-        tokens = value.split()
-        if not tokens:
+            # If typing field name, suggest field names
+            if is_typing_field:
+                field_names = ["source:", "project:", "tag:", "owner:", "size:", "format:", "type:"]
+                partial_lower = partial_value.lower()
+
+                # Find matching field names
+                for field_name in field_names:
+                    if field_name.startswith(partial_lower) and field_name != partial_lower:
+                        # Found a match - return full suggestion
+                        tokens = value.split()
+                        if tokens:
+                            tokens[-1] = field_name
+                            return " ".join(tokens)
+                        else:
+                            return field_name
+
+                # No field name match
+                return None
+
+            # Otherwise, suggest field values
+            suggestions = service.get_suggestions(key=field_key, typed=partial_value, max_suggestions=1)
+            if not suggestions:
+                return None
+            top = suggestions[0]
+            tokens = value.split()
+            if tokens:
+                tokens[-1] = top.insert_text.rstrip()
+                return " ".join(tokens)
+            else:
+                return top.insert_text.rstrip()
+        except Exception as e:
+            logger.debug(f"Suggestion error: {e}")
             return None
-
-        last_token = tokens[-1].lower()
-
-        # Don't suggest if already has colon or is quoted
-        if ":" in last_token or '"' in last_token:
-            return None
-
-        # Find first matching field
-        for field in self.fields:
-            if field.startswith(last_token) and field != last_token:
-                # Return the full value with suggestion
-                rest_of_input = " ".join(tokens[:-1])
-                if rest_of_input:
-                    return f"{rest_of_input} {field}:"
-                return f"{field}:"
-
-        return None
