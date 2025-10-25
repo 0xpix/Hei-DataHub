@@ -526,14 +526,14 @@ max_results = 50
 
 #### `update_check.py` - Version Update Checker
 
-**Purpose:** Check for newer versions on GitHub
+**Purpose:** Check for newer versions
 
 **Key Function:**
 
 ```python
 def check_for_updates() -> Optional[UpdateInfo]:
     """
-    Check GitHub releases for newer version.
+    Check for newer version.
 
     Returns:
         UpdateInfo if update available, else None
