@@ -1,11 +1,11 @@
 
 <p align="center">
-    <img src="/Hei-DataHub/assets/dark_logo_inline_v1.svg" alt="Hei-DataHub Logo" width="500"/>
+    <img src="/Hei-DataHub/assets/Hei-datahub_logo_inline.svg" alt="Hei-DataHub Logo" width="500"/>
 </p>
 
 # The Hei-DataHub Manual
 
-Current version: `{{ project_version }}` (2025-10-10) — Codename: `{{ project_codename }}`
+Current version: `{{ project_version }}` (Oct 25, 2025) — Codename: `{{ project_codename }}`
 
 ---
 
@@ -15,39 +15,11 @@ Current version: `{{ project_version }}` (2025-10-10) — Codename: `{{ project_
 
 Everything runs locally—YAML files + SQLite database—no network required except for optional GitHub integration.
 
-## What's New in v0.58-beta 📚
+## What's New in v0.59-beta 📚
 
-**[Read the full What's New guide →](whats-new/0.58-beta.md)**
+**[Read the full What's New guide →](whats-new/0.59-beta.md)**
 
-## [0.58.3-beta] - 2025-10-10 - Windows Update Patch
-
-**The Windows SUCKS Patch** - This patch completely solves the "Failed to install entrypoint" error that plagued Windows users.
-
-### Added
-- Each OS now has its own dedicated, maintainable update script!
-- **Interactive Branch Selection** - Windows users can now choose update branch
-- **Update Repair Tool** - New `hei-datahub update --repair` command to fix broken installations
-- **Installation Health Check** - Pre-flight check for file locks before attempting update
-- **Better Error Recovery** - Specific error messages for "failed to remove directory" errors
-
-### Fixed
-- **Critical: "Failed to install entrypoint" Error** - The root cause and solution:
-  - **Problem**: Windows locks `.exe` files while they're running (OS error 32)
-  - **Previous Issue**: Running `uv tool install` while `hei-datahub.exe` was active
-  - **Solution**: External batch script + new terminal strategy
-  - **Result**: Python exits completely before update runs = no file lock!
-
-### **v0.58.2-beta** (Oct 10, 2025) — Bug fix release
-
-- **Atomic Updates** — Update command never breaks existing installation (Windows/Linux) - **Haven't tested on macOS yet**
-- **Self-Updating** — Desktop assets update automatically when app version changes
-- **Fix desktop-icon not showing** — Now: Icons and launcher installed automatically on first run in linux - **Haven't tested on Windows/macOS yet**
-
-### **v0.58.1-beta** (Oct 9, 2025) - Bug fix release
-
-- **Fix windows data not appearing in TUI** — Resolved issue with datasets not showing up on Windows installations - **Haven't tested on macOS yet**
-
-### **v0.58.0-beta** (Oct 9, 2025) - "Streamline" release
+## [0.59.0-beta] - Oct 25, 2025 - "Privacy" release
 
 - **UV-Based Install\Update** — Direct from GitHub—no cloning required
 - **Ephemeral Runs** — Test with `uvx` before installing
@@ -58,16 +30,15 @@ Everything runs locally—YAML files + SQLite database—no network required exc
 - **Directory Control** — `--data-dir` flag and environment variable support
 - **XDG Compliance** — Follows Linux desktop standards
 
-## What do we have so far (v0.58.x beta)
+## What do we have so far (v0.59.x beta)
 
 - **Uv -Based Install/Update:** Directly from GitHub using [UV](https://astral.sh/uv/)
-- **Local-First:** All data stored in YAML files + SQLite—no cloud dependencies
+- **Cloud based storage:** All data stored in YAML files + SQLite in the cloud
+- **Simple Storage:** One folder per dataset with `metadata.yaml`
 - **Fast Search:** Full-text search powered by SQLite FTS5 with structured query parsing
-- **Inline Editing:** Edit datasets directly in the TUI with undo/redo and validation
+- **Inline Editing:** Edit datasets directly in the TUI
 - **Validated Metadata:** JSON Schema + Pydantic validation ensure consistency
 - **Clean TUI:** Terminal interface built with Textual, Neovim-style keybindings
-- **Simple Storage:** One folder per dataset with `metadata.yaml`
-- **Automated PRs:** Save → PR workflow with GitHub integration (optional)
 - **Themeable:** 12 built-in themes with easy customization
 - **Customizable:** Configure keybindings, themes, and behavior
 
@@ -85,9 +56,6 @@ uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
 # Persistent install (recommended)
 uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
-
-# Create desktop launcher
-bash scripts/create_desktop_entry.sh
 ```
 
 ### Runtime Commands
@@ -95,7 +63,7 @@ bash scripts/create_desktop_entry.sh
 # Launch the TUI (use either command)
 hei-datahub
 
-# Run system diagnostics (new in v0.58)
+# Run system diagnostics (new from v0.58)
 hei-datahub doctor
 
 # Reindex from YAML files
