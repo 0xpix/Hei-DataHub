@@ -20,13 +20,10 @@ class SettingsMenuScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
-            Label("⚙️ Settings Menu  |  [italic]Choose a configuration option[/italic]", classes="title"),
+            Label("⚙️ Settings  |  [italic]Configuration[/italic]", classes="title"),
             Container(
-                Button("🎨 Theme & Preferences", id="btn-user-config", variant="primary"),
-                Label("[dim]Configure theme, appearance, and general settings[/dim]"),
-                Label(""),
-                Button("🔗 GitHub Integration", id="btn-github-settings", variant="default"),
-                Label("[dim]Configure GitHub credentials and PR automation[/dim]"),
+                Button("☁️ WebDAV (HeiBox)", id="btn-webdav-settings", variant="primary"),
+                Label("[dim]Configure HeiBox/WebDAV credentials for cloud storage[/dim]"),
                 Label(""),
                 Button("← Back", id="btn-cancel", variant="default"),
                 id="settings-menu-container",
@@ -34,15 +31,9 @@ class SettingsMenuScreen(Screen):
         )
         yield Footer()
 
-    @on(Button.Pressed, "#btn-user-config")
-    def on_user_config_button(self) -> None:
-        """Open user config screen."""
-        from mini_datahub.ui.views.user_config import UserConfigScreen
-        self.app.push_screen(UserConfigScreen())
-
-    @on(Button.Pressed, "#btn-github-settings")
-    def on_github_settings_button(self) -> None:
-        """Open GitHub settings screen."""
+    @on(Button.Pressed, "#btn-webdav-settings")
+    def on_webdav_settings_button(self) -> None:
+        """Open WebDAV settings screen."""
         from mini_datahub.ui.views.settings import SettingsScreen
         self.app.push_screen(SettingsScreen())
 
