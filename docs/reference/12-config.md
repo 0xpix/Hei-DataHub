@@ -1,20 +1,35 @@
 # Configuration Reference
 
+**(req. Hei-DataHub 0.59-beta or later)**
+
 ## Configuration Overview
 
-Hei-DataHub uses a **JSON config file** for persistent settings:
+Hei-DataHub uses a **YAML config file** for persistent settings:
 
-**Location:** `PROJECT_ROOT/.datahub_config.json`
+**Location:** `~/.config/hei-datahub/config.yaml`
 
 **Stored settings:**
 
-- GitHub integration (owner, repo, username, branch)
-- Auto-assign reviewers and PR labels
-- Feature toggles (auto-update check, autocomplete, debug logging)
+- Heibox/WebDAV integration (server URL, library ID)
+- Theme customization
+- Keybinding overrides
+- UI preferences
+- Performance tuning
 
 **Not stored in config:**
 
-- **GitHub PAT (Personal Access Token):** Stored in OS keyring (secure)
+- **WebDAV password:** Stored in OS keyring (Linux Secret Service) for security
+- **Search index:** Cached separately in `~/.cache/hei-datahub/index.db`
+
+**Authentication:**
+
+WebDAV credentials are managed via CLI commands:
+```bash
+hei-datahub auth setup     # Interactive setup wizard
+hei-datahub auth status    # Check connection
+hei-datahub auth doctor    # Troubleshoot issues
+hei-datahub auth clear     # Remove credentials
+```
 
 ---
 
@@ -22,120 +37,256 @@ Hei-DataHub uses a **JSON config file** for persistent settings:
 
 ### Location
 
+**Linux/macOS:**
 ```bash
-Hei-DataHub/.datahub_config.json
+~/.config/hei-datahub/config.yaml
 ```
 
-**Note:** This file is **not** version-controlled (`.gitignore` excludes it).
+**Windows:**
+```powershell
+%APPDATA%\hei-datahub\config.yaml
+```
+
+**Note:** This file is **user-specific** and not shared across team members.
 
 ---
 
 ### Full Schema
 
-```json
-{
-  "host": "github.com",
-  "owner": "0xpix",
-  "repo": "Hei-DataHub",
-  "default_branch": "main",
-  "username": "your-github-username",
-  "auto_assign_reviewers": ["reviewer1", "reviewer2"],
-  "pr_labels": ["dataset:add", "needs-review"],
-  "catalog_repo_path": null,
-  "auto_check_updates": true,
-  "suggest_from_catalog_values": true,
-  "background_fetch_interval_minutes": 0,
-  "debug_logging": false
-}
+```yaml
+# ~/.config/hei-datahub/config.yaml
+
+# ============================================================
+# THEME
+# ============================================================
+theme: "gruvbox"  # Choose from: catppuccin, dracula, gruvbox,
+                  # monokai, nord, one-dark, rose-pine, solarized,
+                  # tokyo-night, and more
+
+# ============================================================
+# HEIBOX/WEBDAV CONFIGURATION
+# ============================================================
+heibox:
+  server_url: "https://heibox.uni-heidelberg.de"
+  library_id: "your-library-uuid-here"
+  auto_sync: true               # Sync on save
+  sync_interval: 15             # Minutes between background syncs
+
+# ============================================================
+# KEYBINDINGS
+# ============================================================
+keybindings:
+  # Global actions
+  quit: "q"
+  help: "?"
+  search: "/"
+  settings: "s"
+  refresh: "r"
+
+  # Home screen
+  add_dataset: "a"
+  open_dataset: "enter"
+  delete_dataset: "d"
+  vim_down: "j"
+  vim_up: "k"
+  vim_top: "g g"
+  vim_bottom: "shift+g"
+  page_down: "ctrl+d"
+  page_up: "ctrl+u"
+
+  # Details screen
+  edit_dataset: "e"
+  publish_dataset: "p"
+  copy_source: "c"
+  open_url: "o"
+  back: "escape"
+
+  # Edit screen
+  save: "ctrl+s"
+  cancel: "escape"
+  undo: "ctrl+z"
+  redo: "ctrl+shift+z"
+
+# ============================================================
+# UI PREFERENCES
+# ============================================================
+ui:
+  enable_critter_parade: true   # Animated critters on load
+  reduce_motion: false          # Accessibility: disable animations
+  startup_message: true         # Show welcome message
+  confirm_delete: true          # Confirm before deleting datasets
+
+# ============================================================
+# SEARCH SETTINGS
+# ============================================================
+search:
+  fuzzy_matching: true          # Allow typos in search
+  auto_complete: true           # Show suggestions as you type
+  max_results: 100              # Maximum search results to show
+  highlight_matches: true       # Highlight matched terms
+
+# ============================================================
+# PERFORMANCE
+# ============================================================
+performance:
+  cache_size_mb: 50             # Search index cache size
+  background_indexing: true     # Index while app runs
+  preload_datasets: true        # Load dataset list on startup
 ```
 
 ---
 
 ### Configuration Keys
 
-#### GitHub Configuration
+#### Heibox Configuration
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `host` | String | `"github.com"` | GitHub hostname (use custom for GitHub Enterprise) |
-| `owner` | String | `""` | Repository owner (username or org) |
-| `repo` | String | `""` | Repository name |
-| `default_branch` | String | `"main"` | Base branch for PRs |
-| `username` | String | `""` | Your GitHub username |
-| `auto_assign_reviewers` | List[String] | `[]` | Auto-assign these users to PRs |
-| `pr_labels` | List[String] | `["dataset:add", "needs-review"]` | Labels applied to PRs |
-| `catalog_repo_path` | String | `null` | Local path to separate catalog repo (beta: unused) |
+| `heibox.server_url` | String | `"https://heibox.uni-heidelberg.de"` | WebDAV server URL |
+| `heibox.library_id` | String | `""` | Seafile library UUID |
+| `heibox.auto_sync` | Boolean | `true` | Automatically sync datasets on save |
+| `heibox.sync_interval` | Integer | `15` | Minutes between background syncs |
+
+**Note:** Username and password are stored securely in system keyring, not in config file.
 
 ---
 
-#### Feature Toggles
+#### Theme Configuration
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `auto_check_updates` | Boolean | `true` | Check for new releases weekly |
-| `suggest_from_catalog_values` | Boolean | `true` | Autocomplete suggestions from existing datasets |
-| `background_fetch_interval_minutes` | Integer | `0` | Background fetch interval (0 = disabled) |
-| `debug_logging` | Boolean | `false` | Enable debug-level logs |
+| `theme` | String | `"gruvbox"` | Color scheme name |
+
+**Available themes:**
+- `catppuccin` - Pastel colors with warm tones
+- `dracula` - Dark theme with purple accents
+- `gruvbox` - Retro warm colors (default)
+- `monokai` - Classic dark editor theme
+- `nord` - Arctic blue-ish theme
+- `one-dark` - Atom editor inspired
+- `rose-pine` - Natural pine colors
+- `solarized` - Low-contrast classic
+- `tokyo-night` - Modern dark theme
+- And more...
+
+See [Theme Customization Guide](../how-to/09-change-theme.md) for details.
 
 ---
 
-## GitHub Configuration
+#### Keybinding Configuration
 
-💡 **See the comprehensive [GitHub Settings Guide](../how-to/04-settings.md)** for detailed setup instructions, including:
-- Step-by-step PAT creation (fine-grained vs classic tokens)
-- Using the automated setup script (`setup_pr_workflow.sh`)
-- Troubleshooting common issues
+| Section | Description |
+|---------|-------------|
+| `keybindings` | Custom keyboard shortcuts |
+
+**Example customizations:**
+```yaml
+keybindings:
+  search: "ctrl+f"        # VS Code style
+  add_dataset: "ctrl+n"   # New file convention
+  quit: "ctrl+q"          # Standard quit
+```
+
+See [Keybindings Guide](../how-to/08-customize-keybindings.md) for complete reference.
+
+---
+
+#### UI Preferences
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `ui.enable_critter_parade` | Boolean | `true` | Show animated critters on startup |
+| `ui.reduce_motion` | Boolean | `false` | Disable animations for accessibility |
+| `ui.startup_message` | Boolean | `true` | Show welcome message |
+| `ui.confirm_delete` | Boolean | `true` | Confirm before deleting datasets |
+
+---
+
+#### Search Settings
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `search.fuzzy_matching` | Boolean | `true` | Allow typos in search |
+| `search.auto_complete` | Boolean | `true` | Show autocomplete suggestions |
+| `search.max_results` | Integer | `100` | Maximum search results |
+| `search.highlight_matches` | Boolean | `true` | Highlight matched terms |
+
+---
+
+#### Performance Settings
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `performance.cache_size_mb` | Integer | `50` | Search index cache size |
+| `performance.background_indexing` | Boolean | `true` | Index while app runs |
+| `performance.preload_datasets` | Boolean | `true` | Load dataset list on startup |
+
+---
+
+## Heibox Configuration
+
+💡 **See the comprehensive [Heibox Settings Guide](../how-to/04-settings.md)** for detailed setup instructions, including:
+- Step-by-step WebDAV setup
+- Finding your Library ID
+- Troubleshooting connection issues
 - Security best practices
 
-### Quick Setup via TUI
+### Quick Setup via CLI
 
-1. Press ++s++ to open Settings screen
-2. Fill in required fields:
-    - **GitHub Owner:** Your username or org (e.g., `0xpix`)
-    - **Repository Name:** Repo name (e.g., `Hei-DataHub`)
-    - **GitHub Username:** Your GitHub username
-    - **Personal Access Token (PAT):** Token with appropriate permissions
-3. Press ++ctrl+s++ to save
+Interactive setup wizard:
+
+```bash
+hei-datahub auth setup
+```
+
+**Prompts:**
+
+1. **Server URL:** `https://heibox.uni-heidelberg.de`
+2. **Username:** Your Heibox/Uni Heidelberg username
+3. **Password:** Your WebDAV password (separate from web login)
+4. **Library ID:** UUID from Heibox library settings
 
 **Result:**
 
-- Config saved to `.datahub_config.json`
-- PAT saved to OS keyring (secure storage)
+- Credentials saved to system keyring (encrypted)
+- Connection tested and validated
+- Config file updated with server URL and library ID
 
-**Token Requirements:**
-- **Fine-grained tokens** (recommended): `Contents: Read and write` + `Pull requests: Read and write`
-- **Classic tokens**: `repo` scope
+**Authentication commands:**
 
-📖 [Detailed token setup guide](../how-to/04-settings.md#step-1-create-a-personal-access-token-pat)
+```bash
+hei-datahub auth status    # Check connection status
+hei-datahub auth doctor    # Troubleshoot issues
+hei-datahub auth clear     # Remove credentials
+```
+
+📖 [Detailed setup guide](../how-to/04-settings.md)
 
 **Security:**
 
-- PAT stored in OS keyring (Keychain on macOS, Secret Service on Linux, Credential Manager on Windows)
-- **Never** stored in plain text
+- Password stored in OS keyring (Linux Secret Service with AES-256 encryption)
+- **Never** stored in plain text config file
+- Transmitted over HTTPS only
 
 ---
 
 ### Manual Configuration
 
-Edit `.datahub_config.json` directly:
+Edit `~/.config/hei-datahub/config.yaml` directly:
 
-```json
-{
-  "host": "github.com",
-  "owner": "0xpix",
-  "repo": "Hei-DataHub",
-  "default_branch": "main",
-  "username": "your-github-username",
-  "auto_assign_reviewers": ["teammate1"],
-  "pr_labels": ["dataset:add", "needs-review"]
-}
+```yaml
+heibox:
+  server_url: "https://heibox.uni-heidelberg.de"
+  library_id: "abc123-def456-ghi789"
+  auto_sync: true
+  sync_interval: 15
 ```
 
-**Set PAT via Python:**
+**Set credentials via CLI:**
 
-```python
-import keyring
-keyring.set_password("mini-datahub", "github-token", "ghp_YourTokenHere")
+```bash
+hei-datahub auth setup
+# Follow interactive prompts
 ```
 
 ---
