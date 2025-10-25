@@ -103,7 +103,7 @@ class HomeScreen(Screen):
             Static(logo_text, id="banner"),
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
-            Static(id="github-status"),
+            Static(id="heibox-status"),
             Input(placeholder="Type / to search | Tab/→/Ctrl+F for autocomplete | Enter to view", id="search-input"),
             Horizontal(id="filter-badges-container", classes="filter-badges"),
             Label("All Datasets", id="results-label"),
@@ -123,8 +123,8 @@ class HomeScreen(Screen):
         # Setup search autocomplete
         self._setup_search_autocomplete()
 
-        # Update GitHub status indicator
-        self.update_github_status()
+        # Update Heibox status indicator
+        self.update_heibox_status()
 
         # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
@@ -216,6 +216,42 @@ class HomeScreen(Screen):
             status_widget.update("[yellow]⚠ GitHub Configured (connection failed)[/yellow] [dim]Press S for Settings[/dim]")
         else:
             status_widget.update("[dim]○ GitHub Not Connected[/dim] [dim]Press S to configure[/dim]")
+
+    def update_heibox_status(self) -> None:
+        """Update Heibox/WebDAV connection status display."""
+        try:
+            from mini_datahub.infra.config_paths import get_config_path
+
+            status_widget = self.query_one("#heibox-status", Static)
+
+            # Check if configured and connected
+            if self.app.heibox_connected:
+                # Simply show synced status without username
+                status_widget.update("[green]☁ Synced to Hei-box[/green]")
+            else:
+                # Check if configured but not connected
+                config_path = get_config_path()
+                if config_path.exists():
+                    try:
+                        import tomllib as tomli
+                    except ImportError:
+                        import tomli
+
+                    with open(config_path, "rb") as f:
+                        config = tomli.load(f)
+
+                    if "auth" in config:
+                        status_widget.update("[yellow]⚠ Hei-box Configured (connection failed)[/yellow] [dim]Run: hei-datahub auth doctor[/dim]")
+                    else:
+                        status_widget.update("[dim]○ Hei-box Not Connected[/dim] [dim]Run: hei-datahub auth setup[/dim]")
+                else:
+                    status_widget.update("[dim]○ Hei-box Not Connected[/dim] [dim]Run: hei-datahub auth setup[/dim]")
+
+        except Exception as e:
+            logger.debug(f"Failed to update heibox status: {e}")
+            # Fallback to simple message
+            status_widget = self.query_one("#heibox-status", Static)
+            status_widget.update("[dim]○ Hei-box Status Unknown[/dim]")
 
 
     def load_all_datasets(self, force_refresh: bool = False) -> None:
@@ -2696,6 +2732,8 @@ class DataHubApp(App):
 
     # Track GitHub connection status
     github_connected = reactive(False)
+    # Track WebDAV/Heibox connection status
+    heibox_connected = reactive(False)
 
     def on_mount(self) -> None:
         """Initialize the app."""
@@ -2749,6 +2787,9 @@ class DataHubApp(App):
         # Check GitHub connection status
         self.check_github_connection()
 
+        # Check WebDAV/Heibox connection status
+        self.check_heibox_connection()
+
         # Apply theme from config
         theme_name = self.config.get("theme.name", "gruvbox")
         self.theme = theme_name
@@ -2791,6 +2832,86 @@ class DataHubApp(App):
 
         except Exception:
             self.github_connected = False
+
+    def check_heibox_connection(self) -> None:
+        """Check WebDAV/Heibox connection status on startup."""
+        try:
+            from mini_datahub.infra.config_paths import get_config_path
+
+            # Check if config exists
+            config_path = get_config_path()
+            if not config_path.exists():
+                self.heibox_connected = False
+                return
+
+            # Try to load config
+            try:
+                import tomllib as tomli
+            except ImportError:
+                import tomli
+
+            with open(config_path, "rb") as f:
+                config = tomli.load(f)
+
+            # Check if auth section exists
+            if "auth" not in config:
+                self.heibox_connected = False
+                return
+
+            auth_config = config.get("auth", {})
+            url = auth_config.get("url")
+            username = auth_config.get("username")
+            key_id = auth_config.get("key_id")
+
+            if not all([url, username, key_id]):
+                self.heibox_connected = False
+                return
+
+            # Try to load credentials
+            from mini_datahub.auth.credentials import get_auth_store
+
+            store = get_auth_store(prefer_keyring=True)
+            credential = store.load_secret(key_id)
+
+            if not credential:
+                self.heibox_connected = False
+                return
+
+            # Quick connection test (HEAD request to server)
+            import requests
+            from urllib.parse import urlparse
+
+            parsed = urlparse(url)
+            test_url = f"{parsed.scheme}://{parsed.netloc}"
+
+            try:
+                response = requests.head(
+                    test_url,
+                    auth=(username, credential),
+                    timeout=3,
+                    verify=True
+                )
+                # Accept any non-error response (even 404 means server is reachable)
+                self.heibox_connected = response.status_code < 500
+            except requests.exceptions.RequestException:
+                # Network error - server not reachable
+                self.heibox_connected = False
+
+        except Exception as e:
+            logger.debug(f"Heibox connection check failed: {e}")
+            self.heibox_connected = False
+
+    def refresh_heibox_status(self) -> None:
+        """Refresh Heibox connection status (called after auth setup)."""
+        self.check_heibox_connection()
+
+        # Update home screen if it exists
+        try:
+            for screen in self.screen_stack:
+                if isinstance(screen, HomeScreen):
+                    screen.update_heibox_status()
+        except Exception:
+            pass
 
     def refresh_github_status(self) -> None:
         """Refresh GitHub connection status (called after settings save)."""
