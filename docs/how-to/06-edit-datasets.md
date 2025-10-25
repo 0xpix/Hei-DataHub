@@ -1,10 +1,21 @@
 # How to Edit Datasets
 
-Requirements: Hei-DataHub 0.56-beta or later
+**Requirements:** Hei-DataHub 0.59-beta or later, WebDAV configured
 
-**Goal:** Change dataset information directly in the app without editing YAML files manually.
+**Goal:** Change dataset information directly in the app with instant cloud sync.
 
 **Time:** 2-5 minutes
+
+---
+
+## Overview
+
+Editing datasets in Hei-DataHub v0.59:
+
+- ✅ **Edit inline** - No manual YAML editing needed
+- ✅ **Instant cloud sync** - Changes uploaded to Heibox immediately
+- ✅ **Team visibility** - Everyone sees updates in real-time
+- ✅ **Auto-indexing** - Search results update automatically
 
 ---
 
@@ -30,7 +41,7 @@ Once you're viewing the dataset details:
 
 1. Press **`e`** to start editing
 2. You'll see the edit form with all editable fields
-3. The first field (usually "Name") will be selected
+3. The first field will be selected
 
 **What you'll see:**
 ```
@@ -72,15 +83,18 @@ Once you're viewing the dataset details:
 When you're done editing:
 
 1. Press **`Ctrl+s`** to save
-2. Wait for the success message: "✅ Dataset saved and reindexed"
-3. The details view refreshes automatically
+2. You'll see: "Uploading to Heibox..."
+3. Success message: "✅ Dataset saved and synced to cloud"
+4. Details view refreshes automatically
 
 **What happens when you save:**
 
-- Original YAML file is backed up
-- New values are written to disk
-- Database is automatically updated
-- Search index is refreshed
+- Changes uploaded to Heibox immediately
+- Search index updated automatically
+- **Team members see changes instantly** (no waiting)
+- Cloud becomes the source of truth
+
+**Note:** If Heibox is not connected, changes are saved to local buffer and will sync when connection is restored.
 
 ---
 
@@ -121,16 +135,10 @@ Changed your mind?
 
 ---
 
-## Bulk Changes (Future)
-
-Currently, you must edit datasets one at a time. Bulk editing is planned for version 0.60-beta (will decide later).
-
----
-
 ## Tips & Tricks
 
 ### ✅ Save Often
-Press `Ctrl+s` frequently. Each save creates a backup of the original file.
+Press `Ctrl+s` frequently. Each save syncs to Heibox immediately.
 
 ### ✅ Use Undo
 Made a typo? `Ctrl+z` works across all fields (until you save).
@@ -138,75 +146,11 @@ Made a typo? `Ctrl+z` works across all fields (until you save).
 ### ✅ Check Validation
 If a field turns red or shows an error, fix it before saving.
 
-### ✅ Close and Reopen
-After saving, the details view refreshes automatically. You don't need to restart the app.
+### ✅ Instant Team Updates
+After saving, team members with Heibox access see changes immediately in their TUI.
 
----
-
-## Troubleshooting
-
-### "Save failed" Error
-
-**Symptom:** You press `Ctrl+s` but see an error message.
-
-**Possible causes:**
-
-1. **Name conflict** – Another dataset has the same name
-2. **Invalid date format** – Use `YYYY-MM-DD`
-3. **File permission error** – Check folder write permissions
-
-**What to do:**
-
-- Read the error message carefully
-- Fix the highlighted field
-- Try saving again
-
----
-
-### Edited Dataset Reverts After Closing App
-
-**Known issue in 0.57-beta:**
-
-**Workaround:**
-
-1. After editing, verify YAML file was updated:
-   ```bash
-   cat data/my-dataset/metadata.yaml
-   ```
-2. If YAML is correct but app shows old data, reindex:
-   ```bash
-   hei-datahub reindex
-   ```
-
-This issue is being investigated for {{ project_version }}
-
----
-
-### Edit Form Doesn't Scroll on Small Screens
-
-**Known issue:** If your terminal is small, some fields may be hidden.
-
-**Workarounds:**
-
-- Resize your terminal to at least 80x24
-- Use `Tab` to navigate to hidden fields
-- Edit the YAML file manually for now
-
-Scrollable edit forms coming in version 0.57-beta.
-
----
-
-### Can't Edit Array Fields
-
-**Example:** The `schema_fields` array (column definitions) is not editable in the form.
-
-**Workaround:**
-Edit these fields manually in the YAML file:
-```bash
-vim data/my-dataset/metadata.yaml
-```
-
-Array editing coming in a future release.
+### ✅ Offline Editing
+If Heibox is offline, edits are buffered locally and sync when connection is restored.
 
 ---
 
@@ -214,14 +158,17 @@ Array editing coming in a future release.
 
 Let's edit a dataset called `weather-2024`:
 
-1. Launch app: `hei-datahub`
-2. Search: Type `weather`
-3. Select: Press `Enter` on `weather-2024`
-4. Edit: Press `E`
-5. Change description: Tab to "Description", type `Updated weather data for 2024`
-6. Change format: Tab to "Format", type `parquet` (was `csv`)
-7. Save: Press `Ctrl+S`
-8. Verify: Details screen shows new values
+1. **Launch app:** `hei-datahub`
+2. **Verify Heibox status:** Look for ` Synced to Hei-box` (green)
+3. **Search:** Type `weather`
+4. **Select:** Press `Enter` on `weather-2024`
+5. **Edit:** Press `e`
+6. **Change description:** Tab to "Description", type `Updated weather data for 2024`
+7. **Change format:** Tab to "Format", type `parquet` (was `csv`)
+8. **Save:** Press `Ctrl+s`
+9. **Wait for sync:** "Uploading to Heibox..." → "✅ Dataset saved and synced to cloud"
+10. **Verify:** Details screen shows new values
+11. **Team sees it:** Anyone with Heibox access sees updates immediately
 
 Done! 🎉
 
@@ -230,14 +177,15 @@ Done! 🎉
 ## Next Steps
 
 - **[Search for your updated dataset](07-search-advanced.md)** using field filters
-- **[Customize keyboard shortcuts](08-customize-keybindings.md)** (change `E` to something else)
+- **[Customize keyboard shortcuts](08-customize-keybindings.md)** (change `e` to something else)
 - **[Learn about themes](09-change-theme.md)** for visual customization
 
 ---
 
 ## Related
 
-- [Configuration reference](../reference/12-config.md)
-- [Keyboard shortcuts](../reference/keybindings.md)
-- [Troubleshooting](../help/troubleshooting.md)
-- [What's New](../whats-new/0.57-beta.md)
+- **[Settings Guide](04-settings.md)** - WebDAV configuration
+- **[Privacy & Security](../privacy-and-security.md)** - How data is stored
+- **[Keyboard shortcuts](../reference/keybindings.md)** - Complete shortcut reference
+- **[Troubleshooting](../help/troubleshooting.md)** - Common issues
+- **[What's New in 0.59-beta](../whats-new/0.59-beta.md)** - Latest features

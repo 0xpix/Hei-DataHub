@@ -242,59 +242,6 @@ If you have color vision deficiency, try **high-contrast themes** like solarized
 
 ---
 
-## Troubleshooting
-
-### Theme Doesn't Change
-
-**Problem:** You edited the config but the theme looks the same.
-
-**Solutions:**
-
-1. **Restart the app** – Changes don't apply until restart
-2. **Check spelling** – Theme names are case-sensitive and must match exactly
-3. **Check YAML syntax** – Incorrect YAML is silently ignored
-
----
-
-### Theme Looks Weird
-
-**Problem:** Colors are wrong or hard to read.
-
-**Possible causes:**
-
-1. **Terminal doesn't support 256 colors** – Check your terminal settings
-2. **Terminal theme conflicts** – Your terminal's own color scheme may override app colors
-
-**Solutions:**
-
-- Use a modern terminal (iTerm2, Windows Terminal, Alacritty, etc.)
-- Set terminal to use "default" or "true color" mode
-- Try a different theme
-
----
-
-### How to Reset to Default
-
-Delete the `theme:` line or set it to:
-
-```yaml
-theme: "gruvbox"
-```
-
----
-
-## Terminal Compatibility
-
-### ✅ Recommended Terminals
-
-These terminals have excellent theme support:
-
-- **Linux:** Alacritty, Kitty, GNOME Terminal, Konsole
-- **macOS:** iTerm2, Alacritty, Kitty
-- **Windows:** Windows Terminal, Alacritty
-
----
-
 ### ⚠️ Limited Support
 
 These terminals may have issues:
@@ -357,7 +304,6 @@ theme: "dracula"        # High contrast, dark
 ## Next Steps
 
 - **[Customize keybindings](08-customize-keybindings.md)** to match your workflow
-- **[Configure GitHub integration](../reference/12-config.md)** for publishing
 - **[See all config options](../reference/12-config.md)** for more customization
 
 ---
