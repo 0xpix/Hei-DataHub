@@ -887,7 +887,7 @@ climate project:weather format:csv type:time-series
 - **[Authentication & Sync](auth-and-sync.md)** - WebDAV sync for search index updates
 - **[Security & Privacy](security-privacy.md)** - Search data privacy
 - **[Module Walkthrough](../codebase/module-walkthrough.md)** - Code-level details
-- **[Performance](performance.md)** - Search performance tuning
+- **[Performance](../performance/overview.md)** - Search performance tuning
 
 ---
 
