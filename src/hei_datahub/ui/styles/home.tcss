@@ -1,19 +1,12 @@
-/* ============================================================================
-   HOME SCREEN STYLES - Hei-DataHub
-   All selectors scoped to HomeScreen to prevent leakage
-   ============================================================================ */
+/* Home Screen Styles for Hei-DataHub */
 
-HomeScreen {
-    layout: vertical;
-}
-
-HomeScreen #banner {
+#banner {
     text-align: center;
     padding: 1 0;
     background: $panel;
 }
 
-HomeScreen #update-status {
+#update-status {
     text-align: center;
     padding: 1;
     background: #dbeafe;
@@ -22,149 +15,195 @@ HomeScreen #update-status {
     border-right: solid #2563eb;
 }
 
-HomeScreen #update-status.hidden {
+#update-status.hidden {
     display: none;
 }
 
-HomeScreen #mode-indicator {
+#mode-indicator {
     text-align: center;
     padding: 1 0;
     background: $panel;
 }
 
-HomeScreen .title {
+.title {
     text-align: center;
     text-style: bold;
     padding: 1;
     background: $primary;
 }
 
-HomeScreen #search-container {
-    height: 1fr;
+#github-status {
+    text-align: right;
+    padding: 0 1;
+    background: $panel;
+}
+
+.pr-status {
+    margin-top: 2;
+    padding: 1;
+    text-align: center;
+    background: $panel;
+}
+
+#search-container {
+    height: 100%;
     padding: 1;
 }
 
-HomeScreen #filter-badges-container {
+#filter-badges-container {
     height: auto;
     margin: 1 0;
     padding: 0;
     overflow-x: auto;
-    overflow-y: auto;
-    grid-gutter: 1;  /* No gutter at all */
+    overflow-y: hidden;
+    layout: horizontal;
 }
 
-HomeScreen .filter-badge {
+.filter-badge {
     margin: 0 1 0 0;
-    padding: 0 1;
+    padding: 1 1;
     background: $accent;
     width: auto;
-    height: auto;  /* Auto height to fit content */
-    min-height: 1;  /* Minimum 1 line */
+    height: auto;
 }
 
 /* Retro color palette for badges - muted, vintage colors */
-HomeScreen .badge-retro-teal {
+.badge-retro-teal {
     background: #5a9a8a;
     color: #ffffff;
 }
 
-HomeScreen .badge-retro-coral {
+.badge-retro-coral {
     background: #c97064;
     color: #ffffff;
 }
 
-HomeScreen .badge-retro-sage {
+.badge-retro-sage {
     background: #8b9a7a;
     color: #ffffff;
 }
 
-HomeScreen .badge-retro-mauve {
+.badge-retro-mauve {
     background: #9a7a9a;
     color: #ffffff;
 }
 
-HomeScreen .badge-retro-amber {
+.badge-retro-amber {
     background: #b8945a;
     color: #ffffff;
 }
 
-HomeScreen .badge-retro-slate {
+.badge-retro-slate {
     background: #6a7a8a;
     color: #ffffff;
 }
 
-HomeScreen #results-label {
+#results-label {
     padding: 1 0;
     text-style: bold;
 }
 
-HomeScreen #results-table {
+#results-table {
     height: 1fr;
     margin-top: 1;
 }
 
-HomeScreen #add-data-scroll {
+#details-container {
+    height: 100%;
+    padding: 1;
+}
+
+#details-content {
+    padding: 1;
+}
+
+#add-data-scroll {
     height: 100%;
     overflow-y: auto;
     scrollbar-size: 1 1;
 }
 
-HomeScreen #form-container {
+#form-container {
     padding: 1;
     padding-bottom: 3;
     height: auto;
     min-height: 100%;
 }
 
-HomeScreen #form-container Label {
+#form-container Label {
     margin-top: 1;
 }
 
-HomeScreen #form-container Input,
-HomeScreen #form-container TextArea {
+#form-container Input,
+#form-container TextArea {
     margin-bottom: 1;
 }
 
-HomeScreen #form-container TextArea {
+#form-container TextArea {
     height: 5;
 }
 
-HomeScreen #form-container Button {
+#form-container Button {
     margin: 1 1 2 0;
 }
 
-HomeScreen #form-container Horizontal {
+#form-container Horizontal {
     margin-bottom: 2;
 }
 
-HomeScreen #error-message {
+#error-message {
     color: $error;
     margin-top: 1;
     margin-bottom: 2;
 }
 
-HomeScreen #help-content {
+#probe-status {
+    margin-left: 1;
+    align: center middle;
+}
+
+#help-content {
     padding: 2;
 }
 
-HomeScreen #settings-container {
+#settings-container {
     padding: 2;
     height: auto;
 }
 
-HomeScreen #settings-container Label {
+#settings-container Label {
     margin-top: 1;
 }
 
-HomeScreen #settings-container Input {
+#settings-container Input {
     margin-bottom: 1;
 }
 
-HomeScreen #settings-container Button {
+#settings-container Button {
     margin: 1 1 1 0;
 }
 
-HomeScreen #status-message {
-    margin: 1;
-    padding: 2;
+#status-message {
+    margin-top: 2;
+    padding: 1;
+}
+
+#outbox-container {
+    height: 100%;
+    padding: 1;
+}
+
+#outbox-label {
+    padding: 1 0;
+    text-style: bold;
+}
+
+#outbox-table {
+    height: 1fr;
+    margin: 1 0;
+}
+
+#outbox-status {
+    margin-top: 1;
+    padding: 1;
 }
