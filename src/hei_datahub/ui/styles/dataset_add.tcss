@@ -7,6 +7,7 @@
 AddDataScreen {
     background: $surface;
     layout: vertical;
+    align: center top;
 }
 
 AddDataScreen Header {
@@ -75,25 +76,12 @@ AddDataScreen .title {
    ============================================================================ */
 
 AddDataScreen #form-container Label {
-    margin: 1 0 0 0;
-    color: $text;
-    text-style: bold;
+    margin-top: 1;
 }
 
 AddDataScreen #form-container Input,
 AddDataScreen #form-container TextArea {
-    width: 100%;
-    margin: 0 0 1 0;
-    background: $surface;
-    color: $text;
-    border: round $primary 20%;
-    padding: 0 1;
-}
-
-AddDataScreen #form-container Input:focus,
-AddDataScreen #form-container TextArea:focus {
-    border: round $accent 40%;
-    background: $surface;
+    margin-bottom: 1;
 }
 
 AddDataScreen #form-container TextArea {
@@ -171,12 +159,18 @@ AddDataScreen #error-message {
     background: $error 10%;
     border: round $error 30%;
     color: $error;
-    padding: 1;
-    margin: 1 0 2 0;
-    min-height: 0;
-    height: auto;
+    margin-top: 1;
+    margin-bottom: 2;
 }
 
-AddDataScreen #error-message:empty {
-    display: none;
+AddDataScreen #probe-status {
+    margin-left: 1;
+    align: center middle;
+}
+
+AddDataScreen .title {
+    text-align: center;
+    text-style: bold;
+    padding: 1;
+    background: $primary;
 }
