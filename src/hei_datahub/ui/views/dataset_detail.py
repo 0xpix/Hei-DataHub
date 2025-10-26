@@ -49,7 +49,7 @@ class CloudDatasetDetailsScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
-            Label(f"☁️ Dataset: {self.dataset_id}", classes="title"),
+            Label(f"󱤟 Dataset: {self.dataset_id}", classes="title"),
             Static(id="details-content"),
             id="details-container",
         )
