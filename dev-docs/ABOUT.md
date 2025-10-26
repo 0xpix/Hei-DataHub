@@ -1,17 +1,12 @@
 # Developer Documentation Site - README
 
-> **Version:** 0.60.0-beta — "Clean-up"
-> This documentation reflects the refactored architecture, improved UI polish, and codebase cleanup for Hei-DataHub.
-
 ## Overview
 
-This is the **developer documentation site** for Hei-DataHub. It lives on the `docs/v0.60-beta-update` branch and is published independently from the user-facing documentation.
+This is the **developer documentation site** for Hei-DataHub. It lives on the `docs/devs` branch and is published independently from the user-facing documentation.
 
-**🌐 Published Site:** https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1
+**🌐 Published Site:** https://0xpix.github.io/Hei-DataHub/dev
 
 **📖 User Docs (separate):** https://0xpix.github.io/Hei-DataHub
-
-**🎓 Tutorial Docs (separate):** https://0xpix.github.io/Hei-DataHub/tutorial
 
 ---
 
@@ -66,19 +61,19 @@ dev-docs/
 ### Prerequisites
 
 ```bash
-# Python 3.11+ required
+# Python 3.9+ required
 python --version
 
 # Install dependencies
 cd /path/to/Hei-DataHub
-uv sync
+pip install -r dev-docs/requirements.txt
 ```
 
 ### Local Development
 
 ```bash
 # Switch to the dev-docs branch
-git checkout docs/v0.60-beta-update
+git checkout docs/devs
 
 # Serve locally (auto-reload on save)
 mkdocs serve -f mkdocs-dev.yml
@@ -102,43 +97,51 @@ mkdocs build -f mkdocs-dev.yml --site-dir dev-site
 
 **Publishing is automated via GitHub Actions.**
 
-Workflow: `.github/workflows/pages.yml`
+Workflow: `.github/workflows/dev-docs.yml`
 
-**On every push to `docs/v0.60-beta-update` branch:**
+**On every push to `docs/devs` branch:**
 
 1. GitHub Actions checks out the branch
 2. Installs dependencies from `dev-docs/requirements.txt`
 3. Builds the site with `mkdocs build -f mkdocs-dev.yml`
-4. Publishes to GitHub Pages at `/x9k2m7n4p8q1/`
+4. Publishes to GitHub Pages at a subdirectory or custom domain
 
 **Manual publish (if needed):**
 
 ```bash
 # Deploy to GitHub Pages
-mkdocs gh-deploy -f mkdocs-dev.yml --remote-branch gh-pages
+mkdocs gh-deploy -f mkdocs-dev.yml --remote-branch gh-pages-dev
 ```
 
 ---
 
 ## Contributing to Docs
 
+### Quick Edits
+
+Every page has an **Edit** button (✏️) in the top-right corner. Click it to edit directly on GitHub.
+
 ### Full Contribution Workflow
 
 1. **Fork the repository**
-2. **Create a branch:**
+2. **Create a branch from `docs/devs`:**
    ```bash
-   git pull origin main
-   git checkout -b feat/... OR docs/... OR fix/...
+   git checkout docs/devs
+   git pull origin docs/devs
+   git checkout -b docs/add-missing-api-reference
    ```
 3. **Make your changes**
 4. **Test locally:**
+   ```bash
+   mkdocs serve -f mkdocs-dev.yml
+   ```
 5. **Commit and push:**
    ```bash
-   git add .
-   git commit -m "a good commit message"
-   git push origin {YOUR BRANCH}
+   git add dev-docs/
+   git commit -m "docs: Add API reference for services.search"
+   git push origin docs/add-missing-api-reference
    ```
-6. **Open a PR targeting `main`**
+6. **Open a PR targeting `docs/devs` branch**
 
 ### Commit Message Convention
 
@@ -200,7 +203,7 @@ Use conventional commits:
 
 - **Lowercase with hyphens:** `api-reference/services/search.md`
 - **Descriptive names:** `contributing-workflow.md` not `workflow.md`
-- **Match code structure:** `api-reference/infra/db.md` mirrors `src/hei_datahub/infra/db.py`
+- **Match code structure:** `api-reference/infra/db.md` mirrors `src/mini_datahub/infra/db.py`
 
 ### Directory Structure
 
@@ -230,7 +233,7 @@ When adding a new module to the codebase:
 
 1. **Update [Module Map](architecture/module-map.md)**
 2. **Create API reference page** in `api-reference/`
-3. **Update [Codebase Overview](codebase/overview.md)**
+3. **Update [Codebase Tour](codebase/navigation.md)**
 4. **Add to [Coverage Tracker](maintenance/coverage-tracker.md)**
 
 ---
@@ -269,15 +272,14 @@ This documentation is **versioned alongside the app**.
 
 | Dev Docs Version | App Version | Branch | Status |
 |------------------|-------------|--------|--------|
-| **0.60.0-beta** | v0.60.x | `docs/v0.60-beta-update` | ✅ Current |
-| 0.59.0-beta | v0.59.x | `renovation/dev-docs-0.57-beta` | 📦 Archived |
-| 0.56.0-beta | v0.56.x | `docs/devs` | 📦 Archived |
+| **0.56.0-beta** | v0.56.x | `docs/devs` | ✅ Current |
+| 0.55.2-beta | v0.55.x | `docs/devs-v0.55` | 📦 Archived |
 
 **Switching versions:**
 
 ```bash
-git checkout docs/v0.60-beta-update    # Current (v0.60)
-git checkout renovation/dev-docs-0.57-beta    # Previous (v0.59)
+git checkout docs/devs           # Current (v0.56)
+git checkout docs/devs-v0.55     # Previous (v0.55)
 ```
 
 ---
@@ -308,7 +310,7 @@ mkdocs build -f mkdocs-dev.yml --verbose
 **Fix:**
 
 ```bash
-uv sync
+pip install -r dev-docs/requirements.txt --upgrade
 ```
 
 ---
@@ -317,42 +319,39 @@ uv sync
 
 ### GitHub Actions Workflow
 
-Location: `.github/workflows/pages.yml`
+Location: `.github/workflows/dev-docs.yml`
 
 **Triggers:**
 
-- Push to `docs/v0.60-beta-update` branch
-- Push to `main` branch (user docs)
-- Push to `docs/update-tutorial-doc` branch (tutorial)
+- Push to `docs/devs` branch
 - Manual workflow dispatch
 
 **Steps:**
 
-1. Checkout respective branches
+1. Checkout `docs/devs`
 2. Install Python + dependencies
-3. Build all 3 sites
-4. Deploy to GitHub Pages (/, /x9k2m7n4p8q1/, /tutorial/)
+3. Build site
+4. Deploy to GitHub Pages
 
 **Verify workflow:**
 
 ```bash
 # View workflow status
-gh workflow view pages.yml
+gh workflow view dev-docs.yml
 
 # Trigger manually
-gh workflow run pages.yml
+gh workflow run dev-docs.yml
 ```
 
 ---
 
 ## Branching Strategy
 
-- **`docs/v0.60-beta-update`** → Current dev docs (v0.60, publishes to /x9k2m7n4p8q1/)
-- **`main`** → User docs (publishes to /)
-- **`docs/update-tutorial-doc`** → Tutorial docs (publishes to /tutorial/)
-- **`renovation/dev-docs-0.57-beta`** → Archived v0.59 dev docs
+- **`docs/devs`** → Current dev docs (publishes to GitHub Pages)
+- **`main`** → User docs (separate publishing pipeline)
+- **`docs/devs-v0.XX`** → Archived versions for older releases
 
-**Never merge dev docs branches into `main`** (they are independent sites).
+**Never merge `docs/devs` into `main`** (they are independent sites).
 
 ---
 
@@ -363,12 +362,12 @@ Dev docs have their own changelog: [CHANGELOG.md](CHANGELOG.md)
 **Update on every release:**
 
 ```markdown
-## [0.60.0-beta] - 2025-10-28
+## [0.56.0-beta] - 2025-10-05
 ### Added
-- Comprehensive contribution guides for all types
-- v0.60 upgrade documentation
+- API reference for services.publish
+- Performance SLA documentation
 ### Fixed
-- All documentation links and anchors
+- Broken links in architecture section
 ```
 
 ---
