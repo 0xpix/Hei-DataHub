@@ -55,6 +55,7 @@ CloudDatasetDetailsScreen #details-container .title {
     background: $surface;
     color: $accent;
     border-bottom: solid $primary 30%;
+    text-style: bold italic;  /* You can combine styles */
 }
 
 /* ============================================================================
