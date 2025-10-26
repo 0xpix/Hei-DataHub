@@ -24,7 +24,7 @@ This developer documentation is designed for three primary audiences:
 2. [Module Map](../architecture/module-map.md) — Find the module you're working on
 3. [API Reference](../api-reference/overview.md) — Lookup function signatures
 4. [Contributor Workflow](../contributing/workflow.md) — Learn how to submit code
-5. [Testing Strategy](../qa/testing-strategy.md) — Write effective tests
+5. [Testing](../codebase/tests.md) — Write effective tests
 
 **Your workflow:**
 
@@ -94,11 +94,11 @@ graph LR
 
 **Start here:**
 
-1. [Extensibility Overview](../extensibility/extension-points.md) — Official extension points
-2. [Plugin Architecture](../extensibility/plugins.md) — How plugins work
-3. [Creating Adapters](../extensibility/adapters.md) — Swap components
+1. Extensibility Overview — Official extension points *(planned)*
+2. Plugin Architecture — How plugins work *(planned)*
+3. Creating Adapters — Swap components *(planned)*
 4. [API Reference](../api-reference/overview.md) — Stable APIs with contracts
-5. [Performance SLAs](../performance/slas.md) — Expected performance
+5. [Performance](../performance/overview.md) — Performance tuning
 
 **Your workflow:**
 
@@ -120,17 +120,17 @@ graph LR
 
 **You care about:**
 
-- [Secrets Management](../security/secrets.md)
-- [Data Privacy](../security/privacy.md)
-- [Supply Chain Security](../security/supply-chain.md)
+- [Security & Privacy](../architecture/security-privacy.md)
+- Secrets Management *(planned)*
+- Supply Chain Security *(planned)*
 
 ### 5. **Performance Engineers** ⚡
 
 **You care about:**
 
+- [Performance Overview](../performance/overview.md)
 - [Profiling Guide](../performance/profiling.md)
-- [Common Hotspots](../performance/hotspots.md)
-- [Optimization Playbooks](../performance/playbooks.md)
+- [Optimization Tips](../performance/optimization.md)
 
 ### 6. **Documentation Maintainers** 📚
 
@@ -241,8 +241,8 @@ If you think something is **missing** or **misplaced**:
 |----------|---------------|------------|
 | **Contributors** | Architecture, APIs, testing | [System Overview](../architecture/overview.md) |
 | **Maintainers** | Releases, reviews, CI/CD | [Release Process](../build/releases.md) |
-| **Integrators** | Extension points, plugins | [Extensibility](../extensibility/extension-points.md) |
-| **Security Researchers** | Secrets, privacy, supply chain | [Security](../security/secrets.md) |
+| **Integrators** | Extension points, plugins | Extensibility *(planned)* |
+| **Security Researchers** | Secrets, privacy, supply chain | [Security & Privacy](../architecture/security-privacy.md) |
 | **Performance Engineers** | Profiling, optimization | [Performance](../performance/overview.md) |
 | **Docs Maintainers** | Keeping docs current | [Docs Health](../maintenance/health-checklist.md) |
 
