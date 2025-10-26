@@ -610,7 +610,7 @@ class HomeView(Screen):
 
 - **[CLI Module](cli-module.md)** - Command-line interface
 - **[Services Module](services-module.md)** - Business logic
-- **[UI/TUI Documentation](../ui-tui/overview.md)** - Detailed UI guide
+- **[UI/TUI Documentation](../ui/architecture.md)** - Detailed UI guide
 
 ---
 
