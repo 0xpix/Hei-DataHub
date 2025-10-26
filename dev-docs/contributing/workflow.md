@@ -610,7 +610,7 @@ git push origin feature/my-branch
 
 ### Code Contributions
 
-- **Stuck on setup?** → [Installation Guide](../../docs/installation/index.md)
+- **Stuck on setup?** → [Development Setup](../quickstart/development-setup.md)
 - **Confused about architecture?** → [Architecture Overview](../architecture/overview.md)
 - **Not sure where code goes?** → [Codebase Overview](../codebase/overview.md)
 - **Need API reference?** → [CLI Commands Reference](../api-reference/cli-commands.md)
