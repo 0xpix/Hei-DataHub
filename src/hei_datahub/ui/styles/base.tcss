@@ -1,0 +1,57 @@
+/* ============================================================================
+   GLOBAL BASE STYLES - Hei-DataHub
+   Only truly global, screen-agnostic rules
+   ============================================================================ */
+
+/* Global Screen defaults */
+Screen {
+    background: $background;
+    color: $text;
+    layout: vertical;
+}
+
+/* Global Header defaults */
+Header {
+    dock: top;
+    height: 3;
+    background: $panel;
+    color: $text;
+    text-style: bold;
+}
+
+/* Global Footer defaults */
+Footer {
+    dock: bottom;
+    height: 1;
+    background: $panel;
+    color: $text-muted;
+    text-style: bold;
+}
+
+/* Global Notification styles */
+Notification {
+    background: $surface 8%;
+    border: round $primary 40%;
+    text-style: bold;
+}
+
+Notification.-warning {
+    border: round $warning 40%;
+    color: $warning;
+}
+
+Notification.-error {
+    border: round $error 40%;
+    color: $error;
+}
+
+Notification.-information {
+    border: round $accent 40%;
+}
+
+/* Global Key widget styles */
+Key {
+    background: $surface 8%;
+    border: round $primary 30%;
+    text-style: bold;
+}
