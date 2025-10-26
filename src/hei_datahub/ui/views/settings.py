@@ -60,10 +60,13 @@ class SettingsScreen(Screen):
                     Button("Test Connection", id="test-btn", variant="default"),
                     Button("Save Settings", id="save-btn", variant="primary"),
                     Button("Clear Credentials", id="clear-btn", variant="warning"),
+                ),
+                Horizontal(
+                    Button("Reconfigure (Wizard)", id="wizard-btn", variant="default"),
                     Button("Cancel", id="cancel-btn", variant="default"),
                 ),
                 Label("", id="status-message"),
-                Label("\n[dim]💡 Tip: Use 'hei-datahub auth setup' in terminal for guided configuration[/dim]"),
+                Label("\n[dim]💡 Tip: You can also use 'hei-datahub auth setup' in terminal[/dim]"),
                 id="settings-container",
             ),
         )
@@ -179,6 +182,13 @@ class SettingsScreen(Screen):
                     self.app.notify("No credentials to clear", timeout=3)
         except Exception as e:
             self.app.notify(f"Clear failed: {str(e)}", severity="error", timeout=5)
+
+    @on(Button.Pressed, "#wizard-btn")
+    def on_wizard_button(self) -> None:
+        """Open the setup wizard."""
+        from .settings_wizard import SettingsWizard
+        self.app.pop_screen()  # Close current settings
+        self.app.push_screen(SettingsWizard())
 
     @on(Button.Pressed, "#cancel-btn")
     def on_cancel_button(self) -> None:
