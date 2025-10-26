@@ -54,7 +54,7 @@ class CloudEditDetailsScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
-            Label(f"☁️ Editing Cloud Dataset: {self.dataset_id}  |  [italic]Ctrl+S to save, Esc to cancel[/italic]", classes="title"),
+            Label(f"󱘫 Editing Dataset: {self.dataset_id}", classes="title"),
             Container(
                 Static(id="edit-status", classes="edit-status"),
 
@@ -107,10 +107,33 @@ class CloudEditDetailsScreen(Screen):
 
     def on_mount(self) -> None:
         """Initialize field values after mounting."""
+        # Pre-populate previous values to prevent false dirty marking
+        self._previous_values = {
+            'name': self.metadata.get('dataset_name', self.metadata.get('name', '')),
+            'description': self.metadata.get('description', ''),
+            'source': self.metadata.get('source', ''),
+            'storage': self.metadata.get('storage_location', ''),
+            'date': str(self.metadata.get('date_created', '')),
+            'format': str(self.metadata.get('file_format', '')),
+            'size': str(self.metadata.get('size', '')),
+            'keywords': ', '.join(self.metadata.get('keywords', [])) if isinstance(self.metadata.get('keywords'), list) else str(self.metadata.get('keywords', '')),
+            'license': str(self.metadata.get('license', '')),
+        }
+
         desc_area = self.query_one("#edit-description", TextArea)
         desc_area.text = self.metadata.get('description', '')
         self.query_one("#edit-name", Input).focus()
         self._update_status()
+
+    @on(Button.Pressed, "#save-btn")
+    def on_save_button_pressed(self) -> None:
+        """Handle Save button click."""
+        self.action_save_edits()
+
+    @on(Button.Pressed, "#cancel-btn")
+    def on_cancel_button_pressed(self) -> None:
+        """Handle Cancel button click."""
+        self.action_cancel_edits()
 
     @on(Input.Changed)
     def on_input_changed(self, event: Input.Changed) -> None:
