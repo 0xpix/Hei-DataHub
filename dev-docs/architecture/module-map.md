@@ -582,8 +582,10 @@ graph TD
 
 ---
 
+
+
 ## Next Steps
 
 - Explore [API Reference](../api-reference/overview.md) for function-level details
-- See [Codebase Tour](../codebase/navigation.md) for file-by-file breakdown
+- See [Codebase Overview](../codebase/overview.md) for file-by-file breakdown
 - Check [Data Flow](../architecture/data-flow.md) to understand interactions
