@@ -52,7 +52,7 @@ This is your roadmap to understanding and rebuilding Hei-DataHub. Each page buil
 
 ### "I'm Debugging an Issue"
 1. Read [Advanced 03. Debugging](advanced/03-debugging.md) (20 min)
-2. Reference [Deep 02. Core Scripts](deep/02-core-scripts.md) as needed
+2. Reference [Deep 02. Auth Systems](deep/02-auth.md) as needed
 
 ### "I Want the Full Experience"
 Follow the guide in order from top to bottom!
