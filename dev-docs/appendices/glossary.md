@@ -106,7 +106,7 @@ The process of rebuilding the FTS5 search index from YAML files. Command: `hei-d
 ## S
 
 ### SemVer (Semantic Versioning)
-A versioning scheme using `MAJOR.MINOR.PATCH` format. See [SemVer Guide](../build/semver.md).
+A versioning scheme using `MAJOR.MINOR.PATCH` format. See [Versioning Policy](../versioning.md).
 
 ### Service Layer
 The layer that orchestrates business logic by coordinating Core and Infrastructure. Located in `src/mini_datahub/services/`.
@@ -223,6 +223,8 @@ The query language used for searching datasets. Supports FTS5 syntax with additi
 - **Contributing:** [Contributor Workflow](../contributing/workflow.md)
 - **APIs:** [API Reference](../api-reference/overview.md)
 
+
+
 ---
 
-**Missing a term?** [Add it to this glossary](contributing-docs.md) by submitting a PR!
+**Missing a term?** [Add it to this glossary](../overview/contributing-docs.md) by submitting a PR!
