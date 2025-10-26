@@ -29,6 +29,113 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 ---
 
+## 🎓 New to the Project?
+
+**Start with the Learning Guide** — a step-by-step tutorial that teaches you how to build Hei-DataHub from scratch:
+
+- [**Learning Guide Home**](learn/README.md) — Master index and roadmap
+- [**What is Hei-DataHub?**](learn/01-what-is-hei-datahub.md) — Problem, solution, and overview
+- [**How It Works (Architecture)**](learn/01-architecture.md) — System design deep dive
+- [**Installing & Running Locally**](learn/02-setup.md) — Get it running in 5 minutes
+- [**Building the TUI**](learn/tui/01-layout-basics.md) — Create beautiful terminal interfaces
+- [**Adding Functionality**](learn/logic/01-ui-actions.md) — Connect UI to backend logic
+
+**Estimated time:** 2-3 hours for core concepts, 12-16 hours for full mastery.
+
+---
+
+## Site Navigation Quick Start
+
+<div class="grid cards" markdown>
+
+-   **[🎓 Learning Guide](learn/README.md)**
+
+    **NEW!** Step-by-step tutorials teaching you how to build Hei-DataHub from scratch. Perfect for beginners!
+
+-   **[Architecture Overview](architecture/overview.md)**
+
+    Cloud-first system design, WebDAV integration, data flow, and component diagrams.
+
+-   **[Authentication & Sync](architecture/auth-and-sync.md)**
+
+    WebDAV authentication, keyring storage, background sync, and error recovery.
+
+-   **[Search & Autocomplete](architecture/search-and-autocomplete.md)**
+
+    FTS5 search engine, autocomplete ranking, filter badges, and performance tuning.
+
+-   **[Security & Privacy](architecture/security-privacy.md)**
+
+    Credential handling, data privacy, secure design principles, and threat model.
+
+-   **[Codebase Overview](codebase/overview.md)**
+
+    Every module and directory explained: purpose, responsibilities, and key functions.
+
+-   **[Module Walkthrough](codebase/module-walkthrough.md)**
+
+    File-by-file deep dive with function-level explanations and line-by-line commentary.
+
+-   **[CLI Commands](api-reference/cli-commands.md)**
+
+    Complete command reference: auth, search, sync, update, and diagnostics.
+
+-   **[API Reference](api-reference/overview.md)**
+
+    Function-by-function documentation with signatures, errors, and performance notes.
+
+-   **[Configuration](codebase/configuration.md)**
+
+    Config files, TOML structure, environment variables, and user preferences.
+
+-   **[Data Layer](codebase/data-layer.md)**
+
+    SQLite database, FTS5 indexing, dataset metadata, and schema validation.
+
+-   **[UI/TUI Layer](codebase/ui-architecture.md)**
+
+    Textual views, widgets, state management, keybindings, and theming.
+
+-   **[Build & Release](maintenance/release-process.md)**
+
+    Release process, version management, and changelog policy.
+
+-   **[Testing](maintenance/testing.md)**
+
+    Testing strategy, fixtures, running tests, and coverage tracking.
+
+-   **[Performance](architecture/performance.md)**
+
+    Profiling, benchmarks, optimization strategies, and performance SLAs.
+
+-   **[Security](architecture/security-privacy.md)**
+
+    Credential storage, WebDAV security, data privacy, and threat mitigation.
+
+-   **[Contributing](contributing/workflow.md)**
+
+    End-to-end contributor workflow, commit conventions, and code review.
+
+-   **[ADRs & Roadmap](adr/index.md)**
+
+    Architecture decision records, roadmap, and deprecation policy.
+
+-   **[Known Issues](known-issues.md)**
+
+    Issues specific to this dev docs site and cross-links to project issues.
+
+-   **[Maintenance](maintenance/health-checklist.md)**
+
+    Docs health checklist, coverage tracker, and update procedures.
+
+-   *[Glossary & Appendices](appendices/glossary.md)**
+
+    Terminology, abbreviations, and quick reference cards.
+
+</div>
+
+---
+
 ## What Makes This Site Different?
 
 | **User Docs** (main branch)                      | **Developer Docs** (this site)                    |
@@ -82,8 +189,8 @@ graph LR
 ### For Integration & Extension
 
 - **CLI integration:** See [CLI Commands](api-reference/cli-commands.md)
-- **Storage backends:** Read [Module Walkthrough](codebase/module-walkthrough.md#authcredentialspy)
-- **Custom views:** Guide at [UI Architecture](ui/architecture.md)
+- **Storage backends:** Read [Storage Architecture](codebase/module-walkthrough.md#storage-backends)
+- **Custom views:** Guide at [UI Architecture](codebase/ui-architecture.md)
 
 ---
 
