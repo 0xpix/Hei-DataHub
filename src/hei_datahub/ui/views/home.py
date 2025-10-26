@@ -26,27 +26,22 @@ from textual.reactive import reactive
 from textual.timer import Timer
 
 from hei_datahub.services.config import get_config
-from hei_datahub.ui.utils.keybindings import build_home_bindings
+from hei_datahub.utils.bindings import _build_bindings_from_config
 
 class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
 
     # Load bindings from config file
-    BINDINGS = build_home_bindings()
+    BINDINGS = _build_bindings_from_config()
 
     # Load CSS from styles directory
-    ENABLE_COMMAND_PALETTE = True
-
-    # Style (TCSS file)
-    CSS_PATH = "../styles/home.tcss"
+    CSS_PATH = "../styles/home.tcss"  # TODO: Copy CSS from mini_datahub or create new
 
     search_mode = reactive(False)
     _debounce_timer: Optional[Timer] = None
-    _g_pressed: bool = False
-    _g_timer: Optional[Timer] = None
 
     def compose(self) -> ComposeResult:
-        from hei_datahub.ui.assets.loader import get_logo_widget_text
+        from mini_datahub.ui.assets.loader import get_logo_widget_text
 
         # Load logo from config
         logo_text = get_logo_widget_text(get_config())
@@ -56,7 +51,8 @@ class HomeScreen(Screen):
             Static(logo_text, id="banner"),
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
-            Input(placeholder="Type / to search | Tab/→ for autocomplete | Enter to view", id="search-input"),
+            Static(id="heibox-status"),
+            Input(placeholder="Type / to search | Tab/→/Ctrl+F for autocomplete | Enter to view", id="search-input"),
             Horizontal(id="filter-badges-container", classes="filter-badges"),
             Label("All Datasets", id="results-label"),
             DataTable(id="results-table", cursor_type="row"),
@@ -75,6 +71,9 @@ class HomeScreen(Screen):
         # Setup search autocomplete
         self._setup_search_autocomplete()
 
+        # Update Heibox status indicator
+        self.update_heibox_status()
+
         # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
 
@@ -82,19 +81,9 @@ class HomeScreen(Screen):
         self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
     def _check_indexer_and_reload(self) -> None:
-        """Check if indexer is ready and add new datasets incrementally.
-
-        NOTE: This should ONLY run when showing all datasets, NOT during search!
-        """
-        # Get current search query to check if we're in search mode
-        search_input = self.query_one("#search-input", Input)
-        if search_input.value and len(search_input.value.strip()) >= 2:
-            # We're in search mode - DO NOT add datasets
-            logger.debug("Timer skipped: in search mode")
-            return
-
-        from hei_datahub.services.indexer import get_indexer
-        from hei_datahub.services.fast_search import get_all_indexed
+        """Check if indexer is ready and add new datasets incrementally."""
+        from mini_datahub.services.indexer import get_indexer
+        from mini_datahub.services.fast_search import get_all_indexed
 
         indexer = get_indexer()
         table = self.query_one("#results-table", DataTable)
@@ -128,11 +117,11 @@ class HomeScreen(Screen):
                     snippet,
                     key=result["id"],
                 )
-                logger.info(f"Timer added dataset to table: {display_name}")
+                logger.info(f"Added dataset to table: {display_name}")
 
         # Update label with progress
         if not indexer.is_ready():
-            label.update(f"🔄 Loading...")
+            label.update(f"🔄 Loading... ☁️ {len(cloud_results)} of ? datasets")
         else:
             label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
             # Stop timer once indexer is done
@@ -145,7 +134,7 @@ class HomeScreen(Screen):
     def _setup_search_autocomplete(self) -> None:
         """Setup autocomplete suggester for search input."""
         try:
-            from hei_datahub.ui.widgets.autocomplete import SmartSearchSuggester
+            from mini_datahub.ui.widgets.autocomplete import SmartSearchSuggester
 
             search_input = self.query_one("#search-input", Input)
             search_input.suggester = SmartSearchSuggester()
@@ -155,8 +144,8 @@ class HomeScreen(Screen):
     def _track_search_usage(self, query: str) -> None:
         """Track search filter usage for autocomplete ranking."""
         try:
-            from hei_datahub.core.queries import QueryParser
-            from hei_datahub.services.suggestion_service import get_suggestion_service
+            from mini_datahub.core.queries import QueryParser
+            from mini_datahub.services.suggestion_service import get_suggestion_service
 
             parser = QueryParser()
             parsed = parser.parse(query)
@@ -170,29 +159,55 @@ class HomeScreen(Screen):
         except Exception as e:
             logger.debug(f"Failed to track search usage: {e}")
 
+    def update_heibox_status(self) -> None:
+        """Update Heibox/WebDAV connection status display."""
+        try:
+            from mini_datahub.infra.config_paths import get_config_path
+
+            status_widget = self.query_one("#heibox-status", Static)
+
+            # Check if configured and connected
+            if self.app.heibox_connected:
+                # Simply show synced status without username
+                status_widget.update("[green]☁ Synced to Hei-box[/green]")
+            else:
+                # Check if configured but not connected
+                config_path = get_config_path()
+                if config_path.exists():
+                    with open(config_path, "rb") as f:
+                        config = tomli.load(f)
+
+                    if "auth" in config:
+                        status_widget.update("[yellow]⚠ Hei-box Configured (connection failed)[/yellow] [dim]Run: hei-datahub auth doctor[/dim]")
+                    else:
+                        status_widget.update("[dim]○ Hei-box Not Connected[/dim] [dim]Run: hei-datahub auth setup[/dim]")
+                else:
+                    status_widget.update("[dim]○ Hei-box Not Connected[/dim] [dim]Run: hei-datahub auth setup[/dim]")
+
+        except Exception as e:
+            logger.debug(f"Failed to update heibox status: {e}")
+            # Fallback to simple message
+            status_widget = self.query_one("#heibox-status", Static)
+            status_widget.update("[dim]○ Hei-box Status Unknown[/dim]")
+
+
     def load_all_datasets(self, force_refresh: bool = False) -> None:
         """Load and display all available datasets from index (CLOUD ONLY)."""
         logger.info(f"load_all_datasets called (force_refresh={force_refresh})")
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
-        # Stop any existing indexer check timer
-        try:
-            self.remove_timer("indexer_check")
-        except:
-            pass
-
         try:
             # Force cache clear if requested (e.g., after edit)
             if force_refresh:
-                from hei_datahub.services.index_service import get_index_service
+                from mini_datahub.services.index_service import get_index_service
                 index_service = get_index_service()
                 index_service._query_cache.clear()
                 index_service._cache_timestamps.clear()
                 logger.info("✓ Cleared index cache for fresh data")
 
             # ALWAYS use indexed search for fast loading
-            from hei_datahub.services.fast_search import get_all_indexed
+            from mini_datahub.services.fast_search import get_all_indexed
 
             results = get_all_indexed()
             logger.info(f"get_all_indexed returned {len(results)} results")
@@ -204,7 +219,7 @@ class HomeScreen(Screen):
             label = self.query_one("#results-label", Label)
 
             # Show indexer status if warming
-            from hei_datahub.services.indexer import get_indexer
+            from mini_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
                 label.update(f"🔄 Loading cloud datasets... ☁️ 0 of ? datasets")
@@ -238,9 +253,6 @@ class HomeScreen(Screen):
                     key=result["id"],  # Use folder path as internal key
                 )
 
-            # Restart the indexer check timer for incremental updates (only when showing all datasets)
-            self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
-
         except Exception as e:
             logger.error(f"Error loading datasets from index: {e}", exc_info=True)
             self.app.notify(f"Error loading datasets: {str(e)}", severity="error", timeout=5)
@@ -250,7 +262,7 @@ class HomeScreen(Screen):
     def _load_cloud_files(self) -> None:
         """Load files from cloud storage and display in table."""
         try:
-            from hei_datahub.services.storage_manager import get_storage_backend
+            from mini_datahub.services.storage_manager import get_storage_backend
             import yaml
             import tempfile
             import os
@@ -337,10 +349,8 @@ class HomeScreen(Screen):
 
     def perform_search(self, query: str) -> None:
         """Execute search and update results table (FAST - never hits network)."""
-        logger.info(f"perform_search called with query: '{query}'")
         table = self.query_one("#results-table", DataTable)
         table.clear()
-        logger.info(f"Table cleared, row count: {table.row_count}")
 
         # If query is empty or very short, show all datasets
         if not query.strip() or len(query.strip()) < 2:
@@ -349,13 +359,6 @@ class HomeScreen(Screen):
             return
 
         try:
-            # Stop the indexer check timer during search to prevent interference
-            try:
-                self.remove_timer("indexer_check")
-                logger.info("✓ Stopped indexer_check timer during search")
-            except Exception as e:
-                logger.debug(f"Could not remove timer (may not exist): {e}")
-
             # Update filter badges
             self._update_filter_badges(query)
 
@@ -363,27 +366,25 @@ class HomeScreen(Screen):
             self._track_search_usage(query)
 
             # ALWAYS use indexed search (never hit network on keystroke)
-            from hei_datahub.services.fast_search import search_indexed
+            from mini_datahub.services.fast_search import search_indexed
 
             results = search_indexed(query)
-            logger.info(f"search_indexed returned {len(results)} results")
 
             # CLOUD-ONLY: Filter to show only remote datasets
             cloud_results = [r for r in results if r.get("metadata", {}).get("is_remote", False)]
-            logger.info(f"After cloud filter: {len(cloud_results)} results")
 
             label = self.query_one("#results-label", Label)
 
             # Show indexer status if warming
-            from hei_datahub.services.indexer import get_indexer
+            from mini_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
-                label.update(f"🔄 Indexing… ☁️ Cloud Results ({len(cloud_results)} found) ")
+                label.update(f"🔄 Indexing… ☁️ Cloud Results ({len(cloud_results)} found)")
             else:
-                label.update(f"☁️ Cloud Results ({len(cloud_results)} found) ")
+                label.update(f"☁️ Cloud Results ({len(cloud_results)} found)")
 
             if not cloud_results:
-                label.update(f"No cloud results for '{query}' ")
+                label.update(f"No cloud results for '{query}'")
                 return
 
             for result in cloud_results:
@@ -408,9 +409,7 @@ class HomeScreen(Screen):
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
-                logger.info(f"Added to table: {display_name}")
 
-            logger.info(f"Search complete. Final table row count: {table.row_count}")
             # Don't steal focus from search input
 
         except Exception as e:
@@ -419,8 +418,8 @@ class HomeScreen(Screen):
     def _search_cloud_files(self, query: str) -> None:
         """Search cloud files by name and metadata fields."""
         try:
-            from hei_datahub.services.storage_manager import get_storage_backend
-            from hei_datahub.core.queries import QueryParser
+            from mini_datahub.services.storage_manager import get_storage_backend
+            from mini_datahub.core.queries import QueryParser
             import yaml
             import tempfile
             import os
@@ -569,28 +568,35 @@ class HomeScreen(Screen):
 
         return True
 
-    def _get_badge_color_class(self, badge_text: str) -> str:
+    def _get_badge_color_class(self, key: str) -> str:
         """
-        Get a consistent retro color class for a badge based on its text.
+        Get a consistent color class for a badge based on its key type.
 
-        Uses hash of the badge text to consistently assign the same color
-        to the same badge, but colors appear random across different badges.
+        Maps filter keys to specific colors for visual consistency:
+        - project: Blue
+        - source: Purple
+        - tag: Teal
+        - owner: Orange
+        - size: Gray
+        - format/type: Coral
+        - default: Neutral
         """
-        retro_colors = [
-            "badge-retro-teal",
-            "badge-retro-coral",
-            "badge-retro-sage",
-            "badge-retro-mauve",
-            "badge-retro-amber",
-            "badge-retro-slate",
-        ]
-        # Use hash to get consistent color for same badge text
-        color_index = hash(badge_text) % len(retro_colors)
-        return retro_colors[color_index]
+        key_colors = {
+            "project": "badge-blue",
+            "source": "badge-purple",
+            "tag": "badge-teal",
+            "owner": "badge-orange",
+            "size": "badge-gray",
+            "format": "badge-coral",
+            "file_format": "badge-coral",
+            "type": "badge-sage",
+            "data_type": "badge-sage",
+        }
+        return key_colors.get(key.lower(), "badge-neutral")
 
     def _update_filter_badges(self, query: str) -> None:
         """Update visual badges showing active search filters with uniform key-based styling."""
-        from hei_datahub.core.queries import QueryParser
+        from mini_datahub.core.queries import QueryParser
 
         badges_container = self.query_one("#filter-badges-container", Horizontal)
         badges_container.remove_children()
@@ -619,8 +625,8 @@ class HomeScreen(Screen):
                     # Uniform badge text: key:value or key>value etc
                     badge_text = f"{term.field}{op_symbol}{term.value}"
 
-                    # Get color based on the full badge text for consistency
-                    color_class = self._get_badge_color_class(badge_text)
+                    # Get color based on key type (not operator)
+                    color_class = self._get_badge_color_class(term.field)
 
                     # Create badge with key emoji for visual grouping
                     key_emoji = {
@@ -641,16 +647,15 @@ class HomeScreen(Screen):
             logger.debug(f"Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
 
             for term in free_text_terms:
-                # Free text gets consistent color based on the term value
-                color_class = self._get_badge_color_class(term.value)
+                # Free text uses neutral gray color
+                color_class = "badge-neutral"
                 badge = Static(f"📝 {term.value}", classes=f"filter-badge {color_class}")
                 badges_container.mount(badge)
                 logger.debug(f"Mounted badge for term: {term.value}")
 
         except Exception as e:
-            # If parsing fails, show raw query with color based on query text
-            color_class = self._get_badge_color_class(query)
-            badges_container.mount(Static(f"[dim]🔍 {query}[/dim]", classes=f"filter-badge {color_class}"))
+            # If parsing fails, just show the raw query
+            badges_container.mount(Static(f"[dim]🔍 {query}[/dim]", classes="filter-badge"))
 
     def action_focus_search(self) -> None:
         """Focus search input and enter insert mode."""
@@ -676,37 +681,6 @@ class HomeScreen(Screen):
                 # Prevent Tab from navigating away
                 event.prevent_default()
                 event.stop()
-        else:
-            # Handle 'gg' sequence for jump to top
-            if event.key == "g":
-                if self._g_pressed:
-                    # Second 'g' press - jump to top
-                    self.action_jump_top()
-                    self._g_pressed = False
-                    if self._g_timer:
-                        self._g_timer.stop()
-                        self._g_timer = None
-                    event.prevent_default()
-                    event.stop()
-                else:
-                    # First 'g' press - wait for second one
-                    self._g_pressed = True
-                    # Reset after 1 second if no second 'g'
-                    if self._g_timer:
-                        self._g_timer.stop()
-                    self._g_timer = self.set_timer(1.0, self._reset_g_buffer)
-                    event.prevent_default()
-                    event.stop()
-            elif self._g_pressed:
-                # Any other key pressed - reset the 'g' buffer
-                self._reset_g_buffer()
-
-    def _reset_g_buffer(self) -> None:
-        """Reset the 'g' key buffer."""
-        self._g_pressed = False
-        if self._g_timer:
-            self._g_timer.stop()
-            self._g_timer = None
 
     @on(Input.Submitted, "#search-input")
     def on_search_submitted(self) -> None:
@@ -803,13 +777,14 @@ class HomeScreen(Screen):
 
     def action_show_help(self) -> None:
         """Show help overlay with keybindings (? key)."""
-        from hei_datahub.ui.widgets.help import HelpScreen
-        self.app.push_screen(HelpScreen())
+        from mini_datahub.ui.widgets.help_overlay import HelpOverlay
+        from mini_datahub.services.actions import ActionContext
+        self.app.push_screen(HelpOverlay(ActionContext.HOME))
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
-        from hei_datahub.ui.utils.settings_router import open_settings_screen
-        open_settings_screen(self.app)
+        from mini_datahub.ui.views.settings import SettingsScreen
+        self.app.push_screen(SettingsScreen())
 
     def action_pull_updates(self) -> None:
         """Start pull updates task."""
@@ -823,10 +798,5 @@ class HomeScreen(Screen):
 
     def action_debug_console(self) -> None:
         """Open debug console (: key)."""
-        from hei_datahub.ui.widgets.console import DebugConsoleScreen
+        from mini_datahub.ui.widgets.console import DebugConsoleScreen
         self.app.push_screen(DebugConsoleScreen())
-
-    def action_show_about(self) -> None:
-        """Show about screen."""
-        from hei_datahub.ui.views.about import AboutScreen
-        self.app.push_screen(AboutScreen())
