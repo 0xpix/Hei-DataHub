@@ -4,52 +4,127 @@
    ============================================================================ */
 
 CloudEditDetailsScreen {
+    background: $surface;
     layout: vertical;
 }
 
-CloudEditDetailsScreen #add-data-scroll {
+CloudEditDetailsScreen Header {
+    dock: top;
+    height: 3;
+    background: $panel;
+    color: $text;
+    border-bottom: solid $primary;
+}
+
+CloudEditDetailsScreen Footer {
+    dock: bottom;
+    height: 3;
+    background: $panel;
+    color: $text-muted;
+    border-top: solid $primary;
+}
+
+CloudEditDetailsScreen #edit-scroll {
+    width: 100%;
     height: 1fr;
-    overflow-y: auto;
-    scrollbar-size: 1 1;
+    align: center top;
+    scrollbar-background: $surface;
+    scrollbar-color: $primary;
+    scrollbar-color-hover: $accent;
+    scrollbar-color-active: $accent;
 }
 
-CloudEditDetailsScreen #form-container {
-    padding: 1;
-    padding-bottom: 3;
+CloudEditDetailsScreen #edit-form-container {
+    max-width: 100;
+    width: 100%;
     height: auto;
-    min-height: 100%;
+    padding: 3;
+    padding-bottom: 5;
+    margin: 2 0;
+    background: $panel;
+    border: round $primary 30%;
 }
 
-CloudEditDetailsScreen #form-container Label {
-    margin-top: 1;
+CloudEditDetailsScreen #edit-form-container Label {
+    margin: 1 0 0 0;
+    color: $text;
+    text-style: bold;
 }
 
-CloudEditDetailsScreen #form-container Input,
-CloudEditDetailsScreen #form-container TextArea {
-    margin-bottom: 1;
+CloudEditDetailsScreen #edit-form-container Input,
+CloudEditDetailsScreen #edit-form-container TextArea {
+    width: 100%;
+    margin: 0 0 1 0;
+    background: $surface;
+    color: $text;
+    border: round $primary 20%;
+    padding: 0 1;
 }
 
-CloudEditDetailsScreen #form-container TextArea {
+CloudEditDetailsScreen #edit-form-container Input:focus,
+CloudEditDetailsScreen #edit-form-container TextArea:focus {
+    border: round $accent 40%;
+    background: $surface;
+}
+
+CloudEditDetailsScreen #edit-form-container TextArea {
     height: 5;
 }
 
-CloudEditDetailsScreen #form-container Button {
-    margin: 1 1 2 0;
+CloudEditDetailsScreen #edit-form-container Button {
+    min-width: 20;
+    height: 3;
+    margin: 0 1 0 0;
+    padding: 0 2;
+    text-style: bold;
 }
 
-CloudEditDetailsScreen #form-container Horizontal {
-    margin-bottom: 2;
+CloudEditDetailsScreen Button.--primary {
+    background: $primary;
+    color: $text;
+    border: round $primary;
+}
+
+CloudEditDetailsScreen Button.--default {
+    background: $panel;
+    color: $text;
+    border: round $primary 30%;
+}
+
+CloudEditDetailsScreen Button:hover {
+    background: $accent 40%;
+}
+
+CloudEditDetailsScreen Button:focus {
+    border: round $accent;
+    background: $accent 20%;
+}
+
+CloudEditDetailsScreen #edit-form-container Horizontal {
+    margin: 2 0;
+    height: auto;
 }
 
 CloudEditDetailsScreen #error-message {
+    background: $error 10%;
+    border: round $error 30%;
     color: $error;
-    margin-top: 1;
-    margin-bottom: 2;
+    padding: 1;
+    margin: 1 0 2 0;
+    min-height: 0;
+    height: auto;
+}
+
+CloudEditDetailsScreen #error-message:empty {
+    display: none;
 }
 
 CloudEditDetailsScreen .title {
-    text-align: center;
+    text-align: left;
     text-style: bold;
-    padding: 1;
-    background: $primary;
+    padding: 2;
+    margin-bottom: 2;
+    color: $accent;
+    background: $surface;
+    border-bottom: solid $primary 30%;
 }
