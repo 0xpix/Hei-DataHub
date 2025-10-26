@@ -782,8 +782,8 @@ class HomeScreen(Screen):
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
-        from .settings import SettingsScreen
-        self.app.push_screen(SettingsScreen())
+        from .settings_router import open_settings_screen
+        open_settings_screen(self.app)
 
     def action_pull_updates(self) -> None:
         """Start pull updates task."""
