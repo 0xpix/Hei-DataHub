@@ -1,0 +1,60 @@
+/* ============================================================================
+   ADD DATA SCREEN STYLES - Hei-DataHub
+   All selectors scoped to AddDataScreen to prevent leakage
+   ============================================================================ */
+
+AddDataScreen {
+    layout: vertical;
+}
+
+AddDataScreen #add-data-scroll {
+    height: 1fr;
+    overflow-y: auto;
+    scrollbar-size: 1 1;
+}
+
+AddDataScreen #form-container {
+    padding: 1;
+    padding-bottom: 3;
+    height: auto;
+    min-height: 100%;
+}
+
+AddDataScreen #form-container Label {
+    margin-top: 1;
+}
+
+AddDataScreen #form-container Input,
+AddDataScreen #form-container TextArea {
+    margin-bottom: 1;
+}
+
+AddDataScreen #form-container TextArea {
+    height: 5;
+}
+
+AddDataScreen #form-container Button {
+    margin: 1 1 2 0;
+}
+
+AddDataScreen #form-container Horizontal {
+    margin-bottom: 2;
+}
+
+AddDataScreen #error-message {
+    color: $error;
+    margin-top: 1;
+    margin-bottom: 2;
+}
+
+AddDataScreen #probe-status {
+    margin-left: 1;
+    align: center middle;
+}
+
+AddDataScreen .title {
+    text-align: center;
+    text-style: bold;
+    padding: 1;
+    background: $primary;
+}
