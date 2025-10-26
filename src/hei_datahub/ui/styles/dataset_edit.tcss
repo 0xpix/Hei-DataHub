@@ -1,0 +1,55 @@
+/* ============================================================================
+   CLOUD EDIT DETAILS SCREEN STYLES - Hei-DataHub
+   All selectors scoped to CloudEditDetailsScreen to prevent leakage
+   ============================================================================ */
+
+CloudEditDetailsScreen {
+    layout: vertical;
+}
+
+CloudEditDetailsScreen #add-data-scroll {
+    height: 1fr;
+    overflow-y: auto;
+    scrollbar-size: 1 1;
+}
+
+CloudEditDetailsScreen #form-container {
+    padding: 1;
+    padding-bottom: 3;
+    height: auto;
+    min-height: 100%;
+}
+
+CloudEditDetailsScreen #form-container Label {
+    margin-top: 1;
+}
+
+CloudEditDetailsScreen #form-container Input,
+CloudEditDetailsScreen #form-container TextArea {
+    margin-bottom: 1;
+}
+
+CloudEditDetailsScreen #form-container TextArea {
+    height: 5;
+}
+
+CloudEditDetailsScreen #form-container Button {
+    margin: 1 1 2 0;
+}
+
+CloudEditDetailsScreen #form-container Horizontal {
+    margin-bottom: 2;
+}
+
+CloudEditDetailsScreen #error-message {
+    color: $error;
+    margin-top: 1;
+    margin-bottom: 2;
+}
+
+CloudEditDetailsScreen .title {
+    text-align: center;
+    text-style: bold;
+    padding: 1;
+    background: $primary;
+}
