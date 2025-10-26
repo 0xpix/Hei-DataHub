@@ -21,7 +21,7 @@ site_dir: dev-site
 
 # Configuration
 theme:
-  name: simple-blog
+  name: dracula
   components:
     title: false
     preview: true
@@ -119,6 +119,7 @@ extra:
 # Navigation structure - Simplified for clarity
 nav:
   - Home: index.md
+  - About This Site: ABOUT.md
 
   - 🎓 Learning Guide:
     - Start Here: learn/README.md
@@ -137,12 +138,23 @@ nav:
 
     - Add Functionality:
       - 01. Linking UI to Data: learn/logic/01-ui-actions.md
+      - 02. Database Operations: learn/logic/02-database.md
+      - 03. Autocomplete Logic: learn/logic/03-autocomplete.md
+      - 04. Cloud Sync: learn/logic/04-cloud-sync.md
+      - 05. CLI Integration: learn/logic/05-cli-integration.md
 
     - Deep Dive:
       - 01. Directory Structure: learn/deep/01-directory-structure.md
+      - 02. Auth Systems: learn/deep/02-auth.md
+      - 03. Configuration: learn/deep/03-config.md
+      - 04. Indexing: learn/deep/04-indexing.md
+      - 05. Testing: learn/deep/05-testing.md
 
     - Advanced Topics:
       - 01. Adding New Features: learn/advanced/01-extending.md
+      - 02. Performance: learn/advanced/02-performance.md
+      - 03. Debugging: learn/advanced/03-debugging.md
+      - 04. Deployment: learn/advanced/04-deployment.md
 
   - Quick Start:
     - Getting Started: quickstart/getting-started.md
@@ -168,6 +180,7 @@ nav:
       - Overview: codebase/overview.md
       - Root Files Explained: codebase/root-files.md
       - Package Structure: codebase/package-structure.md
+      - Module Walkthrough: codebase/module-walkthrough.md
       - Core Module (models, rules, errors, queries): codebase/core-module.md
       - Services Module (search, catalog, sync, etc): codebase/services-module.md
       - Infrastructure Module (db, git, config): codebase/infra-module.md
@@ -210,10 +223,34 @@ nav:
       - Common Hotspots: performance/hotspots.md
       - Optimization Tips: performance/optimization.md
 
+  - Overview:
+    - Introduction: overview/introduction.md
+    - Audience: overview/audience.md
+    - Compatibility: overview/compatibility.md
+    - Contributing to Docs: overview/contributing-docs.md
+
   - Reference:
     - API Documentation: api-reference/overview.md
-    - Architecture Decisions (ADRs): adr/index.md
+    - CLI Commands: api-reference/cli-commands.md
+    - Architecture Decisions (ADRs):
+      - Index: adr/index.md
+      - 001 - Docs Split: adr/001-docs-split.md
+      - 002 - Branching Strategy: adr/002-branching-strategy.md
+      - 003 - Changelog Enforcement: adr/003-changelog-enforcement.md
+    - Full Changelog: CHANGELOG.md
     - Changelog: changelog.md
     - Versioning Policy: versioning.md
     - Known Issues: known-issues.md
     - Glossary: appendices/glossary.md
+
+  - Maintenance:
+    - Coverage Tracker: maintenance/coverage-tracker.md
+    - Health Checklist: maintenance/health-checklist.md
+
+  - Additional Architecture:
+    - Auth & Sync: architecture/auth-and-sync.md
+    - Search & Autocomplete: architecture/search-and-autocomplete.md
+    - Security & Privacy: architecture/security-privacy.md
+
+  - Additional Data:
+    - Data Overview: data/overview.md
