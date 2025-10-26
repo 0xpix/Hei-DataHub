@@ -2,8 +2,7 @@
 
 This page tracks issues, gaps, and TODOs specific to the **developer documentation site** itself (not the Hei-DataHub application).
 
-For application-level known issues, see:
-- [Project Known Issues (v0.56.x)](../devs/0.56.x-beta/KNOWN_ISSUES.md)
+For application-level known issues, see the [Changelog](changelog.md) for version-specific notes.
 
 ---
 
