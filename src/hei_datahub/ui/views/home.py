@@ -782,7 +782,7 @@ class HomeScreen(Screen):
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
-        from mini_datahub.ui.views.settings import SettingsScreen
+        from .settings import SettingsScreen
         self.app.push_screen(SettingsScreen())
 
     def action_pull_updates(self) -> None:
