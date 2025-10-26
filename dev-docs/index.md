@@ -85,27 +85,27 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
     Function-by-function documentation with signatures, errors, and performance notes.
 
--   **[Configuration](codebase/configuration.md)**
+-   **[Configuration](config/overview.md)**
 
     Config files, TOML structure, environment variables, and user preferences.
 
--   **[Data Layer](codebase/data-layer.md)**
+-   **[Data Layer](data/storage.md)**
 
     SQLite database, FTS5 indexing, dataset metadata, and schema validation.
 
--   **[UI/TUI Layer](codebase/ui-architecture.md)**
+-   **[UI/TUI Layer](ui/architecture.md)**
 
     Textual views, widgets, state management, keybindings, and theming.
 
--   **[Build & Release](maintenance/release-process.md)**
+-   **[Build & Release](build/releases.md)**
 
     Release process, version management, and changelog policy.
 
--   **[Testing](maintenance/testing.md)**
+-   **[Testing](codebase/tests.md)**
 
     Testing strategy, fixtures, running tests, and coverage tracking.
 
--   **[Performance](architecture/performance.md)**
+-   **[Performance](performance/overview.md)**
 
     Profiling, benchmarks, optimization strategies, and performance SLAs.
 
@@ -156,16 +156,16 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
    Read → [Architecture Overview](architecture/overview.md) + [Auth & Sync](architecture/auth-and-sync.md)
 
 2. **Trace a feature from UI to data:**
-   Follow → [Codebase Overview](codebase/overview.md) → [Search & Autocomplete](architecture/search-and-autocomplete.md) → [Data Layer](codebase/data-layer.md)
+   Follow → [Codebase Overview](codebase/overview.md) → [Search & Autocomplete](architecture/search-and-autocomplete.md) → [Data Layer](data/storage.md)
 
 3. **Understand cloud authentication:**
    Guide → [Auth & Sync](architecture/auth-and-sync.md) + [Security & Privacy](architecture/security-privacy.md)
 
 4. **Add a new UI feature:**
-   Guide → [UI Architecture](codebase/ui-architecture.md) + [Module Walkthrough](codebase/module-walkthrough.md)
+   Guide → [UI Architecture](ui/architecture.md) + [Module Walkthrough](codebase/module-walkthrough.md)
 
 5. **Run tests and diagnostics:**
-   Reference → [Testing](maintenance/testing.md) + [CLI Commands](api-reference/cli-commands.md) (`hei-datahub doctor`)
+   Reference → [Testing](codebase/tests.md) + [CLI Commands](api-reference/cli-commands.md) (`hei-datahub doctor`)
 
 ---
 
@@ -185,14 +185,14 @@ graph LR
 ### For Maintainers
 
 - **Before merging changes:** Check [Contributing Workflow](contributing/workflow.md)
-- **Release process:** Follow [Release Process](maintenance/release-process.md) + update changelog
+- **Release process:** Follow [Release Process](build/releases.md) + update changelog
 - **Adding new features:** Update [Module Map](architecture/module-map.md) and relevant docs
 
 ### For Integration & Extension
 
 - **CLI integration:** See [CLI Commands](api-reference/cli-commands.md)
 - **Storage backends:** Read [Storage Architecture](codebase/module-walkthrough.md#storage-backends)
-- **Custom views:** Guide at [UI Architecture](codebase/ui-architecture.md)
+- **Custom views:** Guide at [UI Architecture](ui/architecture.md)
 
 ---
 
