@@ -89,7 +89,7 @@ mkdocs serve -f mkdocs-dev.yml
 **Problem:** Code example from docs doesn't work.
 
 **Solution:**
-1. Check the [Changelog](CHANGELOG.md) for breaking changes
+1. Check the [Changelog](../changelog.md) for breaking changes
 2. Use `git diff` to compare API changes:
    ```bash
    git diff docs/devs-v0.55 docs/devs -- dev-docs/api-reference/services/search.md
@@ -175,7 +175,7 @@ When we deprecate an API or feature:
 
 Every breaking change is documented:
 
-1. **Changelog:** `dev-docs/CHANGELOG.md`
+1. **Changelog:** `dev-docs/changelog.md`
 2. **API Reference:** Warning box on affected pages
 3. **Migration Guide:** Step-by-step upgrade instructions
 
@@ -248,10 +248,11 @@ If you find version mismatches or compatibility problems:
 2. **Check changelog** for migration notes
 3. **Open an issue:** [Report compatibility issue](https://github.com/0xpix/Hei-DataHub/issues/new?labels=docs,compatibility)
 
+
 ---
 
 ## Next Steps
 
-- **Review [Changelog](CHANGELOG.md)** for version history
+- **Review [Changelog](../changelog.md)** for version history
 - **Check [Known Issues](../known-issues.md)** for version-specific bugs
-- **Read [SemVer Guide](../build/semver.md)** for detailed versioning rules
+- **Read [Versioning Policy](../versioning.md)** for detailed versioning rules
