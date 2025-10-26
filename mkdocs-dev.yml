@@ -21,30 +21,16 @@ site_dir: dev-site
 
 # Configuration
 theme:
-  name: material
-  palette:
-    # Dracula color scheme
-    scheme: slate
-    primary: deep purple
-    accent: pink
-  font:
-    text: Roboto
-    code: Roboto Mono
-  features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.tabs
-    - navigation.sections
-    - navigation.expand
-    - navigation.top
-    - navigation.indexes
-    - toc.follow
-    - search.suggest
-    - search.highlight
-    - content.code.copy
-    - content.code.annotate
-  icon:
-    repo: fontawesome/brands/github
+  name: dracula
+  components:
+    title: false
+    preview: true
+    site_name: false
+  highlightjs: true
+    - bash
+  sidebar: true
+  navigation_depth: 2
+  custom_dir: dev-docs/
   logo: assets/dark_logo_H_large.svg
   favicon: assets/dark_logo_H_large.svg
 
@@ -133,7 +119,30 @@ extra:
 # Navigation structure - Simplified for clarity
 nav:
   - Home: index.md
-  - About This Site: ABOUT.md
+
+  - 🎓 Learning Guide:
+    - Start Here: learn/README.md
+    - Welcome:
+      - Overview & Roadmap: learn/00-overview.md
+      - What Is Hei-DataHub?: learn/01-what-is-hei-datahub.md
+      - How It Works (Architecture): learn/01-architecture.md
+      - Installing & Running Locally: learn/02-setup.md
+
+    - Build the TUI:
+      - 01. Layout Basics: learn/tui/01-layout-basics.md
+      - 02. Creating Views & Widgets: learn/tui/02-widgets.md
+      - 03. Styling & Themes: learn/tui/03-styling.md
+      - 04. Keyboard Shortcuts & Events: learn/tui/04-keybindings.md
+      - 05. Adding Your Own Screen: learn/tui/05-custom-view.md
+
+    - Add Functionality:
+      - 01. Linking UI to Data: learn/logic/01-ui-actions.md
+
+    - Deep Dive:
+      - 01. Directory Structure: learn/deep/01-directory-structure.md
+
+    - Advanced Topics:
+      - 01. Adding New Features: learn/advanced/01-extending.md
 
   - Quick Start:
     - Getting Started: quickstart/getting-started.md
@@ -210,14 +219,7 @@ nav:
 
   - Reference:
     - API Documentation: api-reference/overview.md
-    - CLI Commands: api-reference/cli-commands.md
-    - Architecture Decisions (ADRs):
-      - Index: adr/index.md
-      - 001 - Docs Split: adr/001-docs-split.md
-      - 002 - Branching Strategy: adr/002-branching-strategy.md
-      - 003 - Changelog Enforcement: adr/003-changelog-enforcement.md
-      - 004 - Docs Upgrade and Cleanup: adr/004-docs-upgrade-and-cleanup.md
-    - Full Changelog: CHANGELOG.md
+    - Architecture Decisions (ADRs): adr/index.md
     - Changelog: changelog.md
     - Versioning Policy: versioning.md
     - v0.60 Upgrade Summary: v0.60-UPGRADE-SUMMARY.md
