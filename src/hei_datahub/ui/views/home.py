@@ -777,9 +777,8 @@ class HomeScreen(Screen):
 
     def action_show_help(self) -> None:
         """Show help overlay with keybindings (? key)."""
-        from mini_datahub.ui.widgets.help_overlay import HelpOverlay
-        from mini_datahub.services.actions import ActionContext
-        self.app.push_screen(HelpOverlay(ActionContext.HOME))
+        from .help import HelpScreen
+        self.app.push_screen(HelpScreen())
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
