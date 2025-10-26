@@ -1,24 +1,12 @@
 /* ============================================================================
    HELP SCREEN STYLES - Hei-DataHub
-   Modal-style centered overlay matching debug console
+   All selectors scoped to HelpScreen to prevent leakage
    ============================================================================ */
 
 HelpScreen {
-    align: center middle;
-}
-
-HelpScreen #help-scroll {
-    width: 100;
-    height: auto;
-    max-height: 45;
-    border: solid $accent;
-    background: $surface;
-    scrollbar-gutter: stable;
+    layout: vertical;
 }
 
 HelpScreen #help-content {
-    width: 100%;
-    height: auto;
     padding: 2;
-    background: $surface;
 }
