@@ -5,32 +5,14 @@
 
 CloudEditDetailsScreen {
     background: $surface;
+    background: $surface;
     layout: vertical;
 }
 
-CloudEditDetailsScreen Header {
-    dock: top;
-    height: 1;
-    background: $panel;
-    color: $text;
-}
-
-CloudEditDetailsScreen Footer {
-    dock: bottom;
-    height: 1;
-    background: $panel;
-    color: $text-muted;
-}
-
-CloudEditDetailsScreen #edit-scroll {
-    width: 100%;
+CloudEditDetailsScreen #add-data-scroll {
     height: 1fr;
-    align: center top;
-    scrollbar-gutter: stable;
-    scrollbar-background: $surface;
-    scrollbar-color: $primary;
-    scrollbar-color-hover: $accent;
-    scrollbar-color-active: $accent;
+    overflow-y: auto;
+    scrollbar-size: 1 1;
 }
 
 CloudEditDetailsScreen #edit-form-container {
@@ -119,13 +101,8 @@ CloudEditDetailsScreen #error-message:empty {
 }
 
 CloudEditDetailsScreen .title {
-    width: 100;
-    text-align: left;
+    text-align: center;
     text-style: bold;
-    padding: 2;
-    margin-bottom: 2;
-    background: $surface;
-    color: $accent;
-    border-bottom: solid $primary 30%;
-    text-style: bold italic;  /* You can combine styles */
+    padding: 1;
+    background: $primary;
 }
