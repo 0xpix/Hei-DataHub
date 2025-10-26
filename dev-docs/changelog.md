@@ -467,7 +467,7 @@ Hei-DataHub follows [Semantic Versioning](https://semver.org/):
 
 ## How to Upgrade
 
-See [Versioning Policy](98-versioning.md#upgrade-strategy) for detailed upgrade instructions.
+See [Versioning Policy](versioning.md#upgrade-strategy) for detailed upgrade instructions.
 
 **Quick upgrade (patch releases):**
 
@@ -502,7 +502,7 @@ pip install -e .
 
 ## Related Links
 
-- **[Versioning Policy](98-versioning.md)** - Understanding SemVer and Hei-DataHub's approach
+- **[Versioning Policy](versioning.md)** - Understanding SemVer and Hei-DataHub's approach
 - **[GitHub Releases](https://github.com/0xpix/Hei-DataHub/releases)** - Download releases
 - **[Milestones](https://github.com/0xpix/Hei-DataHub/milestones)** - Upcoming features
 
