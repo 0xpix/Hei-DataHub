@@ -6,9 +6,10 @@ This package contains modular screen implementations split from the monolithic h
 
 from .home import HomeScreen
 from .help import HelpScreen
-from .dataset_detail import CloudDatasetDetailsScreen  # DetailsScreen removed - cloud-only workflow
-from .dataset_edit import CloudEditDetailsScreen  # EditDetailsScreen removed - cloud-only workflow
+from .dataset_detail import CloudDatasetDetailsScreen
+from .dataset_edit import CloudEditDetailsScreen
 from .dataset_add import AddDataScreen
+from .settings import SettingsScreen
 from .dialogs import ConfirmCancelDialog, ConfirmDeleteDialog
 
 __all__ = [
