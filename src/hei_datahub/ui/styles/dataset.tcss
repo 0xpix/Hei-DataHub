@@ -1,0 +1,86 @@
+/* ===========================
+   Global minimal theme tweaks
+   =========================== */
+
+Screen {
+    background: $background;
+    color: $text;
+}
+
+/* Header / Footer: subtle, readable, compact */
+Header, Footer {
+    background: $surface 10%;
+    color: $text;
+    height: 3;
+    text-style: bold;
+    border: none;
+}
+
+/* =========================================
+   CloudDatasetDetailsScreen focused styling
+   Targets existing IDs/classes in the script
+   ========================================= */
+
+/* Center the vertical scroller content area */
+VerticalScroll#details-container {
+    width: 90;                 /* card width; adjust as needed */
+    height: 1fr;
+    margin: 2 0;               /* top margin only */
+    padding: 1 2;
+    align: center top;
+    background: $surface 6%;
+    border: none;
+}
+
+/* Title line: big, accent, with a bottom rule */
+Label.title {
+    content-align: left middle;
+    height: 3;
+    padding: 0 1;
+    color: $primary;
+    text-style: bold;
+    background: $surface 4%;
+    border-bottom: hkey $primary 50%;
+}
+
+/* Details card: rounded border + subtle shadow-esque feel */
+Static#details-content {
+    margin: 1 0 2 0;
+    padding: 1 2;
+    background: $surface;         /* card background */
+    border: round $primary 30%;   /* neat rounded border with primary tint */
+    color: $text;
+}
+
+/* Scrollbar aesthetics inside the details scroller */
+VerticalScroll#details-container {
+    scrollbar-background: $surface-darken-1;
+    scrollbar-color: $primary;
+    scrollbar-color-hover: $primary-lighten-1;
+    scrollbar-color-active: $accent;
+}
+
+/* Notifications: readable with clear severity cues */
+Notification {
+    background: $surface 8%;
+    border: round $primary 40%;
+    text-style: bold;
+}
+Notification.-warning {
+    border: round $warning 40%;
+    color: $warning;
+}
+Notification.-error {
+    border: round $error 40%;
+    color: $error;
+}
+Notification.-information {
+    border: round $accent 40%;
+}
+
+/* Key hints (if shown elsewhere) */
+Key {
+    background: $surface 8%;
+    border: round $primary 30%;
+    text-style: bold;
+}
