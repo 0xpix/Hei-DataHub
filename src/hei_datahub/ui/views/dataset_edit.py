@@ -54,7 +54,7 @@ class CloudEditDetailsScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
-            Label(f"󱘫 Editing Dataset: {self.dataset_id}", classes="title"),
+            Label(f"☁️ Editing Cloud Dataset: {self.dataset_id}  |  [italic]Ctrl+S to save, Esc to cancel[/italic]", classes="title"),
             Container(
                 Static(id="edit-status", classes="edit-status"),
 
@@ -107,33 +107,10 @@ class CloudEditDetailsScreen(Screen):
 
     def on_mount(self) -> None:
         """Initialize field values after mounting."""
-        # Pre-populate previous values to prevent false dirty marking
-        self._previous_values = {
-            'name': self.metadata.get('dataset_name', self.metadata.get('name', '')),
-            'description': self.metadata.get('description', ''),
-            'source': self.metadata.get('source', ''),
-            'storage': self.metadata.get('storage_location', ''),
-            'date': str(self.metadata.get('date_created', '')),
-            'format': str(self.metadata.get('file_format', '')),
-            'size': str(self.metadata.get('size', '')),
-            'keywords': ', '.join(self.metadata.get('keywords', [])) if isinstance(self.metadata.get('keywords'), list) else str(self.metadata.get('keywords', '')),
-            'license': str(self.metadata.get('license', '')),
-        }
-
         desc_area = self.query_one("#edit-description", TextArea)
         desc_area.text = self.metadata.get('description', '')
         self.query_one("#edit-name", Input).focus()
         self._update_status()
-
-    @on(Button.Pressed, "#save-btn")
-    def on_save_button_pressed(self) -> None:
-        """Handle Save button click."""
-        self.action_save_edits()
-
-    @on(Button.Pressed, "#cancel-btn")
-    def on_cancel_button_pressed(self) -> None:
-        """Handle Cancel button click."""
-        self.action_cancel_edits()
 
     @on(Input.Changed)
     def on_input_changed(self, event: Input.Changed) -> None:
@@ -298,7 +275,7 @@ class CloudEditDetailsScreen(Screen):
     def save_to_cloud(self) -> None:
         """Save dataset to cloud storage (WebDAV)."""
         try:
-            from hei_datahub.services.storage_manager import get_storage_backend
+            from mini_datahub.services.storage_manager import get_storage_backend
             import yaml
             import tempfile
             import os
@@ -363,7 +340,7 @@ class CloudEditDetailsScreen(Screen):
 
                 # Update fast search index for cloud dataset
                 try:
-                    from hei_datahub.services.index_service import get_index_service
+                    from mini_datahub.services.index_service import get_index_service
 
                     index_service = get_index_service()
 
@@ -455,7 +432,7 @@ class CloudEditDetailsScreen(Screen):
 
     def action_cancel_edits(self) -> None:
         """Cancel editing and discard changes (Esc)."""
-        from ..widgets.dialogs import ConfirmCancelDialog
+        from .dialogs import ConfirmCancelDialog
 
         if len(self._dirty_fields) > 0:
             self.app.push_screen(
