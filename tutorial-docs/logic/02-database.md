@@ -742,3 +742,4 @@ Now you understand the database layer. Next, let's explore **autocomplete and su
 - [SQLite FTS5 Documentation](https://www.sqlite.org/fts5.html)
 - [BM25 Ranking Algorithm](https://en.wikipedia.org/wiki/Okapi_BM25)
 - [SQLite WAL Mode](https://www.sqlite.org/wal.html)
+- [Hei-DataHub Performance](../../performance/overview.md)
