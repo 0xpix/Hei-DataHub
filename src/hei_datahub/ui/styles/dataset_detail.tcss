@@ -82,7 +82,7 @@ CloudDatasetDetailsScreen #details-content Static {
 
 /* Field labels - cyan bold */
 CloudDatasetDetailsScreen #details-content Static .field-label {
-    color: $accent;
+    color: $text;
     text-style: bold;
 }
 
@@ -130,7 +130,7 @@ CloudDatasetDetailsScreen .metadata-section {
 
 CloudDatasetDetailsScreen .metadata-section-title {
     text-style: bold;
-    color: $accent;
+    color: $text;
     padding-bottom: 1;
     border-bottom: solid $primary 30%;
     margin-bottom: 2;
@@ -169,7 +169,7 @@ CloudDatasetDetailsScreen .field-row {
 }
 
 CloudDatasetDetailsScreen .field-row .label {
-    color: $accent;
+    color: $text;
     text-style: bold;
     padding-right: 2;
 }
