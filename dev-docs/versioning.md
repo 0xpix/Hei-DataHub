@@ -244,7 +244,7 @@ pip install -e .
 
 3. **Check Changelog:**
     ```bash
-    cat docs/99-changelog.md
+    cat dev-docs/changelog.md
     ```
 
 4. **Reinstall:**
@@ -331,7 +331,7 @@ curl -s https://api.github.com/repos/0xpix/Hei-DataHub/releases/latest | grep ta
 
 **Every release PR must:**
 
-1. Update `docs/99-changelog.md` with new version entry
+1. Update `dev-docs/changelog.md` with new version entry
 2. List user-visible changes (features, fixes, breaking changes)
 3. Link to relevant issues/PRs
 
@@ -437,7 +437,7 @@ mini-datahub>=0.55.0,<0.56.0
 
 ## Related Resources
 
-- **[Changelog](99-changelog.md)** — Detailed release notes
+- **[Changelog](changelog.md)** — Detailed release notes
 - **[SemVer Specification](https://semver.org/)** — Official SemVer docs
 - **[GitHub Releases](https://github.com/0xpix/Hei-DataHub/releases)** — All releases
 
@@ -454,6 +454,5 @@ mini-datahub>=0.55.0,<0.56.0
 
 ## Next Steps
 
-- **[Changelog](99-changelog.md)** — See what's new in each release
-- **[Getting Started](01-getting-started.md)** — Install the latest version
-- **[FAQ](90-faq.md)** — Troubleshooting upgrade issues
+- **[Changelog](changelog.md)** — See what's new in each release
+- **[Quick Start](quickstart/getting-started.md)** — Install the latest version
