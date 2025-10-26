@@ -48,7 +48,7 @@ class LogoConfig(BaseModel):
 
 class ThemeConfig(BaseModel):
     """Theme configuration."""
-    name: str = Field(default="gruvbox")
+    name: str = Field(default="catppuccin-mocha")
     overrides: Dict[str, str] = Field(default_factory=dict)
     stylesheets: list[str] = Field(default_factory=list)  # User TCSS files
     tokens: Optional[str] = None  # Path to tokens YAML file
