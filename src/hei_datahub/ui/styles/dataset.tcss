@@ -54,7 +54,6 @@ Static#details-content {
 
 /* Scrollbar aesthetics inside the details scroller */
 VerticalScroll#details-container {
-    scrollbar-gutter: stable;
     scrollbar-background: $surface-darken-1;
     scrollbar-color: $primary;
     scrollbar-color-hover: $primary-lighten-1;
