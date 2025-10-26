@@ -40,7 +40,7 @@ This page tracks documentation completeness for the developer documentation site
 | [System Overview](../architecture/overview.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
 | [Module Map](../architecture/module-map.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
 | [Data Flow](../architecture/data-flow.md) | 📝 Stub | 10% | Unassigned | - |
-| [Dependency Graph](../architecture/dependencies.md) | 📝 Stub | 10% | Unassigned | - |
+| Dependency Graph | 📝 Stub | 10% | Unassigned | - |
 | [Component Diagrams](../architecture/diagrams.md) | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🟡 **44%** complete (2 of 5)
@@ -51,10 +51,10 @@ This page tracks documentation completeness for the developer documentation site
 
 | Page | Status | Completion | Owner | Last Updated |
 |------|--------|------------|-------|--------------|
-| [What is "Core"?](../core-concepts/what-is-core.md) | 📝 Stub | 20% | Unassigned | - |
-| [Platform Constraints](../core-concepts/platform.md) | 📝 Stub | 10% | Unassigned | - |
-| [Domain Model](../core-concepts/domain-model.md) | 📝 Stub | 10% | Unassigned | - |
-| [Design Principles](../core-concepts/design-principles.md) | 📝 Stub | 10% | Unassigned | - |
+| What is "Core"? | 📝 Stub | 20% | Unassigned | - |
+| Platform Constraints | 📝 Stub | 10% | Unassigned | - |
+| Domain Model | 📝 Stub | 10% | Unassigned | - |
+| Design Principles | 📝 Stub | 10% | Unassigned | - |
 
 **Section Status:** 🔴 **13%** complete (0.5 of 4)
 
@@ -64,12 +64,12 @@ This page tracks documentation completeness for the developer documentation site
 
 | Page | Status | Completion | Owner | Last Updated |
 |------|--------|------------|-------|--------------|
-| [Navigation Guide](../codebase/navigation.md) | 📝 Stub | 10% | Unassigned | - |
+| Navigation Guide | 📝 Stub | 10% | Unassigned | - |
 | [Root Files](../codebase/root-files.md) | 📝 Stub | 10% | Unassigned | - |
 | src/mini_datahub pages | ❌ Missing | 0% | Unassigned | - |
 | [tests/](../codebase/tests.md) | ❌ Missing | 0% | Unassigned | - |
-| [scripts/](../codebase/scripts.md) | ❌ Missing | 0% | Unassigned | - |
-| [data/](../codebase/data.md) | ❌ Missing | 0% | Unassigned | - |
+| scripts/ | ❌ Missing | 0% | Unassigned | - |
+| data/ | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **3%** complete (0.5 of 15)
 
@@ -107,7 +107,7 @@ This page tracks documentation completeness for the developer documentation site
 | [Overview](../config/overview.md) | 📝 Stub | 10% | Unassigned | - |
 | [Environment Variables](../config/environment.md) | ❌ Missing | 0% | Unassigned | - |
 | [Config Files](../config/files.md) | ❌ Missing | 0% | Unassigned | - |
-| [Settings Profiles](../config/profiles.md) | ❌ Missing | 0% | Unassigned | - |
+| Settings Profiles | ❌ Missing | 0% | Unassigned | - |
 | [Adding New Config](../config/adding-config.md) | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **2%** complete (0.1 of 5)
@@ -123,7 +123,7 @@ This page tracks documentation completeness for the developer documentation site
 | [Migrations](../data/migrations.md) | ❌ Missing | 0% | Unassigned | - |
 | [Adding Datasets](../data/adding-datasets.md) | ❌ Missing | 0% | Unassigned | - |
 | [Indexing Strategy](../data/indexing.md) | ❌ Missing | 0% | Unassigned | - |
-| [Performance Tips](../data/performance.md) | ❌ Missing | 0% | Unassigned | - |
+| Performance Tips | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **2%** complete (0.1 of 6)
 
@@ -149,10 +149,10 @@ This page tracks documentation completeness for the developer documentation site
 
 | Page | Status | Completion | Owner | Last Updated |
 |------|--------|------------|-------|--------------|
-| [Extension Points](../extensibility/extension-points.md) | 📝 Stub | 10% | Unassigned | - |
-| [Plugin Architecture](../extensibility/plugins.md) | ❌ Missing | 0% | Unassigned | - |
-| [Creating Adapters](../extensibility/adapters.md) | ❌ Missing | 0% | Unassigned | - |
-| [Testing Extensions](../extensibility/testing.md) | ❌ Missing | 0% | Unassigned | - |
+| Extension Points | 📝 Stub | 10% | Unassigned | - |
+| Plugin Architecture | ❌ Missing | 0% | Unassigned | - |
+| Creating Adapters | ❌ Missing | 0% | Unassigned | - |
+| Testing Extensions | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **3%** complete (0.1 of 4)
 
@@ -165,7 +165,7 @@ This page tracks documentation completeness for the developer documentation site
 | [Build Pipeline](../build/pipeline.md) | 📝 Stub | 10% | Unassigned | - |
 | [CI/CD Jobs](../build/ci-cd.md) | 📝 Stub | 10% | Unassigned | - |
 | [Release Process](../build/releases.md) | 📝 Stub | 20% | Unassigned | - |
-| [SemVer Guide](../build/semver.md) | 📝 Stub | 10% | Unassigned | - |
+| SemVer Guide | 📝 Stub | 10% | Unassigned | - |
 | [Changelog Policy](../build/changelog.md) | 📝 Stub | 10% | Unassigned | - |
 
 **Section Status:** 🔴 **12%** complete (0.6 of 5)
@@ -176,11 +176,11 @@ This page tracks documentation completeness for the developer documentation site
 
 | Page | Status | Completion | Owner | Last Updated |
 |------|--------|------------|-------|--------------|
-| [Testing Strategy](../qa/testing-strategy.md) | 📝 Stub | 10% | Unassigned | - |
-| [Test Data & Fixtures](../qa/test-data.md) | ❌ Missing | 0% | Unassigned | - |
-| [Logging Conventions](../qa/logging.md) | ❌ Missing | 0% | Unassigned | - |
-| [Metrics](../qa/metrics.md) | ❌ Missing | 0% | Unassigned | - |
-| [Code Coverage](../qa/coverage.md) | ❌ Missing | 0% | Unassigned | - |
+| Testing Strategy | 📝 Stub | 10% | Unassigned | - |
+| Test Data & Fixtures | ❌ Missing | 0% | Unassigned | - |
+| Logging Conventions | ❌ Missing | 0% | Unassigned | - |
+| Metrics | ❌ Missing | 0% | Unassigned | - |
+| Code Coverage | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **2%** complete (0.1 of 5)
 
@@ -193,8 +193,8 @@ This page tracks documentation completeness for the developer documentation site
 | [Overview](../performance/overview.md) | 📝 Stub | 10% | Unassigned | - |
 | [Profiling Guide](../performance/profiling.md) | ❌ Missing | 0% | Unassigned | - |
 | [Common Hotspots](../performance/hotspots.md) | ❌ Missing | 0% | Unassigned | - |
-| [Optimization Playbooks](../performance/playbooks.md) | ❌ Missing | 0% | Unassigned | - |
-| [Performance SLAs](../performance/slas.md) | ❌ Missing | 0% | Unassigned | - |
+| Optimization Playbooks | ❌ Missing | 0% | Unassigned | - |
+| Performance SLAs | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **2%** complete (0.1 of 5)
 
@@ -204,10 +204,10 @@ This page tracks documentation completeness for the developer documentation site
 
 | Page | Status | Completion | Owner | Last Updated |
 |------|--------|------------|-------|--------------|
-| [Secrets Management](../security/secrets.md) | 📝 Stub | 10% | Unassigned | - |
-| [Data Privacy](../security/privacy.md) | ❌ Missing | 0% | Unassigned | - |
-| [Supply Chain](../security/supply-chain.md) | ❌ Missing | 0% | Unassigned | - |
-| [Security Checklist](../security/checklist.md) | ❌ Missing | 0% | Unassigned | - |
+| Secrets Management | 📝 Stub | 10% | Unassigned | - |
+| Data Privacy | ❌ Missing | 0% | Unassigned | - |
+| Supply Chain | ❌ Missing | 0% | Unassigned | - |
+| Security Checklist | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🔴 **3%** complete (0.1 of 4)
 
@@ -221,7 +221,7 @@ This page tracks documentation completeness for the developer documentation site
 | [Commit Conventions](../contributing/commits.md) | 📝 Stub | 30% | Unassigned | - |
 | [Code Review Guide](../contributing/code-review.md) | 📝 Stub | 20% | Unassigned | - |
 | [Definition of Done](../contributing/definition-of-done.md) | 📝 Stub | 10% | Unassigned | - |
-| [Labels & Triage](../contributing/labels.md) | ❌ Missing | 0% | Unassigned | - |
+| Labels & Triage | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🟡 **32%** complete (1.6 of 5)
 
@@ -235,8 +235,8 @@ This page tracks documentation completeness for the developer documentation site
 | [ADR-001: Docs Split](../adr/001-docs-split.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
 | [ADR-002: Branching](../adr/002-branching-strategy.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
 | [ADR-003: Changelog](../adr/003-changelog-enforcement.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
-| [Roadmap](../roadmap.md) | ❌ Missing | 0% | Unassigned | - |
-| [Deprecation Policy](../deprecation.md) | ❌ Missing | 0% | Unassigned | - |
+| Roadmap | ❌ Missing | 0% | Unassigned | - |
+| Deprecation Policy | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🟡 **67%** complete (4 of 6)
 
@@ -248,7 +248,7 @@ This page tracks documentation completeness for the developer documentation site
 |------|--------|------------|-------|--------------|
 | [Health Checklist](../maintenance/health-checklist.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
 | [Coverage Tracker](../maintenance/coverage-tracker.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
-| [Update Procedures](../maintenance/update-procedures.md) | ❌ Missing | 0% | Unassigned | - |
+| Update Procedures | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🟡 **67%** complete (2 of 3)
 
@@ -259,9 +259,9 @@ This page tracks documentation completeness for the developer documentation site
 | Page | Status | Completion | Owner | Last Updated |
 |------|--------|------------|-------|--------------|
 | [Glossary](../appendices/glossary.md) | ✅ Complete | 100% | Core Team | 2025-10-06 |
-| [File Index](../appendices/file-index.md) | ❌ Missing | 0% | Unassigned | - |
-| [Function Index](../appendices/function-index.md) | ❌ Missing | 0% | Unassigned | - |
-| [Quick Reference](../appendices/quick-reference.md) | ❌ Missing | 0% | Unassigned | - |
+| File Index | ❌ Missing | 0% | Unassigned | - |
+| Function Index | ❌ Missing | 0% | Unassigned | - |
+| Quick Reference | ❌ Missing | 0% | Unassigned | - |
 
 **Section Status:** 🟡 **25%** complete (1 of 4)
 
