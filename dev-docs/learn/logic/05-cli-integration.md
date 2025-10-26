@@ -780,4 +780,4 @@ Congratulations! You've completed the **Logic** section. Now let's dive deep int
 - [Python argparse Tutorial](https://docs.python.org/3/howto/argparse.html)
 - [Click Framework](https://click.palletsprojects.com/) (alternative to argparse)
 - [Rich Console](https://rich.readthedocs.io/) (beautiful terminal output)
-- [Hei-DataHub CLI Reference](../../reference/cli-commands.md)
+- [Hei-DataHub CLI Reference](../../api-reference/cli-commands.md)
