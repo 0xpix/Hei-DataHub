@@ -314,9 +314,11 @@ source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
     { name = "keyring" },
+    { name = "mkdocs-dracula-theme" },
     { name = "mkdocs-macros-plugin" },
     { name = "mkdocs-material" },
     { name = "mkdocs-simple-blog" },
+    { name = "mkdocs-terminal" },
     { name = "mypy" },
     { name = "psutil" },
     { name = "pydantic" },
@@ -344,9 +346,11 @@ requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = ">=23.0.0" },
     { name = "jsonschema", specifier = ">=4.20.0" },
     { name = "keyring", specifier = ">=24.0.0" },
+    { name = "mkdocs-dracula-theme", specifier = ">=1.0.8" },
     { name = "mkdocs-macros-plugin", specifier = ">=1.0.0" },
     { name = "mkdocs-material", specifier = ">=9.6.21" },
     { name = "mkdocs-simple-blog", specifier = ">=0.2.0" },
+    { name = "mkdocs-terminal", specifier = ">=4.7.0" },
     { name = "mypy", specifier = ">=1.18.2" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.7.0" },
     { name = "psutil", specifier = ">=5.9.0" },
@@ -687,6 +691,18 @@ wheels = [
 ]
 
 [[package]]
+name = "mkdocs-dracula-theme"
+version = "1.0.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mkdocs" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d4/6e/a0fa20a34e9bb6194a0668a3f9ecf2b2e00b6204526ec64ff6ee96368cf9/mkdocs_dracula_theme-1.0.8.tar.gz", hash = "sha256:5da6e9b118e3379b5591780ade6e8ad9f3d8ac70c28e50e7fd2a4548670581e5", size = 458668, upload-time = "2025-08-04T18:25:34.369Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/04/ba/39fa5ac5017caedca6bd9d722cf451597b0d4ff6e6cc5b0e735892ff2a42/mkdocs_dracula_theme-1.0.8-py3-none-any.whl", hash = "sha256:bea486ec581792ae7eb2de3ec70c729df9740b56c552654cf38bcdb0979cbe37", size = 465211, upload-time = "2025-08-04T18:25:33.303Z" },
+]
+
+[[package]]
 name = "mkdocs-get-deps"
 version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -761,6 +777,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/2f/f2/68759e7bada3a940675d89af31535d159fcd44a2abc334fd3f6730e24729/mkdocs_simple_blog-0.2.0.tar.gz", hash = "sha256:62f7ad2594566020f97fa614002ec71bc97e7fb38060341b2c2ccd9ca2cb1fe0", size = 275212, upload-time = "2025-03-23T02:39:08.849Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2a/94/7ff44de961282b2f2d3a615e5d4d4a94111057f5bfe34f1ce8b525973d2e/mkdocs_simple_blog-0.2.0-py3-none-any.whl", hash = "sha256:ffa09798ca598c67c260e6f588f63d7dd5a1e50eeb632644e4952fee8116d447", size = 282014, upload-time = "2025-03-23T02:39:07.447Z" },
+]
+
+[[package]]
+name = "mkdocs-terminal"
+version = "4.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jinja2" },
+    { name = "markdown" },
+    { name = "mkdocs" },
+    { name = "pygments" },
+    { name = "pymdown-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/41/0d4ab5fcee2030f4800f0925ccbc03531d44f89686ad07db83cf2fd77854/mkdocs_terminal-4.7.0.tar.gz", hash = "sha256:9a8abcc560d66974a3fcfac9381167c7a3d52add1c30403b8cf35b3d2b10362e", size = 619993, upload-time = "2024-12-17T05:19:18.725Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/98/062d03109576f3dc5a27bb3a2a74bea9b59aa4ed5d2b9b12f98a15a09fd8/mkdocs_terminal-4.7.0-py3-none-any.whl", hash = "sha256:6a223bcef762728f5bcdba045b4acabc3d119ae9215160693f45be8a09889815", size = 641970, upload-time = "2024-12-17T05:19:17.034Z" },
 ]
 
 [[package]]
