@@ -689,7 +689,7 @@ The `core/` module is:
 **Next Steps:**
 - [Infrastructure Module →](infra-module.md) (Database & APIs)
 - [Services Module →](services-module.md) (Business logic)
-- [API Reference →](../api-reference/core/models.md) (Detailed API docs)
+- [API Reference →](../api-reference/overview.md) (Detailed API docs - *core module docs planned*)
 
 ---
 
