@@ -1,0 +1,12 @@
+/* ============================================================================
+   HELP SCREEN STYLES - Hei-DataHub
+   All selectors scoped to HelpScreen to prevent leakage
+   ============================================================================ */
+
+HelpScreen {
+    layout: vertical;
+}
+
+HelpScreen #help-content {
+    padding: 2;
+}
