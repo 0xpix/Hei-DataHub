@@ -804,3 +804,4 @@ Now you understand the **UI layer**! Time to dive deeper into the **Logic layer*
 - [Textual Screens Guide](https://textual.textualize.io/guide/screens/)
 - [Screen API Reference](https://textual.textualize.io/api/screen/)
 - [Workers (@work)](https://textual.textualize.io/guide/workers/)
+- [Hei-DataHub UI Architecture](../../ui/architecture.md)
