@@ -6,7 +6,7 @@ Moved from mini_datahub.ui.views.home.HelpScreen
 from textual.app import ComposeResult
 from textual.containers import VerticalScroll
 from textual.screen import Screen
-from textual.widgets import Footer, Header, Static
+from textual.widgets import Static
 
 
 class HelpScreen(Screen):
@@ -20,7 +20,6 @@ class HelpScreen(Screen):
     ]
 
     def compose(self) -> ComposeResult:
-        yield Header()
         yield VerticalScroll(
             Static("""
 [bold cyan]Hei-DataHub Keybindings[/bold cyan]
@@ -58,8 +57,8 @@ class HelpScreen(Screen):
 
 Press [cyan]Esc[/cyan] or [cyan]q[/cyan] to close this help.
             """, id="help-content"),
+            id="help-scroll",
         )
-        yield Footer()
 
     def action_dismiss(self) -> None:
         """Close help screen."""
