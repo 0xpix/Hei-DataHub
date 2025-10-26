@@ -44,7 +44,7 @@ class AddDataScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
-            Label("➕ Add New Dataset  |  [italic]Ctrl+S to save, Esc to cancel[/italic]", classes="title"),
+            Label("󰆺 Add New Dataset", classes="title"),
             Container(
                 Label("Dataset Name (required):"),
                 Input(placeholder="e.g., Global Weather Stations 2024", id="input-name"),
