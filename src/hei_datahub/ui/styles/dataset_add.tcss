@@ -5,7 +5,24 @@
    ============================================================================ */
 
 AddDataScreen {
+    background: $surface;
     layout: vertical;
+}
+
+AddDataScreen Header {
+    dock: top;
+    height: 3;
+    background: $panel;
+    color: $text;
+    border-bottom: solid $primary;
+}
+
+AddDataScreen Footer {
+    dock: bottom;
+    height: 3;
+    background: $panel;
+    color: $text-muted;
+    border-top: solid $primary;
 }
 
 AddDataScreen #add-data-scroll {
@@ -48,7 +65,7 @@ AddDataScreen .title {
     padding: 2;
     margin-bottom: 2;
     color: $accent;
-    background: $panel;
+    background: $surface;
     border-bottom: solid $primary 30%;
 }
 
@@ -58,7 +75,7 @@ AddDataScreen .title {
 
 AddDataScreen #form-container Label {
     margin: 1 0 0 0;
-    color: $accent;
+    color: $text;
     text-style: bold;
 }
 
@@ -67,6 +84,7 @@ AddDataScreen #form-container TextArea {
     width: 100%;
     margin: 0 0 1 0;
     background: $surface;
+    color: $text;
     border: round $primary 20%;
     padding: 0 1;
 }
@@ -74,6 +92,7 @@ AddDataScreen #form-container TextArea {
 AddDataScreen #form-container Input:focus,
 AddDataScreen #form-container TextArea:focus {
     border: round $accent 40%;
+    background: $surface;
 }
 
 AddDataScreen #form-container TextArea {
@@ -104,17 +123,18 @@ AddDataScreen Button.--primary {
 }
 
 AddDataScreen Button.--default {
-    background: $surface;
+    background: $panel;
     color: $text;
     border: round $primary 30%;
 }
 
 AddDataScreen Button:hover {
-    background: $primary 40%;
+    background: $accent 40%;
 }
 
 AddDataScreen Button:focus {
     border: round $accent;
+    background: $accent 20%;
 }
 
 /* ============================================================================
@@ -129,7 +149,7 @@ AddDataScreen .section {
 }
 
 AddDataScreen .section-title {
-    color: $accent;
+    color: $text;
     text-style: bold;
     padding-bottom: 1;
     border-bottom: solid $primary 20%;
