@@ -9,7 +9,6 @@
  *   h/l        - Navigate to previous/next page
  *   /          - Focus search box (if available)
  *   :          - Enter command mode (type :dev to go to developer docs)
- *   :          - Enter command mode (type :dev to go to developer docs)
  *   Escape     - Blur active element (exit input focus)
  */
 
@@ -28,8 +27,6 @@
   // State
   let ggBuffer = false;          // track 'g' press for 'gg' command
   let ggTimeout = null;
-  let commandMode = false;       // track if in command mode
-  let commandInput = null;       // reference to command input element
   let commandMode = false;       // track if in command mode
   let commandInput = null;       // reference to command input element
 
@@ -299,19 +296,11 @@
   function handleKeyPress(e) {
     // Debug: log key presses (remove in production if needed)
     if (['j', 'k', 'h', 'l', 'g', 'G', 'd', 'u', '/', ':'].includes(e.key)) {
-    if (['j', 'k', 'h', 'l', 'g', 'G', 'd', 'u', '/', ':'].includes(e.key)) {
       console.log('[Vim Navigation] Key pressed:', e.key, '| URL:', location.pathname);
     }
 
-    // Handle command mode separately
+    // If we're in command mode, don't handle global keys
     if (commandMode) {
-      // Command input handles its own keys
-      return;
-    }
-
-    // Handle command mode separately
-    if (commandMode) {
-      // Command input handles its own keys
       return;
     }
 
@@ -392,7 +381,7 @@
         e.preventDefault();
         break;
 
-      case 'h':
+      case 'h': {
         // Previous page
         const { prev } = findNavLinks();
         if (prev) {
@@ -400,8 +389,9 @@
           e.preventDefault();
         }
         break;
+      }
 
-      case 'l':
+      case 'l': {
         // Next page
         const { next } = findNavLinks();
         if (next) {
@@ -409,6 +399,7 @@
           e.preventDefault();
         }
         break;
+      }
 
       case '/':
         // Focus search
@@ -499,22 +490,17 @@
     console.log('[Vim Navigation] Initialized. Keybindings: j/k (scroll), d/u (half-page), gg/G (top/bottom), h/l (prev/next), / (search), : (command mode)');
     console.log('[Vim Navigation] Command mode: Type ":dev" to navigate to Developer Docs');
 
-
     // Listen for instant navigation / history changes (for MkDocs instant loading)
     // This ensures vim navigation works after client-side page transitions
-    if (window.navigation) {
-      // Modern Navigation API
+
+    // Modern Navigation API (optional, guard against environments without it)
+    if (window.navigation && typeof window.navigation.addEventListener === 'function') {
       window.navigation.addEventListener('navigate', () => {
         console.log('[Vim Navigation] Page navigated (Navigation API)');
       });
     }
 
-    // Listen for popstate (back/forward button)
-    window.addEventListener('popstate', () => {
-      console.log('[Vim Navigation] Page navigated (popstate)');
-    });
-
-    // Listen for MkDocs instant loading (Material theme)
+    // Listen for DOMContentSwitch (MkDocs Material theme instant loading)
     document.addEventListener('DOMContentSwitch', () => {
       console.log('[Vim Navigation] Page navigated (DOMContentSwitch)');
     });
