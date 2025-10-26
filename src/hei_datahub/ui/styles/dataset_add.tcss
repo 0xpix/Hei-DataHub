@@ -7,7 +7,6 @@
 AddDataScreen {
     background: $surface;
     layout: vertical;
-    align: center top;
 }
 
 AddDataScreen Header {
@@ -50,38 +49,16 @@ AddDataScreen #form-container {
     border: round $primary 30%;
 }
 
-/* All form elements span full width by default */
-AddDataScreen #form-container > * {
-    width: 100%;
-}
-
-/* ============================================================================
-   FORM TITLE - Matching dataset_detail.tcss
-   ============================================================================ */
-
-AddDataScreen .title {
-    width: 100;
-    text-align: left;
-    text-style: bold;
-    padding: 2;
-    margin-bottom: 2;
-    background: $surface;
-    color: $accent;
-    border-bottom: solid $primary 30%;
-    text-style: bold italic;  /* You can combine styles */
-}
-
-/* ============================================================================
-   FORM FIELDS - Labels, Inputs, TextAreas
-   ============================================================================ */
 
 AddDataScreen #form-container Label {
-    margin-top: 1;
+    margin: 1 0 0.5 0;
+    color: $accent;
+    text-style: bold;
 }
 
 AddDataScreen #form-container Input,
 AddDataScreen #form-container TextArea {
-    margin-bottom: 1;
+    margin: 0 0 1.5 0;
 }
 
 AddDataScreen #form-container TextArea {
@@ -111,24 +88,32 @@ AddDataScreen Button.--primary {
     border: round $primary;
 }
 
-AddDataScreen Button.--default {
-    background: $panel;
-    color: $text;
-    border: round $primary 30%;
+AddDataScreen Input, AddDataScreen TextArea {
+    background: $surface;
+    border: round $primary 20%;
+    padding: 0 1;
+}
+AddDataScreen Input:focus, AddDataScreen TextArea:focus {
+    border: round $accent 40%;
+}
+AddDataScreen Input::placeholder, AddDataScreen TextArea::placeholder {
+    color: $text-muted;
 }
 
-AddDataScreen Button:hover {
-    background: $accent 40%;
+AddDataScreen #form-container {
+    layout: grid;
+    grid-columns: 1fr 1fr;
+    grid-gutter: 2 2;
 }
-
-AddDataScreen Button:focus {
-    border: round $accent;
-    background: $accent 20%;
+AddDataScreen #form-container > Label,
+AddDataScreen #form-container > Input,
+AddDataScreen #form-container > TextArea,
+AddDataScreen #form-container > Horizontal { grid-column: 1 / -1; } /* default full width */
+@media (min-width: 120) {
+    /* put lighter fields side-by-side */
+    AddDataScreen #edit-format,
+    AddDataScreen #edit-size { grid-column: span 1; }
 }
-
-/* ============================================================================
-   SECTIONS - Grouped form fields (optional)
-   ============================================================================ */
 
 AddDataScreen .section {
     background: $surface;
@@ -172,5 +157,5 @@ AddDataScreen .title {
     text-align: center;
     text-style: bold;
     padding: 1;
-    background: $primary;
+    margin: 1 0 2 0;
 }
