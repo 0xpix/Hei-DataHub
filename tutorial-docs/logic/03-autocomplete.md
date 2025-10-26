@@ -752,3 +752,4 @@ Now you understand autocomplete and suggestions. Next, let's explore **cloud sto
 - [Autocomplete UX Best Practices](https://www.nngroup.com/articles/autocomplete/)
 - [Trie Data Structure](https://en.wikipedia.org/wiki/Trie) (for large-scale autocomplete)
 - [Levenshtein Distance](https://en.wikipedia.org/wiki/Levenshtein_distance) (fuzzy matching)
+- [Hei-DataHub UI Documentation](../../ui/architecture.md)
