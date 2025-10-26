@@ -631,7 +631,7 @@ See [Module Walkthrough](../codebase/module-walkthrough.md) for implementation d
 - Results cached for repeated identical queries
 - Background sync uses exponential backoff on failures
 
-See [Performance](performance.md) for detailed benchmarks and optimization strategies.
+See [Performance Overview](../performance/overview.md) for detailed benchmarks and optimization strategies.
 
 ---
 
@@ -711,4 +711,4 @@ hei-datahub auth doctor
 
 - [Contributing Workflow](../contributing/workflow.md)
 - [Module Map](module-map.md)
-- [Performance Tuning](performance.md)
+- [Performance Tuning](../performance/overview.md)
