@@ -5,6 +5,7 @@
 
 AddDataScreen {
     layout: vertical;
+    align: center top;
 }
 
 AddDataScreen #add-data-scroll {
@@ -14,19 +15,24 @@ AddDataScreen #add-data-scroll {
 }
 
 AddDataScreen #form-container {
-    padding: 1;
-    padding-bottom: 3;
-    height: auto;
-    min-height: 100%;
+    max-width: 120;
+    width: 100%;
+    margin: 2 auto;
+    padding: 2 3;
+    background: $panel;
+    border: round $primary 30%;
 }
 
+
 AddDataScreen #form-container Label {
-    margin-top: 1;
+    margin: 1 0 0.5 0;
+    color: $accent;
+    text-style: bold;
 }
 
 AddDataScreen #form-container Input,
 AddDataScreen #form-container TextArea {
-    margin-bottom: 1;
+    margin: 0 0 1.5 0;
 }
 
 AddDataScreen #form-container TextArea {
@@ -53,8 +59,78 @@ AddDataScreen #probe-status {
 }
 
 AddDataScreen .title {
-    text-align: center;
-    text-style: bold;
-    padding: 1;
-    background: $primary;
+    text-align: left;
+    padding: 1 2;
+    background: none;
+    color: $accent;
+    border-bottom: solid $primary 30%;
 }
+
+AddDataScreen Input, AddDataScreen TextArea {
+    background: $surface;
+    border: round $primary 20%;
+    padding: 0 1;
+}
+AddDataScreen Input:focus, AddDataScreen TextArea:focus {
+    border: round $accent 40%;
+}
+AddDataScreen Input::placeholder, AddDataScreen TextArea::placeholder {
+    color: $text-muted;
+}
+
+AddDataScreen #form-container {
+    layout: grid;
+    grid-columns: 1fr 1fr;
+    grid-gutter: 2 2;
+}
+AddDataScreen #form-container > Label,
+AddDataScreen #form-container > Input,
+AddDataScreen #form-container > TextArea,
+AddDataScreen #form-container > Horizontal { grid-column: 1 / -1; } /* default full width */
+@media (min-width: 120) {
+    /* put lighter fields side-by-side */
+    AddDataScreen #edit-format,
+    AddDataScreen #edit-size { grid-column: span 1; }
+}
+
+AddDataScreen .section {
+    background: $surface;
+    border: round $primary 20%;
+    padding: 2;
+    margin: 1.5 0;
+}
+AddDataScreen .section-title {
+    color: $accent;
+    text-style: bold;
+    padding-bottom: 1;
+    border-bottom: solid $primary 20%;
+    margin-bottom: 1;
+}
+
+AddDataScreen #form-container Button {
+    margin: 1 1 0 0;
+    border: round $primary 30%;
+    text-style: bold;
+}
+AddDataScreen #form-container Button.-primary {
+    background: $primary 20%;
+    border: round $primary 40%;
+}
+AddDataScreen #form-container Button.-secondary {
+    background: $surface;
+    border: round $primary 20%;
+}
+
+AddDataScreen #probe-status {
+    margin: 0 0 0.5 1;
+    color: $text-muted;
+}
+
+AddDataScreen #error-message {
+    background: $surface;
+    border: round $error 30%;
+    color: $error;
+    padding: 1;
+    margin: 1 0 2 0;
+}
+
