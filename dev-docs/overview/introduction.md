@@ -191,7 +191,7 @@ Then dive into the specific module you're working on.
 Use the search bar (top right) or jump directly to:
 
 - [API Reference](../api-reference/overview.md) for function signatures
-- [Codebase Tour](../codebase/navigation.md) to find a specific file
+- [Codebase Overview](../codebase/overview.md) to find a specific file
 - [Performance](../performance/overview.md) when optimizing
 - [Known Issues](../known-issues.md) before starting work
 
