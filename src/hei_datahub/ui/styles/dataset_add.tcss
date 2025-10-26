@@ -1,104 +1,133 @@
 /* ============================================================================
    ADD DATA SCREEN STYLES - Hei-DataHub
    All selectors scoped to AddDataScreen to prevent leakage
+   Centered card layout matching dataset_detail.tcss aesthetic
    ============================================================================ */
 
 AddDataScreen {
     layout: vertical;
-    align: center top;
 }
 
 AddDataScreen #add-data-scroll {
     height: 1fr;
-    overflow-y: auto;
-    scrollbar-size: 1 1;
+    width: 100%;
+    align: center top;
+    scrollbar-background: $surface;
+    scrollbar-color: $primary;
+    scrollbar-color-hover: $accent;
+    scrollbar-color-active: $accent;
 }
 
+/* ============================================================================
+   CARD LAYOUT - Centered form container
+   ============================================================================ */
+
 AddDataScreen #form-container {
-    max-width: 120;
+    max-width: 100;
     width: 100%;
-    margin: 2 auto;
-    padding: 2 3;
+    height: auto;
+    padding: 3;
+    padding-bottom: 5;
+    margin: 2 0;
     background: $panel;
     border: round $primary 30%;
 }
 
+/* All form elements span full width by default */
+AddDataScreen #form-container > * {
+    width: 100%;
+}
+
+/* ============================================================================
+   FORM TITLE - Matching dataset_detail.tcss
+   ============================================================================ */
+
+AddDataScreen .title {
+    text-align: left;
+    text-style: bold;
+    padding: 2;
+    margin-bottom: 2;
+    color: $accent;
+    background: $panel;
+    border-bottom: solid $primary 30%;
+}
+
+/* ============================================================================
+   FORM FIELDS - Labels, Inputs, TextAreas
+   ============================================================================ */
 
 AddDataScreen #form-container Label {
-    margin: 1 0 0.5 0;
+    margin: 1 0 0 0;
     color: $accent;
     text-style: bold;
 }
 
 AddDataScreen #form-container Input,
 AddDataScreen #form-container TextArea {
-    margin: 0 0 1.5 0;
+    width: 100%;
+    margin: 0 0 1 0;
+    background: $surface;
+    border: round $primary 20%;
+    padding: 0 1;
+}
+
+AddDataScreen #form-container Input:focus,
+AddDataScreen #form-container TextArea:focus {
+    border: round $accent 40%;
 }
 
 AddDataScreen #form-container TextArea {
     height: 5;
 }
 
-AddDataScreen #form-container Button {
-    margin: 1 1 2 0;
-}
-
 AddDataScreen #form-container Horizontal {
-    margin-bottom: 2;
+    margin: 2 0;
+    height: auto;
 }
 
-AddDataScreen #error-message {
-    color: $error;
-    margin-top: 1;
-    margin-bottom: 2;
+/* ============================================================================
+   BUTTONS - Primary and Secondary Actions
+   ============================================================================ */
+
+AddDataScreen Button {
+    min-width: 20;
+    height: 3;
+    margin: 0 1 0 0;
+    padding: 0 2;
+    text-style: bold;
 }
 
-AddDataScreen #probe-status {
-    margin-left: 1;
-    align: center middle;
+AddDataScreen Button.--primary {
+    background: $primary;
+    color: $text;
+    border: round $primary;
 }
 
-AddDataScreen .title {
-    text-align: left;
-    padding: 1 2;
-    background: none;
-    color: $accent;
-    border-bottom: solid $primary 30%;
-}
-
-AddDataScreen Input, AddDataScreen TextArea {
+AddDataScreen Button.--default {
     background: $surface;
-    border: round $primary 20%;
-    padding: 0 1;
-}
-AddDataScreen Input:focus, AddDataScreen TextArea:focus {
-    border: round $accent 40%;
-}
-AddDataScreen Input::placeholder, AddDataScreen TextArea::placeholder {
-    color: $text-muted;
+    color: $text;
+    border: round $primary 30%;
 }
 
-AddDataScreen #form-container {
-    layout: grid;
-    grid-columns: 1fr 1fr;
-    grid-gutter: 2 2;
+AddDataScreen Button:hover {
+    background: $primary 40%;
 }
-AddDataScreen #form-container > Label,
-AddDataScreen #form-container > Input,
-AddDataScreen #form-container > TextArea,
-AddDataScreen #form-container > Horizontal { grid-column: 1 / -1; } /* default full width */
-@media (min-width: 120) {
-    /* put lighter fields side-by-side */
-    AddDataScreen #edit-format,
-    AddDataScreen #edit-size { grid-column: span 1; }
+
+AddDataScreen Button:focus {
+    border: round $accent;
 }
+
+/* ============================================================================
+   SECTIONS - Grouped form fields (optional)
+   ============================================================================ */
 
 AddDataScreen .section {
     background: $surface;
     border: round $primary 20%;
     padding: 2;
-    margin: 1.5 0;
+    margin: 2 0;
 }
+
 AddDataScreen .section-title {
     color: $accent;
     text-style: bold;
@@ -107,30 +136,25 @@ AddDataScreen .section-title {
     margin-bottom: 1;
 }
 
-AddDataScreen #form-container Button {
-    margin: 1 1 0 0;
-    border: round $primary 30%;
-    text-style: bold;
-}
-AddDataScreen #form-container Button.-primary {
-    background: $primary 20%;
-    border: round $primary 40%;
-}
-AddDataScreen #form-container Button.-secondary {
-    background: $surface;
-    border: round $primary 20%;
-}
+/* ============================================================================
+   STATUS & ERROR MESSAGES
+   ============================================================================ */
 
 AddDataScreen #probe-status {
-    margin: 0 0 0.5 1;
+    margin: 0 0 0 1;
     color: $text-muted;
 }
 
 AddDataScreen #error-message {
-    background: $surface;
+    background: $error 10%;
     border: round $error 30%;
     color: $error;
     padding: 1;
     margin: 1 0 2 0;
+    min-height: 0;
+    height: auto;
 }
 
+AddDataScreen #error-message:empty {
+    display: none;
+}
