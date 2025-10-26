@@ -59,12 +59,12 @@ See [Coverage Tracker](../maintenance/coverage-tracker.md) for current documenta
 
 **Priority modules to document:**
 
-1. 🔴 [services.search](services/search.md) — Search query execution
-2. 🔴 [services.catalog](services/catalog.md) — Dataset management
-3. 🔴 [services.publish](services/publish.md) — PR creation workflow
-4. 🔴 [core.models](core/models.md) — Domain models
-5. 🔴 [infra.db](infra/db.md) — Database connection
-6. 🔴 [infra.index](infra/index.md) — FTS5 search operations
+1. 🔴 services.search — Search query execution *(planned)*
+2. 🔴 services.catalog — Dataset management *(planned)*
+3. 🔴 services.publish — PR creation workflow *(planned)*
+4. 🔴 core.models — Domain models *(planned)*
+5. 🔴 infra.db — Database connection *(planned)*
+6. 🔴 infra.index — FTS5 search operations *(planned)*
 
 ---
 
@@ -72,34 +72,34 @@ See [Coverage Tracker](../maintenance/coverage-tracker.md) for current documenta
 
 ### By Layer
 
-- [app Module](app/runtime.md) — Application runtime
-- [core Module](core/models.md) — Domain logic
-- [infra Module](infra/db.md) — Infrastructure
-- [services Module](services/search.md) — Business logic
-- [ui Module](ui/theme.md) — User interface
-- [cli Module](cli/main.md) — CLI entry point
+- app Module — Application runtime *(planned)*
+- core Module — Domain logic *(planned)*
+- infra Module — Infrastructure *(planned)*
+- services Module — Business logic *(planned)*
+- ui Module — User interface *(planned)*
+- cli Module — CLI entry point *(planned)*
 
 ### By Use Case
 
 **Searching datasets:**
-- [services.search](services/search.md)
-- [infra.index](infra/index.md)
-- [core.queries](core/queries.md)
+- services.search *(planned)*
+- infra.index *(planned)*
+- core.queries *(planned)*
 
 **Managing datasets:**
-- [services.catalog](services/catalog.md)
-- [infra.store](infra/store.md)
-- [core.models](core/models.md)
+- services.catalog *(planned)*
+- infra.store *(planned)*
+- core.models *(planned)*
 
 **Publishing changes:**
-- [services.publish](services/publish.md)
-- [infra.git](infra/git.md)
-- [infra.github_api](infra/github_api.md)
+- services.publish *(planned)*
+- infra.git *(planned)*
+- infra.github_api *(planned)*
 
 **Building UI:**
-- [ui.views](ui/views.md)
-- [ui.widgets](ui/widgets.md)
-- [ui.theme](ui/theme.md)
+- ui.views *(planned)*
+- ui.widgets *(planned)*
+- ui.theme *(planned)*
 
 ---
 
