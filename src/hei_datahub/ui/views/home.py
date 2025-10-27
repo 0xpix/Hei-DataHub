@@ -26,22 +26,25 @@ from textual.reactive import reactive
 from textual.timer import Timer
 
 from hei_datahub.services.config import get_config
-from hei_datahub.utils.bindings import _build_bindings_from_config
+from hei_datahub.ui.utils.keybindings import build_home_bindings
 
 class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
 
     # Load bindings from config file
-    BINDINGS = _build_bindings_from_config()
+    BINDINGS = build_home_bindings()
 
     # Load CSS from styles directory
-    CSS_PATH = "../styles/home.tcss"  # TODO: Copy CSS from mini_datahub or create new
+    ENABLE_COMMAND_PALETTE = True
+
+    # Style (TCSS file)
+    CSS_PATH = "../styles/home.tcss"
 
     search_mode = reactive(False)
     _debounce_timer: Optional[Timer] = None
 
     def compose(self) -> ComposeResult:
-        from mini_datahub.ui.assets.loader import get_logo_widget_text
+        from hei_datahub.ui.assets.loader import get_logo_widget_text
 
         # Load logo from config
         logo_text = get_logo_widget_text(get_config())
@@ -82,8 +85,8 @@ class HomeScreen(Screen):
 
     def _check_indexer_and_reload(self) -> None:
         """Check if indexer is ready and add new datasets incrementally."""
-        from mini_datahub.services.indexer import get_indexer
-        from mini_datahub.services.fast_search import get_all_indexed
+        from hei_datahub.services.indexer import get_indexer
+        from hei_datahub.services.fast_search import get_all_indexed
 
         indexer = get_indexer()
         table = self.query_one("#results-table", DataTable)
@@ -134,7 +137,7 @@ class HomeScreen(Screen):
     def _setup_search_autocomplete(self) -> None:
         """Setup autocomplete suggester for search input."""
         try:
-            from mini_datahub.ui.widgets.autocomplete import SmartSearchSuggester
+            from hei_datahub.ui.widgets.autocomplete import SmartSearchSuggester
 
             search_input = self.query_one("#search-input", Input)
             search_input.suggester = SmartSearchSuggester()
@@ -144,8 +147,8 @@ class HomeScreen(Screen):
     def _track_search_usage(self, query: str) -> None:
         """Track search filter usage for autocomplete ranking."""
         try:
-            from mini_datahub.core.queries import QueryParser
-            from mini_datahub.services.suggestion_service import get_suggestion_service
+            from hei_datahub.core.queries import QueryParser
+            from hei_datahub.services.suggestion_service import get_suggestion_service
 
             parser = QueryParser()
             parsed = parser.parse(query)
@@ -162,7 +165,7 @@ class HomeScreen(Screen):
     def update_heibox_status(self) -> None:
         """Update Heibox/WebDAV connection status display."""
         try:
-            from mini_datahub.infra.config_paths import get_config_path
+            from hei_datahub.infra.config_paths import get_config_path
 
             status_widget = self.query_one("#heibox-status", Static)
 
@@ -200,14 +203,14 @@ class HomeScreen(Screen):
         try:
             # Force cache clear if requested (e.g., after edit)
             if force_refresh:
-                from mini_datahub.services.index_service import get_index_service
+                from hei_datahub.services.index_service import get_index_service
                 index_service = get_index_service()
                 index_service._query_cache.clear()
                 index_service._cache_timestamps.clear()
                 logger.info("✓ Cleared index cache for fresh data")
 
             # ALWAYS use indexed search for fast loading
-            from mini_datahub.services.fast_search import get_all_indexed
+            from hei_datahub.services.fast_search import get_all_indexed
 
             results = get_all_indexed()
             logger.info(f"get_all_indexed returned {len(results)} results")
@@ -219,7 +222,7 @@ class HomeScreen(Screen):
             label = self.query_one("#results-label", Label)
 
             # Show indexer status if warming
-            from mini_datahub.services.indexer import get_indexer
+            from hei_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
                 label.update(f"🔄 Loading cloud datasets... ☁️ 0 of ? datasets")
@@ -262,7 +265,7 @@ class HomeScreen(Screen):
     def _load_cloud_files(self) -> None:
         """Load files from cloud storage and display in table."""
         try:
-            from mini_datahub.services.storage_manager import get_storage_backend
+            from hei_datahub.services.storage_manager import get_storage_backend
             import yaml
             import tempfile
             import os
@@ -366,7 +369,7 @@ class HomeScreen(Screen):
             self._track_search_usage(query)
 
             # ALWAYS use indexed search (never hit network on keystroke)
-            from mini_datahub.services.fast_search import search_indexed
+            from hei_datahub.services.fast_search import search_indexed
 
             results = search_indexed(query)
 
@@ -376,7 +379,7 @@ class HomeScreen(Screen):
             label = self.query_one("#results-label", Label)
 
             # Show indexer status if warming
-            from mini_datahub.services.indexer import get_indexer
+            from hei_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
                 label.update(f"🔄 Indexing… ☁️ Cloud Results ({len(cloud_results)} found)")
@@ -418,8 +421,8 @@ class HomeScreen(Screen):
     def _search_cloud_files(self, query: str) -> None:
         """Search cloud files by name and metadata fields."""
         try:
-            from mini_datahub.services.storage_manager import get_storage_backend
-            from mini_datahub.core.queries import QueryParser
+            from hei_datahub.services.storage_manager import get_storage_backend
+            from hei_datahub.core.queries import QueryParser
             import yaml
             import tempfile
             import os
@@ -596,7 +599,7 @@ class HomeScreen(Screen):
 
     def _update_filter_badges(self, query: str) -> None:
         """Update visual badges showing active search filters with uniform key-based styling."""
-        from mini_datahub.core.queries import QueryParser
+        from hei_datahub.core.queries import QueryParser
 
         badges_container = self.query_one("#filter-badges-container", Horizontal)
         badges_container.remove_children()
@@ -777,12 +780,12 @@ class HomeScreen(Screen):
 
     def action_show_help(self) -> None:
         """Show help overlay with keybindings (? key)."""
-        from .help import HelpScreen
+        from hei_datahub.ui.widgets.help import HelpScreen
         self.app.push_screen(HelpScreen())
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
-        from .settings_router import open_settings_screen
+        from hei_datahub.ui.utils.settings_router import open_settings_screen
         open_settings_screen(self.app)
 
     def action_pull_updates(self) -> None:
@@ -797,5 +800,5 @@ class HomeScreen(Screen):
 
     def action_debug_console(self) -> None:
         """Open debug console (: key)."""
-        from mini_datahub.ui.widgets.console import DebugConsoleScreen
+        from hei_datahub.ui.widgets.console import DebugConsoleScreen
         self.app.push_screen(DebugConsoleScreen())
