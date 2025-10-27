@@ -55,7 +55,7 @@ def _get_version_stamp_path() -> Path:
 def _get_current_version() -> str:
     """Get current application version."""
     try:
-        from mini_datahub.version import __version__
+        from hei_datahub.version import __version__
         return __version__
     except ImportError:
         return "0.0.0-dev"
