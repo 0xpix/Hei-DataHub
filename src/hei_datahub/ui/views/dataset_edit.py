@@ -298,7 +298,7 @@ class CloudEditDetailsScreen(Screen):
     def save_to_cloud(self) -> None:
         """Save dataset to cloud storage (WebDAV)."""
         try:
-            from mini_datahub.services.storage_manager import get_storage_backend
+            from hei_datahub.services.storage_manager import get_storage_backend
             import yaml
             import tempfile
             import os
@@ -363,7 +363,7 @@ class CloudEditDetailsScreen(Screen):
 
                 # Update fast search index for cloud dataset
                 try:
-                    from mini_datahub.services.index_service import get_index_service
+                    from hei_datahub.services.index_service import get_index_service
 
                     index_service = get_index_service()
 
@@ -455,7 +455,7 @@ class CloudEditDetailsScreen(Screen):
 
     def action_cancel_edits(self) -> None:
         """Cancel editing and discard changes (Esc)."""
-        from .dialogs import ConfirmCancelDialog
+        from ..widgets.dialogs import ConfirmCancelDialog
 
         if len(self._dirty_fields) > 0:
             self.app.push_screen(
