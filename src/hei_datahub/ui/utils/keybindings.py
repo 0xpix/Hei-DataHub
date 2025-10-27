@@ -64,10 +64,9 @@ def get_action_display_map_home() -> Dict[str, tuple]:
         "add_dataset": ("Add Dataset", "a", True),
         "settings": ("Settings", "s", True),
         "open_details": ("Open", "o", False),
-        "outbox": ("Outbox", "p", True),
-        "pull_updates": ("Pull", "u", True),
+        "pull_updates": ("Pull", "u", False),
         "refresh_data": ("Refresh", "r", True),
-        "quit": ("Quit", "q", True),
+        "quit": ("Quit", "Ctrl+q", True),
         "move_down": ("Down", "j", False),
         "move_up": ("Up", "k", False),
         "jump_top": ("Top", "gg", False),
@@ -76,17 +75,6 @@ def get_action_display_map_home() -> Dict[str, tuple]:
         "clear_search": ("Clear", "esc", False),
         "debug_console": ("Debug", ":", False),
         "show_help": ("Help", "?", True),
-    }
-
-
-def get_action_display_map_details() -> Dict[str, tuple]:
-    """Get action display map for details screen."""
-    return {
-        "back": ("Back", "q", True),
-        "copy_source": ("Copy", "y", True),
-        "open_url": ("Open URL", "o", True),
-        "enter_edit_mode": ("Edit", "e", True),
-        "publish_pr": ("Publish PR", "P", True),
     }
 
 
