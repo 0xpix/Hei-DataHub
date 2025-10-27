@@ -15,7 +15,7 @@ from textual.widgets import (
 )
 from textual.reactive import reactive
 
-from mini_datahub.infra.db import ensure_database
+from hei_datahub.infra.db import ensure_database
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.views.home import HomeScreen
 
@@ -31,9 +31,9 @@ class DataHubApp(App):
     def on_mount(self) -> None:
         """Initialize the app."""
         # Initialize logging
-        from mini_datahub.app.runtime import setup_logging, log_startup
-        from mini_datahub import __version__
-        from mini_datahub.app.settings import get_github_config
+        from hei_datahub.app.runtime import setup_logging, log_startup
+        from hei_datahub import __version__
+        from hei_datahub.app.settings import get_github_config
 
         config = get_github_config()
         setup_logging(debug=config.debug_logging)
@@ -47,8 +47,8 @@ class DataHubApp(App):
             ensure_database()
 
             # Check if we need to do initial indexing
-            from mini_datahub.infra.index import reindex_all
-            from mini_datahub.infra.store import list_datasets
+            from hei_datahub.infra.index import reindex_all
+            from hei_datahub.infra.store import list_datasets
 
             datasets = list_datasets()
             if datasets:
@@ -61,7 +61,7 @@ class DataHubApp(App):
 
         # Start background indexer (FAST - non-blocking)
         import asyncio
-        from mini_datahub.services.indexer import start_background_indexer, get_indexer
+        from hei_datahub.services.indexer import start_background_indexer, get_indexer
         try:
             # Force a fresh index on every startup for cloud datasets
             logger.info("Forcing fresh reindex on startup")
@@ -84,11 +84,6 @@ class DataHubApp(App):
         theme_name = self.config.get("theme.name", "gruvbox")
         self.theme = theme_name
 
-        # Initialize autocomplete from catalog
-        if config.suggest_from_catalog_values:
-            from mini_datahub.services.autocomplete import refresh_autocomplete
-            refresh_autocomplete()
-
         # Push home screen (will automatically load from cloud or local based on config)
         self.push_screen(HomeScreen())
 
@@ -102,7 +97,7 @@ class DataHubApp(App):
     def check_heibox_connection(self) -> None:
         """Check WebDAV/Heibox connection status on startup."""
         try:
-            from mini_datahub.infra.config_paths import get_config_path
+            from hei_datahub.infra.config_paths import get_config_path
 
             # Check if config exists
             config_path = get_config_path()
@@ -134,7 +129,7 @@ class DataHubApp(App):
                 return
 
             # Try to load credentials
-            from mini_datahub.auth.credentials import get_auth_store
+            from hei_datahub.cli.auth.credentials import get_auth_store
 
             store = get_auth_store(prefer_keyring=True)
             credential = store.load_secret(key_id)
@@ -182,7 +177,7 @@ class DataHubApp(App):
     @work(exclusive=True, thread=True)
     async def check_for_updates_async(self) -> None:
         """Check for updates asynchronously (background)."""
-        from mini_datahub.services.update_check import check_for_updates, format_update_message
+        from hei_datahub.services.update_check import check_for_updates, format_update_message
 
         update_info = check_for_updates(force=False)
         if update_info and update_info.get("has_update"):
@@ -191,66 +186,9 @@ class DataHubApp(App):
 
     @work(exclusive=True, thread=True)
     async def startup_pull_check(self) -> None:
-        """Check if we should prompt for pull on startup."""
-        from mini_datahub.services.sync import get_auto_pull_manager
-        from mini_datahub.services.state import get_state_manager
-        from mini_datahub.app.settings import get_github_config
-        from pathlib import Path
-        import asyncio
-
-        # Wait a bit for screen to be fully mounted
-        await asyncio.sleep(0.5)
-
-        state = get_state_manager()
-
-        # Skip if user doesn't want prompts this session
-        if not state.should_prompt_pull():
-            return
-
-        try:
-            config = get_github_config()
-            if not config.catalog_repo_path:
-                return
-
-            pull_manager = get_auto_pull_manager(Path(config.catalog_repo_path))
-
-            # Quick network check
-            if not pull_manager.check_network_available():
-                return
-
-            # Fetch to check if behind
-            pull_manager.git_ops.fetch()
-
-            is_behind, commits_behind = pull_manager.is_behind_remote()
-
-            if is_behind:
-                plural = "s" if commits_behind > 1 else ""
-
-                # Find the HomeScreen and update its widgets
-                try:
-                    # Get the active screen (should be HomeScreen)
-                    for screen in self.screen_stack:
-                        if isinstance(screen, HomeScreen):
-                            # Show status indicator below main banner
-                            try:
-                                update_status = screen.query_one("#update-status", Static)
-                                update_status.update(
-                                    f"[bold]⬇ {commits_behind} Update{plural} Available[/bold]  •  Press [bold]U[/bold] to update"
-                                )
-                                update_status.remove_class("hidden")
-                            except Exception:
-                                pass
-                            break
-                except Exception:
-                    pass
-
-                # Show persistent notification (no timeout)
-                self.notify(
-                    f"⬇ {commits_behind} update{plural} available. Press [bold]U[/bold] to update.",
-                    severity="information"
-                )
-        except Exception:
-            pass
+        """Check if we should prompt for pull on startup - DISABLED (cloud-only via WebDAV)."""
+        # No longer needed - using WebDAV sync instead of Git pull
+        pass
 
     def _load_config(self) -> None:
         """Load and apply configuration settings."""
@@ -272,14 +210,14 @@ class DataHubApp(App):
         """
         try:
             # Reload config to pick up the latest changes
-            from mini_datahub.services.config import reload_config
+            from hei_datahub.services.config import reload_config
             self.config = reload_config()
 
             # Update the app's theme attribute (Textual built-in)
             self.theme = theme_name
 
             # Reload the theme manager to pick up new theme
-            from mini_datahub.ui.theme import reload_theme
+            from hei_datahub.ui.theme import reload_theme
             reload_theme()
 
             # Refresh all screens to apply new theme
@@ -302,7 +240,7 @@ class DataHubApp(App):
         """
         try:
             # Reload config to pick up the latest changes
-            from mini_datahub.services.config import reload_config
+            from hei_datahub.services.config import reload_config
             self.config = reload_config()
 
             # Check if we're currently on the HomeScreen
@@ -324,11 +262,11 @@ class DataHubApp(App):
 
                 # Reload the module to pick up new bindings
                 import importlib
-                import mini_datahub.ui.views.home as home_module
+                import hei_datahub.ui.views.home as home_module
                 importlib.reload(home_module)
 
                 # Push new home screen with updated bindings
-                from mini_datahub.ui.views.home import HomeScreen as NewHomeScreen
+                from hei_datahub.ui.views.home import HomeScreen as NewHomeScreen
                 self.push_screen(NewHomeScreen())
 
                 self.notify("Keybindings reloaded successfully!", timeout=3)
@@ -344,110 +282,18 @@ class DataHubApp(App):
 
     @work(exclusive=True, thread=True)
     async def pull_updates(self) -> None:
-        """Pull updates from catalog repository."""
-        from mini_datahub.services.sync import get_auto_pull_manager
-        from mini_datahub.app.runtime import log_pull_update, log_reindex
-        from mini_datahub.infra.index import reindex_all
-        from mini_datahub.app.settings import get_github_config
-        from pathlib import Path
+        """Pull updates from WebDAV storage - DISABLED (no Git/GitHub integration)."""
+        # Cloud-only via WebDAV - no Git pull needed
+        # Data is synced directly from Heibox WebDAV storage
+        self.notify("Cloud sync via WebDAV (no Git pull needed)", timeout=3)
 
-        try:
-            config = get_github_config()
-            if not config.catalog_repo_path:
-                self.notify("Catalog path not configured", severity="error", timeout=5)
-                return
 
-            pull_manager = get_auto_pull_manager(Path(config.catalog_repo_path))
 
-            # Check network
-            if not pull_manager.check_network_available():
-                self.notify("No network connection", severity="warning", timeout=5)
-                return
-
-            # Note: Local changes check removed - pull_updates() now handles via auto-stash
-
-            # Check divergence
-            is_diverged, ahead, behind = pull_manager.is_diverged()
-            if is_diverged:
-                self.notify(
-                    "Cannot pull: Local branch has diverged from remote",
-                    severity="error",
-                    timeout=7
-                )
-                return
-
-            # Fetch first
-            self.notify("Fetching updates...", timeout=3)
-            pull_manager.git_ops.fetch()
-
-            # Check if actually behind
-            is_behind, commits_behind = pull_manager.is_behind_remote()
-            if not is_behind:
-                self.notify("Already up to date", timeout=3)
-                return
-
-            # Pull
-            self.notify("Pulling updates...", timeout=3)
-            success, message, old_commit, new_commit = pull_manager.pull_updates(
-                branch="main",
-                from_remote=True,   # Pull from REMOTE origin/main
-                allow_merge=True,   # Allow merge commits (handles divergence)
-                auto_stash=True     # Auto-stash uncommitted changes
-            )
-
-            if not success:
-                self.notify(f"Pull failed: {message}", severity="error", timeout=7)
-                log_pull_update(success=False, error=message)
-                return
-
-            # Hide update status after successful pull
-            try:
-                for screen in self.screen_stack:
-                    if isinstance(screen, HomeScreen):
-                        try:
-                            update_status = screen.query_one("#update-status", Static)
-                            update_status.add_class("hidden")
-                        except Exception:
-                            pass
-                        break
-            except Exception:
-                pass
-
-            # Check for metadata changes
-            if old_commit and new_commit and old_commit != new_commit:
-                has_metadata, metadata_count = pull_manager.has_metadata_changes(old_commit, new_commit)
-                if has_metadata:
-                    self.notify("Reindexing datasets...", timeout=3)
-                    dataset_count, errors = reindex_all()
-
-                    if errors:
-                        self.notify(
-                            f"Pull complete. Reindexed {dataset_count} datasets with {len(errors)} errors",
-                            severity="warning",
-                            timeout=7
-                        )
-                        log_reindex(success=False, datasets_count=dataset_count, error=f"{len(errors)} errors")
-                    else:
-                        self.notify(
-                            f"Pull complete. Reindexed {dataset_count} datasets",
-                            severity="information",
-                            timeout=5
-                        )
-                        log_reindex(success=True, datasets_count=dataset_count)
-
-                    log_pull_update(success=True, files_changed=metadata_count)
-                else:
-                    self.notify("Pull complete (no metadata changes)", timeout=5)
-                    log_pull_update(success=True, files_changed=0)
-            else:
-                self.notify("Pull complete (already up to date)", timeout=5)
-                log_pull_update(success=True, files_changed=0)
-
-        except Exception as e:
-            self.notify(f"Pull failed: {str(e)}", severity="error", timeout=7)
-            log_pull_update(success=False, error=str(e))
-
-if __name__ == "__main__":
+def run_tui():
     """Launch the TUI application."""
     app = DataHubApp()
     app.run()
+
+
+if __name__ == "__main__":
+    run_tui()
