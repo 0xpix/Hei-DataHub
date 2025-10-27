@@ -1,38 +1,41 @@
-# Include version configuration
-include version.yaml
 # MANIFEST.in - Include non-Python files in source distributions
 # This ensures data files are included when installing from source
 
-# Include all SQL schemas
-recursive-include src/mini_datahub/infra/sql *
-
-# Include schema.json
-include src/mini_datahub/schema.json
-
-# Include all datasets
-recursive-include src/mini_datahub/data *
-
-# Include sample data templates
-recursive-include src/mini_datahub/templates *
 # Include version configuration
 include version.yaml
+include schema.json
+
+# Include all SQL schemas
+recursive-include src/hei_datahub/infra/sql *
+
+# Include schema.json and version.yaml in package
+include src/hei_datahub/schema.json
+include src/hei_datahub/version.yaml
+
+# Include all datasets
+recursive-include src/hei_datahub/data *
+
+# Include sample data templates
+recursive-include src/hei_datahub/templates *
+
+# Include UI styles and assets
+recursive-include src/hei_datahub/ui *.tcss
+recursive-include src/hei_datahub/ui/assets/ascii *.txt
+
+# Include desktop assets
+recursive-include src/hei_datahub/assets *.svg *.png *.tmpl
 
 # Include documentation
 include README.md
 include LICENSE
+include CHANGELOG.md
 
 # Include important root files
 include pyproject.toml
 include uv.lock
 include mkdocs.yml
-include CHANGELOG.md
 
 # Exclude development files
 global-exclude __pycache__
 global-exclude *.py[co]
 global-exclude .DS_Store
-
-# Include important root files
-include pyproject.toml
-include uv.lock
-include mkdocs.yml
