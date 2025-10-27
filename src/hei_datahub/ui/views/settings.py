@@ -21,12 +21,9 @@ from textual.widgets import (
     Label,
 )
 
-from mini_datahub.auth.credentials import get_auth_store
-from mini_datahub.services.webdav_storage import WebDAVStorage
-from mini_datahub.infra.config_paths import get_config_path
-from mini_datahub.auth.credentials import get_auth_store
-from mini_datahub.infra.config_paths import get_config_path
-from mini_datahub.auth.credentials import get_auth_store
+from hei_datahub.cli.auth.credentials import get_auth_store
+from hei_datahub.services.webdav_storage import WebDAVStorage
+from hei_datahub.infra.config_paths import get_config_path
 
 
 class SettingsScreen(Screen):
@@ -186,7 +183,7 @@ class SettingsScreen(Screen):
     @on(Button.Pressed, "#wizard-btn")
     def on_wizard_button(self) -> None:
         """Open the setup wizard."""
-        from .settings_wizard import SettingsWizard
+        from hei_datahub.ui.widgets.settings_wizard import SettingsWizard
         self.app.pop_screen()  # Close current settings
         self.app.push_screen(SettingsWizard())
 
