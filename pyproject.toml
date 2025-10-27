@@ -55,8 +55,8 @@ dev = [
 ]
 
 [project.scripts]
-mini-datahub = "mini_datahub.cli.main:main"
-hei-datahub = "mini_datahub.cli.main:main"
+hei-datahub = "hei_datahub.cli.main:main"
+mini-datahub = "hei_datahub.cli.main:main"  # Legacy alias
 
 [project.urls]
 Homepage = "https://github.com/0xpix/Hei-DataHub"
@@ -72,7 +72,7 @@ where = ["src"]
 include = ["mini_datahub*", "hei_datahub*"]
 
 [tool.setuptools.package-data]
-mini_datahub = [
+hei_datahub = [
     "infra/sql/*.sql",
     "schema.json",
     "version.yaml",
@@ -81,9 +81,7 @@ mini_datahub = [
     "ui/views/*.tcss",
     "ui/widgets/*.tcss",
     "ui/styles/*.tcss",
-    "ui/assets/ascii/*.txt"
-]
-hei_datahub = [
+    "ui/assets/ascii/*.txt",
     "assets/icons/*.svg",
     "assets/icons/*.png",
     "assets/desktop/*.tmpl"
