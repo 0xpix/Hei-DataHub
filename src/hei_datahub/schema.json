@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dataset Metadata",
+  "description": "Schema for dataset metadata in Hei-DataHub",
+  "type": "object",
+  "required": [
+    "id",
+    "dataset_name",
+    "description",
+    "source",
+    "date_created",
+    "storage_location"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier (slug): lowercase letters, digits, dashes, underscores; must start with alphanumeric",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "dataset_name": {
+      "type": "string",
+      "description": "Human-readable name of the dataset",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of what this dataset contains",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "description": "URL or library snippet showing where the data came from",
+      "minLength": 1
+    },
+    "date_created": {
+      "type": "string",
+      "description": "ISO 8601 date when the dataset was created",
+      "format": "date"
+    },
+    "storage_location": {
+      "type": "string",
+      "description": "Where the actual data files are stored (path, URL, S3 bucket, etc.)",
+      "minLength": 1
+    },
+    "file_format": {
+      "type": "string",
+      "description": "File format (CSV, JSON, Parquet, etc.)",
+      "examples": ["CSV", "JSON", "Parquet", "Excel", "SQLite", "HDF5"]
+    },
+    "size": {
+      "type": "string",
+      "description": "File size or row count (human-readable)",
+      "examples": ["2.5 GB", "1,000,000 rows", "500 MB"]
+    },
+    "data_types": {
+      "type": "array",
+      "description": "Categories or domains (e.g., weather, finance, genomics)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "used_in_projects": {
+      "type": "array",
+      "description": "List of projects that use this dataset",
+      "items": {
+        "type": "string"
+      }
+    },
+    "schema_fields": {
+      "type": "array",
+      "description": "Field/column definitions",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Field name"
+          },
+          "type": {
+            "type": "string",
+            "description": "Data type (string, integer, float, datetime, etc.)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Field description"
+          }
+        }
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "description": "ISO 8601 date when the dataset was last updated",
+      "format": "date"
+    },
+    "dependencies": {
+      "type": "string",
+      "description": "Required libraries or tools to use this dataset"
+    },
+    "preprocessing_steps": {
+      "type": "string",
+      "description": "Data cleaning or transformation steps applied"
+    },
+    "linked_documentation": {
+      "type": "array",
+      "description": "URLs to documentation, papers, or resources",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "cite": {
+      "type": "string",
+      "description": "Citation information"
+    },
+    "spatial_resolution": {
+      "type": "string",
+      "description": "Geographic resolution (e.g., '1km grid', 'country-level')"
+    },
+    "temporal_resolution": {
+      "type": "string",
+      "description": "Time resolution (e.g., 'hourly', 'daily', 'monthly')"
+    },
+    "temporal_coverage": {
+      "type": "string",
+      "description": "Date range covered (e.g., '2020-2024', 'Jan 2023 - Dec 2023')"
+    },
+    "spatial_coverage": {
+      "type": "string",
+      "description": "Geographic coverage (e.g., 'Global', 'USA', 'Europe')"
+    },
+    "codes": {
+      "type": "array",
+      "description": "Related code snippets or repository links",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extras": {
+      "type": "object",
+      "description": "Free-form object for custom fields",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
