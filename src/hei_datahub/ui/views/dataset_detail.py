@@ -1,8 +1,7 @@
 """
-TUI application using Textual framework with Neovim-style keybindings.
+Cloud dataset details screen.
 """
 import logging
-import webbrowser
 import yaml
 import tempfile
 import os
@@ -10,7 +9,7 @@ import os
 logger = logging.getLogger(__name__)
 from textual import work
 from textual.app import ComposeResult
-from textual.containers import  VerticalScroll
+from textual.containers import VerticalScroll
 from textual.screen import Screen
 from textual.widgets import (
     Footer,
@@ -19,16 +18,14 @@ from textual.widgets import (
     Static,
 )
 
-from .home import HomeScreen
+from hei_datahub.ui.utils.actions import NavActionsMixin, UrlActionsMixin, ClipboardActionsMixin
 
-from mini_datahub.services.storage_manager import get_storage_backend
-from mini_datahub.services.index_service import get_index_service
-from mini_datahub.services.storage_manager import get_storage_backend
-from mini_datahub.services.index_service import get_index_service
-from mini_datahub.infra.index import delete_dataset
+from hei_datahub.services.storage_manager import get_storage_backend
+from hei_datahub.services.index_service import get_index_service
+from hei_datahub.infra.index import delete_dataset
 
 
-class CloudDatasetDetailsScreen(Screen):
+class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActionsMixin, Screen):
     """Screen to view cloud dataset details (from metadata.yaml)."""
 
     CSS_PATH = "../styles/dataset_detail.tcss"
@@ -45,6 +42,13 @@ class CloudDatasetDetailsScreen(Screen):
         super().__init__()
         self.dataset_id = dataset_id
         self.metadata = None
+
+    @property
+    def source_url(self) -> str:
+        """Get source URL for mixins (used by UrlActionsMixin and ClipboardActionsMixin)."""
+        if self.metadata and 'source' in self.metadata:
+            return self.metadata['source']
+        return None
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -161,36 +165,11 @@ class CloudDatasetDetailsScreen(Screen):
         details_widget = self.query_one("#details-content", Static)
         details_widget.update("\n".join(content))
 
-    def action_back(self) -> None:
-        """Go back to previous screen."""
-        self.app.pop_screen()
-
-    def action_copy_source(self) -> None:
-        """Copy source URL to clipboard."""
-        if self.metadata and 'source' in self.metadata:
-            try:
-                import pyperclip
-                pyperclip.copy(self.metadata['source'])
-                self.app.notify("✓ Source copied to clipboard", timeout=3)
-            except Exception as e:
-                self.app.notify(f"Failed to copy: {str(e)}", severity="error", timeout=3)
-
-    def action_open_url(self) -> None:
-        """Open source URL in browser if it's a URL (o key)."""
-        if self.metadata and 'source' in self.metadata:
-            source = self.metadata['source']
-            if source.startswith('http://') or source.startswith('https://'):
-                try:
-                    webbrowser.open(source)
-                    self.app.notify("Opening URL in browser...", timeout=2)
-                except Exception as e:
-                    self.app.notify(f"Failed to open URL: {str(e)}", severity="error", timeout=3)
-            else:
-                self.app.notify("Source is not a URL", severity="warning", timeout=2)
+    # action_back, action_copy_source, action_open_url are inherited from mixins
 
     def action_delete_dataset(self) -> None:
         """Delete dataset (d key) - shows confirmation dialog."""
-        from .dialogs import ConfirmDeleteDialog
+        from ..widgets.dialogs import ConfirmDeleteDialog
 
         self.app.push_screen(
             ConfirmDeleteDialog(self.dataset_id),
@@ -214,19 +193,17 @@ class CloudDatasetDetailsScreen(Screen):
             storage = get_storage_backend()
 
             # Delete the entire dataset folder
-            folder_path = f"{self.dataset_id}/"
+            folder_path = self.dataset_id
             try:
                 # List and delete all files in the dataset folder
-                items = storage.list(folder_path)
+                items = storage.listdir(folder_path)
                 for item in items:
-                    storage.delete(item)
+                    file_path = f"{folder_path}/{item.name}"
+                    storage.delete(file_path)
+                    logger.debug(f"Deleted file: {file_path}")
 
-                # Also try to delete the folder itself (may not be necessary depending on backend)
-                try:
-                    storage.delete(folder_path)
-                except:
-                    pass  # Folder deletion might not be supported
-
+                # Delete the folder itself
+                storage.delete(folder_path)
                 logger.info(f"Deleted dataset folder from cloud: {folder_path}")
             except Exception as e:
                 logger.warning(f"Error deleting from cloud: {e}")
@@ -257,6 +234,7 @@ class CloudDatasetDetailsScreen(Screen):
 
             # Refresh the home screen table
             def refresh_home():
+                from .home import HomeScreen
                 for screen in self.app.screen_stack:
                     if isinstance(screen, HomeScreen):
                         screen.refresh_data()
