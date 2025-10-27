@@ -11,7 +11,7 @@ from typing import Any, Dict, Optional
 import yaml
 from pydantic import BaseModel, Field, field_validator
 
-from mini_datahub.infra.config_paths import get_user_config_file, ensure_user_config_dir
+from hei_datahub.infra.config_paths import get_user_config_file, ensure_user_config_dir
 
 logger = logging.getLogger(__name__)
 
@@ -79,13 +79,12 @@ class UIConfig(BaseModel):
 
 
 class StorageConfig(BaseModel):
-    """Storage backend configuration for cloud/remote access."""
-    backend: str = Field(default="filesystem")  # "filesystem" | "webdav"
+    """Storage backend configuration for cloud/remote access (WebDAV-only)."""
+    backend: str = Field(default="webdav")  # Cloud storage via WebDAV
     base_url: Optional[str] = None  # WebDAV base URL (e.g., https://heibox.uni-heidelberg.de/seafdav)
     library: Optional[str] = None  # Library/folder name (e.g., testing-hei-datahub)
     username: Optional[str] = None  # WebDAV username (empty = use env)
     password_env: str = Field(default="HEIBOX_WEBDAV_TOKEN")  # Env var name for password/token
-    data_dir: Optional[str] = None  # Filesystem mode: local data directory
     connect_timeout: int = Field(default=5, ge=1, le=30)  # Connection timeout in seconds
     read_timeout: int = Field(default=60, ge=10, le=300)  # Read timeout in seconds
     max_retries: int = Field(default=3, ge=0, le=10)  # Max retry attempts on 5xx errors
@@ -93,11 +92,11 @@ class StorageConfig(BaseModel):
     @field_validator("backend")
     @classmethod
     def validate_backend(cls, v: str) -> str:
-        """Validate storage backend type."""
-        allowed = {"filesystem", "webdav"}
+        """Validate storage backend type (WebDAV only)."""
+        allowed = {"webdav"}
         if v not in allowed:
-            logger.warning(f"Unknown storage backend '{v}', falling back to 'filesystem'. Available: {', '.join(sorted(allowed))}")
-            return "filesystem"
+            logger.warning(f"Unknown storage backend '{v}', falling back to 'webdav'. Only WebDAV is supported.")
+            return "webdav"
         return v
 
 
@@ -224,12 +223,11 @@ class ConfigManager:
             # Add storage section if not present
             if "storage" not in data:
                 data["storage"] = {
-                    "backend": "filesystem",
+                    "backend": "webdav",
                     "base_url": None,
                     "library": None,
                     "username": None,
                     "password_env": "HEIBOX_WEBDAV_TOKEN",
-                    "data_dir": None,
                     "connect_timeout": 5,
                     "read_timeout": 60,
                     "max_retries": 3,
@@ -316,14 +314,13 @@ class ConfigManager:
                 f.write("\n")
 
                 # Write storage section
-                f.write("# Storage backend (webdav for cloud, filesystem for local)\n")
+                f.write("# Storage backend (WebDAV cloud storage only)\n")
                 f.write("storage:\n")
-                f.write(f"  backend: {data['storage']['backend']}  # filesystem | webdav\n")
+                f.write(f"  backend: {data['storage']['backend']}  # webdav (cloud storage)\n")
                 f.write(f"  base_url: {data['storage'].get('base_url') or 'null'}  # WebDAV URL (e.g., https://heibox.uni-heidelberg.de/seafdav)\n")
                 f.write(f"  library: {data['storage'].get('library') or 'null'}  # Library/folder name\n")
                 f.write(f"  username: {data['storage'].get('username') or 'null'}  # WebDAV username (empty = use env)\n")
                 f.write(f"  password_env: {data['storage']['password_env']}  # Env var for token/password\n")
-                f.write(f"  data_dir: {data['storage'].get('data_dir') or 'null'}  # Filesystem mode only\n")
                 f.write(f"  connect_timeout: {data['storage']['connect_timeout']}  # seconds\n")
                 f.write(f"  read_timeout: {data['storage']['read_timeout']}  # seconds\n")
                 f.write(f"  max_retries: {data['storage']['max_retries']}  # retry attempts\n")
