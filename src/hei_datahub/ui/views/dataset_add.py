@@ -26,10 +26,10 @@ from .dataset_detail import CloudDatasetDetailsScreen
 from .home import HomeScreen
 
 # TODO: CHANGE WHEN ADD FILES IN INFRA AND SERVICES
-from mini_datahub.infra.store import validate_metadata
-from mini_datahub.services.catalog import generate_id as generate_unique_id
-from mini_datahub.services.storage_manager import get_storage_backend
-from mini_datahub.services.index_service import get_index_service
+from hei_datahub.infra.store import validate_metadata
+from hei_datahub.services.catalog import generate_id as generate_unique_id
+from hei_datahub.services.storage_manager import get_storage_backend
+from hei_datahub.services.index_service import get_index_service
 
 class AddDataScreen(Screen):
     """Screen to add a new dataset with scrolling support and Neovim keys."""
