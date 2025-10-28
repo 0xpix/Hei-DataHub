@@ -672,5 +672,3 @@ Now that you understand the basics, let's dive into **how to build your own widg
 
 - [Textual Official Docs](https://textual.textualize.io/)
 - [Textual Tutorial](https://textual.textualize.io/tutorial/)
-- [Hei-DataHub UI Architecture](../../ui/architecture.md)
-- [Widget Reference](../../ui/widgets.md)
