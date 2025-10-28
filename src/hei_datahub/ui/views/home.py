@@ -57,7 +57,7 @@ class HomeScreen(Screen):
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
             Static(id="heibox-status"),
-            Input(placeholder="Type / to search | Tab/→/Ctrl+F for autocomplete | Enter to view", id="search-input"),
+            Input(placeholder="Type / to search | Tab/→ for autocomplete | Enter to view", id="search-input"),
             Horizontal(id="filter-badges-container", classes="filter-badges"),
             Label("All Datasets", id="results-label"),
             DataTable(id="results-table", cursor_type="row"),
@@ -126,7 +126,7 @@ class HomeScreen(Screen):
 
         # Update label with progress
         if not indexer.is_ready():
-            label.update(f"🔄 Loading... ☁️ {len(cloud_results)} of ? datasets")
+            label.update(f"🔄 Loading...")
         else:
             label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
             # Stop timer once indexer is done
@@ -174,7 +174,7 @@ class HomeScreen(Screen):
             # Check if configured and connected
             if self.app.heibox_connected:
                 # Simply show synced status without username
-                status_widget.update("[green]☁ Synced to Hei-box[/green]")
+                status_widget.update("[green]Synced to Hei-box[/green]")
             else:
                 # Check if configured but not connected
                 config_path = get_config_path()
