@@ -129,6 +129,9 @@ class IndexService:
         self,
         query_text: str,
         project_filter: Optional[str] = None,
+        source_filter: Optional[str] = None,
+        format_filter: Optional[str] = None,
+        tag_filter: Optional[str] = None,
         limit: int = INDEX_MAX_RESULTS,
         offset: int = 0
     ) -> List[Dict[str, Any]]:
@@ -138,6 +141,9 @@ class IndexService:
         Args:
             query_text: Free text query (will be tokenized for FTS)
             project_filter: Optional project prefix filter
+            source_filter: Optional source filter
+            format_filter: Optional format filter
+            tag_filter: Optional tag filter
             limit: Maximum results to return
             offset: Offset for pagination
 
@@ -145,7 +151,7 @@ class IndexService:
             List of matching items with metadata
         """
         # Check cache first
-        cache_key = (query_text, project_filter)
+        cache_key = (query_text, project_filter, source_filter, format_filter, tag_filter)
         if cache_key in self._query_cache:
             timestamp = self._cache_timestamps.get(cache_key, 0)
             if time.time() - timestamp < self._cache_timeout:
@@ -158,79 +164,100 @@ class IndexService:
 
             # Build FTS query
             if query_text and query_text.strip():
-                # Tokenize and add prefix matching
+                # Tokenize and add prefix matching, but escape special characters
                 tokens = query_text.strip().split()
-                fts_query = " ".join(f"{token}*" for token in tokens if len(token) >= 2)
+                # Only add * for tokens >= 2 chars and alphanumeric
+                fts_tokens = []
+                for token in tokens:
+                    if len(token) >= 2:
+                        # Escape special FTS5 characters: " * ( ) - +
+                        escaped = token.replace('"', '""')
+                        # Only add * if token doesn't already have special chars
+                        if escaped.isalnum():
+                            fts_tokens.append(f"{escaped}*")
+                        else:
+                            fts_tokens.append(f'"{escaped}"')
 
-                if not fts_query:
-                    fts_query = query_text  # Fallback to original
+                fts_query = " ".join(fts_tokens) if fts_tokens else query_text
+
+                # Build WHERE clauses for filters (applied to items table, not FTS)
+                where_clauses: List[str] = []
 
                 if project_filter:
-                    sql = """
-                        SELECT
-                            items.id,
-                            items.name,
-                            items.path,
-                            items.project,
-                            items.size,
-                            items.mtime,
-                            items.is_remote,
-                            items.description,
-                            items.format,
-                            items.source,
-                            items.tags
-                        FROM items
-                        JOIN items_fts ON items.id = items_fts.rowid
-                        WHERE items_fts MATCH ?
-                          AND items.project LIKE ? || '%'
-                        ORDER BY items.mtime DESC
-                        LIMIT ? OFFSET ?
-                    """
-                    params = [fts_query, project_filter, limit, offset]
-                else:
-                    sql = """
-                        SELECT
-                            items.id,
-                            items.name,
-                            items.path,
-                            items.project,
-                            items.size,
-                            items.mtime,
-                            items.is_remote,
-                            items.description,
-                            items.format,
-                            items.source,
-                            items.tags
-                        FROM items
-                        JOIN items_fts ON items.id = items_fts.rowid
-                        WHERE items_fts MATCH ?
-                        ORDER BY items.mtime DESC
-                        LIMIT ? OFFSET ?
-                    """
-                    params = [fts_query, limit, offset]
+                    where_clauses.append("items.project LIKE ?")
+                    params.append(f"{project_filter}%")
+
+                if source_filter:
+                    where_clauses.append("items.source LIKE ?")
+                    params.append(f"%{source_filter}%")
+
+                if format_filter:
+                    where_clauses.append("items.format LIKE ?")
+                    params.append(f"%{format_filter}%")
+
+                if tag_filter:
+                    where_clauses.append("items.tags LIKE ?")
+                    params.append(f"%{tag_filter}%")
+
+                sql = """
+                    SELECT
+                        items.id,
+                        items.name,
+                        items.path,
+                        items.project,
+                        items.size,
+                        items.mtime,
+                        items.is_remote,
+                        items.description,
+                        items.format,
+                        items.source,
+                        items.tags
+                    FROM items
+                    JOIN items_fts ON items.id = items_fts.rowid
+                    WHERE items_fts MATCH ?
+                """
+                # FTS query is first param
+                fts_params = [fts_query] + params
+
+                # Add additional filters
+                if where_clauses:
+                    sql += " AND " + " AND ".join(where_clauses)
+
+                sql += " ORDER BY items.mtime DESC LIMIT ? OFFSET ?"
+                fts_params.extend([limit, offset])
+                params = fts_params
             else:
-                # No text query, just filter by project if provided
+                # No text query, just apply filters
+                where_clauses: List[str] = []
+
                 if project_filter:
-                    sql = """
-                        SELECT
-                            id, name, path, project, size, mtime, is_remote,
-                            description, format, source, tags
-                        FROM items
-                        WHERE project LIKE ? || '%'
-                        ORDER BY mtime DESC
-                        LIMIT ? OFFSET ?
-                    """
-                    params = [project_filter, limit, offset]
-                else:
-                    sql = """
-                        SELECT
-                            id, name, path, project, size, mtime, is_remote,
-                            description, format, source, tags
-                        FROM items
-                        ORDER BY mtime DESC
-                        LIMIT ? OFFSET ?
-                    """
-                    params = [limit, offset]
+                    where_clauses.append("items.project LIKE ?")
+                    params.append(f"{project_filter}%")
+
+                if source_filter:
+                    where_clauses.append("items.source LIKE ?")
+                    params.append(f"%{source_filter}%")
+
+                if format_filter:
+                    where_clauses.append("items.format LIKE ?")
+                    params.append(f"%{format_filter}%")
+
+                if tag_filter:
+                    where_clauses.append("items.tags LIKE ?")
+                    params.append(f"%{tag_filter}%")
+
+                sql = """
+                    SELECT
+                        id, name, path, project, size, mtime, is_remote,
+                        description, format, source, tags
+                    FROM items
+                """
+
+                if where_clauses:
+                    sql += " WHERE " + " AND ".join(where_clauses)
+
+                sql += " ORDER BY mtime DESC LIMIT ? OFFSET ?"
+                params.extend([limit, offset])
 
             cursor = conn.execute(sql, params)
             rows = cursor.fetchall()
