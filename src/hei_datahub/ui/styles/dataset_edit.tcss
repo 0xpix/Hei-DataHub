@@ -28,6 +28,7 @@ CloudEditDetailsScreen #edit-scroll {
     width: 100%;
     height: 1fr;
     align: center top;
+    scrollbar-gutter: stable;
     scrollbar-background: $surface;
     scrollbar-color: $primary;
     scrollbar-color-hover: $accent;
