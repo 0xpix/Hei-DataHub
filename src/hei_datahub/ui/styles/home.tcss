@@ -49,8 +49,8 @@ HomeScreen #filter-badges-container {
     margin: 1 0;
     padding: 0;
     overflow-x: auto;
-    overflow-y: hidden;
-    layout: horizontal;
+    overflow-y: auto;
+    grid-gutter: 1;  /* No gutter at all */
 }
 
 HomeScreen .filter-badge {
@@ -58,7 +58,8 @@ HomeScreen .filter-badge {
     padding: 0 1;
     background: $accent;
     width: auto;
-    height: auto;
+    height: auto;  /* Auto height to fit content */
+    min-height: 1;  /* Minimum 1 line */
 }
 
 /* Retro color palette for badges - muted, vintage colors */
