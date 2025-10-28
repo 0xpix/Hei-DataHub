@@ -581,4 +581,3 @@ Now that you can build widgets, let's make them **look good**!
 
 - [Textual Widgets Guide](https://textual.textualize.io/guide/widgets/)
 - [Widget API Reference](https://textual.textualize.io/api/widget/)
-- [Hei-DataHub Widget Module](../../ui/widgets.md)
