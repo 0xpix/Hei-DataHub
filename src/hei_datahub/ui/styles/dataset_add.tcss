@@ -29,6 +29,7 @@ AddDataScreen #add-data-scroll {
     height: 1fr;
     width: 100%;
     align: center top;
+    scrollbar-gutter: stable;
     scrollbar-background: $surface;
     scrollbar-color: $primary;
     scrollbar-color-hover: $accent;
@@ -46,6 +47,8 @@ AddDataScreen #form-container {
     padding: 3;
     padding-bottom: 5;
     margin: 2 0;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
     background: $panel;
     border: round $primary 30%;
 }
