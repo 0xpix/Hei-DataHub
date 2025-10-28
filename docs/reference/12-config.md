@@ -548,16 +548,6 @@ PROJECT_ROOT/.cache/
 
 ---
 
-### Outbox Directory
-
-```
-PROJECT_ROOT/.outbox/
-```
-
-**Used for:** Failed PR tasks (retryable).
-
----
-
 ### Logs Directory
 
 ```
