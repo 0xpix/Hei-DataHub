@@ -25,6 +25,14 @@ jobs:
         with:
           ref: main
 
+      # Checkout docs/update-tutorial-doc branch for tutorial docs (if exists)
+      - name: Checkout tutorial docs branch
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: docs/update-tutorial-doc
+          path: docs-tutorial
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -57,47 +65,15 @@ jobs:
       # Build Developer Docs (Obfuscated - /x9k2m7n4p8q1)
       # ========================================
       - name: Install developer docs dependencies
-        run: |
-          if [ -f dev-docs/requirements.txt ]; then
-            echo "📦 Installing developer docs dependencies..."
-            pip install -r dev-docs/requirements.txt
-          else
-            echo "⚠️  No dev-docs/requirements.txt found, skipping..."
-          fi
+        if: hashFiles('docs-devs/dev-docs/requirements.txt') != ''
+        working-directory: docs-devs
+        run: pip install -r dev-docs/requirements.txt
 
-      - name: Build developer documentation site
-        run: |
-          if [ -f mkdocs-dev.yml ]; then
-            echo "🔧 Building developer documentation..."
-            mkdocs build --config-file mkdocs-dev.yml --site-dir combined-site/x9k2m7n4p8q1
-          else
-            echo "⚠️  No mkdocs-dev.yml found, skipping developer docs..."
-          fi
+      - name: Build developer documentation site (obfuscated path)
+        if: hashFiles('docs-devs/mkdocs-dev.yml') != ''
+        working-directory: docs-devs
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
 
-      # ========================================
-      # Build Tutorial Docs (/tutorial)
-      # ========================================
-      - name: Install tutorial docs dependencies
-        run: |
-          if [ -f tutorial-docs/requirements.txt ]; then
-            echo "📦 Installing tutorial docs dependencies..."
-            pip install -r tutorial-docs/requirements.txt
-          else
-            echo "⚠️  No tutorial-docs/requirements.txt found, skipping..."
-          fi
-
-      - name: Build tutorial documentation site
-        run: |
-          if [ -f mkdocs-tutorial.yml ]; then
-            echo "🎓 Building tutorial documentation..."
-            mkdocs build --config-file mkdocs-tutorial.yml --site-dir combined-site/tutorial
-          else
-            echo "⚠️  No mkdocs-tutorial.yml found, skipping tutorial docs..."
-          fi
-
-      # ========================================
-      # Verify Build Output
-      # ========================================
       - name: Verify combined build output
         run: |
           echo "========================================="
@@ -134,19 +110,8 @@ jobs:
               echo "❌ Error: Tutorial docs index.html not found"
               exit 1
             fi
-            echo "✅ Tutorial docs built successfully"
-          else
-            echo ""
-            echo "⚠️  Tutorial docs not built (branch may not exist)"
           fi
-
-          echo ""
-          echo "========================================="
-          echo "✅ Build verification passed!"
-          echo "========================================="
-          echo ""
-          echo "Combined site structure:"
-          ls -lah combined-site/ | head -20
+          echo "Build verification passed!"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
