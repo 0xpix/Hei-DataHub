@@ -719,5 +719,4 @@ Now you understand **how data flows**. Next, let's dive deep into the **database
 
 - [Clean Architecture (Uncle Bob)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/)
-- [Hei-DataHub Architecture Docs](../../architecture/overview.md)
 - [Service Layer Pattern](https://martinfowler.com/eaaCatalog/serviceLayer.html)
