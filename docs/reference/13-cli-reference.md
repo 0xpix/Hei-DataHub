@@ -533,7 +533,7 @@ export XDG_DATA_HOME="$HOME/.local/share"
 # Cache directory
 export XDG_CACHE_HOME="$HOME/.cache"
 
-# State directory (logs, outbox)
+# State directory (logs)
 export XDG_STATE_HOME="$HOME/.local/state"
 ```
 
