@@ -18,7 +18,7 @@ AboutScreen #about-container {
 
 /* Main card with subtle border */
 AboutScreen #about-card {
-    max-width: 60;
+    max-width: 80;
     min-height: 100%;
     height: auto;
     background: $surface;
@@ -102,6 +102,7 @@ AboutScreen .tech-stack {
 /* Footer hint */
 AboutScreen #footer-hint {
     width: 100%;
+    dock: bottom;
     text-align: center;
     color: $text-muted 60%;
     text-style: italic;
