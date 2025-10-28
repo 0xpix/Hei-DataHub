@@ -39,19 +39,6 @@ HomeScreen .title {
     background: $primary;
 }
 
-HomeScreen #github-status {
-    text-align: right;
-    padding: 0 1;
-    background: $panel;
-}
-
-HomeScreen .pr-status {
-    margin-top: 2;
-    padding: 1;
-    text-align: center;
-    background: $panel;
-}
-
 HomeScreen #search-container {
     height: 1fr;
     padding: 1;
@@ -177,6 +164,6 @@ HomeScreen #settings-container Button {
 }
 
 HomeScreen #status-message {
-    margin-top: 2;
-    padding: 1;
+    margin: 1;
+    padding: 2;
 }
