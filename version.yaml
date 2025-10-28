@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.59.0-beta"
-codename: "Privacy"
-release_date: "2025-10-10"
-compatibility: "Hei-DataHub v0.59.x (beta)"
-notes: "Privacy update - migrate from catalog in github repo to our own server (Linux only for now)"
+version: "0.60.0-beta"
+codename: "Clean-up"
+release_date: "2025-10-28"
+compatibility: "Hei-DataHub v0.60.x (beta)"
+notes: "Clean-up release - UI polish, enhanced navigation, and codebase cleanup"
 
 # Additional metadata
 app_name: "Hei-DataHub"
