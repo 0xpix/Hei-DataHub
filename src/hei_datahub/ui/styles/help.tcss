@@ -13,6 +13,7 @@ HelpScreen #help-scroll {
     max-height: 45;
     border: solid $accent;
     background: $surface;
+    scrollbar-gutter: stable;
 }
 
 HelpScreen #help-content {
