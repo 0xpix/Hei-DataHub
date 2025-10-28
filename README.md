@@ -14,13 +14,13 @@
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/Version-0.59.0--beta-blue.svg)
+![Version](https://img.shields.io/badge/Version-0.60.0--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key "save → HeiBox".
 
-- **Latest:** 0.59-beta "Privacy" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.59-beta/)
+- **Latest:** 0.60-beta "Clean-up" — see [What's new](https://0xpix.github.io/Hei-DataHub/whats-new/0.60-beta/)
 - **Docs:** Start with [Installation Guide](https://0xpix.github.io/Hei-DataHub/installation/README/) and then the [User Guide](https://0xpix.github.io/Hei-DataHub/)
 
 ---
@@ -40,7 +40,7 @@ More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
 
 ---
 
-## 🚀 Quick Install — UV Method (v0.59.x-beta)
+## 🚀 Quick Install — UV Method (v0.60.x-beta)
 
 **Linux users:** No cloning required! Install directly from the private repository with modern UV tooling.
 
@@ -83,10 +83,10 @@ hei-datahub auth setup
 ### Version Pinning
 ```bash
 # Install specific version
-uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.59.0-beta"
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.60.0-beta"
 
 # Install from feature branch
-uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@release/0.59-beta"
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@release/0.60-beta"
 ```
 
 **📚 WebDAV Setup (for cloud storage):**
