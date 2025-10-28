@@ -55,7 +55,7 @@ HomeScreen #filter-badges-container {
 
 HomeScreen .filter-badge {
     margin: 0 1 0 0;
-    padding: 1 1;
+    padding: 0 1;
     background: $accent;
     width: auto;
     height: auto;
