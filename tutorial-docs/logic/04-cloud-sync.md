@@ -792,4 +792,3 @@ Now you understand cloud storage integration. Next, let's explore **CLI commands
 - [WebDAV RFC 4918](https://datatracker.ietf.org/doc/html/rfc4918)
 - [Seafile WebDAV Extension](https://manual.seafile.com/extension/webdav/)
 - [Python keyring Library](https://github.com/jaraco/keyring)
-- [Hei-DataHub Auth & Sync](../../architecture/auth-and-sync.md)
