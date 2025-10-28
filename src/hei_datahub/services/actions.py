@@ -209,7 +209,7 @@ class ActionRegistry:
             label="Go to Top",
             description="Jump to the first item",
             contexts=[ActionContext.HOME],
-            default_keys=["g g"]
+            default_keys=["gg"]
         ))
 
         self.register(Action(
