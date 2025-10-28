@@ -56,7 +56,6 @@ class HomeScreen(Screen):
             Static(logo_text, id="banner"),
             Static("", id="update-status", classes="hidden"),
             Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
-            Static(id="heibox-status"),
             Input(placeholder="Type / to search | Tab/→ for autocomplete | Enter to view", id="search-input"),
             Horizontal(id="filter-badges-container", classes="filter-badges"),
             Label("All Datasets", id="results-label"),
@@ -75,9 +74,6 @@ class HomeScreen(Screen):
 
         # Setup search autocomplete
         self._setup_search_autocomplete()
-
-        # Update Heibox status indicator
-        self.update_heibox_status()
 
         # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
@@ -163,38 +159,6 @@ class HomeScreen(Screen):
                     logger.debug(f"Tracked usage: {term.field}:{term.value}")
         except Exception as e:
             logger.debug(f"Failed to track search usage: {e}")
-
-    def update_heibox_status(self) -> None:
-        """Update Heibox/WebDAV connection status display."""
-        try:
-            from hei_datahub.infra.config_paths import get_config_path
-
-            status_widget = self.query_one("#heibox-status", Static)
-
-            # Check if configured and connected
-            if self.app.heibox_connected:
-                # Simply show synced status without username
-                status_widget.update("[green]Synced to Hei-box[/green]")
-            else:
-                # Check if configured but not connected
-                config_path = get_config_path()
-                if config_path.exists():
-                    with open(config_path, "rb") as f:
-                        config = tomli.load(f)
-
-                    if "auth" in config:
-                        status_widget.update("[yellow]⚠ Hei-box Configured (connection failed)[/yellow] [dim]Run: hei-datahub auth doctor[/dim]")
-                    else:
-                        status_widget.update("[dim]○ Hei-box Not Connected[/dim] [dim]Run: hei-datahub auth setup[/dim]")
-                else:
-                    status_widget.update("[dim]○ Hei-box Not Connected[/dim] [dim]Run: hei-datahub auth setup[/dim]")
-
-        except Exception as e:
-            logger.debug(f"Failed to update heibox status: {e}")
-            # Fallback to simple message
-            status_widget = self.query_one("#heibox-status", Static)
-            status_widget.update("[dim]○ Hei-box Status Unknown[/dim]")
-
 
     def load_all_datasets(self, force_refresh: bool = False) -> None:
         """Load and display all available datasets from index (CLOUD ONLY)."""
