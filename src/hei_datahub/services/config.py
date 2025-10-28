@@ -110,6 +110,7 @@ def get_default_keybindings() -> Dict[str, list[str]]:
         "pull_updates": ["u"],
         "refresh_data": ["r"],
         "quit": ["q"],
+        "show_about": ["ctrl+a"],
         "move_down": ["j", "down"],
         "move_up": ["k", "up"],
         "jump_top": ["g"],
