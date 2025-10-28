@@ -15,11 +15,11 @@ Current version: `{{ project_version }}` (Oct 25, 2025) — Codename: `{{ projec
 
 It provides a lightweight, command-line data catalog that connects directly to your HeiBox storage — allowing you to browse, search, and manage datasets securely.
 
-## What's New in v0.59-beta 📚
+## What's New in v0.60-beta 📚
 
-**[Read the full What's New guide →](whats-new/0.59-beta.md)**
+**[Read the full What's New guide →](whats-new/0.60-beta.md)**
 
-## What do we have so far (v0.59.x beta)
+## What do we have so far (v0.60.x beta)
 
 - **Uv -Based Install/Update:** Directly from GitHub using [UV](https://astral.sh/uv/)
 - **Cloud based storage:** All data stored in YAML files + SQLite in the cloud
