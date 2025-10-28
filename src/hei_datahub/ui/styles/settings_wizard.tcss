@@ -12,6 +12,7 @@ SettingsWizard #wizard-scroll {
     height: 1fr;
     align: center top;
     padding: 2;
+    scrollbar-gutter: stable;
     scrollbar-background: $surface;
     scrollbar-color: $primary;
     scrollbar-color-hover: $accent;
