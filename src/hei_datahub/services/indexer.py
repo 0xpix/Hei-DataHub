@@ -119,8 +119,11 @@ class BackgroundIndexer:
                         description = metadata.get("description", "")
                         keywords = metadata.get("keywords", [])
                         tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
-                        project = metadata.get("project")
-                        file_format = metadata.get("format")
+                        # Extract project from used_in_projects list (first one if exists)
+                        used_in_projects = metadata.get("used_in_projects", [])
+                        project = used_in_projects[0] if used_in_projects else None
+                        # Use correct field name: file_format not format
+                        file_format = metadata.get("file_format")
                         source = metadata.get("source")
                     else:
                         name = entry.name
