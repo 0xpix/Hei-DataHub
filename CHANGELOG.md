@@ -7,6 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.60.0-beta] - 2025-10-28 - Clean-up
+
+**UI polish and codebase cleanup!** This release focuses on refining the user experience, streamlining the TUI, and removing legacy code.
+
+### Added
+
+- **New About Screen** - Minimalistic retro-inspired About screen
+  - Press `Ctrl+a` to access from home screen
+  - Project story, GitHub links, and documentation
+  - Full Vim navigation support (`j/k`, `gg/G`, `d/u`)
+- **Enhanced Search Filters** - New metadata filters
+  - `source:` filter (e.g., `source:kaggle`)
+  - `format:` filter (e.g., `format:csv`)
+  - `tags:` filter (e.g., `tags:climate`)
+- **Vim-Style Navigation** - Power user keyboard shortcuts
+  - `gg` - Jump to top of list
+  - `G` - Jump to bottom of list
+  - `Ctrl+a` - Show About screen
+- **Stable Scrollbars** - Consistent scrollbar behavior across all screens
+  - Settings screen, wizard, help screen
+  - Dataset details, add data form, edit screen
+
+### Changed
+
+- **UI Layout Improvements** - Refined visual hierarchy
+  - Header & Footer reduced to 1 line height
+  - Optimized padding and spacing throughout
+  - Simplified search input placeholder
+  - Updated loading status messages
+- **Filter Badges** - Visual enhancements
+  - Hash-based consistent color assignment
+  - Vertical overflow support
+  - Improved minimum height and padding
+- **Search & Indexing** - Better metadata handling
+  - Fixed field name mappings in metadata extraction
+  - Improved project list parsing
+  - Enhanced dataset loading with better logging
+
+### Removed
+
+- **Outbox Feature** - No longer needed with direct WebDAV workflow
+  - Removed outbox service and UI screen
+  - Removed outbox keybindings
+- **Legacy GitHub Integration** - Fully replaced by WebDAV in v0.59
+  - Removed GitHub PR workflow
+  - Removed GitHub API client
+  - Removed Git stash/branch operations
+  - Removed PR-related status indicators
+- **UI Cleanup**
+  - Removed HeiBox/GitHub/PR status indicators from Home screen
+  - Removed Cloud File Preview screen styles
+  - Removed unused keybinding configuration logic
+- **Code Cleanup**
+  - Removed deprecated `mini_datahub` package initialization
+  - Removed unused imports across UI views
+  - Removed unused action display maps (~500 lines of code removed)
+
+### Fixed
+
+- Search navigation `gg` sequence handling for jump-to-top
+- Keybinding display labels in footer
+- Scrollbar flickering in scrollable containers
+- Badge color consistency
+
+### Documentation
+
+- Added comprehensive v0.60-beta release notes
+- Updated README badges and version references
+- Updated installation guides to reference v0.60
+- Maintained all existing WebDAV setup documentation
+
+---
+
 ## [0.59.0-beta] - 2025-10-25 - Privacy
 
 **WebDAV migration complete!** This release replaces GitHub-based catalog with direct WebDAV (HeiBox) cloud storage for datasets.
