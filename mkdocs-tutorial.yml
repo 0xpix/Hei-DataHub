@@ -120,7 +120,6 @@ extra:
 # Navigation structure
 nav:
   - Home: index.md
-  - 🎓 Start Here: README.md
   - Welcome:
     - Overview & Roadmap: 00-overview.md
     - What Is Hei-DataHub?: 01-what-is-hei-datahub.md
@@ -147,3 +146,9 @@ nav:
     - 03. Configuration: deep/03-config.md
     - 04. Indexing: deep/04-indexing.md
     - 05. Testing: deep/05-testing.md
+
+  - Advanced Topics:
+    - 01. Extending Hei-DataHub: advanced/01-extending.md
+    - 02. Performance Optimization: advanced/02-performance.md
+    - 03. Debugging Techniques: advanced/03-debugging.md
+    - 04. Deployment & Distribution: advanced/04-deployment.md
