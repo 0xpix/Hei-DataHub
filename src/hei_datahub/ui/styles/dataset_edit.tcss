@@ -10,18 +10,16 @@ CloudEditDetailsScreen {
 
 CloudEditDetailsScreen Header {
     dock: top;
-    height: 3;
+    height: 1;
     background: $panel;
     color: $text;
-    border-bottom: solid $primary;
 }
 
 CloudEditDetailsScreen Footer {
     dock: bottom;
-    height: 3;
+    height: 1;
     background: $panel;
     color: $text-muted;
-    border-top: solid $primary;
 }
 
 CloudEditDetailsScreen #edit-scroll {
@@ -121,11 +119,13 @@ CloudEditDetailsScreen #error-message:empty {
 }
 
 CloudEditDetailsScreen .title {
+    width: 100;
     text-align: left;
     text-style: bold;
     padding: 2;
     margin-bottom: 2;
-    color: $accent;
     background: $surface;
+    color: $accent;
     border-bottom: solid $primary 30%;
+    text-style: bold italic;  /* You can combine styles */
 }
