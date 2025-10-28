@@ -683,9 +683,3 @@ hei-datahub reindex
 This rebuilds the FTS5 index.
 
 ---
-
-## Further Reading
-
-- [Configuration Deep Dive](../config/overview.md)
-- [WebDAV Setup Guide](../architecture/auth-and-sync.md)
-- [Keybinding Customization](../ui/keybindings.md)
