@@ -12,10 +12,9 @@ CloudDatasetDetailsScreen {
 
 CloudDatasetDetailsScreen Header {
     dock: top;
-    height: 3;
+    height: 1;
     background: $panel;
     color: $text;
-    border-bottom: solid $primary;
 }
 
 CloudDatasetDetailsScreen Footer {
