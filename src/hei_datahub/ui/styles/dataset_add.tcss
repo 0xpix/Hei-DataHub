@@ -11,18 +11,16 @@ AddDataScreen {
 
 AddDataScreen Header {
     dock: top;
-    height: 3;
+    height: 1;
     background: $panel;
     color: $text;
-    border-bottom: solid $primary;
 }
 
 AddDataScreen Footer {
     dock: bottom;
-    height: 3;
+    height: 1;
     background: $panel;
     color: $text-muted;
-    border-top: solid $primary;
 }
 
 AddDataScreen #add-data-scroll {
@@ -47,8 +45,6 @@ AddDataScreen #form-container {
     padding: 3;
     padding-bottom: 5;
     margin: 2 0;
-    overflow-y: scroll;
-    scrollbar-gutter: stable;
     background: $panel;
     border: round $primary 30%;
 }
@@ -63,6 +59,7 @@ AddDataScreen #form-container > * {
    ============================================================================ */
 
 AddDataScreen .title {
+    width: 100;
     text-align: left;
     text-style: bold;
     padding: 2;
@@ -70,6 +67,7 @@ AddDataScreen .title {
     color: $accent;
     background: $panel;
     border-bottom: solid $primary 30%;
+    text-style: bold italic;  /* You can combine styles */
 }
 
 /* ============================================================================
