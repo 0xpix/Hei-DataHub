@@ -569,31 +569,24 @@ class HomeScreen(Screen):
 
         return True
 
-    def _get_badge_color_class(self, key: str) -> str:
+    def _get_badge_color_class(self, badge_text: str) -> str:
         """
-        Get a consistent color class for a badge based on its key type.
+        Get a consistent retro color class for a badge based on its text.
 
-        Maps filter keys to specific colors for visual consistency:
-        - project: Blue
-        - source: Purple
-        - tag: Teal
-        - owner: Orange
-        - size: Gray
-        - format/type: Coral
-        - default: Neutral
+        Uses hash of the badge text to consistently assign the same color
+        to the same badge, but colors appear random across different badges.
         """
-        key_colors = {
-            "project": "badge-blue",
-            "source": "badge-purple",
-            "tag": "badge-teal",
-            "owner": "badge-orange",
-            "size": "badge-gray",
-            "format": "badge-coral",
-            "file_format": "badge-coral",
-            "type": "badge-sage",
-            "data_type": "badge-sage",
-        }
-        return key_colors.get(key.lower(), "badge-neutral")
+        retro_colors = [
+            "badge-retro-teal",
+            "badge-retro-coral",
+            "badge-retro-sage",
+            "badge-retro-mauve",
+            "badge-retro-amber",
+            "badge-retro-slate",
+        ]
+        # Use hash to get consistent color for same badge text
+        color_index = hash(badge_text) % len(retro_colors)
+        return retro_colors[color_index]
 
     def _update_filter_badges(self, query: str) -> None:
         """Update visual badges showing active search filters with uniform key-based styling."""
@@ -626,8 +619,8 @@ class HomeScreen(Screen):
                     # Uniform badge text: key:value or key>value etc
                     badge_text = f"{term.field}{op_symbol}{term.value}"
 
-                    # Get color based on key type (not operator)
-                    color_class = self._get_badge_color_class(term.field)
+                    # Get color based on the full badge text for consistency
+                    color_class = self._get_badge_color_class(badge_text)
 
                     # Create badge with key emoji for visual grouping
                     key_emoji = {
@@ -648,15 +641,16 @@ class HomeScreen(Screen):
             logger.debug(f"Found {len(free_text_terms)} free text terms: {[t.value for t in free_text_terms]}")
 
             for term in free_text_terms:
-                # Free text uses neutral gray color
-                color_class = "badge-neutral"
+                # Free text gets consistent color based on the term value
+                color_class = self._get_badge_color_class(term.value)
                 badge = Static(f"📝 {term.value}", classes=f"filter-badge {color_class}")
                 badges_container.mount(badge)
                 logger.debug(f"Mounted badge for term: {term.value}")
 
         except Exception as e:
-            # If parsing fails, just show the raw query
-            badges_container.mount(Static(f"[dim]🔍 {query}[/dim]", classes="filter-badge"))
+            # If parsing fails, show raw query with color based on query text
+            color_class = self._get_badge_color_class(query)
+            badges_container.mount(Static(f"[dim]🔍 {query}[/dim]", classes=f"filter-badge {color_class}"))
 
     def action_focus_search(self) -> None:
         """Focus search input and enter insert mode."""
