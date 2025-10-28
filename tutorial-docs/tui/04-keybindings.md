@@ -697,5 +697,4 @@ Now that you understand keyboard input, let's build a **complete custom screen**
 
 - [Textual Bindings Guide](https://textual.textualize.io/guide/actions/)
 - [Textual Events Reference](https://textual.textualize.io/events/)
-- [Hei-DataHub Keybinding Config](../../ui/keybindings.md)
 - [Input Widget Docs](https://textual.textualize.io/widgets/input/)
