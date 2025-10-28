@@ -835,3 +835,8 @@ class HomeScreen(Screen):
         """Open debug console (: key)."""
         from hei_datahub.ui.widgets.console import DebugConsoleScreen
         self.app.push_screen(DebugConsoleScreen())
+
+    def action_show_about(self) -> None:
+        """Show about screen."""
+        from hei_datahub.ui.views.about import AboutScreen
+        self.app.push_screen(AboutScreen())
