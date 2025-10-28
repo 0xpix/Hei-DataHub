@@ -36,6 +36,8 @@ CloudDatasetDetailsScreen #details-container {
     background: $surface;
     padding: 2;
     align: center top;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
     scrollbar-background: $surface;
     scrollbar-color: $primary;
     scrollbar-color-hover: $accent;
