@@ -18,6 +18,9 @@ def search_indexed(query: str, limit: int = 50) -> List[Dict[str, Any]]:
     Supports:
     - Free text search
     - project: filter
+    - source: filter
+    - format: filter
+    - tag: filter
     - Combined filters
 
     Args:
@@ -32,17 +35,26 @@ def search_indexed(query: str, limit: int = 50) -> List[Dict[str, Any]]:
 
     # Parse query
     project_filter = None
+    source_filter = None
+    format_filter = None
+    tag_filter = None
     query_text = query
 
     try:
         parser = QueryParser()
         parsed = parser.parse(query)
 
-        # Extract project filter if present
+        # Extract all field filters
         for term in parsed.terms:
-            if not term.is_free_text and term.field == "project":
-                project_filter = term.value
-                break
+            if not term.is_free_text:
+                if term.field == "project":
+                    project_filter = term.value
+                elif term.field == "source":
+                    source_filter = term.value
+                elif term.field == "format":
+                    format_filter = term.value
+                elif term.field in ("tag", "tags"):
+                    tag_filter = term.value
 
         # Get free text part
         query_text = parsed.free_text_query or ""
@@ -51,12 +63,18 @@ def search_indexed(query: str, limit: int = 50) -> List[Dict[str, Any]]:
         logger.debug(f"Query parse error (using simple search): {e}")
         # Fall back to simple text search
         project_filter = None
+        source_filter = None
+        format_filter = None
+        tag_filter = None
 
     # Search the index
     index_service = get_index_service()
     results = index_service.search(
         query_text=query_text,
         project_filter=project_filter,
+        source_filter=source_filter,
+        format_filter=format_filter,
+        tag_filter=tag_filter,
         limit=limit
     )
 
