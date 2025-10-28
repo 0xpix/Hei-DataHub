@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build User and Developer Documentation
+    name: Build User, Tutorial, and Developer Documentation
     runs-on: ubuntu-latest
     steps:
       # Checkout main branch for user docs
@@ -33,6 +33,14 @@ jobs:
         with:
           ref: docs/devs
           path: docs-devs
+
+      # Checkout docs/update-tutorial-doc branch for tutorial docs (if exists)
+      - name: Checkout tutorial docs branch
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: docs/update-tutorial-doc
+          path: docs-tutorial
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -72,6 +80,17 @@ jobs:
         working-directory: docs-devs
         run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
 
+      # Build tutorial docs from docs/update-tutorial-doc branch to /tutorial path
+      - name: Install tutorial docs dependencies
+        if: hashFiles('docs-tutorial/tutorial-docs/requirements.txt') != ''
+        working-directory: docs-tutorial
+        run: pip install -r tutorial-docs/requirements.txt
+
+      - name: Build tutorial documentation site
+        if: hashFiles('docs-tutorial/mkdocs-tutorial.yml') != ''
+        working-directory: docs-tutorial
+        run: mkdocs build --config-file mkdocs-tutorial.yml --site-dir ../combined-site/tutorial
+
       - name: Verify combined build output
         run: |
           echo "Checking combined build output..."
@@ -85,6 +104,14 @@ jobs:
             ls -la combined-site/x9k2m7n4p8q1/
             if [ ! -f "combined-site/x9k2m7n4p8q1/index.html" ]; then
               echo "Error: Developer docs index.html not found at obfuscated path"
+              exit 1
+            fi
+          fi
+          if [ -d "combined-site/tutorial" ]; then
+            echo "✓ Tutorial docs built to /tutorial path"
+            ls -la combined-site/tutorial/
+            if [ ! -f "combined-site/tutorial/index.html" ]; then
+              echo "Error: Tutorial docs index.html not found"
               exit 1
             fi
           fi
