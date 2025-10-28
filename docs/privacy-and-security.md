@@ -112,7 +112,6 @@ hei-datahub
 
 GitHub tokens are used only for:
 1. Installing from private repository (`uv tool install`)
-2. Creating pull requests (user manages via Git)
 
 **You manage tokens yourself:**
 - Store in Git credential helper
@@ -233,7 +232,6 @@ Hei-DataHub is **local-first** and only makes network calls when:
 2. **User actions**
    - Uploading a dataset to cloud (`Ctrl+S` in TUI)
    - Running `hei-datahub auth doctor` (connection test)
-   - Creating a GitHub Pull Request
 
 3. **Installation/updates**
    - Downloading package from GitHub (via `uv`)
