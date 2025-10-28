@@ -545,12 +545,3 @@ Pick a feature (e.g., "delete dataset") and trace:
 Now that you understand the **architecture**, let's get it running on your machine!
 
 **Next**: [3. Installing & Running Locally](02-setup.md)
-
----
-
-## Further Reading
-
-- [Architecture Diagrams](../architecture/diagrams.md) — Visual diagrams
-- [Module Map](../architecture/module-map.md) — Detailed file breakdown
-- [Data Flow](../architecture/data-flow.md) — More flow examples
-- [Design Principles](../architecture/design-principles.md) — Philosophy
