@@ -2,7 +2,7 @@
 
 !!! info "Version 0.60-beta Updates"
     **Recent architectural changes:**
-    
+
     - ✅ Removed legacy GitHub PR workflow (simplified cloud-only architecture)
     - ✅ Removed Outbox feature (direct WebDAV sync only)
     - ✅ Added About screen component
