@@ -50,7 +50,7 @@ class AboutScreen(Screen):
                 yield Static(f"Hei-datahub - v{__version__}", id="version-badge")
 
                 # Separator
-                yield Static("─" * 80, id="header-separator", classes="separator")
+                yield Static("─" * 70, id="header-separator", classes="separator")
 
                 # Tagline
                 yield Static(
@@ -58,35 +58,25 @@ class AboutScreen(Screen):
                     id="tagline"
                 )
 
-                # Feature highlights in compact horizontal layout
-                with Horizontal(id="features-row"):
-                    yield Static("⚡ Fast search", classes="feature-badge")
-                    yield Static("🔒 Secure keyring", classes="feature-badge")
-                    yield Static("☁  WebDAV sync", classes="feature-badge")
-
                 # Separator
-                yield Static("─" * 60, id="features-separator", classes="separator")
+                yield Static("─" * 70, id="features-separator", classes="separator")
 
                 # Compact content sections
                 with Vertical(id="content-section"):
+
+                    yield Static("[b #d4a574]Story[/b #d4a574]", classes="section-title")
+                    yield Static(
+                        "It began as a simple [b]Excel sheet inventory[/b]. "
+                        "It was just boring, I wanted something fast, private, and fun to use—inside the terminal.\n"
+                        "So Hei-DataHub was born: a TUI that keeps data in your hands, syncs to Heibox for the team, and makes finding things instant. The goal is simple: less friction, more science.",
+                        classes="section-content"
+                    )
+
                     yield Static("[b #d4a574]What is Hei-DataHub?[/b #d4a574]", classes="section-title")
                     yield Static(
                         "A terminal user interface designed for researchers and data scientists to "
                         "catalog, organize, and manage datasets efficiently. Combines YAML metadata, "
                         "SQLite full-text search, and seamless cloud integration.\n",
-                        classes="section-content"
-                    )
-
-                    yield Static("[b #d4a574]Technology Stack[/b #d4a574]", classes="section-title")
-                    yield Static(
-                        "Textual · SQLite FTS5 · Pydantic · PyYAML · Requests · Keyring · UV",
-                        classes="section-content tech-stack"
-                    )
-
-                    yield Static("[b #d4a574]Story[/b #d4a574]", classes="section-title")
-                    yield Static(
-                        "[b]It all started with an Excel sheet[/b] when we decided to gather data for the team, I was asked to do an inventory, but I found the excelsheet boring and not interactive. So Hei-datahub was born, a TUI app where we can add data to our Heibox for [b]privacy[/b] and everyone who has the app can see the data (if you are part of the team of course)\n"
-                        "I enjoyed working on this project, it was really fun 󰋑",
                         classes="section-content"
                     )
 
