@@ -38,6 +38,10 @@ def bind_actions_from_config(
     bindings = []
 
     for action, (display_name, key_display, show) in action_map.items():
+        # Skip jump_top as it's handled manually in on_key() to require double 'g' press
+        if action == "jump_top":
+            continue
+
         keys = keys_cfg.get(action, [])
         if not keys:
             logger.warning(f"No keys configured for action: {action}")
@@ -69,7 +73,7 @@ def get_action_display_map_home() -> Dict[str, tuple]:
         "quit": ("Quit", "Ctrl+q", True),
         "move_down": ("Down", "j", False),
         "move_up": ("Up", "k", False),
-        "jump_top": ("Top", "gg", False),
+        "jump_top": ("Top", "g g", False),
         "jump_bottom": ("Bottom", "G", False),
         "focus_search": ("Search", "/", True),
         "clear_search": ("Clear", "esc", False),
@@ -131,7 +135,7 @@ def build_home_bindings() -> list[Binding]:
             Binding("k", "move_up", "Up", show=False),
             Binding("down", "move_down", "", show=False),
             Binding("up", "move_up", "", show=False),
-            Binding("gg", "jump_top", "Top", key_display="gg", show=False),
+            # Note: 'gg' is handled manually in on_key() method to require double-press
             Binding("G", "jump_bottom", "Bottom", show=False),
             Binding("/", "focus_search", "Search", key_display="/"),
             Binding("escape", "clear_search", "Clear", show=False),
