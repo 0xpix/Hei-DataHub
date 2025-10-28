@@ -1,0 +1,149 @@
+# MkDocs Configuration for Hei-DataHub Tutorial Documentation
+# This site contains tutorials and learning guides for Hei-DataHub
+# User-facing documentation: https://0xpix.github.io/Hei-DataHub/
+# Developer documentation: https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/
+
+site_name: Hei-DataHub Tutorials
+site_description: 'Tutorial documentation for Hei-DataHub v0.60.0 (beta) - Step-by-step guides for building with Hei-DataHub'
+site_author: Hei-DataHub Tutorial Team
+site_url: https://0xpix.github.io/Hei-DataHub/tutorial
+
+# Repository
+repo_name: 0xpix/Hei-DataHub
+repo_url: https://github.com/0xpix/Hei-DataHub
+edit_uri: edit/main/tutorial-docs/
+
+# Copyright
+copyright: Copyright &copy; 2025 Hei-DataHub Contributors | Tutorial Documentation
+
+# Directory Configuration
+docs_dir: tutorial-docs
+site_dir: tutorial-site
+
+# Configuration
+theme:
+  name: dracula
+  components:
+    title: false
+    preview: true
+    site_name: false
+  highlightjs: true
+    - bash
+  sidebar: true
+  navigation_depth: 2
+  custom_dir: tutorial-docs/
+  logo: assets/dark_logo_H_large.svg
+  favicon: assets/dark_logo_H_large.svg
+
+# Plugins
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 4
+      permalink_title: Link to this section
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Extra CSS and JavaScript
+extra_css:
+  - assets/tutorial-overrides.css
+
+extra_javascript:
+  - assets/vim-navigation-tutorial.js
+  - assets/repo_url.js
+
+# Extra configuration
+extra:
+  version:
+    provider: mike
+    default: stable
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/0xpix/Hei-DataHub
+      name: GitHub Repository
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/thumb-up-outline
+          name: This page was helpful
+          data: 1
+          note: Thanks for your feedback!
+        - icon: material/thumb-down-outline
+          name: This page could be improved
+          data: 0
+          note: Thanks! Help us improve by opening an issue.
+
+# Navigation structure
+nav:
+  - Home: index.md
+  - 🎓 Start Here: README.md
+  - Welcome:
+    - Overview & Roadmap: 00-overview.md
+    - What Is Hei-DataHub?: 01-what-is-hei-datahub.md
+    - How It Works (Architecture): 01-architecture.md
+    - Installing & Running Locally: 02-setup.md
+
+  - Build the TUI:
+    - 01. Layout Basics: tui/01-layout-basics.md
+    - 02. Creating Views & Widgets: tui/02-widgets.md
+    - 03. Styling & Themes: tui/03-styling.md
+    - 04. Keyboard Shortcuts & Events: tui/04-keybindings.md
+    - 05. Adding Your Own Screen: tui/05-custom-view.md
+
+  - Add Functionality:
+    - 01. Linking UI to Data: logic/01-ui-actions.md
+    - 02. Database Operations: logic/02-database.md
+    - 03. Autocomplete Logic: logic/03-autocomplete.md
+    - 04. Cloud Sync: logic/04-cloud-sync.md
+    - 05. CLI Integration: logic/05-cli-integration.md
+
+  - Deep Dive:
+    - 01. Directory Structure: deep/01-directory-structure.md
+    - 02. Auth Systems: deep/02-auth.md
+    - 03. Configuration: deep/03-config.md
+    - 04. Indexing: deep/04-indexing.md
+    - 05. Testing: deep/05-testing.md
