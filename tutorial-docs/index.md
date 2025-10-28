@@ -306,9 +306,9 @@ Or jump directly to:
 
 ## Welcome, Developer! 👩‍💻👨‍💻
 
-This is the **comprehensive technical reference** for Hei-DataHub internals. Whether you're:
+This is the **comprehensive tutorial guide** for Hei-DataHub. Whether you're:
 
-- 🎓 **Learning how to build** a TUI app with Textual → [**Start the Learning Guide**](learn/README.md)
+- 🎓 **Learning how to build** a TUI app with Textual → [**Start the Learning Guide**](00-overview.md)
 - 🔧 **Contributing code** to the project
 - 🏗️ **Understanding the architecture** before diving in
 - 🐛 **Debugging an issue** deep in the stack
@@ -324,9 +324,9 @@ This is the **comprehensive technical reference** for Hei-DataHub internals. Whe
 
 **Start with the Learning Guide** — a step-by-step tutorial that teaches you how to build Hei-DataHub from scratch:
 
-- [**Learning Guide Home**](learn/README.md) — Master index and roadmap
-- [**What is Hei-DataHub?**](learn/01-what-is-hei-datahub.md) — Problem, solution, and overview
-- [**How It Works (Architecture)**](learn/01-architecture.md) — System design deep dive
+- [**Learning Guide Home**](00-overview.md) — Master index and roadmap
+- [**What is Hei-DataHub?**](01-what-is-hei-datahub.md) — Problem, solution, and overview
+- [**How It Works (Architecture)**](01-architecture.md) — System design deep dive
 - [**Installing & Running Locally**](02-setup.md) — Get it running in 5 minutes
 - [**Building the TUI**](tui/01-layout-basics.md) — Create beautiful terminal interfaces
 - [**Adding Functionality**](logic/01-ui-actions.md) — Connect UI to backend logic
