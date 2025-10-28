@@ -48,9 +48,8 @@ The app uses these standardized base directories:
 ~/.cache/hei-datahub/            # Cache (reserved for future use)
 
 ~/.local/state/hei-datahub/      # State & logs
-├── logs/
-│   └── app.log                  # Application logs
-└── outbox/                      # Failed PR operations
+└── logs/
+    └── app.log                  # Application logs
 ```
 
 ## First-Run Initialization
