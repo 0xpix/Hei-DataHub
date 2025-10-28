@@ -82,7 +82,17 @@ class HomeScreen(Screen):
         self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
     def _check_indexer_and_reload(self) -> None:
-        """Check if indexer is ready and add new datasets incrementally."""
+        """Check if indexer is ready and add new datasets incrementally.
+
+        NOTE: This should ONLY run when showing all datasets, NOT during search!
+        """
+        # Get current search query to check if we're in search mode
+        search_input = self.query_one("#search-input", Input)
+        if search_input.value and len(search_input.value.strip()) >= 2:
+            # We're in search mode - DO NOT add datasets
+            logger.debug("Timer skipped: in search mode")
+            return
+
         from hei_datahub.services.indexer import get_indexer
         from hei_datahub.services.fast_search import get_all_indexed
 
@@ -118,7 +128,7 @@ class HomeScreen(Screen):
                     snippet,
                     key=result["id"],
                 )
-                logger.info(f"Added dataset to table: {display_name}")
+                logger.info(f"Timer added dataset to table: {display_name}")
 
         # Update label with progress
         if not indexer.is_ready():
@@ -165,6 +175,12 @@ class HomeScreen(Screen):
         logger.info(f"load_all_datasets called (force_refresh={force_refresh})")
         table = self.query_one("#results-table", DataTable)
         table.clear()
+
+        # Stop any existing indexer check timer
+        try:
+            self.remove_timer("indexer_check")
+        except:
+            pass
 
         try:
             # Force cache clear if requested (e.g., after edit)
@@ -221,6 +237,9 @@ class HomeScreen(Screen):
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
+
+            # Restart the indexer check timer for incremental updates (only when showing all datasets)
+            self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
         except Exception as e:
             logger.error(f"Error loading datasets from index: {e}", exc_info=True)
@@ -318,8 +337,10 @@ class HomeScreen(Screen):
 
     def perform_search(self, query: str) -> None:
         """Execute search and update results table (FAST - never hits network)."""
+        logger.info(f"perform_search called with query: '{query}'")
         table = self.query_one("#results-table", DataTable)
         table.clear()
+        logger.info(f"Table cleared, row count: {table.row_count}")
 
         # If query is empty or very short, show all datasets
         if not query.strip() or len(query.strip()) < 2:
@@ -328,6 +349,13 @@ class HomeScreen(Screen):
             return
 
         try:
+            # Stop the indexer check timer during search to prevent interference
+            try:
+                self.remove_timer("indexer_check")
+                logger.info("✓ Stopped indexer_check timer during search")
+            except Exception as e:
+                logger.debug(f"Could not remove timer (may not exist): {e}")
+
             # Update filter badges
             self._update_filter_badges(query)
 
@@ -338,9 +366,11 @@ class HomeScreen(Screen):
             from hei_datahub.services.fast_search import search_indexed
 
             results = search_indexed(query)
+            logger.info(f"search_indexed returned {len(results)} results")
 
             # CLOUD-ONLY: Filter to show only remote datasets
             cloud_results = [r for r in results if r.get("metadata", {}).get("is_remote", False)]
+            logger.info(f"After cloud filter: {len(cloud_results)} results")
 
             label = self.query_one("#results-label", Label)
 
@@ -348,12 +378,12 @@ class HomeScreen(Screen):
             from hei_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
-                label.update(f"🔄 Indexing… ☁️ Cloud Results ({len(cloud_results)} found)")
+                label.update(f"🔄 Indexing… ☁️ Cloud Results ({len(cloud_results)} found) ")
             else:
-                label.update(f"☁️ Cloud Results ({len(cloud_results)} found)")
+                label.update(f"☁️ Cloud Results ({len(cloud_results)} found) ")
 
             if not cloud_results:
-                label.update(f"No cloud results for '{query}'")
+                label.update(f"No cloud results for '{query}' ")
                 return
 
             for result in cloud_results:
@@ -378,7 +408,9 @@ class HomeScreen(Screen):
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
+                logger.info(f"Added to table: {display_name}")
 
+            logger.info(f"Search complete. Final table row count: {table.row_count}")
             # Don't steal focus from search input
 
         except Exception as e:
