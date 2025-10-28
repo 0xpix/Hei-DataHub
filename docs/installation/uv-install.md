@@ -132,9 +132,8 @@ The app automatically initializes XDG-compliant directories:
 
 ~/.cache/hei-datahub/           # Cache (currently unused)
 
-~/.local/state/hei-datahub/     # Logs and outbox
-  ├── logs/
-  └── outbox/
+~/.local/state/hei-datahub/     # Logs
+  └── logs/
 ```
 
 ## Verify Installation
