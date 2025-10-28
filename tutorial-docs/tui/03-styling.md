@@ -591,4 +591,3 @@ Now that your TUI looks great, let's make it **interactive**!
 
 - [Textual CSS Reference](https://textual.textualize.io/styles/)
 - [Textual Themes Guide](https://textual.textualize.io/guide/design/)
-- [Hei-DataHub Theme System](../../ui/theming.md)
