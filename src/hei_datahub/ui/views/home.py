@@ -42,6 +42,8 @@ class HomeScreen(Screen):
 
     search_mode = reactive(False)
     _debounce_timer: Optional[Timer] = None
+    _g_pressed: bool = False
+    _g_timer: Optional[Timer] = None
 
     def compose(self) -> ComposeResult:
         from hei_datahub.ui.assets.loader import get_logo_widget_text
@@ -684,6 +686,37 @@ class HomeScreen(Screen):
                 # Prevent Tab from navigating away
                 event.prevent_default()
                 event.stop()
+        else:
+            # Handle 'gg' sequence for jump to top
+            if event.key == "g":
+                if self._g_pressed:
+                    # Second 'g' press - jump to top
+                    self.action_jump_top()
+                    self._g_pressed = False
+                    if self._g_timer:
+                        self._g_timer.stop()
+                        self._g_timer = None
+                    event.prevent_default()
+                    event.stop()
+                else:
+                    # First 'g' press - wait for second one
+                    self._g_pressed = True
+                    # Reset after 1 second if no second 'g'
+                    if self._g_timer:
+                        self._g_timer.stop()
+                    self._g_timer = self.set_timer(1.0, self._reset_g_buffer)
+                    event.prevent_default()
+                    event.stop()
+            elif self._g_pressed:
+                # Any other key pressed - reset the 'g' buffer
+                self._reset_g_buffer()
+
+    def _reset_g_buffer(self) -> None:
+        """Reset the 'g' key buffer."""
+        self._g_pressed = False
+        if self._g_timer:
+            self._g_timer.stop()
+            self._g_timer = None
 
     @on(Input.Submitted, "#search-input")
     def on_search_submitted(self) -> None:
