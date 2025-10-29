@@ -25,21 +25,6 @@
 
 ---
 
-## Why Hei-DataHub?
-
-- **Lightning fast:** <80ms search with SQLite FTS5, <300ms startup
-- **Cloud-native:** WebDAV integration for Heibox/Seafile collaboration
-- **Secure auth:** Linux keyring storage, interactive setup wizard
-- **Stay consistent:** JSON Schema + Pydantic validation
-- **Work local:** YAML on disk, background sync, zero network on search
-- **Publish easily:** Direct cloud upload or auto-stash → branch → PR
-- **Team-friendly:** Instant dataset sharing, no GitHub required
-- **Easy install:** Direct from GitHub with UV - no cloning needed
-
-More: see the [User Guide](https://0xpix.github.io/Hei-DataHub/).
-
----
-
 ## 🚀 Quick Install — UV Method (v0.60.x-beta)
 
 **Linux users:** No cloning required! Install directly from the private repository with modern UV tooling.
@@ -128,7 +113,7 @@ Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-gettin
 
 ---
 
-## ✨ Key Features in v0.59-beta "Privacy"
+## ✨ Key Features in v0.59+ "Privacy"
 
 ### 🔐 WebDAV Authentication System
 - **Interactive setup wizard** — `hei-datahub auth setup` with guided prompts
@@ -177,8 +162,7 @@ Guides:
 * Secure credentials: Linux keyring storage
 
 Details: [Basics](https://0xpix.github.io/Hei-DataHub/getting-started/03-the-basics/)
-
-
+s
 ---
 
 **Built for teams who want to organize data without the overhead.**
