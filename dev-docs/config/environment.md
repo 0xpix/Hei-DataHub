@@ -182,7 +182,7 @@ export HEI_DATAHUB_SYNC_AUTO_SYNC="no"
 FROM python:3.10-slim
 
 # Install application
-RUN pip install hei-datahub
+RUN uv add hei-datahub
 
 # Set configuration via environment variables
 ENV HEI_DATAHUB_WEBDAV_BASE_URL="https://cloud.example.com/webdav"
@@ -190,7 +190,7 @@ ENV HEI_DATAHUB_WEBDAV_LIBRARY_PATH="datasets"
 ENV HEI_DATAHUB_SYNC_AUTO_SYNC="true"
 ENV HEI_DATAHUB_LOGGING_LEVEL="INFO"
 
-CMD ["mini-datahub"]
+CMD ["hei-datahub"]
 ```
 
 **Docker Compose:**
@@ -229,11 +229,11 @@ jobs:
       HEI_DATAHUB_SYNC_AUTO_SYNC: false
       HEI_DATAHUB_LOGGING_LEVEL: DEBUG
       HEI_DATAHUB_DATABASE_PATH: ./test-data/test.db
-    
+
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
-        run: pip install -e .
+        run: uv sync --dev
       - name: Run tests
         run: pytest
 ```
@@ -250,7 +250,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/mini-datahub
+ExecStart=/usr/bin/hei-datahub
 Environment="HEI_DATAHUB_WEBDAV_BASE_URL=https://heibox.uni-heidelberg.de/remote.php/webdav"
 Environment="HEI_DATAHUB_SYNC_AUTO_SYNC=true"
 Environment="HEI_DATAHUB_LOGGING_LEVEL=INFO"
@@ -289,7 +289,7 @@ echo "Development environment configured"
 
 ```bash
 source dev-env.sh
-mini-datahub
+hei-datahub
 ```
 
 ---
@@ -332,14 +332,14 @@ HEI_DATAHUB_LOGGING_LOG_FILE="/var/log/hei-datahub/app.log"
 
 ### Example Scenario
 
-**System Config (`/etc/mini-datahub/config.toml`):**
+**System Config (`/etc/hei-datahub/config.toml`):**
 
 ```toml
 [sync]
 sync_interval = 300
 ```
 
-**User Config (`~/.config/mini-datahub/config.toml`):**
+**User Config (`~/.config/hei-datahub/config.toml`):**
 
 ```toml
 [sync]
@@ -355,7 +355,7 @@ export HEI_DATAHUB_SYNC_SYNC_INTERVAL="900"
 **Command-line Argument:**
 
 ```bash
-mini-datahub --sync-interval 1200
+hei-datahub --sync-interval 1200
 ```
 
 **Effective Value:** `1200` (from command-line argument)
@@ -374,36 +374,36 @@ mini-datahub --sync-interval 1200
 ### Loading Environment Variables
 
 ```python
-# src/mini_datahub/core/config.py
+# src/hei_datahub/core/config.py
 
 import os
 
 def apply_env_overrides(config_dict: dict) -> None:
     """Apply environment variable overrides to config"""
     prefix = "HEI_DATAHUB_"
-    
+
     for env_key, env_value in os.environ.items():
         # Skip non-matching environment variables
         if not env_key.startswith(prefix):
             continue
-        
+
         # Parse: HEI_DATAHUB_WEBDAV_BASE_URL → ["webdav", "base_url"]
         parts = env_key[len(prefix):].lower().split("_")
-        
+
         if len(parts) < 2:
             continue
-        
+
         section = parts[0]
         config_key = "_".join(parts[1:])
-        
+
         # Skip unknown sections
         if section not in config_dict:
             logger.warning(f"Unknown config section in {env_key}: {section}")
             continue
-        
+
         # Get current value to determine type
         current_value = config_dict[section].get(config_key)
-        
+
         # Convert string to appropriate type
         try:
             if isinstance(current_value, bool):
@@ -418,11 +418,11 @@ def apply_env_overrides(config_dict: dict) -> None:
             else:
                 # String (no conversion)
                 converted_value = env_value
-            
+
             # Apply override
             config_dict[section][config_key] = converted_value
             logger.debug(f"Applied env override: {section}.{config_key} = {converted_value}")
-            
+
         except (ValueError, TypeError) as e:
             logger.warning(f"Failed to parse {env_key}={env_value}: {e}")
 ```
@@ -438,38 +438,38 @@ def apply_env_overrides(config_dict: dict) -> None:
 
 import os
 import pytest
-from mini_datahub.core.config import load_config
+from hei_datahub.core.config import load_config
 
 def test_webdav_url_override(monkeypatch):
     """Test WebDAV URL override via environment variable"""
     monkeypatch.setenv("HEI_DATAHUB_WEBDAV_BASE_URL", "https://test.example.com/webdav")
-    
+
     config = load_config()
-    
+
     assert config.webdav.base_url == "https://test.example.com/webdav"
 
 def test_sync_interval_override(monkeypatch):
     """Test sync interval override"""
     monkeypatch.setenv("HEI_DATAHUB_SYNC_SYNC_INTERVAL", "900")
-    
+
     config = load_config()
-    
+
     assert config.sync.sync_interval == 900
 
 def test_boolean_override_true(monkeypatch):
     """Test boolean override (true)"""
     monkeypatch.setenv("HEI_DATAHUB_SYNC_AUTO_SYNC", "true")
-    
+
     config = load_config()
-    
+
     assert config.sync.auto_sync is True
 
 def test_boolean_override_false(monkeypatch):
     """Test boolean override (false)"""
     monkeypatch.setenv("HEI_DATAHUB_SYNC_AUTO_SYNC", "0")
-    
+
     config = load_config()
-    
+
     assert config.sync.auto_sync is False
 ```
 
@@ -512,9 +512,9 @@ export HEI_DATAHUB_WEBDAV_BASE_URL="https://your-server.example.com/webdav"
 def validate_env_vars() -> None:
     """Validate required environment variables"""
     required = ["HEI_DATAHUB_WEBDAV_BASE_URL"]
-    
+
     missing = [var for var in required if var not in os.environ]
-    
+
     if missing:
         raise ValueError(f"Missing required environment variables: {missing}")
 ```
@@ -533,7 +533,7 @@ def validate_env_vars() -> None:
 import os
 print("HEI_DATAHUB_SYNC_AUTO_SYNC:", os.environ.get("HEI_DATAHUB_SYNC_AUTO_SYNC"))
 
-from mini_datahub.core.config import load_config
+from hei_datahub.core.config import load_config
 config = load_config()
 print("Config value:", config.sync.auto_sync)
 ```
@@ -577,4 +577,4 @@ export HEI_DATAHUB_SYNC_SYNC_INTERVAL="600"  # Integer, not "600 seconds"
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
