@@ -2,16 +2,16 @@
 
 ## Overview
 
-This document explains the organization of the `mini_datahub` Python package, including the purpose of each module, directory structure, and import conventions.
+This document explains the organization of the `hei_datahub` Python package, including the purpose of each module, directory structure, and import conventions.
 
 ---
 
 ## Directory Layout
 
 ```
-src/mini_datahub/
+src/hei_datahub/
 ├── __init__.py            # Package initialization
-├── __main__.py            # Entry point for `python -m mini_datahub`
+├── __main__.py            # Entry point for `python -m hei_datahub`
 ├── version.py             # Version utilities
 ├── version.yaml           # Version metadata
 ├── schema.json            # Dataset JSON schema
@@ -117,8 +117,8 @@ Hei-DataHub - Lightweight local data hub with TUI
 __version__ = "0.59.0-beta"
 
 # Public API exports
-from mini_datahub.core.models import DatasetMetadata
-from mini_datahub.services.fast_search import FastSearch
+from hei_datahub.core.models import DatasetMetadata
+from hei_datahub.services.fast_search import FastSearch
 
 __all__ = [
     "DatasetMetadata",
@@ -132,16 +132,16 @@ __all__ = [
 
 #### `__main__.py`
 
-**Purpose:** Allow running as module (`python -m mini_datahub`)
+**Purpose:** Allow running as module (`python -m hei_datahub`)
 
 **Contents:**
 
 ```python
 """
-Entry point for python -m mini_datahub
+Entry point for python -m hei_datahub
 """
 
-from mini_datahub.cli.main import main
+from hei_datahub.cli.main import main
 
 if __name__ == "__main__":
     main()
@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
 **Usage:**
 ```bash
-python -m mini_datahub --help
+python -m hei_datahub --help
 # Equivalent to:
 hei-datahub --help
 ```
@@ -181,7 +181,7 @@ def get_release_name() -> str:
 
 **Usage:**
 ```python
-from mini_datahub.version import get_version
+from hei_datahub.version import get_version
 
 print(f"Hei-DataHub v{get_version()}")
 ```
@@ -241,7 +241,7 @@ cli/
 # cli/commands/auth.py
 def setup_command(args):
     """Run interactive auth setup wizard"""
-    from mini_datahub.auth.setup import run_setup_wizard
+    from hei_datahub.auth.setup import run_setup_wizard
     run_setup_wizard()
 ```
 
@@ -503,8 +503,8 @@ ui/
 
 ```python
 # ✅ CORRECT
-from mini_datahub.core.models import DatasetMetadata
-from mini_datahub.services.fast_search import FastSearch
+from hei_datahub.core.models import DatasetMetadata
+from hei_datahub.services.fast_search import FastSearch
 
 # ❌ WRONG
 from ..core.models import DatasetMetadata  # Relative import
@@ -521,8 +521,8 @@ from ..core.models import DatasetMetadata  # Relative import
 
 ```python
 # ✅ CORRECT (Service → Core + Infra)
-from mini_datahub.core.models import DatasetMetadata
-from mini_datahub.infra.index import Index
+from hei_datahub.core.models import DatasetMetadata
+from hei_datahub.infra.index import Index
 
 class DatasetService:
     def __init__(self, index: Index):
@@ -532,7 +532,7 @@ class DatasetService:
 ```python
 # ❌ WRONG (Core → Infra)
 # In core/models.py
-from mini_datahub.infra.index import Index  # ❌ Violates Clean Architecture
+from hei_datahub.infra.index import Index  # ❌ Violates Clean Architecture
 
 class DatasetMetadata:
     index = Index()  # ❌ Core depends on infrastructure
@@ -547,7 +547,7 @@ class DatasetMetadata:
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mini_datahub.services.sync_manager import SyncManager
+    from hei_datahub.services.sync_manager import SyncManager
 
 class DatasetService:
     def __init__(self, sync_manager: "SyncManager"):
@@ -564,7 +564,7 @@ After `pip install hei-datahub`, the package is installed as:
 
 ```
 site-packages/
-└── mini_datahub/
+└── hei_datahub/
     ├── __init__.py
     ├── cli/
     ├── ui/
@@ -581,14 +581,14 @@ site-packages/
 
 ```toml
 [project.scripts]
-hei-datahub = "mini_datahub.cli.main:main"
-mini-datahub = "mini_datahub.cli.main:main"
+hei-datahub = "hei_datahub.cli.main:main"
+hei-datahub = "hei_datahub.cli.main:main"
 ```
 
 **Creates executable scripts:**
 ```bash
 hei-datahub --help
-# Executes: mini_datahub.cli.main:main()
+# Executes: hei_datahub.cli.main:main()
 ```
 
 ---
@@ -630,4 +630,4 @@ tests/
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
