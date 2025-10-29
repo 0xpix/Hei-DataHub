@@ -530,7 +530,7 @@ class Config:
    - Include relevant context
 
 3. **Easy setup**
-   - One-command install (`uv pip install`)
+   - One-command install (`uv sync`)
    - Setup wizard for config
    - Sample data for testing
 
@@ -566,7 +566,7 @@ raise ValueError(f"Bad date: {value}")  # ❌ No guidance
 | **FTS5 instead of FTS3** | Performance vs. compatibility | FTS5 has better ranking (BM25) |
 | **Last-write-wins sync** | Simplicity vs. conflict detection | Rare conflicts, simple resolution |
 | **Textual TUI** | Limited UI vs. lightweight | Terminal-based fits research workflow |
-| **Python 3.10+** | Modern features vs. legacy support | Type hints, match/case improve DX |
+| **Python 3.11+** | Modern features vs. legacy support | Type hints, match/case improve DX |
 
 ### Rejected Alternatives
 
@@ -622,4 +622,4 @@ When adding a feature, ask:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
