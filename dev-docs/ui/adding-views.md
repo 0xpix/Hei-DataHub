@@ -38,13 +38,13 @@ This guide walks you through creating new views/screens in the Hei-DataHub TUI.
 
 ```bash
 # Create file
-touch src/mini_datahub/ui/views/statistics_view.py
+touch src/hei_datahub/ui/views/statistics_view.py
 ```
 
 **Basic Structure:**
 
 ```python
-# src/mini_datahub/ui/views/statistics_view.py
+# src/hei_datahub/ui/views/statistics_view.py
 
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -99,7 +99,7 @@ class StatisticsView(Screen):
 
     def load_statistics(self) -> None:
         """Load and display statistics"""
-        from mini_datahub.services.catalog import get_catalog_service
+        from hei_datahub.services.catalog import get_catalog_service
 
         catalog = get_catalog_service()
         stats = catalog.get_statistics()
@@ -136,7 +136,7 @@ class StatisticsView(Screen):
 ### Step 3: Create View Stylesheet
 
 ```css
-/* src/mini_datahub/ui/tcss/views/statistics.tcss */
+/* src/hei_datahub/ui/tcss/views/statistics.tcss */
 
 StatisticsView {
     background: $surface;
@@ -191,9 +191,9 @@ StatisticsView Button {
 ### Step 4: Register View in App
 
 ```python
-# src/mini_datahub/ui/app.py
+# src/hei_datahub/ui/app.py
 
-from mini_datahub.ui.views.statistics_view import StatisticsView
+from hei_datahub.ui.views.statistics_view import StatisticsView
 
 class MiniDataHubApp(App):
     # Load stylesheet
@@ -220,7 +220,7 @@ class MiniDataHubApp(App):
 **From HomeView:**
 
 ```python
-# src/mini_datahub/ui/views/home_view.py
+# src/hei_datahub/ui/views/home_view.py
 
 class HomeView(Screen):
     def compose(self) -> ComposeResult:
@@ -231,7 +231,7 @@ class HomeView(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "stats-btn":
-            from mini_datahub.ui.views.statistics_view import StatisticsView
+            from hei_datahub.ui.views.statistics_view import StatisticsView
             self.app.push_screen(StatisticsView())
 ```
 
@@ -293,7 +293,7 @@ class CreateDatasetView(Screen):
             return
 
         # Save dataset
-        from mini_datahub.services.catalog import get_catalog_service
+        from hei_datahub.services.catalog import get_catalog_service
         catalog = get_catalog_service()
 
         dataset = catalog.create_dataset(
@@ -335,7 +335,7 @@ class CloudFilesView(Screen):
 
         try:
             # Async API call
-            from mini_datahub.services.webdav_storage import get_webdav_storage
+            from hei_datahub.services.webdav_storage import get_webdav_storage
             storage = get_webdav_storage()
 
             files = await storage.list_files_async("/")
@@ -415,8 +415,8 @@ def delete_dataset(dataset_id: str) -> None:
 ```python
 # tests/ui/views/test_statistics_view.py
 
-from mini_datahub.ui.app import MiniDataHubApp
-from mini_datahub.ui.views.statistics_view import StatisticsView
+from hei_datahub.ui.app import MiniDataHubApp
+from hei_datahub.ui.views.statistics_view import StatisticsView
 
 async def test_statistics_view_renders():
     """Test view renders correctly"""
@@ -545,8 +545,8 @@ async def load_data(self) -> None:
 
 ## Checklist for New Views
 
-- [ ] View file created in `src/mini_datahub/ui/views/`
-- [ ] Stylesheet created in `src/mini_datahub/ui/tcss/views/`
+- [ ] View file created in `src/hei_datahub/ui/views/`
+- [ ] Stylesheet created in `src/hei_datahub/ui/tcss/views/`
 - [ ] Registered in `MiniDataHubApp`
 - [ ] Keybindings defined
 - [ ] Navigation added from other views
@@ -567,4 +567,4 @@ async def load_data(self) -> None:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
