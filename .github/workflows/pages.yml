@@ -19,28 +19,11 @@ jobs:
     name: Build User, Developer, and Tutorial Documentation
     runs-on: ubuntu-latest
     steps:
-      # Checkout main branch for user docs
-      - name: Checkout main branch
+      # Checkout main branch for all docs (user, developer, tutorial)
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
-          path: main
-
-      # Checkout docs/v0.60-beta-update branch for developer docs
-      - name: Checkout developer docs branch
-        uses: actions/checkout@v4
-        continue-on-error: true
-        with:
-          ref: docs/v0.60-beta-update
-          path: docs-devs
-
-      # Checkout docs/update-tutorial-doc branch for tutorial docs
-      - name: Checkout tutorial docs branch
-        uses: actions/checkout@v4
-        continue-on-error: true
-        with:
-          ref: docs/update-tutorial-doc
-          path: docs-tutorial
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -60,7 +43,6 @@ jobs:
       # Build User Docs (Main Site - /)
       # ========================================
       - name: Install user docs dependencies
-        working-directory: main
         run: |
           if [ -f docs/requirements.txt ]; then
             pip install -r docs/requirements.txt
@@ -69,34 +51,29 @@ jobs:
           fi
 
       - name: Build user documentation site
-        working-directory: main
-        run: mkdocs build --site-dir ../combined-site
+        run: mkdocs build --site-dir combined-site
 
       # ========================================
       # Build Developer Docs (Obfuscated - /x9k2m7n4p8q1)
       # ========================================
       - name: Install developer docs dependencies
-        if: hashFiles('docs-devs/dev-docs/requirements.txt') != ''
-        working-directory: docs-devs
+        if: hashFiles('dev-docs/requirements.txt') != ''
         run: pip install -r dev-docs/requirements.txt
 
       - name: Build developer documentation site
-        if: hashFiles('docs-devs/mkdocs-dev.yml') != ''
-        working-directory: docs-devs
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
+        if: hashFiles('mkdocs-dev.yml') != ''
+        run: mkdocs build --config-file mkdocs-dev.yml --site-dir combined-site/x9k2m7n4p8q1
 
       # ========================================
       # Build Tutorial Docs (/tutorial)
       # ========================================
       - name: Install tutorial docs dependencies
-        if: hashFiles('docs-tutorial/tutorial-docs/requirements.txt') != ''
-        working-directory: docs-tutorial
+        if: hashFiles('tutorial-docs/requirements.txt') != ''
         run: pip install -r tutorial-docs/requirements.txt
 
       - name: Build tutorial documentation site
-        if: hashFiles('docs-tutorial/mkdocs-tutorial.yml') != ''
-        working-directory: docs-tutorial
-        run: mkdocs build --config-file mkdocs-tutorial.yml --site-dir ../combined-site/tutorial
+        if: hashFiles('mkdocs-tutorial.yml') != ''
+        run: mkdocs build --config-file mkdocs-tutorial.yml --site-dir combined-site/tutorial
 
       # ========================================
       # Verify Build Output
