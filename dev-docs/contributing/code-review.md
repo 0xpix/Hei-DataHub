@@ -2,14 +2,19 @@
 
 ## Overview
 
-This guide explains Hei-DataHub's code review process, criteria, and best practices for both reviewers and contributors.
+This guide explains Hei-DataHub's code review process for **all contribution types**: features, bug fixes, documentation, tests, refactoring, performance improvements, and security fixes.
 
 **Goals:**
-- ✅ Maintain code quality
-- ✅ Catch bugs early
-- ✅ Share knowledge
-- ✅ Ensure consistency
-- ✅ Improve architecture
+- ✅ Maintain code quality and consistency
+- ✅ Catch bugs and security issues early
+- ✅ Share knowledge across the team
+- ✅ Ensure architectural coherence
+- ✅ Improve contributor skills
+
+**Who reviews:**
+- Maintainers review all PRs
+- Contributors can review each other's work
+- Anyone can leave feedback (non-binding)
 
 ---
 
@@ -116,6 +121,84 @@ Reviewers evaluate:
 - [ ] **Dev docs updated** - If architecture change
 - [ ] **CHANGELOG entry** - For user-visible changes
 - [ ] **Comments explain why** - Not just what
+
+---
+
+## Review Criteria by Contribution Type
+
+### Bug Fixes 🐛
+
+Focus on:
+- [ ] **Bug is actually fixed** - Can no longer reproduce the issue
+- [ ] **Root cause identified** - Fix addresses cause, not symptoms
+- [ ] **Regression test added** - Prevents bug from returning
+- [ ] **No new bugs introduced** - Fix doesn't break other features
+- [ ] **Error handling improved** - Related error cases considered
+
+### New Features ✨
+
+Focus on:
+- [ ] **Feature complete** - Matches issue requirements
+- [ ] **User experience** - Intuitive to use
+- [ ] **Backwards compatible** - Or migration path provided
+- [ ] **Performance acceptable** - No significant slowdowns
+- [ ] **Documentation complete** - How to use the feature
+- [ ] **Tests comprehensive** - Happy path + edge cases
+
+### Documentation 📚
+
+Focus on:
+- [ ] **Accuracy** - Information is correct
+- [ ] **Completeness** - No missing sections
+- [ ] **Clarity** - Easy to understand for target audience
+- [ ] **Examples** - Code samples where helpful
+- [ ] **Links work** - All references valid
+- [ ] **Consistent style** - Matches existing docs
+
+### Refactoring ♻️
+
+Focus on:
+- [ ] **No behavior change** - Functionality identical
+- [ ] **Improvement clear** - Readability/maintainability/performance
+- [ ] **Tests unchanged** - Or only test structure improved
+- [ ] **No new dependencies** - Uses existing libraries
+- [ ] **Commit history clean** - Easy to review step-by-step
+
+### Tests 🧪
+
+Focus on:
+- [ ] **Tests meaningful** - Not just for coverage percentage
+- [ ] **Edge cases** - Boundary conditions tested
+- [ ] **Test names clear** - Describes what is being tested
+- [ ] **No flaky tests** - Pass consistently
+- [ ] **Fast execution** - Unit tests < 100ms
+
+### Performance ⚡
+
+Focus on:
+- [ ] **Benchmarks provided** - Before/after measurements
+- [ ] **Profiling done** - Actual bottleneck identified
+- [ ] **No regressions** - Other features not slower
+- [ ] **Trade-offs documented** - Memory, complexity, readability
+- [ ] **Tests still pass** - Optimization doesn't break functionality
+
+### Security 🔒
+
+Focus on:
+- [ ] **Vulnerability fixed** - Security issue resolved
+- [ ] **No new vulnerabilities** - Fix doesn't introduce new issues
+- [ ] **Input validation** - User input sanitized
+- [ ] **Credentials safe** - No leaks in logs/errors
+- [ ] **Tests verify security** - Regression test for vulnerability
+
+### UI/UX 🎨
+
+Focus on:
+- [ ] **Keyboard accessible** - All actions have keybindings
+- [ ] **Consistent with existing UI** - Follows established patterns
+- [ ] **Responsive** - Doesn't freeze during operations
+- [ ] **Error messages clear** - Users understand what went wrong
+- [ ] **Help documented** - Keybindings in help screen
 
 ---
 
@@ -240,7 +323,7 @@ logger.info(f"Connecting to {url} with token {token}")
 **✅ Suggestion:**
 
 ```python
-from mini_datahub.auth.credentials import redact
+from hei_datahub.auth.credentials import redact
 
 logger.info(f"Connecting to {url} with token {redact(token)}")
 # Logs: "Connecting to ... with token my***23"
@@ -252,7 +335,7 @@ logger.info(f"Connecting to {url} with token {redact(token)}")
 
 ```python
 # core/models.py
-from mini_datahub.infra.db import get_connection  # ❌ Wrong layer
+from hei_datahub.infra.db import get_connection  # ❌ Wrong layer
 
 class Dataset:
     def save(self):
@@ -268,8 +351,8 @@ class Dataset:
     pass
 
 # services/dataset_service.py
-from mini_datahub.core.models import Dataset
-from mini_datahub.infra import index
+from hei_datahub.core.models import Dataset
+from hei_datahub.infra import index
 
 def save_dataset(dataset: Dataset):
     """Service handles orchestration and I/O"""
@@ -532,4 +615,4 @@ Great work! 🎉
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
