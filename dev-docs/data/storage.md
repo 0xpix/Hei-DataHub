@@ -10,7 +10,7 @@ Hei-DataHub uses a **hybrid local-first storage architecture** combining local S
 
 ### 1. Local Storage (SQLite)
 
-**Location:** `~/.local/share/mini-datahub/datasets.db`
+**Location:** `~/.local/share/hei-datahub/datasets.db`
 
 **Purpose:**
 - Primary operational data store
@@ -84,7 +84,7 @@ CREATE TABLE fast_search_index (
 
 ### 3. Outbox (Failed Uploads)
 
-**Location:** `~/.local/share/mini-datahub/outbox/`
+**Location:** `~/.local/share/hei-datahub/outbox/`
 
 **Purpose:** Queue datasets that failed to upload during sync
 
@@ -241,7 +241,7 @@ def autocomplete_suggestions(prefix: str) -> list[str]:
 ### Authentication
 
 ```python
-from mini_datahub.infra.auth import get_webdav_credentials
+from hei_datahub.infra.auth import get_webdav_credentials
 
 # Get credentials from keyring
 creds = get_webdav_credentials()
@@ -261,7 +261,7 @@ creds = get_webdav_credentials()
 #### Upload File
 
 ```python
-from mini_datahub.services.webdav_storage import write_file
+from hei_datahub.services.webdav_storage import write_file
 
 def upload_dataset(dataset_id: str, metadata: dict) -> None:
     """Upload metadata to WebDAV"""
@@ -289,7 +289,7 @@ dataset_name: Climate Model Data
 #### Download File
 
 ```python
-from mini_datahub.services.webdav_storage import read_file
+from hei_datahub.services.webdav_storage import read_file
 
 def download_dataset(dataset_id: str) -> dict:
     """Download metadata from WebDAV"""
@@ -311,7 +311,7 @@ Authorization: Basic <base64-credentials>
 #### List Files
 
 ```python
-from mini_datahub.services.webdav_storage import list_remote_files
+from hei_datahub.services.webdav_storage import list_remote_files
 
 def list_datasets() -> list[dict]:
     """List all datasets on cloud"""
@@ -344,7 +344,7 @@ Content-Type: application/xml
 #### Delete File
 
 ```python
-from mini_datahub.services.webdav_storage import delete_file
+from hei_datahub.services.webdav_storage import delete_file
 
 def delete_cloud_dataset(dataset_id: str) -> None:
     """Delete dataset from cloud"""
@@ -667,4 +667,4 @@ password = keyring.get_password("hei-datahub", "webdav_password")
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
