@@ -10,7 +10,7 @@ This guide explains how to add new configuration options to Hei-DataHub. Follow 
 
 ### 1. Define Configuration Schema
 
-**Location:** `src/mini_datahub/core/config.py`
+**Location:** `src/hei_datahub/core/config.py`
 
 Add the new field to the appropriate configuration dataclass:
 
@@ -39,7 +39,7 @@ class SearchConfig:
 
 ### 2. Update Default Configuration
 
-**Location:** `src/mini_datahub/core/config.py`
+**Location:** `src/hei_datahub/core/config.py`
 
 Add the default value to `get_default_config()`:
 
@@ -66,7 +66,7 @@ def get_default_config() -> dict:
 **Location:** Create/update default config template
 
 ```toml
-# ~/.config/mini-datahub/config.toml
+# ~/.config/hei-datahub/config.toml
 
 [search]
 max_results = 50
@@ -81,7 +81,7 @@ enable_stemming = true  # NEW FIELD - Enable Porter stemming
 
 ### 4. Add Validation (Optional)
 
-**Location:** `src/mini_datahub/core/config.py`
+**Location:** `src/hei_datahub/core/config.py`
 
 Add validation in `validate_config()`:
 
@@ -119,9 +119,9 @@ Add the environment variable to documentation:
 **Example:** Using the new config in a service
 
 ```python
-# src/mini_datahub/services/fast_search.py
+# src/hei_datahub/services/fast_search.py
 
-from mini_datahub.core.config import load_config
+from hei_datahub.core.config import load_config
 
 class FastSearchService:
     def __init__(self):
@@ -142,7 +142,7 @@ class FastSearchService:
 
 ### 7. Add CLI Argument (Optional)
 
-**Location:** `src/mini_datahub/cli/commands.py`
+**Location:** `src/hei_datahub/cli/commands.py`
 
 Add command-line argument override:
 
@@ -175,7 +175,7 @@ Add tests for the new configuration option:
 
 ```python
 import pytest
-from mini_datahub.core.config import load_config, Config
+from hei_datahub.core.config import load_config, Config
 
 def test_enable_stemming_default():
     """Test default value for enable_stemming"""
@@ -252,7 +252,7 @@ Let's walk through adding a complete cache configuration section:
 #### 1. Define Schema
 
 ```python
-# src/mini_datahub/core/config.py
+# src/hei_datahub/core/config.py
 
 @dataclass
 class CacheConfig:
@@ -295,7 +295,7 @@ def get_default_config() -> dict:
 #### 3. Add to Config Template
 
 ```toml
-# ~/.config/mini-datahub/config.toml
+# ~/.config/hei-datahub/config.toml
 
 [cache]
 enabled = true
@@ -346,9 +346,9 @@ def load_config() -> Config:
 #### 6. Use in Code
 
 ```python
-# src/mini_datahub/infra/cache.py
+# src/hei_datahub/infra/cache.py
 
-from mini_datahub.core.config import load_config
+from hei_datahub.core.config import load_config
 from functools import lru_cache
 
 class CacheManager:
@@ -597,4 +597,4 @@ validate_config(config_dict)  # See exact error
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
