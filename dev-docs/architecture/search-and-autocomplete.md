@@ -1,5 +1,11 @@
 # Search & Autocomplete
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the enhanced search filters and performance optimizations in v0.60.
+
+!!! info "What this section covers"
+    This page explains Hei-DataHub's lightning-fast search engine built on SQLite FTS5, including autocomplete, filter badges, and performance tuning. Essential for understanding how sub-100ms search is achieved.
+
 ## Overview
 
 Hei-DataHub provides **lightning-fast search** with sub-100ms response times for thousands of datasets using **SQLite FTS5** (Full-Text Search). The search system includes smart autocomplete, filter badges, and context-aware suggestions to help users find datasets quickly.
@@ -8,11 +14,12 @@ Hei-DataHub provides **lightning-fast search** with sub-100ms response times for
 
 - ⚡ **<80ms search latency** for typical queries
 - 🔍 **Full-text search** across all metadata fields
-- 🏷️ **Filter badges** for projects, formats, and tags
+- 🏷️ **Enhanced filter badges** - new in v0.60: `source:`, `format:`, `tags:`
 - 💡 **Smart autocomplete** with ranking and fuzzy matching
 - 🎯 **Context-aware suggestions** based on query history
 - 📊 **Relevance scoring** with BM25 algorithm
 - 🔄 **Incremental indexing** for instant updates
+- 🎨 **Hash-based badge coloring** - consistent visual identity for filters (v0.60)
 
 ---
 
@@ -227,7 +234,7 @@ LIMIT 50;
 
 ### Query Parser
 
-**Implementation:** `src/mini_datahub/core/queries.py`
+**Implementation:** `src/hei_datahub/core/queries.py`
 
 ```python
 class QueryParser:
@@ -273,7 +280,7 @@ The autocomplete system provides real-time suggestions as users type, with ranki
 
 ### Autocomplete Manager
 
-**Implementation:** `src/mini_datahub/services/autocomplete.py`
+**Implementation:** `src/hei_datahub/services/autocomplete.py`
 
 ```python
 class AutocompleteManager:
@@ -595,7 +602,7 @@ class DebouncedSearch:
 
 ### Suggestion Service
 
-**Implementation:** `src/mini_datahub/services/suggestion_service.py`
+**Implementation:** `src/hei_datahub/services/suggestion_service.py`
 
 The suggestion service provides context-aware autocomplete based on:
 
@@ -735,8 +742,8 @@ def reindex_all() -> Tuple[int, List[str]]:
     Returns:
         (count, errors) - Number of indexed datasets and list of errors
     """
-    from mini_datahub.infra.store import list_datasets, read_dataset
-    from mini_datahub.infra.index import upsert_dataset, optimize_index
+    from hei_datahub.infra.store import list_datasets, read_dataset
+    from hei_datahub.infra.index import upsert_dataset, optimize_index
 
     dataset_ids = list_datasets()
     count = 0
@@ -860,7 +867,7 @@ sqlite3 ~/.local/share/Hei-DataHub/db.sqlite "VACUUM;"
 
 ```python
 # Force reload autocomplete data
-from mini_datahub.services.autocomplete import AutocompleteManager
+from hei_datahub.services.autocomplete import AutocompleteManager
 
 manager = AutocompleteManager()
 count = manager.load_from_catalog()
@@ -897,14 +904,14 @@ climate project:weather format:csv type:time-series
 
 | File | Purpose |
 |------|---------|
-| `src/mini_datahub/services/fast_search.py` | Main search interface |
-| `src/mini_datahub/services/index_service.py` | Index management service |
-| `src/mini_datahub/services/autocomplete.py` | Autocomplete manager |
-| `src/mini_datahub/services/suggestion_service.py` | Context-aware suggestions |
-| `src/mini_datahub/infra/index.py` | FTS5 operations |
-| `src/mini_datahub/infra/db.py` | Database connection |
-| `src/mini_datahub/core/queries.py` | Query parser |
-| `src/mini_datahub/ui/widgets/autocomplete.py` | Autocomplete UI widget |
+| `src/hei_datahub/services/fast_search.py` | Main search interface |
+| `src/hei_datahub/services/index_service.py` | Index management service |
+| `src/hei_datahub/services/autocomplete.py` | Autocomplete manager |
+| `src/hei_datahub/services/suggestion_service.py` | Context-aware suggestions |
+| `src/hei_datahub/infra/index.py` | FTS5 operations |
+| `src/hei_datahub/infra/db.py` | Database connection |
+| `src/hei_datahub/core/queries.py` | Query parser |
+| `src/hei_datahub/ui/widgets/autocomplete.py` | Autocomplete UI widget |
 
 ### Testing Search
 
@@ -924,4 +931,4 @@ pytest bench/search_performance_bench.py -v
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
