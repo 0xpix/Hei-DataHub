@@ -57,23 +57,43 @@ jobs:
       # Build Developer Docs (Obfuscated - /x9k2m7n4p8q1)
       # ========================================
       - name: Install developer docs dependencies
-        if: hashFiles('dev-docs/requirements.txt') != ''
-        run: pip install -r dev-docs/requirements.txt
+        run: |
+          if [ -f dev-docs/requirements.txt ]; then
+            echo "📦 Installing developer docs dependencies..."
+            pip install -r dev-docs/requirements.txt
+          else
+            echo "⚠️  No dev-docs/requirements.txt found, skipping..."
+          fi
 
       - name: Build developer documentation site
-        if: hashFiles('mkdocs-dev.yml') != ''
-        run: mkdocs build --config-file mkdocs-dev.yml --site-dir combined-site/x9k2m7n4p8q1
+        run: |
+          if [ -f mkdocs-dev.yml ]; then
+            echo "🔧 Building developer documentation..."
+            mkdocs build --config-file mkdocs-dev.yml --site-dir combined-site/x9k2m7n4p8q1
+          else
+            echo "⚠️  No mkdocs-dev.yml found, skipping developer docs..."
+          fi
 
       # ========================================
       # Build Tutorial Docs (/tutorial)
       # ========================================
       - name: Install tutorial docs dependencies
-        if: hashFiles('tutorial-docs/requirements.txt') != ''
-        run: pip install -r tutorial-docs/requirements.txt
+        run: |
+          if [ -f tutorial-docs/requirements.txt ]; then
+            echo "📦 Installing tutorial docs dependencies..."
+            pip install -r tutorial-docs/requirements.txt
+          else
+            echo "⚠️  No tutorial-docs/requirements.txt found, skipping..."
+          fi
 
       - name: Build tutorial documentation site
-        if: hashFiles('mkdocs-tutorial.yml') != ''
-        run: mkdocs build --config-file mkdocs-tutorial.yml --site-dir combined-site/tutorial
+        run: |
+          if [ -f mkdocs-tutorial.yml ]; then
+            echo "🎓 Building tutorial documentation..."
+            mkdocs build --config-file mkdocs-tutorial.yml --site-dir combined-site/tutorial
+          else
+            echo "⚠️  No mkdocs-tutorial.yml found, skipping tutorial docs..."
+          fi
 
       # ========================================
       # Verify Build Output
