@@ -13,7 +13,7 @@ This guide explains how to add new datasets to Hei-DataHub's catalog system. It 
 #### 1. Launch Application
 
 ```bash
-mini-datahub
+hei-datahub
 ```
 
 #### 2. Create New Dataset
@@ -49,7 +49,7 @@ mini-datahub
 
 ```bash
 # Interactive mode
-mini-datahub create-dataset
+hei-datahub create-dataset
 
 # Follow prompts:
 # Dataset Name: Climate Model Data
@@ -65,7 +65,7 @@ mini-datahub create-dataset
 ### Python API
 
 ```python
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 
 # Define metadata
 metadata = {
@@ -94,7 +94,7 @@ save_dataset(metadata)
 ### Batch Import
 
 ```python
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 import json
 
 # Load from JSON file
@@ -141,7 +141,7 @@ for dataset in datasets:
 
 ```python
 import csv
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 
 # Read from CSV
 with open("datasets.csv") as f:
@@ -249,10 +249,10 @@ save_dataset(metadata)
 
 ```bash
 # Sync all datasets
-mini-datahub sync now
+hei-datahub sync now
 
 # Sync specific dataset
-mini-datahub sync --dataset climate-data
+hei-datahub sync --dataset climate-data
 ```
 
 ---
@@ -261,17 +261,17 @@ mini-datahub sync --dataset climate-data
 
 Failed uploads are queued in outbox:
 
-**Location:** `~/.local/share/mini-datahub/outbox/`
+**Location:** `~/.local/share/hei-datahub/outbox/`
 
 ```bash
 # List outbox contents
-mini-datahub outbox list
+hei-datahub outbox list
 
 # Retry failed uploads
-mini-datahub outbox retry
+hei-datahub outbox retry
 
 # Clear outbox (after manual sync)
-mini-datahub outbox clear
+hei-datahub outbox clear
 ```
 
 ---
@@ -282,7 +282,7 @@ mini-datahub outbox clear
 
 ```python
 import requests
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 
 # Fetch from DSpace REST API
 response = requests.get("https://dspace.example.org/rest/items")
@@ -307,7 +307,7 @@ for item in items:
 
 ```python
 import requests
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 
 # Fetch from CKAN API
 response = requests.get("https://data.gov.uk/api/3/action/package_list")
@@ -337,7 +337,7 @@ for package_id in package_ids[:10]:  # First 10
 
 ```python
 from pathlib import Path
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 
 # Scan directory for NetCDF files
 data_dir = Path("/data/climate")
@@ -366,7 +366,7 @@ for nc_file in data_dir.rglob("*.nc"):
 ### Update Existing Dataset
 
 ```python
-from mini_datahub.services.dataset_service import get_dataset, save_dataset
+from hei_datahub.services.dataset_service import get_dataset, save_dataset
 
 # Fetch existing dataset
 dataset = get_dataset("climate-data")
@@ -385,7 +385,7 @@ save_dataset(dataset)
 ### Partial Update
 
 ```python
-from mini_datahub.services.dataset_service import update_dataset_fields
+from hei_datahub.services.dataset_service import update_dataset_fields
 
 # Update specific fields only
 update_dataset_fields(
@@ -410,13 +410,13 @@ update_dataset_fields(
 ### Delete via CLI
 
 ```bash
-mini-datahub delete-dataset climate-data
+hei-datahub delete-dataset climate-data
 ```
 
 ### Delete via API
 
 ```python
-from mini_datahub.services.dataset_service import delete_dataset
+from hei_datahub.services.dataset_service import delete_dataset
 
 delete_dataset("climate-data")
 # Deletes from local index AND cloud storage
@@ -429,7 +429,7 @@ delete_dataset("climate-data")
 ### Schema Validation
 
 ```python
-from mini_datahub.core.models import DatasetMetadata
+from hei_datahub.core.models import DatasetMetadata
 from pydantic import ValidationError
 
 try:
@@ -557,13 +557,13 @@ contact_person = "admin@example.com"
 
 ```bash
 # Rebuild search index
-mini-datahub rebuild-index
+hei-datahub rebuild-index
 
 # Force sync
-mini-datahub sync now --force
+hei-datahub sync now --force
 
 # Check dataset exists
-mini-datahub get-dataset climate-data
+hei-datahub get-dataset climate-data
 ```
 
 ---
@@ -573,19 +573,19 @@ mini-datahub get-dataset climate-data
 **Check outbox:**
 
 ```bash
-mini-datahub outbox list
+hei-datahub outbox list
 ```
 
 **Retry upload:**
 
 ```bash
-mini-datahub outbox retry
+hei-datahub outbox retry
 ```
 
 **Check network connection:**
 
 ```bash
-mini-datahub auth doctor
+hei-datahub auth doctor
 ```
 
 ---
@@ -599,4 +599,4 @@ mini-datahub auth doctor
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
