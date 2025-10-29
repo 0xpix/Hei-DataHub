@@ -21,16 +21,30 @@ site_dir: dev-site
 
 # Configuration
 theme:
-  name: dracula
-  components:
-    title: false
-    preview: true
-    site_name: false
-  highlightjs: true
-    - bash
-  sidebar: true
-  navigation_depth: 2
-  custom_dir: dev-docs/
+  name: material
+  palette:
+    # Dracula color scheme
+    scheme: slate
+    primary: deep purple
+    accent: pink
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
   logo: assets/dark_logo_H_large.svg
   favicon: assets/dark_logo_H_large.svg
 
