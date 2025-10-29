@@ -610,7 +610,7 @@ def create_temp_config(tmp_path: Path) -> Path:
 ### Format Search Results
 
 ```python
-from mini_datahub.utils.formatting import format_table
+from hei_datahub.utils.formatting import format_table
 
 results = search_indexed("climate")
 
@@ -627,7 +627,7 @@ print(table)
 ### Measure Performance
 
 ```python
-from mini_datahub.utils.timing import timing, measure_time
+from hei_datahub.utils.timing import timing, measure_time
 
 @timing
 def expensive_operation():
@@ -642,8 +642,8 @@ with measure_time("Database query"):
 ### Validate Input
 
 ```python
-from mini_datahub.utils.network import is_url_reachable
-from mini_datahub.utils.formatting import is_valid_email
+from hei_datahub.utils.network import is_url_reachable
+from hei_datahub.utils.formatting import is_valid_email
 
 # Validate WebDAV URL
 if not is_valid_url(url, require_https=True):
@@ -664,4 +664,4 @@ if not is_url_reachable(url):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
