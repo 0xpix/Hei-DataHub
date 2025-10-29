@@ -107,7 +107,7 @@ Use this template:
 ```markdown
 # module.function_name
 
-**Module:** `mini_datahub.services.search`
+**Module:** `hei_datahub.services.search`
 **Added in:** v0.56.0
 **Status:** ✅ Stable
 
@@ -229,7 +229,7 @@ except SearchError as e:
 ### Basic Search
 
 \`\`\`python
-from mini_datahub.services import search
+from hei_datahub.services import search
 
 results = search.search_datasets("climate data")
 for dataset in results:
@@ -484,7 +484,7 @@ git push origin docs/add-search-api-reference
 ### Code Examples
 
 - Always use syntax highlighting: ```python
-- Show imports: `from mini_datahub.services import search`
+- Show imports: `from hei_datahub.services import search`
 - Use real, working code (not pseudocode)
 - Add comments to explain non-obvious parts
 
