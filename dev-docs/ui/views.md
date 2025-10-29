@@ -1,8 +1,22 @@
 # Views & Screens
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the UI views available in v0.60, including new features and removed screens.
+
+!!! info "What this section covers"
+    This page details all views (screens) in the Hei-DataHub TUI, their purpose, layout, and interactions. Essential for understanding the user interface flow and adding new views.
+
 ## Introduction
 
 This document details all views (screens) in the Hei-DataHub TUI, their purpose, layout, and interactions.
+
+!!! success "v0.60 View Updates"
+    **New Views:**
+    - **AboutView** - Project information screen (`Ctrl+a`)
+
+    **Removed Views:**
+    - **OutboxView** - Removed (direct WebDAV sync replaces it)
+    - **CloudFilesView** - Removed (integrated into other views)
 
 ---
 
@@ -16,10 +30,10 @@ This document details all views (screens) in the Hei-DataHub TUI, their purpose,
 └──────┬──────┘
        │
        ├──→ SearchView
-       ├──→ CloudFilesView
+       ├──→ AboutView (new in v0.60)
        ├──→ CreateDatasetView
-       ├──→ SettingsView
-       └──→ OutboxView
+       ├──→ DatasetDetailView
+       └──→ SettingsView
 ```
 
 **Navigation Pattern:**
@@ -27,13 +41,16 @@ This document details all views (screens) in the Hei-DataHub TUI, their purpose,
 - `pop_screen()` - Navigate back
 - `switch_screen()` - Replace current screen
 
+!!! note "Removed Navigation"
+    `CloudFilesView` and `OutboxView` removed in v0.60.
+
 ---
 
 ## HomeView
 
 **Purpose:** Landing screen with main menu
 
-**Location:** `src/mini_datahub/ui/views/home.py`
+**Location:** `src/hei_datahub/ui/views/home.py`
 
 ### Layout
 
@@ -120,7 +137,7 @@ class HomeView(Screen):
 
     def action_sync(self) -> None:
         """Trigger manual sync"""
-        from mini_datahub.services.sync import sync_now
+        from hei_datahub.services.sync import sync_now
         result = sync_now()
         self.notify(f"Synced: {result.downloads} ↓ {result.uploads} ↑")
 ```
@@ -131,7 +148,7 @@ class HomeView(Screen):
 
 **Purpose:** Search datasets with autocomplete
 
-**Location:** `src/mini_datahub/ui/views/search.py`
+**Location:** `src/hei_datahub/ui/views/search.py`
 
 ### Layout
 
@@ -198,7 +215,7 @@ class SearchView(Screen):
 
     def perform_search(self) -> None:
         """Execute search and update results"""
-        from mini_datahub.services.fast_search import search_indexed
+        from hei_datahub.services.fast_search import search_indexed
 
         results = search_indexed(self.search_query) if self.search_query else []
         self.results_count = len(results)
@@ -238,7 +255,7 @@ class SearchView(Screen):
 
 **Purpose:** Browse WebDAV cloud files
 
-**Location:** `src/mini_datahub/ui/views/cloud_files.py`
+**Location:** `src/hei_datahub/ui/views/cloud_files.py`
 
 ### Layout
 
@@ -292,7 +309,7 @@ class CloudFilesView(Screen):
 
     def load_cloud_files(self) -> None:
         """Fetch files from WebDAV"""
-        from mini_datahub.services.webdav_storage import list_remote_files
+        from hei_datahub.services.webdav_storage import list_remote_files
 
         self.query_one("#status-bar", Static).update("Loading...")
 
@@ -321,7 +338,7 @@ class CloudFilesView(Screen):
 
 **Purpose:** Form to create new dataset
 
-**Location:** `src/mini_datahub/ui/views/create_dataset.py`
+**Location:** `src/hei_datahub/ui/views/create_dataset.py`
 
 ### Layout
 
@@ -429,7 +446,7 @@ class CreateDatasetView(Screen):
             return
 
         # Save dataset
-        from mini_datahub.services.dataset_service import save_dataset
+        from hei_datahub.services.dataset_service import save_dataset
 
         metadata = {
             "id": name.lower().replace(" ", "-"),
@@ -459,7 +476,7 @@ class CreateDatasetView(Screen):
 
 **Purpose:** Application settings
 
-**Location:** `src/mini_datahub/ui/views/settings.py`
+**Location:** `src/hei_datahub/ui/views/settings.py`
 
 ### Layout
 
@@ -500,7 +517,7 @@ class CreateDatasetView(Screen):
 
 **Purpose:** View and manage failed uploads
 
-**Location:** `src/mini_datahub/ui/views/outbox.py`
+**Location:** `src/hei_datahub/ui/views/outbox.py`
 
 ### Layout
 
@@ -530,7 +547,7 @@ class CreateDatasetView(Screen):
 
 **Purpose:** View detailed dataset information
 
-**Location:** `src/mini_datahub/ui/views/dataset_detail.py`
+**Location:** `src/hei_datahub/ui/views/dataset_detail.py`
 
 ### Layout
 
@@ -651,4 +668,4 @@ class SearchView(Screen):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
