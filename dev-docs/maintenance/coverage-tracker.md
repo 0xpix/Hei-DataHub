@@ -66,7 +66,7 @@ This page tracks documentation completeness for the developer documentation site
 |------|--------|------------|-------|--------------|
 | Navigation Guide | 📝 Stub | 10% | Unassigned | - |
 | [Root Files](../codebase/root-files.md) | 📝 Stub | 10% | Unassigned | - |
-| src/mini_datahub pages | ❌ Missing | 0% | Unassigned | - |
+| src/hei_datahub pages | ❌ Missing | 0% | Unassigned | - |
 | [tests/](../codebase/tests.md) | ❌ Missing | 0% | Unassigned | - |
 | scripts/ | ❌ Missing | 0% | Unassigned | - |
 | data/ | ❌ Missing | 0% | Unassigned | - |
