@@ -468,7 +468,7 @@ Services Layer (orchestration)
 **Directory structure with responsibilities:**
 
 ```
-src/mini_datahub/
+src/hei_datahub/
 │
 ├── cli/                    # CLI Layer
 │   ├── commands/
@@ -672,4 +672,4 @@ Communication:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
