@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'version.yaml'
-      - 'src/mini_datahub/version.py'
+      - 'src/hei_datahub/version.py'
       - 'pyproject.toml'
       - 'README.md'
       - 'docs/_includes/version.md'
@@ -13,7 +13,7 @@ on:
       - main
     paths:
       - 'version.yaml'
-      - 'src/mini_datahub/version.py'
+      - 'src/hei_datahub/version.py'
 
 jobs:
   check-version-consistency:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -38,4 +38,4 @@ jobs:
       - name: Display current version
         if: success()
         run: |
-          python -c "import sys; sys.path.insert(0, 'src'); from mini_datahub.version import __version__, CODENAME, RELEASE_DATE; print(f'✅ Version: {__version__}'); print(f'✅ Codename: {CODENAME}'); print(f'✅ Release Date: {RELEASE_DATE}')"
+          python scripts/test_version.py
