@@ -88,7 +88,7 @@ tests/
 import pytest
 from pydantic import ValidationError
 
-from mini_datahub.core.models import DatasetMetadata
+from hei_datahub.core.models import DatasetMetadata
 
 
 def test_dataset_metadata_valid():
@@ -184,13 +184,13 @@ def test_dataset_to_dict():
 from unittest.mock import Mock, patch
 import pytest
 
-from mini_datahub.services.fast_search import search_indexed
+from hei_datahub.services.fast_search import search_indexed
 
 
 def test_search_indexed_simple_query():
     """Test simple search query"""
     # Mock the index service
-    with patch("mini_datahub.services.fast_search.get_index_service") as mock_get_index:
+    with patch("hei_datahub.services.fast_search.get_index_service") as mock_get_index:
         mock_index = Mock()
         mock_index.search.return_value = [
             {"path": "test-dataset", "name": "Test Dataset", "description": "Test"}
@@ -208,7 +208,7 @@ def test_search_indexed_simple_query():
 
 def test_search_indexed_with_project_filter():
     """Test search with project filter"""
-    with patch("mini_datahub.services.fast_search.get_index_service") as mock_get_index:
+    with patch("hei_datahub.services.fast_search.get_index_service") as mock_get_index:
         mock_index = Mock()
         mock_index.search.return_value = []
         mock_get_index.return_value = mock_index
@@ -232,7 +232,7 @@ def test_search_indexed_empty_query():
 
 def test_search_indexed_limit():
     """Test result limiting"""
-    with patch("mini_datahub.services.fast_search.get_index_service") as mock_get_index:
+    with patch("hei_datahub.services.fast_search.get_index_service") as mock_get_index:
         mock_index = Mock()
         mock_index.search.return_value = []
         mock_get_index.return_value = mock_index
@@ -260,8 +260,8 @@ import tempfile
 from pathlib import Path
 import pytest
 
-from mini_datahub.infra.index import upsert_dataset, search_datasets, delete_dataset
-from mini_datahub.infra.db import get_connection
+from hei_datahub.infra.index import upsert_dataset, search_datasets, delete_dataset
+from hei_datahub.infra.db import get_connection
 
 
 @pytest.fixture
@@ -271,7 +271,7 @@ def test_db():
         db_path = Path(tmpdir) / "test.db"
 
         # Override DB_PATH for tests
-        import mini_datahub.infra.db as db_module
+        import hei_datahub.infra.db as db_module
         original_path = db_module.DB_PATH
         db_module.DB_PATH = db_path
 
@@ -399,7 +399,7 @@ def test_dataset_lifecycle(test_db):
     upsert_dataset("test", metadata)
 
     # READ
-    from mini_datahub.infra.store import get_dataset
+    from hei_datahub.infra.store import get_dataset
     stored = get_dataset("test")
     assert stored is not None
     assert stored["dataset_name"] == "Test"
@@ -437,9 +437,9 @@ python tests/manual/test_webdav.py
 Manual WebDAV connection test.
 Requires credentials to be configured.
 """
-from mini_datahub.services.config import load_config
-from mini_datahub.auth.credentials import get_secret
-from mini_datahub.services.webdav_storage import WebDAVStorage
+from hei_datahub.services.config import load_config
+from hei_datahub.auth.credentials import get_secret
+from hei_datahub.services.webdav_storage import WebDAVStorage
 
 
 def main():
@@ -522,7 +522,7 @@ def test_dataset():
 @pytest.fixture
 def mock_index_service(mocker):
     """Mock IndexService"""
-    return mocker.patch("mini_datahub.services.index_service.IndexService")
+    return mocker.patch("hei_datahub.services.index_service.IndexService")
 ```
 
 ---
@@ -533,7 +533,7 @@ def mock_index_service(mocker):
 
 ```bash
 # Run all tests with coverage
-pytest --cov=mini_datahub --cov-report=html --cov-report=term
+pytest --cov=hei_datahub --cov-report=html --cov-report=term
 
 # Run specific test file
 pytest tests/unit/core/test_models.py -v
@@ -624,4 +624,4 @@ def test_with_fixture(sample_dataset):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
