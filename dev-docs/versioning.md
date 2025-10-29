@@ -157,12 +157,13 @@ MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
 - Search engine optimized
 - GitHub integration added
 
-### **0.55.0-beta (Current)**
+### **0.60.0-beta (Current)**
 
-- **"Clean Architecture" release**
-- Auto-stash for PR workflow
-- Improved gitignore handling
-- Dual command support (`hei-datahub` and `mini-datahub`)
+- **"Clean-up" release**
+- UI polish and improved navigation
+- Code cleanup and refactoring
+- Enhanced performance optimizations
+- Removed legacy GitHub/outbox features
 
 ---
 
@@ -421,16 +422,16 @@ If you need to pin a specific version:
 
 ```bash
 # In requirements.txt
-mini-datahub==0.55.0-beta
+hei-datahub==0.60.0-beta
 
 # Or in pyproject.toml
-dependencies = ["mini-datahub==0.55.0"]
+dependencies = ["hei-datahub==0.60.0"]
 ```
 
 **Tip:** Pin MINOR version for stability:
 
 ```bash
-mini-datahub>=0.55.0,<0.56.0
+hei-datahub>=0.60.0,<0.61.0
 ```
 
 ---
