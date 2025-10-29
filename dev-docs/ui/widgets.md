@@ -8,7 +8,7 @@ This document catalogs all custom widgets and reusable components in the Hei-Dat
 
 ## Widget Overview
 
-**Location:** `src/mini_datahub/ui/widgets/`
+**Location:** `src/hei_datahub/ui/widgets/`
 
 ### Custom Widgets
 
@@ -27,12 +27,12 @@ This document catalogs all custom widgets and reusable components in the Hei-Dat
 
 **Purpose:** Input field with autocomplete dropdown
 
-**Location:** `src/mini_datahub/ui/widgets/autocomplete_input.py`
+**Location:** `src/hei_datahub/ui/widgets/autocomplete_input.py`
 
 ### Usage
 
 ```python
-from mini_datahub.ui.widgets import AutocompleteInput
+from hei_datahub.ui.widgets import AutocompleteInput
 
 class SearchView(Screen):
     def compose(self):
@@ -81,7 +81,7 @@ class AutocompleteInput(Container):
             return
 
         # Fetch suggestions
-        from mini_datahub.services.autocomplete import get_suggestions
+        from hei_datahub.services.autocomplete import get_suggestions
         self.suggestions = get_suggestions(event.value)
 
         if self.suggestions:
@@ -148,12 +148,12 @@ AutocompleteInput #suggestions ListItem:hover {
 
 **Purpose:** Specialized table for displaying datasets
 
-**Location:** `src/mini_datahub/ui/widgets/dataset_table.py`
+**Location:** `src/hei_datahub/ui/widgets/dataset_table.py`
 
 ### Usage
 
 ```python
-from mini_datahub.ui.widgets import DatasetTable
+from hei_datahub.ui.widgets import DatasetTable
 
 class SearchView(Screen):
     def compose(self):
@@ -248,7 +248,7 @@ class DatasetTable(DataTable):
 
 **Purpose:** Quick action launcher (Ctrl+K style)
 
-**Location:** `src/mini_datahub/ui/widgets/command_palette.py`
+**Location:** `src/hei_datahub/ui/widgets/command_palette.py`
 
 ### Usage
 
@@ -324,7 +324,7 @@ class CommandPaletteScreen(ModalScreen):
         elif action == "new_dataset":
             self.app.push_screen("create_dataset")
         elif action == "sync":
-            from mini_datahub.services.sync import sync_now
+            from hei_datahub.services.sync import sync_now
             result = sync_now()
             self.app.notify(f"Synced: {result.downloads} ↓ {result.uploads} ↑")
         # ... other actions
@@ -370,7 +370,7 @@ CommandPaletteScreen {
 
 **Purpose:** Show sync status in header
 
-**Location:** `src/mini_datahub/ui/widgets/sync_status.py`
+**Location:** `src/hei_datahub/ui/widgets/sync_status.py`
 
 ### Implementation
 
@@ -416,7 +416,7 @@ class SyncStatusIndicator(Static):
 
 **Purpose:** Animated loading indicator
 
-**Location:** `src/mini_datahub/ui/widgets/loading_spinner.py`
+**Location:** `src/hei_datahub/ui/widgets/loading_spinner.py`
 
 ### Usage
 
@@ -462,7 +462,7 @@ class LoadingSpinner(Static):
 
 **Purpose:** Confirmation modal dialog
 
-**Location:** `src/mini_datahub/ui/widgets/confirm_dialog.py`
+**Location:** `src/hei_datahub/ui/widgets/confirm_dialog.py`
 
 ### Usage
 
@@ -555,7 +555,7 @@ ConfirmDialog {
 # tests/ui/test_widgets.py
 
 from textual.app import App
-from mini_datahub.ui.widgets import AutocompleteInput
+from hei_datahub.ui.widgets import AutocompleteInput
 
 async def test_autocomplete_input_suggestions():
     """Test autocomplete shows suggestions"""
@@ -643,4 +643,4 @@ class MyWidget(Widget):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
