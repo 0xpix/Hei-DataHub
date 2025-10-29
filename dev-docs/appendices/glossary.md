@@ -22,7 +22,7 @@ An architectural pattern that separates business logic (Core) from I/O concerns 
 The terminal-based interface for running Hei-DataHub commands like `hei-datahub reindex`.
 
 ### Core
-The domain layer of Hei-DataHub containing pure business logic with no I/O dependencies. Located in `src/mini_datahub/core/`.
+The domain layer of Hei-DataHub containing pure business logic with no I/O dependencies. Located in `src/hei_datahub/core/`.
 
 ---
 
@@ -63,7 +63,7 @@ See **Ports and Adapters**. Another name for the architectural pattern we use.
 ## I
 
 ### Infrastructure Layer
-The layer responsible for I/O operations (database, filesystem, network). Located in `src/mini_datahub/infra/`.
+The layer responsible for I/O operations (database, filesystem, network). Located in `src/hei_datahub/infra/`.
 
 ### Integrator
 A user who extends Hei-DataHub by writing plugins, adapters, or integrations.
@@ -109,7 +109,7 @@ The process of rebuilding the FTS5 search index from YAML files. Command: `hei-d
 A versioning scheme using `MAJOR.MINOR.PATCH` format. See [Versioning Policy](../versioning.md).
 
 ### Service Layer
-The layer that orchestrates business logic by coordinating Core and Infrastructure. Located in `src/mini_datahub/services/`.
+The layer that orchestrates business logic by coordinating Core and Infrastructure. Located in `src/hei_datahub/services/`.
 
 ### Singleton Pattern
 A design pattern ensuring only one instance of a class exists. Used for database connections in `infra/db.py`.
