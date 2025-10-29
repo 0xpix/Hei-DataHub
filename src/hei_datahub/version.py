@@ -16,12 +16,13 @@ def _load_version_data() -> dict:
     Returns:
         Dictionary with version metadata
     """
-    # Try package directory first (works in both dev and installed)
-    version_file = Path(__file__).parent / "version.yaml"
+    # PRIORITY 1: Try project root first (for development)
+    # This ensures we always use the most up-to-date version.yaml
+    version_file = Path(__file__).parent.parent.parent / "version.yaml"
 
-    # Fallback: try project root (for dev mode)
+    # PRIORITY 2: Try package directory (for installed/packaged version)
     if not version_file.exists():
-        version_file = Path(__file__).parent.parent.parent / "version.yaml"
+        version_file = Path(__file__).parent / "version.yaml"
 
     # Last resort: use defaults if file not found
     if not version_file.exists():
