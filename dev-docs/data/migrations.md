@@ -65,7 +65,7 @@ SELECT * FROM schema_version ORDER BY version;
 
 ### File Structure
 
-**Location:** `src/mini_datahub/infra/migrations/`
+**Location:** `src/hei_datahub/infra/migrations/`
 
 **Naming Convention:** `{version:03d}_{description}.sql`
 
@@ -259,7 +259,7 @@ INSERT INTO schema_version (version) VALUES (4);
 
 ### Implementation
 
-**Location:** `src/mini_datahub/infra/db.py`
+**Location:** `src/hei_datahub/infra/db.py`
 
 ```python
 import sqlite3
@@ -360,10 +360,10 @@ def init_database(db_path: Path) -> sqlite3.Connection:
 ### Application Startup
 
 ```python
-# In src/mini_datahub/__main__.py or app initialization
+# In src/hei_datahub/__main__.py or app initialization
 
-from mini_datahub.infra.db import init_database
-from mini_datahub.infra.paths import get_data_dir
+from hei_datahub.infra.db import init_database
+from hei_datahub.infra.paths import get_data_dir
 
 def main():
     # Initialize database (runs migrations automatically)
@@ -382,7 +382,7 @@ def main():
 #### 1. Determine Next Version
 
 ```bash
-ls src/mini_datahub/infra/migrations/
+ls src/hei_datahub/infra/migrations/
 # Output: 001_initial.sql, 002_optimize.sql, 003_add_etag.sql
 # Next version: 004
 ```
@@ -390,7 +390,7 @@ ls src/mini_datahub/infra/migrations/
 #### 2. Create Migration File
 
 ```bash
-touch src/mini_datahub/infra/migrations/004_add_new_field.sql
+touch src/hei_datahub/infra/migrations/004_add_new_field.sql
 ```
 
 #### 3. Write Migration SQL
@@ -425,7 +425,7 @@ INSERT INTO schema_version (version) VALUES (4);
 # test_migration.py
 import sqlite3
 from pathlib import Path
-from mini_datahub.infra.db import run_migrations
+from hei_datahub.infra.db import run_migrations
 
 # Test on empty database
 test_db = Path("/tmp/test_migration.db")
@@ -450,13 +450,13 @@ conn.close()
 
 ```bash
 # Backup production database
-cp ~/.local/share/mini-datahub/datasets.db ~/backup-$(date +%Y%m%d).db
+cp ~/.local/share/hei-datahub/datasets.db ~/backup-$(date +%Y%m%d).db
 
 # Run application (migrations run automatically)
-mini-datahub
+hei-datahub
 
 # Verify
-sqlite3 ~/.local/share/mini-datahub/datasets.db \
+sqlite3 ~/.local/share/hei-datahub/datasets.db \
   "SELECT version, applied_at FROM schema_version ORDER BY version;"
 ```
 
@@ -557,7 +557,7 @@ INSERT INTO schema_version (version) VALUES (5);
 systemctl --user stop hei-datahub
 
 # 2. Restore backup
-cp ~/backup-20240501.db ~/.local/share/mini-datahub/datasets.db
+cp ~/backup-20240501.db ~/.local/share/hei-datahub/datasets.db
 
 # 3. Restart application
 systemctl --user start hei-datahub
@@ -701,16 +701,16 @@ def check_version_compatibility(conn: sqlite3.Connection) -> None:
 
 ```bash
 # 1. Restore from backup
-cp ~/backup-20240501.db ~/.local/share/mini-datahub/datasets.db
+cp ~/backup-20240501.db ~/.local/share/hei-datahub/datasets.db
 
 # 2. Fix migration SQL
 
 # 3. Test migration on copy
-cp ~/.local/share/mini-datahub/datasets.db /tmp/test.db
+cp ~/.local/share/hei-datahub/datasets.db /tmp/test.db
 sqlite3 /tmp/test.db < migrations/004_add_field.sql
 
 # 4. Re-run application
-mini-datahub
+hei-datahub
 ```
 
 ---
@@ -752,4 +752,4 @@ rebuild_database()
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
