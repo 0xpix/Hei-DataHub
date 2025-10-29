@@ -489,7 +489,7 @@ class SensitiveDataFilter(logging.Filter):
         return True
 
 # Apply filter to all loggers
-logger = logging.getLogger('mini_datahub')
+logger = logging.getLogger('hei_datahub')
 logger.addFilter(SensitiveDataFilter())
 ```
 
@@ -732,6 +732,6 @@ If you see any of these, report immediately:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
 
 **Security Commitment:** Hei-DataHub prioritizes user privacy and data security. We follow industry best practices and welcome security researchers to help us improve.
