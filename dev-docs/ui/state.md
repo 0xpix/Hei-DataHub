@@ -32,7 +32,7 @@ class MyView(Screen):
 
 ### Global App State
 
-**Location:** `src/mini_datahub/ui/app.py`
+**Location:** `src/hei_datahub/ui/app.py`
 
 ```python
 from textual.app import App
@@ -479,4 +479,4 @@ class SearchView(Screen):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
