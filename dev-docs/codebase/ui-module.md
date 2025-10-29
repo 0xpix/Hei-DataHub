@@ -68,7 +68,7 @@ ui/
 #### App → Screen → Widget Hierarchy
 
 ```
-App (mini_datahub.ui.app.DataHubApp)
+App (hei_datahub.ui.app.DataHubApp)
  ├── HomeView (Screen)
  │   ├── Header (Widget)
  │   ├── SearchBar (Widget)
@@ -614,4 +614,4 @@ class HomeView(Screen):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
