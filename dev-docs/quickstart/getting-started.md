@@ -84,7 +84,7 @@ hei-datahub
 
 ```
 Hei-DataHub/
-├── src/mini_datahub/       # Main Python package
+├── src/hei_datahub/       # Main Python package
 │   ├── app/                # Application runtime & settings
 │   ├── cli/                # Command-line interface entry point
 │   ├── core/               # Domain models, rules, queries
@@ -95,7 +95,7 @@ Hei-DataHub/
 ├── data/                   # Sample datasets (for testing)
 ├── tests/                  # Unit and integration tests
 ├── docs/                   # User documentation (main branch)
-├── dev-docs/               # Developer docs (this site, docs/devs branch)
+├── dev-docs/               # Developer docs (this site, docs/v0.60-beta-update branch)
 ├── scripts/                # Dev tools & automation
 ├── pyproject.toml          # Project metadata & dependencies
 └── db.sqlite               # Local SQLite database (created on first run)
@@ -154,7 +154,7 @@ hei-datahub --verbose
 which python  # Should point to .venv/bin/python
 
 # Reinstall in development mode
-uv pip install -e .
+uv sync --dev
 ```
 
 ### Database Errors
