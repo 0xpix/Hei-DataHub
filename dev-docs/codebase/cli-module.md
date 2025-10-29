@@ -103,8 +103,8 @@ hei-datahub tui
 ```python
 def handle_tui(args):
     """Launch the terminal user interface"""
-    from mini_datahub.ui.views.home import run_tui
-    from mini_datahub.infra.db import ensure_database
+    from hei_datahub.ui.views.home import run_tui
+    from hei_datahub.infra.db import ensure_database
 
     # Initialize database if needed
     ensure_database()
@@ -144,8 +144,8 @@ hei-datahub reindex --verbose
 ```python
 def handle_reindex(args):
     """Rebuild FTS5 search index from YAML files"""
-    from mini_datahub.infra.store import list_datasets, read_dataset
-    from mini_datahub.infra.index import upsert_dataset
+    from hei_datahub.infra.store import list_datasets, read_dataset
+    from hei_datahub.infra.index import upsert_dataset
 
     print("Reindexing datasets...")
 
@@ -196,7 +196,7 @@ hei-datahub auth setup --url https://heibox.uni-heidelberg.de
 ```python
 def handle_auth_setup(args):
     """Run interactive auth setup wizard"""
-    from mini_datahub.auth.setup import run_setup_wizard
+    from hei_datahub.auth.setup import run_setup_wizard
 
     # Interactive wizard
     if args.url:
@@ -286,7 +286,7 @@ hei-datahub auth doctor --verbose
 ```python
 def handle_auth_doctor(args):
     """Run diagnostics"""
-    from mini_datahub.cli.doctor import run_diagnostics
+    from hei_datahub.cli.doctor import run_diagnostics
 
     results = run_diagnostics(verbose=args.verbose)
 
@@ -332,8 +332,8 @@ WebDAV Configuration:
 ```python
 def handle_auth_status(args):
     """Show authentication status"""
-    from mini_datahub.services.config import load_config
-    from mini_datahub.auth.credentials import has_secret
+    from hei_datahub.services.config import load_config
+    from hei_datahub.auth.credentials import has_secret
 
     config = load_config()
     webdav = config.get("webdav", {})
@@ -368,7 +368,7 @@ hei-datahub sync now --force
 ```python
 def handle_sync_now(args):
     """Trigger immediate sync"""
-    from mini_datahub.services.sync import sync_now
+    from hei_datahub.services.sync import sync_now
 
     print("Syncing with cloud...")
 
@@ -417,14 +417,14 @@ hei-datahub sync disable
 ```python
 def handle_sync_enable(args):
     """Enable background sync"""
-    from mini_datahub.services.config import update_config
+    from hei_datahub.services.config import update_config
 
     update_config({"sync": {"enabled": True}})
     print("✓ Background sync enabled")
 
 def handle_sync_disable(args):
     """Disable background sync"""
-    from mini_datahub.services.config import update_config
+    from hei_datahub.services.config import update_config
 
     update_config({"sync": {"enabled": False}})
     print("✓ Background sync disabled")
@@ -450,7 +450,7 @@ hei-datahub search --json  # Output as JSON
 ```python
 def handle_search(args):
     """Search datasets from CLI"""
-    from mini_datahub.services.fast_search import search_indexed
+    from hei_datahub.services.fast_search import search_indexed
 
     # Build query with filters
     query = args.query
@@ -491,8 +491,8 @@ hei-datahub validate --all
 ```python
 def handle_validate(args):
     """Validate dataset metadata against schema"""
-    from mini_datahub.core.validators import validate_dataset
-    from mini_datahub.infra.store import read_dataset
+    from hei_datahub.core.validators import validate_dataset
+    from hei_datahub.infra.store import read_dataset
 
     if args.all:
         # Validate all datasets
@@ -535,7 +535,7 @@ hei-datahub update install
 ```python
 def handle_update_check(args):
     """Check for newer version"""
-    from mini_datahub.services.update_check import check_for_updates
+    from hei_datahub.services.update_check import check_for_updates
 
     print("Checking for updates...")
 
@@ -560,11 +560,11 @@ def handle_update_install(args):
     system = platform.system()
 
     if system == "Linux":
-        from mini_datahub.cli.linux_update import install_update
+        from hei_datahub.cli.linux_update import install_update
     elif system == "Darwin":
-        from mini_datahub.cli.macos_update import install_update
+        from hei_datahub.cli.macos_update import install_update
     elif system == "Windows":
-        from mini_datahub.cli.windows_update import install_update
+        from hei_datahub.cli.windows_update import install_update
     else:
         print("✗ Automatic updates not supported on this platform")
         sys.exit(1)
@@ -707,4 +707,4 @@ except NetworkError:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
