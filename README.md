@@ -25,7 +25,11 @@
 
 ---
 
-## ⚡ Install in 30 Seconds
+## 🚀 Quick Install — UV Method (v0.60.x-beta)
+
+**Linux users:** No cloning required! Install directly from the private repository with modern UV tooling.
+
+### Prerequisites
 
 ```bash
 # Install UV package manager
@@ -105,6 +109,44 @@ cd Hei-DataHub
 uv sync --dev && source .venv/bin/activate
 
 # Run from source
+hei-datahub     # or: mini-datahub
+```
+
+**macOS/Windows:** Coming soon in future releases.
+
+Check [QUICKSTART](https://0xpix.github.io/Hei-DataHub/getting-started/01-getting-started/) for details.
+
+---
+
+## ✨ Key Features in v0.59+ "Privacy"
+
+### 🔐 WebDAV Authentication System
+- **Interactive setup wizard** — `hei-datahub auth setup` with guided prompts
+- **Secure credential storage** — Linux keyring integration, no plaintext secrets
+- **Comprehensive diagnostics** — `hei-datahub auth doctor` for troubleshooting
+- **Multiple auth methods** — Token or password-based authentication
+- **ENV fallback** — Environment variable support when keyring unavailable
+
+### ☁️ Cloud-First Data Management
+- **Heibox/Seafile integration** — Direct WebDAV storage for team collaboration
+- **Add to cloud** — Upload datasets directly, no GitHub required
+- **Instant sharing** — Team members see changes immediately
+- **Better privacy** — No Git history, data stays in your institution's cloud
+
+### 🚀 Performance Overhaul
+- **Lightning-fast startup** — UI appears in <300ms (warm cache)
+- **Instant search** — <80ms response time, zero network calls on keystroke
+- **Background indexing** — SQLite FTS5 with automatic updates
+- **Smart caching** — Incremental sync with ETag-based validation
+
+## Cloud-Based (Heibox/Seafile) — New in 0.59! ✨
+**Setup** WebDAV credentials → **Browse** cloud datasets (instant search) → **Add** datasets directly to Heibox → **Team access** immediately
+
+```bash
+# One-time setup
+hei-datahub auth setup
+
+# Launch and search (fast!)
 hei-datahub
 ```
 
@@ -114,26 +156,15 @@ See [Developer Docs](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/) for cont
 
 ## 📦 How It Works
 
-```
-┌─────────────────┐
-│  YAML Metadata  │ → Validated (JSON Schema + Pydantic)
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│  SQLite FTS5    │ → Local index, <80ms search
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│  WebDAV Cloud   │ → Sync to Heibox/Seafile
-└─────────────────┘
-```
+* `data/<id>/metadata.yaml` on cloud via WebDAV
+* Local SQLite FTS5 index with background sync
+* Fast search: <80ms response, zero network on keystroke
+* Validation via JSON Schema + Pydantic
+* Textual TUI (keyboard-first)
+* Secure credentials: Linux keyring storage
 
-**Core principles:**
-- Local-first: Work offline, sync when ready
-- Keyboard-driven: Textual TUI, zero mouse needed
-- Schema-validated: Catch errors before they spread
-- Fast: Sub-second everything
-
+Details: [Basics](https://0xpix.github.io/Hei-DataHub/getting-started/03-the-basics/)
+s
 ---
 
 <p align="center">
