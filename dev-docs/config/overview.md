@@ -403,7 +403,7 @@ DEFAULT_CONFIG = {
 ### Loading Configuration
 
 ```python
-from mini_datahub.services.config import load_config
+from hei_datahub.services.config import load_config
 
 # Load configuration
 config = load_config()
@@ -416,7 +416,7 @@ sync_enabled = config["sync"]["enabled"]
 ### Saving Configuration
 
 ```python
-from mini_datahub.services.config import save_config
+from hei_datahub.services.config import save_config
 
 # Update configuration
 config["sync"]["interval_minutes"] = 10
@@ -426,7 +426,7 @@ save_config(config)
 ### Getting Single Values
 
 ```python
-from mini_datahub.services.config import get_config_value
+from hei_datahub.services.config import get_config_value
 
 # Get with default
 sync_interval = get_config_value("sync.interval_minutes", default=5)
@@ -550,4 +550,4 @@ export HEI_DATAHUB_SYNC_INTERVAL_MINUTES=10
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
