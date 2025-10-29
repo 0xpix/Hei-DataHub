@@ -70,15 +70,15 @@ dev = [
 
 **Install dev dependencies:**
 ```bash
-uv pip install -e ".[dev]"
+uv sync --dev
 ```
 
 ### Scripts (Entry Points)
 
 ```toml
 [project.scripts]
-mini-datahub = "mini_datahub.cli.main:main"
-hei-datahub = "mini_datahub.cli.main:main"
+hei-datahub = "hei_datahub.cli.main:main"
+hei-datahub = "hei_datahub.cli.main:main"
 ```
 
 **Both commands** point to the same entry point (aliases for convenience).
@@ -86,14 +86,14 @@ hei-datahub = "mini_datahub.cli.main:main"
 **Usage:**
 ```bash
 hei-datahub --help       # Preferred name
-mini-datahub --help      # Legacy alias
+hei-datahub --help      # Legacy alias
 ```
 
 ### Package Data
 
 ```toml
 [tool.setuptools.package-data]
-mini_datahub = [
+hei_datahub = [
     "infra/sql/*.sql",       # Schema migrations
     "schema.json",           # JSON schema
     "version.yaml",          # Version metadata
@@ -133,7 +133,7 @@ ignore = ["E501"]  # Line too long (handled by formatter)
 ```bash
 make lint
 # or directly:
-ruff check src/mini_datahub
+ruff check src/hei_datahub
 ```
 
 #### Pytest
@@ -178,7 +178,7 @@ disallow_untyped_defs = false  # Gradual typing
 ```bash
 make lint  # Includes mypy
 # or directly:
-mypy src/mini_datahub
+mypy src/hei_datahub
 ```
 
 ---
@@ -219,7 +219,7 @@ test:  ## Run tests
 	pytest tests/ -v
 
 test-coverage:  ## Run tests with coverage report
-	pytest tests/ -v --cov=mini_datahub --cov-report=html --cov-report=term
+	pytest tests/ -v --cov=hei_datahub --cov-report=html --cov-report=term
 ```
 
 **Coverage reports:**
@@ -237,11 +237,11 @@ open htmlcov/index.html  # View coverage report
 
 ```makefile
 lint:  ## Run linters (ruff + mypy)
-	ruff check mini_datahub tests
-	mypy mini_datahub || true
+	ruff check hei_datahub tests
+	mypy hei_datahub || true
 
 format:  ## Format code with black
-	black mini_datahub tests
+	black hei_datahub tests
 ```
 
 **Format before committing:**
@@ -385,7 +385,7 @@ make test          # Run tests
 
 **Usage in Pydantic:**
 
-The schema is **mirrored** in `src/mini_datahub/core/models.py`:
+The schema is **mirrored** in `src/hei_datahub/core/models.py`:
 
 ```python
 class DatasetMetadata(BaseModel):
@@ -424,7 +424,7 @@ minimum_db_version: "0.58.0"
 **Usage:**
 
 ```python
-from mini_datahub.utils.version import get_version
+from hei_datahub.utils.version import get_version
 
 version = get_version()
 print(f"Running Hei-DataHub v{version}")
@@ -669,4 +669,4 @@ jobs:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
