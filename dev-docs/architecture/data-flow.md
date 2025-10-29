@@ -1,5 +1,11 @@
 # Data Flow
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the optimized data flow and performance improvements in v0.60.
+
+!!! info "What this section covers"
+    This page explains how data moves through Hei-DataHub's layers, from user interaction to database queries and cloud sync. Essential for understanding performance characteristics and debugging issues.
+
 ## Overview
 
 This document explains how data flows through Hei-DataHub's architecture, from user input to storage and back. Understanding data flow is essential for debugging, optimization, and adding new features.
@@ -489,4 +495,4 @@ graph TD
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
