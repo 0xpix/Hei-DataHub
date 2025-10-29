@@ -116,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Highlights:**
     - Introduced **layered architecture** (UI → Services → Core → Infrastructure)
-    - Added **dual CLI commands:** `hei-datahub` and `mini-datahub`
+    - Added **dual CLI commands:** `hei-datahub` and `hei-datahub`
     - New **version management system** (`version.yaml` + auto-generated files)
     - Integrated **GitHub Actions CI**, **pre-commit hooks**, and **MkDocs** documentation site
 
@@ -127,8 +127,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Dynamic documentation banner and macros plugin
 
 - **Changed:**
-    - Migrated to `src/mini_datahub/` package structure
-    - Unified settings via `GitHubConfig`
+    - Migrated to `src/hei_datahub/` package structure
+    - Unified settings via `WebDAVConfig`
     - Refactored exception hierarchy for clearer error handling
 
 - **Fixed:**
@@ -475,7 +475,7 @@ See [Versioning Policy](versioning.md#upgrade-strategy) for detailed upgrade ins
 cd Hei-DataHub
 git pull origin main
 source .venv/bin/activate
-pip install -e .
+uv sync --dev
 ```
 
 ---
