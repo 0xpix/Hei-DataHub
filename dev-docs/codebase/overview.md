@@ -1,6 +1,20 @@
 # Codebase Overview
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the current codebase structure and clean architecture introduced in v0.60.
+
+!!! info "What this section covers"
+    Your complete guide to understanding the Hei-DataHub codebase structure, modules, and how they work together. Essential reading before making any code changes.
+
 This is your complete guide to understanding the Hei-DataHub codebase. We'll start from the ground up, assuming you've never worked with this code before.
+
+!!! success "v0.60 Code Cleanup"
+    **Removed in v0.60:**
+    - Legacy `mini_datahub` package initialization
+    - GitHub PR workflow code (~500 lines)
+    - Outbox service and UI
+    - Unused action display maps
+    - Deprecated imports across UI views
 
 ## 🎯 What Does This Project Do?
 
@@ -44,14 +58,14 @@ Think of it as a combination of:
                  │
 ┌────────────────▼────────────────────────────────┐
 │              CLI Layer                          │
-│  (src/mini_datahub/cli/main.py)                │
+│  (src/hei_datahub/cli/main.py)                │
 │  • Parse commands (auth, reindex, doctor, etc.) │
 │  • Initialize workspace & logging               │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │          Authentication Layer                   │
-│  (src/mini_datahub/auth/)                      │
+│  (src/hei_datahub/auth/)                      │
 │  • WebDAV credential management                 │
 │  • Keyring integration                          │
 │  • Connection validation                        │
@@ -59,7 +73,7 @@ Think of it as a combination of:
                  │
 ┌────────────────▼────────────────────────────────┐
 │            UI/TUI Layer                         │
-│  (src/mini_datahub/ui/)                        │
+│  (src/hei_datahub/ui/)                        │
 │  • Screens & Views (home, search, settings)     │
 │  • Widgets & Components (autocomplete, etc.)    │
 │  • Keybindings & Theme                          │
@@ -67,7 +81,7 @@ Think of it as a combination of:
                  │
 ┌────────────────▼────────────────────────────────┐
 │          Services Layer                         │
-│  (src/mini_datahub/services/)                  │
+│  (src/hei_datahub/services/)                  │
 │  • search: FTS5 queries & autocomplete          │
 │  • catalog: CRUD for datasets                   │
 │  • sync: Cloud ↔ Local synchronization         │
@@ -77,7 +91,7 @@ Think of it as a combination of:
                  │
 ┌────────────────▼────────────────────────────────┐
 │            Core Layer                           │
-│  (src/mini_datahub/core/)                      │
+│  (src/hei_datahub/core/)                      │
 │  • models: Data structures (Pydantic)           │
 │  • queries: Query parsing & filters             │
 │  • rules: Business logic validation             │
@@ -86,7 +100,7 @@ Think of it as a combination of:
                  │
 ┌────────────────▼────────────────────────────────┐
 │       Infrastructure Layer                      │
-│  (src/mini_datahub/infra/)                     │
+│  (src/hei_datahub/infra/)                     │
 │  • db: SQLite FTS5 operations                   │
 │  • paths: XDG Base Directory paths              │
 │  • config_paths: Config file resolution         │
@@ -107,7 +121,7 @@ Think of it as a combination of:
 ## 📁 Directory Structure Explained
 
 ```
-src/mini_datahub/              # Main Python package
+src/hei_datahub/              # Main Python package
 │
 ├── __init__.py                # Package initialization
 ├── version.py                 # Version info and display
@@ -314,7 +328,7 @@ When you run `hei-datahub`:
 
 ```python
 # 1. CLI entry point
-src/mini_datahub/cli/main.py:main()
+src/hei_datahub/cli/main.py:main()
 
 # 2. Initialize runtime
 app.runtime.initialize_app()
@@ -391,7 +405,7 @@ Search uses:
 
 1. Start with [Getting Started](../quickstart/getting-started.md)
 2. Make [Your First Contribution](../quickstart/first-contribution.md)
-3. Read [Package Structure](#-directory-structure-explained) above
+3. Read [Package Structure](#directory-structure-explained) above
 4. Explore one module at a time:
    - [Core Module](core-module.md) (simplest, pure Python)
    - [Infrastructure Module](infra-module.md) (database & APIs)
