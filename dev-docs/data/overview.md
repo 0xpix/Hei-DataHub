@@ -74,7 +74,7 @@ Upload to WebDAV (async)
 **Code Example:**
 
 ```python
-from mini_datahub.services.dataset_service import save_dataset
+from hei_datahub.services.dataset_service import save_dataset
 
 # User provides metadata
 metadata = {
@@ -109,7 +109,7 @@ Return results (from SQLite)
 **Code Example:**
 
 ```python
-from mini_datahub.services.fast_search import search_indexed
+from hei_datahub.services.fast_search import search_indexed
 
 # Search (local only, fast)
 results = search_indexed("climate")
@@ -138,7 +138,7 @@ Update local index
 **Code Example:**
 
 ```python
-from mini_datahub.services.sync import sync_now
+from hei_datahub.services.sync import sync_now
 
 # Manual sync trigger
 result = sync_now()
@@ -578,4 +578,4 @@ save_dataset_and_wait_for_upload(metadata)  # Slow!
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
