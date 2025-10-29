@@ -73,6 +73,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- **Developer Documentation Refactor** - Complete upgrade for v0.60-beta
+  - Rebranded from `mini-datahub` → `hei-datahub` across all dev docs
+  - Updated all code examples, import paths, and CLI commands
+  - Added version banners and compatibility matrix
+  - Created ADR-004 documenting the docs upgrade
+  - Enhanced navigation with breadcrumbs and cross-links
+  - Added visual improvements (callouts, tables, diagrams)
 - Added comprehensive v0.60-beta release notes
 - Updated README badges and version references
 - Updated installation guides to reference v0.60
