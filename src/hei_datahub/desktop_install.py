@@ -23,6 +23,33 @@ def _is_linux() -> bool:
     return sys.platform.startswith("linux")
 
 
+def _is_ephemeral_environment() -> bool:
+    """
+    Check if running in an ephemeral/temporary environment (like uvx).
+
+    Returns:
+        True if running in uvx or similar temporary environment.
+    """
+    # Check if UV_INTERNAL__PARENT_ID is set (uvx sets this)
+    if os.environ.get("UV_INTERNAL__PARENT_ID"):
+        return True
+
+    # Check if sys.prefix is in uv cache (uvx creates temp venvs here)
+    if ".cache/uv/" in sys.prefix or "cache/uv/" in sys.prefix:
+        return True
+
+    # Check if VIRTUAL_ENV looks like a temporary directory
+    venv_path = os.environ.get("VIRTUAL_ENV", "")
+    if venv_path and (
+        venv_path.startswith("/tmp/") or
+        "/tmp/" in venv_path or
+        "temp" in venv_path.lower()
+    ):
+        return True
+
+    return False
+
+
 def _get_xdg_data_home() -> Path:
     """Get XDG data home directory (Linux-only)."""
     if not _is_linux():
@@ -440,6 +467,10 @@ def ensure_desktop_assets_once(verbose: bool = False) -> bool:
         True if assets were just installed, False if already present.
     """
     if not _is_linux():
+        return False
+
+    # Skip desktop integration in ephemeral environments (uvx, temporary venvs)
+    if _is_ephemeral_environment():
         return False
 
     # Fast path: check version stamp
