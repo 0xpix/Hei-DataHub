@@ -84,7 +84,7 @@ def search_indexed(query: str, limit: int = 50) -> List[Dict[str, Any]]:
 **Usage:**
 
 ```python
-from mini_datahub.services.fast_search import search_indexed
+from hei_datahub.services.fast_search import search_indexed
 
 # Simple search
 results = search_indexed("climate data")
@@ -676,4 +676,4 @@ def test_search_end_to_end(tmp_path):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
