@@ -759,8 +759,8 @@ print(cursor.fetchone())
 - **[Data Layer Overview](overview.md)** - Architecture overview
 - **[Schema](schema.md)** - Database schema
 - **[Storage](storage.md)** - Storage mechanisms
-- **[Services: Fast Search](../codebase/services-module.md#fast-search)** - Search service implementation
+- **[Services: Fast Search](../codebase/services-module.md#search-services)** - Search service implementation
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
