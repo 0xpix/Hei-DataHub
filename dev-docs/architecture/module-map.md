@@ -16,7 +16,7 @@ This page provides a **comprehensive map of every module** in the Hei-DataHub co
 
 ```
 Hei-DataHub/
-├── src/mini_datahub/          # Main application package
+├── src/hei_datahub/          # Main application package
 │   ├── app/                   # Application runtime & settings
 │   ├── cli/                   # Command-line interface
 │   ├── core/                  # Domain logic (pure, no I/O)
@@ -34,7 +34,7 @@ Hei-DataHub/
 
 ---
 
-## Core Package: `src/mini_datahub/`
+## Core Package: `src/hei_datahub/`
 
 ### `__init__.py`
 
@@ -55,7 +55,7 @@ Hei-DataHub/
 
 **Purpose:** Version management, single source of truth
 
-**Location:** `src/mini_datahub/version.py`
+**Location:** `src/hei_datahub/version.py`
 
 **Exports:**
 - `__version__`: Version string from `version.yaml`
