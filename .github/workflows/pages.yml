@@ -25,7 +25,7 @@ jobs:
         with:
           ref: main
 
-      # Checkout docs/update-tutorial-doc branch for tutorial docs (if exists)
+      # Checkout docs/update-tutorial-doc branch for tutorial docs
       - name: Checkout tutorial docs branch
         uses: actions/checkout@v4
         continue-on-error: true
@@ -69,7 +69,7 @@ jobs:
         working-directory: docs-devs
         run: pip install -r dev-docs/requirements.txt
 
-      - name: Build developer documentation site (obfuscated path)
+      - name: Build developer documentation site
         if: hashFiles('docs-devs/mkdocs-dev.yml') != ''
         working-directory: docs-devs
         run: mkdocs build --config-file mkdocs-dev.yml --site-dir ../combined-site/x9k2m7n4p8q1
@@ -110,8 +110,19 @@ jobs:
               echo "❌ Error: Tutorial docs index.html not found"
               exit 1
             fi
+            echo "✅ Tutorial docs built successfully"
+          else
+            echo ""
+            echo "⚠️  Tutorial docs not built (branch may not exist)"
           fi
-          echo "Build verification passed!"
+
+          echo ""
+          echo "========================================="
+          echo "✅ Build verification passed!"
+          echo "========================================="
+          echo ""
+          echo "Combined site structure:"
+          ls -lah combined-site/ | head -20
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
