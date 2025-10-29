@@ -35,7 +35,7 @@ This document covers profiling tools, techniques, and best practices for analyzi
 
 ```bash
 # Profile entire application
-python -m cProfile -o profile.stats src/mini_datahub/cli/main.py search "test"
+python -m cProfile -o profile.stats src/hei_datahub/cli/main.py search "test"
 
 # View results
 python -m pstats profile.stats
@@ -55,7 +55,7 @@ def profile_function():
     profiler.enable()
 
     # Code to profile
-    from mini_datahub.services.fast_search import get_fast_search_service
+    from hei_datahub.services.fast_search import get_fast_search_service
     search = get_fast_search_service()
     results = search.search("machine learning")
 
@@ -78,7 +78,7 @@ def profile_function():
 ### Decorator for Easy Profiling
 
 ```python
-# src/mini_datahub/utils/profiling.py
+# src/hei_datahub/utils/profiling.py
 
 import cProfile
 import pstats
@@ -112,7 +112,7 @@ def profile(sort_by: str = 'cumulative', lines: int = 20):
     return decorator
 
 # Usage
-from mini_datahub.utils.profiling import profile
+from hei_datahub.utils.profiling import profile
 
 @profile(sort_by='cumulative', lines=10)
 def expensive_function():
@@ -130,7 +130,7 @@ def expensive_function():
 **Install:**
 
 ```bash
-uv pip install line_profiler
+uv add --dev line_profiler
 ```
 
 **Profile specific functions:**
@@ -156,7 +156,7 @@ def search_datasets(query: str) -> list[Dataset]:
 **Run profiler:**
 
 ```bash
-kernprof -l -v src/mini_datahub/cli/main.py search "test"
+kernprof -l -v src/hei_datahub/cli/main.py search "test"
 
 # Output:
 # Line #      Hits         Time  Per Hit   % Time  Line Contents
@@ -179,7 +179,7 @@ kernprof -l -v src/mini_datahub/cli/main.py search "test"
 **Install:**
 
 ```bash
-uv pip install memory_profiler
+uv add --dev memory_profiler
 ```
 
 **Profile memory usage:**
@@ -251,7 +251,7 @@ def track_memory_leaks():
         print(stat)
 
 # Output:
-# src/mini_datahub/services/cache.py:45: size=2048 KiB (+2048 KiB), count=500 (+500)
+# src/hei_datahub/services/cache.py:45: size=2048 KiB (+2048 KiB), count=500 (+500)
 # → Cache is growing without bounds!
 ```
 
@@ -264,7 +264,7 @@ def track_memory_leaks():
 **Using yappi:**
 
 ```bash
-uv pip install yappi
+uv add --dev yappi
 ```
 
 **Profile async functions:**
@@ -516,7 +516,7 @@ hei-datahub search "machine learning"
 ### 2. Profile with cProfile
 
 ```bash
-python -m cProfile -o profile.stats -m mini_datahub.cli.main search "machine learning"
+python -m cProfile -o profile.stats -m hei_datahub.cli.main search "machine learning"
 
 python -m pstats profile.stats
 > sort cumtime
@@ -584,4 +584,4 @@ python -m cProfile search_script.py
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
