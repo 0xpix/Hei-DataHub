@@ -446,7 +446,7 @@ def update_fast_index(dataset: dict) -> None:
 
 ### Migration Files
 
-**Location:** `src/mini_datahub/infra/migrations/`
+**Location:** `src/hei_datahub/infra/migrations/`
 
 **Naming:** `XXX_description.sql` (e.g., `003_add_etag_field.sql`)
 
@@ -592,10 +592,10 @@ def save_dataset(metadata: dict) -> None:
 
 ```bash
 # Backup database
-cp ~/.local/share/mini-datahub/datasets.db ~/backups/datasets-$(date +%Y%m%d).db
+cp ~/.local/share/hei-datahub/datasets.db ~/backups/datasets-$(date +%Y%m%d).db
 
 # Restore from backup
-cp ~/backups/datasets-20240115.db ~/.local/share/mini-datahub/datasets.db
+cp ~/backups/datasets-20240115.db ~/.local/share/hei-datahub/datasets.db
 ```
 
 ---
@@ -629,4 +629,4 @@ def rebuild_search_index() -> None:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
