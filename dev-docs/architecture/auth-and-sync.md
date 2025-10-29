@@ -1,8 +1,17 @@
 # Authentication & Sync
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the WebDAV-only workflow introduced in v0.59 and refined in v0.60.
+
+!!! info "What this section covers"
+    This page explains how Hei-DataHub authenticates with WebDAV cloud storage, securely stores credentials using the system keyring, and synchronizes data between local cache and remote storage. Essential for understanding the cloud-first architecture.
+
 ## Overview
 
-Hei-DataHub uses **WebDAV** to connect to cloud storage (HeiBox/Seafile), enabling team collaboration and dataset sharing without GitHub. This document explains how authentication works, how credentials are stored securely, and how background synchronization keeps local and cloud data in sync.
+Hei-DataHub uses **WebDAV** to connect to cloud storage (HeiBox/Seafile), enabling team collaboration and dataset sharing. This document explains how authentication works, how credentials are stored securely, and how background synchronization keeps local and cloud data in sync.
+
+!!! success "GitHub Integration Removed in v0.60"
+    The legacy GitHub PR workflow has been fully removed in v0.60-beta. All collaboration now happens through direct WebDAV cloud storage, providing better privacy and simpler workflows.
 
 ---
 
@@ -542,7 +551,7 @@ auto_cleanup = true                                 # Clean old cache files
 ### Reading Config
 
 ```python
-from mini_datahub.infra.config_paths import get_config_path
+from hei_datahub.infra.config_paths import get_config_path
 import tomllib  # Python 3.11+ built-in
 
 config_path = get_config_path()
@@ -709,14 +718,14 @@ hei-datahub reindex     # Rebuild index
 
 | File | Purpose |
 |------|---------|
-| `src/mini_datahub/auth/setup.py` | Interactive setup wizard |
-| `src/mini_datahub/auth/credentials.py` | Keyring integration |
-| `src/mini_datahub/auth/validator.py` | Connection validation |
-| `src/mini_datahub/auth/doctor.py` | Diagnostic tool |
-| `src/mini_datahub/auth/clear.py` | Clear credentials |
-| `src/mini_datahub/services/webdav_storage.py` | WebDAV client |
-| `src/mini_datahub/services/sync.py` | Background sync |
-| `src/mini_datahub/infra/config_paths.py` | Config path resolution |
+| `src/hei_datahub/auth/setup.py` | Interactive setup wizard |
+| `src/hei_datahub/auth/credentials.py` | Keyring integration |
+| `src/hei_datahub/auth/validator.py` | Connection validation |
+| `src/hei_datahub/auth/doctor.py` | Diagnostic tool |
+| `src/hei_datahub/auth/clear.py` | Clear credentials |
+| `src/hei_datahub/services/webdav_storage.py` | WebDAV client |
+| `src/hei_datahub/services/sync.py` | Background sync |
+| `src/hei_datahub/infra/config_paths.py` | Config path resolution |
 
 ### Testing Authentication
 
@@ -733,4 +742,4 @@ hei-datahub auth doctor
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
