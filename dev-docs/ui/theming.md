@@ -11,7 +11,7 @@ Hei-DataHub uses Textual's CSS system for styling the TUI. This document covers 
 ### File Structure
 
 ```
-src/mini_datahub/ui/
+src/hei_datahub/ui/
 ├── tcss/
 │   ├── base.tcss           # Base styles
 │   ├── themes/
@@ -352,7 +352,7 @@ SearchView .no-results {
 **2. Apply Theme:**
 
 ```python
-# src/mini_datahub/ui/app.py
+# src/hei_datahub/ui/app.py
 
 class MiniDataHubApp(App):
     # Load custom theme
@@ -714,4 +714,4 @@ def test_color_contrast():
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
