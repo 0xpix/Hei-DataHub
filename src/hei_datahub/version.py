@@ -30,13 +30,14 @@ def _load_version_data() -> dict:
     Returns:
         Dictionary with version metadata
     """
-    # PRIORITY 1: Try project root first (for development)
-    base_path = _get_base_path()
-    version_file = base_path / "version.yaml"
+    # PRIORITY 1: Try package directory first (for installed/packaged version)
+    # This works for uv/pip installs
+    version_file = Path(__file__).parent / "version.yaml"
 
-    # PRIORITY 2: Try package directory (for installed/packaged version)
+    # PRIORITY 2: Try project root (for development)
     if not version_file.exists():
-        version_file = Path(__file__).parent / "version.yaml"
+        base_path = _get_base_path()
+        version_file = base_path / "version.yaml"
 
     # PRIORITY 3: Try PyInstaller bundle hei_datahub directory
     if not version_file.exists() and getattr(sys, 'frozen', False):
