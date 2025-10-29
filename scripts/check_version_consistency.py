@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Version consistency checker for Hei-DataHub.
+Version consistency checker for Hei-DataHub v0.60+
 
 Verifies that version information from version.yaml is correctly
 referenced across all documentation and configuration files.
 
-This replaces the old sync_version.py approach - now version.yaml
-is the single source of truth read at runtime by Python.
+version.yaml is the single source of truth, read at runtime by Python.
 
 This script only CHECKS consistency, it does not modify files.
 """
@@ -124,7 +123,7 @@ def check_docs_version_include(config: dict) -> Tuple[bool, List[str]]:
 
 def check_python_version_module(config: dict) -> Tuple[bool, List[str]]:
     """Check that version.py can load version.yaml correctly."""
-    version_py_path = ROOT / "src" / "mini_datahub" / "version.py"
+    version_py_path = ROOT / "src" / "hei_datahub" / "version.py"
     issues = []
 
     if not version_py_path.exists():
@@ -142,7 +141,7 @@ def check_python_version_module(config: dict) -> Tuple[bool, List[str]]:
     # Try to import and check values
     try:
         sys.path.insert(0, str(ROOT / "src"))
-        from mini_datahub.version import __version__, CODENAME
+        from hei_datahub.version import __version__, CODENAME
 
         if __version__ != config['version']:
             issues.append(f"❌ version.py: __version__ mismatch")
@@ -165,14 +164,23 @@ def check_python_version_module(config: dict) -> Tuple[bool, List[str]]:
 
 def check_no_legacy_version_file(config: dict) -> Tuple[bool, List[str]]:
     """Check that old _version.py doesn't exist."""
-    legacy_path = ROOT / "src" / "mini_datahub" / "_version.py"
+    legacy_paths = [
+        ROOT / "src" / "hei_datahub" / "_version.py",
+        ROOT / "src" / "mini_datahub" / "version.py",
+        ROOT / "src" / "mini_datahub" / "_version.py",
+        ROOT / "src" / "mini_datahub",  # Check if old package dir exists
+    ]
     issues = []
 
-    if legacy_path.exists():
-        issues.append(f"❌ {legacy_path} should not exist")
-        issues.append(f"   Legacy _version.py found - should be deleted")
-        issues.append(f"   Version info is now read from version.yaml at runtime")
-        return False, issues
+    for legacy_path in legacy_paths:
+        if legacy_path.exists():
+            issues.append(f"❌ {legacy_path} should not exist")
+            if legacy_path.name == "mini_datahub":
+                issues.append(f"   Legacy mini_datahub package found - should be deleted")
+            else:
+                issues.append(f"   Legacy version file found - should be deleted")
+            issues.append(f"   Version info is now read from version.yaml at runtime")
+            return False, issues
 
     return True, []
 
