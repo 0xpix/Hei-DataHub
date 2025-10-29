@@ -1,14 +1,23 @@
 # CLI Commands Reference
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the current CLI commands available in v0.60.
+
+!!! info "What this section covers"
+    Complete reference for all `hei-datahub` command-line interface commands. This page covers every subcommand, option, and flag available in v0.60.0-beta.
+
 ## Overview
 
-Complete reference for all `hei-datahub` and `mini-datahub` command-line interface commands. This document covers every subcommand, option, and flag available in v0.59.0-beta "Privacy".
+Complete reference for all `hei-datahub` command-line interface commands.
+
+!!! note "Command Name Change"
+    **v0.60:** The `mini-datahub` alias has been removed. Use `hei-datahub` exclusively.
 
 **Quick Reference:**
 
 - [TUI Launch](#tui-launch) - Launch the terminal interface
 - [Authentication](#authentication-commands) - WebDAV credential management
-- [Search & Index](#search--index-commands) - Dataset indexing and search
+- [Search & Index](#search-index-commands) - Dataset indexing and search
 - [Diagnostics](#diagnostic-commands) - Health checks and troubleshooting
 - [System](#system-commands) - Updates, paths, and configuration
 - [Desktop Integration](#desktop-integration-commands) - Linux desktop shortcuts
@@ -21,11 +30,10 @@ Complete reference for all `hei-datahub` and `mini-datahub` command-line interfa
 ```bash
 # General syntax
 hei-datahub [GLOBAL_OPTIONS] [COMMAND] [COMMAND_OPTIONS]
-
-# Aliases
-hei-datahub  # Primary command
-mini-datahub # Alternative name (legacy)
 ```
+
+!!! warning "Legacy Alias Removed"
+    The `mini-datahub` alias was removed in v0.60. Use `hei-datahub` instead.
 
 ### Global Options
 
@@ -1062,4 +1070,4 @@ hei-datahub reindex || echo "Reindex failed"
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
