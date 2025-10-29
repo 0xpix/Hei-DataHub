@@ -86,7 +86,7 @@ conn.execute("PRAGMA journal_mode = WAL")  # Write-Ahead Logging
 **Usage:**
 
 ```python
-from mini_datahub.infra.db import get_connection
+from hei_datahub.infra.db import get_connection
 
 conn = get_connection()
 cursor = conn.cursor()
@@ -290,7 +290,7 @@ def ensure_directories() -> None:
 **Usage:**
 
 ```python
-from mini_datahub.infra.paths import CONFIG_FILE, DB_PATH
+from hei_datahub.infra.paths import CONFIG_FILE, DB_PATH
 
 # Load config
 with open(CONFIG_FILE) as f:
@@ -453,7 +453,7 @@ def run_migrations():
 **✅ CORRECT:** Wrap I/O errors
 
 ```python
-from mini_datahub.core.exceptions import StorageError
+from hei_datahub.core.exceptions import StorageError
 
 def read_dataset_file(path: Path) -> dict:
     """Read dataset YAML file"""
@@ -589,7 +589,7 @@ def test_db():
         db_path = Path(tmpdir) / "test.db"
 
         # Override DB_PATH
-        import mini_datahub.infra.db as db_module
+        import hei_datahub.infra.db as db_module
         original_path = db_module.DB_PATH
         db_module.DB_PATH = db_path
 
@@ -603,13 +603,13 @@ def test_db():
 
 def test_upsert_dataset(test_db):
     """Test dataset upsert"""
-    from mini_datahub.infra.index import upsert_dataset
+    from hei_datahub.infra.index import upsert_dataset
 
     metadata = {"id": "test", "dataset_name": "Test Dataset"}
     upsert_dataset("test", metadata)
 
     # Verify stored
-    from mini_datahub.infra.store import get_dataset
+    from hei_datahub.infra.store import get_dataset
     stored = get_dataset("test")
     assert stored["dataset_name"] == "Test Dataset"
 ```
@@ -625,4 +625,4 @@ def test_upsert_dataset(test_db):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
