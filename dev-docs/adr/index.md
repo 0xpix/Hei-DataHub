@@ -83,6 +83,7 @@ Any additional context or follow-up.
 | [ADR-001](001-docs-split.md) | Split User and Developer Documentation | ✅ Accepted | 2025-10-06 |
 | [ADR-002](002-branching-strategy.md) | Branching Strategy for Developer Docs | ✅ Accepted | 2025-10-06 |
 | [ADR-003](003-changelog-enforcement.md) | Changelog Enforcement Policy | ✅ Accepted | 2025-10-06 |
+| [ADR-004](004-docs-upgrade-and-cleanup.md) | Developer Documentation Upgrade and Cleanup | ✅ Accepted | 2025-10-28 |
 
 ### Proposed ADRs
 
@@ -119,7 +120,7 @@ Create an ADR when:
 4. **Get feedback:** Share with maintainers and stakeholders
 5. **Revise:** Incorporate feedback
 6. **Decide:** Achieve consensus or defer to maintainers
-7. **Merge:** Update status to "Accepted" and merge to `docs/devs`
+7. **Merge:** Update status to "Accepted" and merge to `main`
 8. **Update index:** Add to the table above
 
 ---
