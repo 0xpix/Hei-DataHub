@@ -1,5 +1,11 @@
 # System Architecture Overview
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the refactored architecture and modular structure introduced in v0.60.
+
+!!! info "What this section covers"
+    This page provides a comprehensive overview of Hei-DataHub's system architecture, including the layered structure, core design principles, and how different modules work together. Essential reading for understanding the codebase structure.
+
 ## Big Picture
 
 Hei-DataHub is a **cloud-first TUI application** for managing dataset metadata with these core capabilities:
@@ -514,7 +520,7 @@ graph TB
 | Layer | Technologies |
 |-------|-------------|
 | **UI** | Textual (TUI framework), Rich (terminal rendering) |
-| **Language** | Python 3.10+ |
+| **Language** | Python 3.11+ |
 | **Cloud Storage** | WebDAV (HeiBox/Seafile) |
 | **Local Storage** | SQLite (FTS5 extension), YAML files (cache) |
 | **Authentication** | Linux keyring (Secret Service), Windows Credential Manager, macOS Keychain |
