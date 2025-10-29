@@ -64,7 +64,7 @@ This document provides an overview of Hei-DataHub's performance characteristics,
 # Benchmark: Search 10,000 datasets
 
 import time
-from mini_datahub.services.fast_search import get_fast_search_service
+from hei_datahub.services.fast_search import get_fast_search_service
 
 search = get_fast_search_service()
 
@@ -159,7 +159,7 @@ print(f"Warm search: {warm_time:.2f}ms")
 **Decorator for performance tracking:**
 
 ```python
-# src/mini_datahub/utils/timing.py
+# src/hei_datahub/utils/timing.py
 
 import time
 from functools import wraps
@@ -195,7 +195,7 @@ def search_datasets(query: str) -> list[Dataset]:
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('mini_datahub.performance')
+logger = logging.getLogger('hei_datahub.performance')
 
 def search(query: str) -> list[Dataset]:
     """Search with performance logging"""
@@ -246,7 +246,7 @@ python bench/search_performance_bench.py
 
 import time
 import statistics
-from mini_datahub.services.fast_search import get_fast_search_service
+from hei_datahub.services.fast_search import get_fast_search_service
 
 def benchmark_search(queries: list[str], iterations: int = 100):
     """Benchmark search performance"""
@@ -324,7 +324,7 @@ if __name__ == '__main__':
 # tests/performance/test_search_regression.py
 
 import pytest
-from mini_datahub.services.fast_search import get_fast_search_service
+from hei_datahub.services.fast_search import get_fast_search_service
 
 @pytest.mark.performance
 def test_search_performance(benchmark):
@@ -391,4 +391,4 @@ def test_search_does_not_regress(benchmark_history):
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
