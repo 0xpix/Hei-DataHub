@@ -6,10 +6,10 @@ This document provides a **file-by-file walkthrough** of the key modules in Hei-
 
 **Target audience:** Developers working on the codebase who need function-level understanding.
 
-**Structure:** `src/mini_datahub/` organized by Clean Architecture layers:
+**Structure:** `src/hei_datahub/` organized by Clean Architecture layers:
 
 ```
-src/mini_datahub/
+src/hei_datahub/
 ├── core/          # Pure business logic (no I/O)
 ├── services/      # Orchestration layer
 ├── infra/         # Infrastructure (DB, filesystem, I/O)
@@ -23,23 +23,23 @@ src/mini_datahub/
 ## Table of Contents
 
 - [Core Layer](#core-layer)
-  - [models.py](#coremodels.py) - Pydantic data models
-  - [queries.py](#corequeries.py) - Query parsing
+  - [models.py](#coremodelspy) - Pydantic data models
+  - [queries.py](#corequeriespy) - Query parsing
 - [Authentication Layer](#authentication-layer)
-  - [credentials.py](#authcredentials.py) - Credential storage
-  - [setup.py](#authsetup.py) - Setup wizard
-  - [validator.py](#authvalidator.py) - Credential validation
-  - [doctor.py](#authdoctor.py) - Diagnostics
-  - [clear.py](#authclear.py) - Credential removal
+  - [credentials.py](#authcredentialspy) - Credential storage
+  - [setup.py](#authsetuppy) - Setup wizard
+  - [validator.py](#authvalidatorpy) - Credential validation
+  - [doctor.py](#authdoctorpy) - Diagnostics
+  - [clear.py](#authclearpy) - Credential removal
 - [Services Layer](#services-layer)
-  - [fast_search.py](#servicesfast_search.py) - Search interface
-  - [webdav_storage.py](#serviceswebdav_storage.py) - WebDAV client
-  - [autocomplete.py](#servicesautocomplete.py) - Autocomplete engine
-  - [sync.py](#servicessync.py) - Background sync
+  - [fast_search.py](#servicesfast_searchpy) - Search interface
+  - [webdav_storage.py](#serviceswebdav_storagepy) - WebDAV client
+  - [autocomplete.py](#servicesautocompletepy) - Autocomplete engine
+  - [sync.py](#servicessyncpy) - Background sync
 - [Infrastructure Layer](#infrastructure-layer)
-  - [db.py](#infradb.py) - Database connections
-  - [index.py](#infraindex.py) - FTS5 operations
-  - [paths.py](#infrapaths.py) - Path management
+  - [db.py](#infradbpy) - Database connections
+  - [index.py](#infraindexpy) - FTS5 operations
+  - [paths.py](#infrapathspy) - Path management
 
 ---
 
@@ -135,7 +135,7 @@ def to_dict(self) -> dict:
 **Usage Example:**
 
 ```python
-from mini_datahub.core.models import DatasetMetadata
+from hei_datahub.core.models import DatasetMetadata
 
 # Parse from YAML
 metadata = DatasetMetadata(
@@ -215,7 +215,7 @@ class QueryParser:
 **Example:**
 
 ```python
-from mini_datahub.core.queries import QueryParser
+from hei_datahub.core.queries import QueryParser
 
 parser = QueryParser()
 
@@ -232,7 +232,7 @@ parsed = parser.parse("project:weather temperature")
 
 **Related:**
 - Used by: `services/fast_search.py`
-- See: [Search & Autocomplete](../architecture/search-and-autocomplete.md#query-parsing)
+- See: [Search & Autocomplete](../architecture/search-and-autocomplete.md#query-parser)
 
 ---
 
@@ -369,7 +369,7 @@ redact("mySecretToken123")  # "my***23"
 **Usage Example:**
 
 ```python
-from mini_datahub.auth.credentials import KeyringAuthStore
+from hei_datahub.auth.credentials import KeyringAuthStore
 
 store = KeyringAuthStore()
 
@@ -387,7 +387,7 @@ if not store.available():
 
 **Related:**
 - Used by: `auth/setup.py`, `auth/validator.py`
-- See: [Security & Privacy](../architecture/security-privacy.md#credential-storage)
+- See: [Security & Privacy](../architecture/security-privacy.md#storage-architecture)
 
 ---
 
@@ -514,7 +514,7 @@ key_id = "webdav:token:-@heibox.uni-heidelberg.de"
 
 **Related:**
 - CLI command: `hei-datahub auth setup`
-- See: [Authentication & Sync](../architecture/auth-and-sync.md#setup-wizard)
+- See: [Authentication & Sync](../architecture/auth-and-sync.md#hei-datahub-auth-setup)
 
 ---
 
@@ -588,7 +588,7 @@ if response.status_code == 401:
 **Usage Example:**
 
 ```python
-from mini_datahub.auth.validator import validate_webdav_connection
+from hei_datahub.auth.validator import validate_webdav_connection
 
 valid = validate_webdav_connection(
     url="https://heibox.uni-heidelberg.de/seafdav",
@@ -607,7 +607,7 @@ else:
 
 **Related:**
 - Used by: `auth/setup.py`, `auth/doctor.py`
-- See: [Authentication & Sync](../architecture/auth-and-sync.md#credential-validation)
+- See: [Authentication & Sync](../architecture/auth-and-sync.md)
 
 ---
 
@@ -695,7 +695,7 @@ else:
 
 **Related:**
 - CLI command: `hei-datahub auth doctor`
-- See: [Authentication & Sync](../architecture/auth-and-sync.md#diagnostics)
+- See: [Authentication & Sync](../architecture/auth-and-sync.md#hei-datahub-auth-doctor)
 
 ---
 
@@ -845,7 +845,7 @@ return formatted_results
 **Usage Example:**
 
 ```python
-from mini_datahub.services.fast_search import search_indexed
+from hei_datahub.services.fast_search import search_indexed
 
 # Simple search
 results = search_indexed("climate data")
@@ -859,7 +859,7 @@ results = search_indexed("temperature", limit=10)
 
 **Related:**
 - Uses: `core/queries.py`, `services/index_service.py`
-- See: [Search & Autocomplete](../architecture/search-and-autocomplete.md#search-interface)
+- See: [Search & Autocomplete](../architecture/search-and-autocomplete.md#search-query-flow)
 
 ---
 
@@ -1049,7 +1049,7 @@ _mask_auth("https://user:pass@heibox.uni-heidelberg.de/seafdav")
 **Usage Example:**
 
 ```python
-from mini_datahub.services.webdav_storage import WebDAVStorage
+from hei_datahub.services.webdav_storage import WebDAVStorage
 
 # Initialize
 storage = WebDAVStorage(
@@ -1076,7 +1076,7 @@ storage.mkdir("datasets/new-folder")
 
 **Related:**
 - Implements: `storage_backend.py` interface
-- See: [Authentication & Sync](../architecture/auth-and-sync.md#webdav-operations)
+- See: [Authentication & Sync](../architecture/auth-and-sync.md#webdav-authentication)
 
 ---
 
@@ -1187,7 +1187,7 @@ def _normalize(self, query: str) -> str:
 **Usage Example:**
 
 ```python
-from mini_datahub.services.autocomplete import AutocompleteManager
+from hei_datahub.services.autocomplete import AutocompleteManager
 
 manager = AutocompleteManager(debounce_ms=300)
 
@@ -1307,7 +1307,7 @@ def _process_outbox():
 
 **Related:**
 - Uses: `services/webdav_storage.py`
-- See: [Authentication & Sync](../architecture/auth-and-sync.md#background-sync)
+- See: [Authentication & Sync](../architecture/auth-and-sync.md#background-synchronization)
 
 ---
 
@@ -1410,7 +1410,7 @@ def ensure_database():
 **Usage Example:**
 
 ```python
-from mini_datahub.infra.db import get_connection, ensure_database
+from hei_datahub.infra.db import get_connection, ensure_database
 
 # Initialize database
 ensure_database()
@@ -1557,7 +1557,7 @@ def get_dataset_from_store(dataset_id: str) -> Dict[str, Any]:
 **Related:**
 - Uses: `infra/db.py`
 - Used by: `services/fast_search.py`
-- See: [Search & Autocomplete](../architecture/search-and-autocomplete.md#fts5-operations)
+- See: [Search & Autocomplete](../architecture/search-and-autocomplete.md#sqlite-fts5-search-engine)
 
 ---
 
@@ -1625,13 +1625,13 @@ def _is_dev_mode() -> bool:
     """
     Check if running from repository (development mode).
 
-    Looks for repo structure: /repo/src/mini_datahub
+    Looks for repo structure: /repo/src/hei_datahub
     """
     package_path = Path(__file__).resolve()
-    # Go up 4 levels: infra -> mini_datahub -> src -> repo_root
+    # Go up 4 levels: infra -> hei_datahub -> src -> repo_root
     potential_repo = package_path.parent.parent.parent.parent
     return (
-        (potential_repo / "src" / "mini_datahub").exists() and
+        (potential_repo / "src" / "hei_datahub").exists() and
         (potential_repo / "pyproject.toml").exists()
     )
 ```
@@ -1677,7 +1677,7 @@ def initialize_workspace():
 **Usage Example:**
 
 ```python
-from mini_datahub.infra.paths import (
+from hei_datahub.infra.paths import (
     DATA_DIR,
     CONFIG_DIR,
     DB_PATH,
@@ -1746,4 +1746,4 @@ This walkthrough covered the key modules in Hei-DataHub:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
