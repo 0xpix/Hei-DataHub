@@ -4,9 +4,23 @@ Version information for Hei-DataHub.
 This module reads version data directly from version.yaml at runtime.
 For version updates, simply edit version.yaml - no sync step needed!
 """
+import sys
 import yaml
 from pathlib import Path
 from typing import Tuple
+
+
+def _get_base_path() -> Path:
+    """
+    Get the base path for resource files.
+    Handles both development and PyInstaller packaged environments.
+    """
+    if getattr(sys, 'frozen', False):
+        # Running in PyInstaller bundle
+        return Path(sys._MEIPASS)  # type: ignore
+    else:
+        # Running in development
+        return Path(__file__).parent.parent.parent
 
 
 def _load_version_data() -> dict:
@@ -17,12 +31,16 @@ def _load_version_data() -> dict:
         Dictionary with version metadata
     """
     # PRIORITY 1: Try project root first (for development)
-    # This ensures we always use the most up-to-date version.yaml
-    version_file = Path(__file__).parent.parent.parent / "version.yaml"
+    base_path = _get_base_path()
+    version_file = base_path / "version.yaml"
 
     # PRIORITY 2: Try package directory (for installed/packaged version)
     if not version_file.exists():
         version_file = Path(__file__).parent / "version.yaml"
+
+    # PRIORITY 3: Try PyInstaller bundle hei_datahub directory
+    if not version_file.exists() and getattr(sys, 'frozen', False):
+        version_file = Path(sys._MEIPASS) / "hei_datahub" / "version.yaml"  # type: ignore
 
     # Last resort: use defaults if file not found
     if not version_file.exists():
@@ -131,8 +149,15 @@ def print_version_info(verbose: bool = False) -> None:
 
         console = Console()
 
-        # Load dog ASCII art
-        dog_path = Path(__file__).parent / "ui" / "assets" / "ascii" / "dog.txt"
+        # Load dog ASCII art - handle PyInstaller bundled environment
+        if getattr(sys, 'frozen', False):
+            # PyInstaller bundle
+            base_path = Path(sys._MEIPASS)  # type: ignore
+            dog_path = base_path / "hei_datahub" / "ui" / "assets" / "ascii" / "dog.txt"
+        else:
+            # Development
+            dog_path = Path(__file__).parent / "ui" / "assets" / "ascii" / "dog.txt"
+
         if dog_path.exists():
             dog_lines = dog_path.read_text().splitlines()
         else:
