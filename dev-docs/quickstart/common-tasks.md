@@ -22,10 +22,10 @@ hei-datahub --config /path/to/config.yaml
 ### In Development Mode (Auto-reload)
 ```bash
 # Install watchdog first
-uv pip install watchdog
+uv add --dev watchdog
 
 # Run with auto-reload
-watchmedo auto-restart --patterns="*.py" --recursive -- python -m mini_datahub.cli.main
+watchmedo auto-restart --patterns="*.py" --recursive -- python -m hei_datahub.cli.main
 ```
 
 ## Testing
@@ -42,7 +42,7 @@ pytest tests/test_search_integration.py
 
 ### Run Tests with Coverage
 ```bash
-pytest --cov=mini_datahub --cov-report=html
+pytest --cov=hei_datahub --cov-report=html
 # Open htmlcov/index.html to see coverage report
 ```
 
@@ -78,7 +78,7 @@ ruff check --fix src/ tests/
 
 ### Type Checking (mypy)
 ```bash
-mypy src/mini_datahub
+mypy src/hei_datahub
 ```
 
 ### Run All Quality Checks
@@ -115,7 +115,7 @@ cp db.sqlite db.sqlite.backup
 ```bash
 # Migrations are auto-applied on startup
 # To manually run:
-python -m mini_datahub.infra.db migrate
+python -m hei_datahub.infra.db migrate
 ```
 
 ## Working with Datasets
@@ -154,7 +154,7 @@ git checkout -b feature/my-feature
 ### Commit Changes
 ```bash
 # Stage specific files
-git add src/mini_datahub/services/search.py
+git add src/hei_datahub/services/search.py
 
 # Or stage all changes
 git add .
@@ -259,7 +259,7 @@ stats.print_stats(20)  # Top 20 functions
 pip install memory_profiler
 
 # Add @profile decorator to function
-python -m memory_profiler src/mini_datahub/services/search.py
+python -m memory_profiler src/hei_datahub/services/search.py
 ```
 
 ## Useful Scripts
@@ -305,16 +305,16 @@ Press `Ctrl+Shift+P` and search for "Tasks: Run Task":
 
 ### PyCharm Run Configurations
 1. Add Python configuration
-2. Script path: `src/mini_datahub/cli/main.py`
+2. Script path: `src/hei_datahub/cli/main.py`
 3. Working directory: project root
 4. Python interpreter: `.venv/bin/python`
 
 ## Troubleshooting Common Issues
 
-### "ModuleNotFoundError: No module named 'mini_datahub'"
+### "ModuleNotFoundError: No module named 'hei_datahub'"
 ```bash
 # Reinstall in editable mode
-uv pip install -e .
+uv sync --dev
 ```
 
 ### "Permission denied" on scripts
