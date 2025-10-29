@@ -43,7 +43,7 @@ source .venv/bin/activate  # Linux/macOS
 .venv\Scripts\activate     # Windows
 
 # Install in editable mode
-uv pip install -e .
+uv sync --dev
 
 # Verify
 hei-datahub --version
@@ -124,7 +124,7 @@ Create `.vscode/tasks.json`:
       "label": "Run Application",
       "type": "shell",
       "command": "${workspaceFolder}/.venv/bin/python",
-      "args": ["-m", "mini_datahub.cli.main"],
+      "args": ["-m", "hei_datahub.cli.main"],
       "problemMatcher": []
     },
     {
@@ -156,7 +156,7 @@ Create `.vscode/launch.json`:
       "name": "Run Hei-DataHub",
       "type": "python",
       "request": "launch",
-      "module": "mini_datahub.cli.main",
+      "module": "hei_datahub.cli.main",
       "console": "integratedTerminal",
       "justMyCode": false
     },
@@ -260,7 +260,7 @@ export $(cat .env | xargs)
 
 ```bash
 # Install pre-commit
-uv pip install pre-commit
+uv add --dev pre-commit
 
 # Install git hooks
 pre-commit install
@@ -392,7 +392,7 @@ pyenv local 3.11
 
 ```bash
 # Reinstall in editable mode
-uv pip install -e .
+uv sync --dev
 
 # Or sync dependencies
 uv sync
