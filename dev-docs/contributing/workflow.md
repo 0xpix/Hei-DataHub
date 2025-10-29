@@ -2,9 +2,20 @@
 
 ## Overview
 
-This guide covers **code contributions** to Hei-DataHub. There are two types of contributions:
+This guide covers **all types of code contributions** to Hei-DataHub:
 
-1. **Code Contributions** (this guide) — Bug fixes, features, documentation via GitHub PRs
+- 🐛 **Bug Fixes** — Fix issues, crashes, or incorrect behavior
+- ✨ **New Features** — Add functionality, UI enhancements, or integrations
+- 📚 **Documentation** — Improve guides, fix typos, add examples
+- ♻️ **Refactoring** — Improve code structure without changing behavior
+- 🧪 **Tests** — Add or improve test coverage
+- ⚡ **Performance** — Optimize slow operations, reduce memory usage
+- 🔒 **Security** — Fix vulnerabilities, improve credential handling
+- 🎨 **UI/UX** — Enhance terminal interface, improve workflows
+
+There are two types of contributions to Hei-DataHub:
+
+1. **Code Contributions** (this guide) — Code, docs, tests, fixes via GitHub PRs
 2. **Dataset Contributions** (see below) — Adding/editing datasets via WebDAV cloud storage
 
 ---
@@ -43,7 +54,7 @@ graph TB
 
 ### Path 1: Code Contributions (GitHub)
 
-**For:** Bug fixes, new features, tests, documentation improvements
+**For:** Bug fixes, new features, tests, documentation, refactoring, performance improvements, security fixes, UI enhancements
 
 **Process:** Fork → Branch → Code → Test → PR → Review → Merge
 
@@ -75,19 +86,21 @@ graph TB
 
 ## Code Contribution Prerequisites
 
-Before contributing code:
+Before contributing:
 
 - ✅ Read [System Overview](../architecture/overview.md) to understand the architecture
 - ✅ Read [Codebase Overview](../codebase/overview.md) to know where code lives
-- ✅ Have Python 3.10+ installed
+- ✅ Understand the [Module Structure](../codebase/module-walkthrough.md) for your area
+- ✅ Have Python 3.11+ installed (`python --version`)
 - ✅ Have `uv` installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - ✅ Have Git configured with your name and email
+- ✅ (Optional) Read [Security & Privacy](../architecture/security-privacy.md) for security-sensitive changes
 
 ---
 
 ## Code Contribution Workflow
 
-The following steps apply to **code contributions only** (bug fixes, features, documentation). Dataset contributions follow a different workflow via WebDAV (see above).
+The following steps apply to **all code contributions**: bug fixes, features, documentation, tests, refactoring, performance improvements, and security fixes.
 
 ---
 
@@ -97,22 +110,40 @@ The following steps apply to **code contributions only** (bug fixes, features, d
 
 Visit [GitHub Issues](https://github.com/0xpix/Hei-DataHub/issues)
 
-**Good first issues:**
-- Filter by label: `good first issue`
-- Look for: Small bug fixes, documentation improvements, test additions
+**Filter by type:**
+- `bug` — Something isn't working correctly
+- `enhancement` — New feature or improvement
+- `documentation` — Docs improvements
+- `good first issue` — Great for newcomers
+- `help wanted` — Maintainers need assistance
+- `performance` — Speed or memory optimization
+- `security` — Security-related fixes
 
 **Before starting work:**
 - Comment on the issue: "I'd like to work on this"
 - Wait for maintainer confirmation (avoid duplicate work)
+- Ask questions if requirements are unclear
 
 ### Create a New Issue
 
-If you found a bug or want to propose a feature:
+If you found a bug, want to propose a feature, or suggest an improvement:
 
-1. Search existing issues first (avoid duplicates)
-2. Use issue template (bug report or feature request)
-3. Provide context: What? Why? How?
-4. Wait for triage and feedback
+1. **Search existing issues first** (avoid duplicates)
+2. **Use the appropriate issue template:**
+   - **Bug Report** — For crashes, errors, or incorrect behavior
+   - **Feature Request** — For new functionality
+   - **Documentation** — For docs improvements
+   - **Performance** — For optimization suggestions
+3. **Provide context:**
+   - **What** happened or what you want to add
+   - **Why** it's important or how it affects users
+   - **How** you propose to fix/implement it (optional)
+4. **Include details:**
+   - Version: `hei-datahub --version`
+   - OS: Linux, macOS, Windows
+   - Steps to reproduce (for bugs)
+   - Expected vs actual behavior
+5. **Wait for triage and feedback** from maintainers
 
 ---
 
@@ -157,13 +188,15 @@ source .venv/bin/activate
 hei-datahub --version
 ```
 
-### Alternative: Traditional pip
+### Alternative: Traditional pip (Not Recommended)
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
+
+**Note:** We recommend using `uv` for faster and more reliable dependency management.
 
 ### Verify Setup
 
@@ -182,7 +215,7 @@ hei-datahub
 
 ## Step 4: Create a Feature Branch
 
-**Never work directly on `main` or `docs/devs`.**
+**Never work directly on `main`.**
 
 ### Branch Naming Convention
 
@@ -196,7 +229,7 @@ git checkout -b test/add-sync-tests
 ```
 
 **Branch prefixes:**
-- `feature/` — New features
+- `feature/` — New features or enhancements
 - `fix/` — Bug fixes
 - `docs/` — Documentation only
 - `refactor/` — Code refactoring (no behavior change)
@@ -204,13 +237,27 @@ git checkout -b test/add-sync-tests
 - `chore/` — Maintenance (dependencies, tooling, CI/CD)
 - `security/` — Security fixes
 - `perf/` — Performance improvements
+- `ui/` — UI/UX improvements
 
 **Examples:**
 - `feature/webdav-connection-pooling`
+- `feature/csv-export`
+- `feature/date-range-filters`
 - `fix/keyring-timeout-on-slow-unlock`
+- `fix/search-crash-empty-query`
+- `fix/auth-validation-error`
 - `docs/auth-troubleshooting-section`
+- `docs/cli-examples`
 - `refactor/split-sync-service`
+- `refactor/extract-webdav-client`
+- `test/add-sync-tests`
+- `test/improve-search-coverage`
 - `security/sanitize-log-credentials`
+- `security/prevent-path-traversal`
+- `perf/optimize-fts5-queries`
+- `perf/cache-autocomplete-results`
+- `ui/add-dark-mode`
+- `ui/improve-help-screen`
 
 ---
 
@@ -234,7 +281,7 @@ Before coding:
 **Follow these principles:**
 
 - ✅ **Follow Clean Architecture:** Core has no I/O, Services orchestrate, Infrastructure handles I/O
-- ✅ **Type hints:** Use type annotations for all functions (Python 3.10+ syntax)
+- ✅ **Type hints:** Use type annotations for all functions (Python 3.11+ syntax)
 - ✅ **Docstrings:** Document public functions (Google style)
 - ✅ **Error handling:** Use explicit exceptions or Result types
 - ✅ **Immutability:** Prefer immutable data structures (Pydantic models)
@@ -246,7 +293,7 @@ Before coding:
 ```python
 # Good
 from typing import Optional
-from mini_datahub.core.models import Dataset
+from hei_datahub.core.models import Dataset
 
 def search_datasets(
     query: str,
@@ -308,8 +355,8 @@ pytest -m "not integration"
 ```python
 # tests/services/test_search.py
 import pytest
-from mini_datahub.services import fast_search
-from mini_datahub.core.models import Dataset
+from hei_datahub.services import fast_search
+from hei_datahub.core.models import Dataset
 
 def test_search_with_query_returns_matching_datasets():
     """Test that search returns datasets matching the query."""
