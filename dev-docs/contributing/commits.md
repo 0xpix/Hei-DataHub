@@ -4,6 +4,13 @@
 
 Hei-DataHub follows the **Conventional Commits** specification for clear, structured commit messages that enable automated changelog generation and semantic versioning.
 
+**Why this matters:**
+- ✅ Automated changelog generation
+- ✅ Semantic version bumps (major.minor.patch)
+- ✅ Clear git history for all contributors
+- ✅ Easy to search/filter commits by type
+- ✅ Consistency across the project
+
 ---
 
 ## Commit Message Format
@@ -160,6 +167,115 @@ This improves testability and code organization.
 
 ---
 
+## Real-World Examples by Contribution Type
+
+### Bug Fixes
+
+```bash
+# Simple bug fix
+fix(search): prevent crash on empty query
+
+# Bug fix with explanation
+fix(auth): handle keyring unlock timeout gracefully
+
+When keyring takes >5s to unlock, the app would crash.
+Now shows a friendly error message with retry option.
+
+Fixes #234
+
+# Security bug fix
+security(logging): mask credentials in error messages
+
+Credentials were visible in stack traces when WebDAV
+connection failed. Now replaced with [REDACTED].
+```
+
+### New Features
+
+```bash
+# New feature
+feat(export): add CSV export for datasets
+
+# Feature with breaking change
+feat(cli)!: add interactive mode for setup wizard
+
+BREAKING CHANGE: `hei-datahub auth setup` now requires
+user input. Use `--non-interactive` flag for automation.
+
+# UI feature
+feat(ui): add dark mode theme support
+
+- Add dark color scheme in theme.py
+- Add theme toggle in settings (Ctrl+T)
+- Persist theme preference in config
+
+Closes #42
+```
+
+### Refactoring
+
+```bash
+# Code reorganization
+refactor(services): extract WebDAV client to separate module
+
+Improves testability and reduces coupling between
+sync service and WebDAV implementation.
+
+# Performance refactoring
+perf(search): optimize FTS5 query for large datasets
+
+- Add index on dataset_id column
+- Use prepared statements for repeated queries
+- Reduce database round-trips from 3 to 1
+
+Query time reduced from 500ms to 50ms for 10k datasets.
+```
+
+### Documentation
+
+```bash
+# Documentation improvement
+docs(auth): add troubleshooting section for keyring errors
+
+# API documentation
+docs(api): add examples for search filters
+
+# README update
+docs: update installation instructions for macOS
+```
+
+### Tests
+
+```bash
+# New tests
+test(auth): add comprehensive WebDAV validation tests
+
+- Test timeout scenarios
+- Test network errors
+- Test invalid credentials
+- Add integration test with mock server
+
+Coverage increased from 65% to 85%.
+
+# Fix flaky test
+test(sync): fix race condition in background sync test
+```
+
+### Chores & Maintenance
+
+```bash
+# Dependency update
+chore(deps): upgrade textual to 0.47.0
+
+# CI/CD improvement
+ci: add code coverage reporting to pull requests
+
+# Build system
+build: migrate to uv for dependency management
+```
+
+---
+
 ## Rules
 
 ### DO ✅
@@ -187,7 +303,7 @@ This improves testability and code organization.
 
 ```bash
 # Stage specific files
-git add src/mini_datahub/auth/setup.py tests/auth/test_setup.py
+git add src/hei_datahub/auth/setup.py tests/auth/test_setup.py
 
 # Review staged changes
 git diff --staged
@@ -257,7 +373,7 @@ fi
 Install commitizen for interactive commit creation:
 
 ```bash
-pip install commitizen
+uv add --dev commitizen
 
 # Interactive commit
 cz commit
@@ -277,7 +393,7 @@ git log --pretty=format:"%s" --grep="^feat" > CHANGELOG.md
 **Output:**
 
 ```markdown
-## [0.59.0] - 2025-10-25
+## [0.60.0] - 2025-10-29
 
 ### Features
 - feat(auth): add WebDAV token validation
@@ -345,4 +461,4 @@ Closes #123
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
