@@ -137,5 +137,5 @@ See [Developer Docs](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/) for cont
 ---
 
 <p align="center">
-  <strong>Built for research teams who want clean data organization without the overhead</strong>
+  <strong>Built with 󰋑 for research teams who want clean data organization without the overhead</strong>
 </p>
