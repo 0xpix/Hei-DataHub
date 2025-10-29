@@ -10,7 +10,7 @@ This document identifies known performance bottlenecks in Hei-DataHub and provid
 
 ### 1. FTS5 Query Compilation
 
-**Location:** `src/mini_datahub/services/fast_search.py`
+**Location:** `src/hei_datahub/services/fast_search.py`
 
 **Issue:**
 - SQLite compiles FTS query on every search
@@ -54,7 +54,7 @@ def search(query: str):
 
 ### 2. Large Result Sets
 
-**Location:** `src/mini_datahub/services/fast_search.py`
+**Location:** `src/hei_datahub/services/fast_search.py`
 
 **Issue:**
 - Fetching all results at once
@@ -97,7 +97,7 @@ def search(query: str, limit: int = 20):
 
 ### 3. Autocomplete Index Rebuilds
 
-**Location:** `src/mini_datahub/services/autocomplete.py`
+**Location:** `src/hei_datahub/services/autocomplete.py`
 
 **Issue:**
 - Rebuilding entire autocomplete index on every dataset change
@@ -141,7 +141,7 @@ def update_autocomplete_index(dataset_id: str):
 
 ### 4. Serial WebDAV Downloads
 
-**Location:** `src/mini_datahub/services/sync.py`
+**Location:** `src/hei_datahub/services/sync.py`
 
 **Issue:**
 - Downloading datasets sequentially
@@ -187,7 +187,7 @@ async def sync_download():
 
 ### 5. Redundant Cloud Checks
 
-**Location:** `src/mini_datahub/services/sync.py`
+**Location:** `src/hei_datahub/services/sync.py`
 
 **Issue:**
 - Checking if every dataset exists on cloud
@@ -230,7 +230,7 @@ def sync_upload():
 
 ### 6. WebDAV Connection Overhead
 
-**Location:** `src/mini_datahub/infra/webdav_storage.py`
+**Location:** `src/hei_datahub/infra/webdav_storage.py`
 
 **Issue:**
 - Creating new HTTP connection for each request
@@ -282,7 +282,7 @@ def download(dataset):
 
 ### 7. DataTable Re-renders
 
-**Location:** `src/mini_datahub/ui/widgets/dataset_table.py`
+**Location:** `src/hei_datahub/ui/widgets/dataset_table.py`
 
 **Issue:**
 - Re-rendering entire table on every keystroke
@@ -334,7 +334,7 @@ class DatasetTable(DataTable):
 
 ### 8. Synchronous Cloud Status Checks
 
-**Location:** `src/mini_datahub/ui/views/home_view.py`
+**Location:** `src/hei_datahub/ui/views/home_view.py`
 
 **Issue:**
 - Checking cloud sync status on UI thread
@@ -379,7 +379,7 @@ class HomeView(Screen):
 
 ### 9. Missing Indexes
 
-**Location:** `src/mini_datahub/infra/database.py`
+**Location:** `src/hei_datahub/infra/database.py`
 
 **Issue:**
 - Full table scan on `datasets_store.uuid`
@@ -419,7 +419,7 @@ SELECT * FROM datasets_store WHERE uuid = 'abc123';
 
 ### 10. FTS5 Rebuild on Startup
 
-**Location:** `src/mini_datahub/infra/index_service.py`
+**Location:** `src/hei_datahub/infra/index_service.py`
 
 **Issue:**
 - Checking FTS index integrity on every startup
@@ -470,7 +470,7 @@ def quick_fts_check():
 
 ### 11. Caching All Search Results
 
-**Location:** `src/mini_datahub/services/cache.py`
+**Location:** `src/hei_datahub/services/cache.py`
 
 **Issue:**
 - Unbounded cache of search results
@@ -555,4 +555,4 @@ python -m cProfile app.py
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
