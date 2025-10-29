@@ -11,7 +11,7 @@ The `core/` module is the **heart of the business logic**. It contains:
 ## File Structure
 
 ```
-src/mini_datahub/core/
+src/hei_datahub/core/
 ├── __init__.py         # Package exports
 ├── models.py           # Pydantic data models
 ├── queries.py          # Query parsing & structured search
@@ -32,7 +32,7 @@ Define **type-safe data structures** using Pydantic for automatic validation.
 The main data model representing a complete dataset.
 
 ```python
-from mini_datahub.core.models import DatasetMetadata
+from hei_datahub.core.models import DatasetMetadata
 from datetime import date
 
 # Create a dataset
@@ -97,7 +97,7 @@ dataset_name="a" * 201  # ❌ Too long (max 200)
 Defines a single field/column in the dataset schema.
 
 ```python
-from mini_datahub.core.models import SchemaField
+from hei_datahub.core.models import SchemaField
 
 field = SchemaField(
     name="temperature",
@@ -157,7 +157,7 @@ def validate_id(cls, v: str) -> str:
 ```python
 # services/catalog.py
 import yaml
-from mini_datahub.core.models import DatasetMetadata
+from hei_datahub.core.models import DatasetMetadata
 
 def load_dataset(yaml_path: str) -> DatasetMetadata:
     with open(yaml_path) as f:
@@ -313,7 +313,7 @@ ParsedQuery(
 #### Basic Parsing
 
 ```python
-from mini_datahub.core.queries import QueryParser
+from hei_datahub.core.queries import QueryParser
 
 parser = QueryParser()
 parsed = parser.parse("source:webdav format:csv climate")
@@ -398,7 +398,7 @@ Centralize business logic like ID generation, validation, and normalization.
 Convert any text to a valid dataset ID slug.
 
 ```python
-from mini_datahub.core.rules import slugify
+from hei_datahub.core.rules import slugify
 
 # Examples
 slugify("My Dataset Name")  # → "my-dataset-name"
@@ -429,7 +429,7 @@ def slugify(text: str) -> str:
 Generate a unique ID, handling collisions with automatic suffixes.
 
 ```python
-from mini_datahub.core.rules import generate_unique_id
+from hei_datahub.core.rules import generate_unique_id
 
 def dataset_exists(id: str) -> bool:
     # Check if ID already in database
@@ -463,7 +463,7 @@ def create_dataset(name: str, metadata: dict) -> str:
 Validate an ID against all rules.
 
 ```python
-from mini_datahub.core.rules import validate_dataset_id
+from hei_datahub.core.rules import validate_dataset_id
 
 # Valid IDs
 is_valid, error = validate_dataset_id("my-dataset")
@@ -536,8 +536,8 @@ Exception (Python built-in)
 
 #### ValidationError
 ```python
-from mini_datahub.core.errors import ValidationError
-from mini_datahub.core.models import DatasetMetadata
+from hei_datahub.core.errors import ValidationError
+from hei_datahub.core.models import DatasetMetadata
 
 try:
     dataset = DatasetMetadata(
@@ -551,7 +551,7 @@ except ValidationError as e:
 
 #### StorageError
 ```python
-from mini_datahub.core.errors import StorageError
+from hei_datahub.core.errors import StorageError
 
 try:
     with open(dataset_path) as f:
@@ -562,7 +562,7 @@ except IOError as e:
 
 #### IndexError (Database)
 ```python
-from mini_datahub.core.errors import IndexError as DataHubIndexError
+from hei_datahub.core.errors import IndexError as DataHubIndexError
 
 try:
     conn.execute("INSERT INTO datasets ...")
@@ -572,7 +572,7 @@ except sqlite3.Error as e:
 
 #### SyncError
 ```python
-from mini_datahub.core.errors import SyncError
+from hei_datahub.core.errors import SyncError
 
 try:
     webdav_client.download(remote_path)
@@ -582,7 +582,7 @@ except httpx.HTTPError as e:
 
 #### ConfigError
 ```python
-from mini_datahub.core.errors import ConfigError
+from hei_datahub.core.errors import ConfigError
 
 def load_config(path: str):
     if not path.exists():
@@ -610,7 +610,7 @@ def load_and_validate_dataset(path: str) -> DatasetMetadata:
 
 #### Catch All DataHub Errors
 ```python
-from mini_datahub.core.errors import DataHubError
+from hei_datahub.core.errors import DataHubError
 
 try:
     dataset = catalog.load_dataset("my-dataset")
@@ -632,8 +632,8 @@ The core module is **pure Python** with no external dependencies, making it easy
 
 ```python
 # tests/test_core_models.py
-from mini_datahub.core.models import DatasetMetadata
-from mini_datahub.core.errors import ValidationError
+from hei_datahub.core.models import DatasetMetadata
+from hei_datahub.core.errors import ValidationError
 import pytest
 from datetime import date
 
@@ -662,7 +662,7 @@ def test_invalid_id_raises_error():
 
 def test_slugify():
     """Test slug generation."""
-    from mini_datahub.core.rules import slugify
+    from hei_datahub.core.rules import slugify
 
     assert slugify("My Dataset") == "my-dataset"
     assert slugify("Climate_Data") == "climate-data"
