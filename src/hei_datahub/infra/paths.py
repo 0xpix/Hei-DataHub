@@ -124,12 +124,10 @@ KEYRING_USERNAME = "github-token"
 
 def ensure_directories():
     """Ensure all required directories exist."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
-    OUTBOX_DIR.mkdir(parents=True, exist_ok=True)
     if _is_installed_package():
         ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
