@@ -2,7 +2,22 @@
 
 ## Overview
 
-This document defines when a feature, bug fix, or task is considered **complete** in Hei-DataHub. Use this as a checklist before marking work as done.
+This document defines when a contribution is considered **complete** and ready to merge. Use this as a checklist before submitting your pull request.
+
+**Applies to all contribution types:**
+- 🐛 Bug fixes
+- ✨ New features
+- 📚 Documentation improvements
+- ♻️ Refactoring
+- 🧪 Tests
+- ⚡ Performance optimizations
+- 🔒 Security fixes
+- 🎨 UI/UX enhancements
+
+**Quick Reference:**
+- [General Criteria](#general-criteria) — Applies to all contributions
+- [Feature-Specific](#feature-specific-criteria) — Based on contribution type
+- [Layer-Specific](#layer-specific-criteria) — Based on code layer modified
 
 ---
 
@@ -128,6 +143,56 @@ This document defines when a feature, bug fix, or task is considered **complete*
 - [x] Links: Cross-references to security docs
 - [x] Proofread: No spelling errors
 - [x] Style: Matches other architecture docs
+
+### Performance Optimization
+
+- [ ] **Benchmark before** - Baseline performance measured
+- [ ] **Benchmark after** - Improvement quantified
+- [ ] **No regressions** - Other features not slower
+- [ ] **Profiling done** - Identified actual bottleneck
+- [ ] **Trade-offs documented** - Any complexity/memory costs noted
+- [ ] **Tests still pass** - Optimization doesn't break functionality
+
+**Example Checklist for "Optimize FTS5 Queries":**
+
+- [x] Benchmark: Query time reduced from 500ms to 50ms
+- [x] Profiling: Identified N+1 query problem
+- [x] Solution: Added index, batched queries
+- [x] No regressions: Other searches unaffected
+- [x] Trade-off: Index adds 5MB to database size
+- [x] Tests pass: All search tests still green
+
+### Security Fix
+
+- [ ] **Vulnerability fixed** - Security issue resolved
+- [ ] **No information disclosure** - Credentials/data not exposed
+- [ ] **Tests added** - Regression test for vulnerability
+- [ ] **Security implications documented** - CVE/advisory created if needed
+- [ ] **Backport considered** - Fix applied to supported versions
+
+**Example Checklist for "Fix Credential Logging":**
+
+- [x] Vulnerability: Credentials visible in error logs
+- [x] Fix: Mask passwords with [REDACTED]
+- [x] Test: Verify credentials not in log output
+- [x] No disclosure: Old logs reviewed/cleaned
+- [x] Backport: Applied to v0.59 and v0.58
+
+### Test Addition
+
+- [ ] **Tests meaningful** - Not just for coverage
+- [ ] **Edge cases covered** - Boundary conditions tested
+- [ ] **Tests pass consistently** - No flaky tests
+- [ ] **Fast execution** - Unit tests < 100ms each
+- [ ] **Clear test names** - Describes what is being tested
+
+**Example Checklist for "Add Auth Tests":**
+
+- [x] Meaningful: Tests real validation scenarios
+- [x] Edge cases: Empty credentials, timeout, network error
+- [x] Consistent: Tests pass 100 times in a row
+- [x] Fast: All unit tests run in < 50ms
+- [x] Clear names: `test_validate_with_invalid_credentials_returns_false`
 
 ---
 
@@ -344,4 +409,4 @@ Breaking changes allowed:
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
