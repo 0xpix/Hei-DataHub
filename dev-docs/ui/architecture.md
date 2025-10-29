@@ -1,8 +1,27 @@
 # UI/TUI Architecture
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the UI polish, removed features, and enhanced navigation in v0.60.
+
+!!! info "What this section covers"
+    This page explains Hei-DataHub's Terminal User Interface built with Textual, including views, widgets, event handling, and the reactive programming model. Essential for understanding and extending the UI.
+
 ## Introduction
 
 Hei-DataHub uses **Textual** for its Terminal User Interface (TUI). This document explains the UI architecture, design patterns, and how components interact.
+
+!!! success "v0.60 UI Improvements"
+    **New in v0.60:**
+    - About screen with Vim navigation (`Ctrl+a`)
+    - Enhanced search filters (`source:`, `format:`, `tags:`)
+    - Vim-style navigation (`gg`, `G`)
+    - Stable scrollbars across all screens
+    - UI layout optimizations (1-line header/footer)
+
+    **Removed in v0.60:**
+    - Outbox view (replaced by direct WebDAV workflow)
+    - GitHub PR integration screens
+    - Cloud file preview screen
 
 ---
 
@@ -61,12 +80,12 @@ Hei-DataHub uses **Textual** for its Terminal User Interface (TUI). This documen
 
 ## Application Entry Point
 
-**Location:** `src/mini_datahub/ui/app.py`
+**Location:** `src/hei_datahub/ui/app.py`
 
 ```python
 from textual.app import App
 from textual.binding import Binding
-from mini_datahub.ui.views.home import HomeView
+from hei_datahub.ui.views.home import HomeView
 
 class MiniDataHubApp(App):
     """Main TUI application"""
@@ -87,17 +106,17 @@ class MiniDataHubApp(App):
 
     def action_search(self) -> None:
         """Open search view"""
-        from mini_datahub.ui.views.search import SearchView
+        from hei_datahub.ui.views.search import SearchView
         self.push_screen(SearchView())
 
     def action_new_dataset(self) -> None:
         """Open create dataset form"""
-        from mini_datahub.ui.views.create_dataset import CreateDatasetView
+        from hei_datahub.ui.views.create_dataset import CreateDatasetView
         self.push_screen(CreateDatasetView())
 
     def action_sync(self) -> None:
         """Trigger manual sync"""
-        from mini_datahub.services.sync import sync_now
+        from hei_datahub.services.sync import sync_now
         result = sync_now()
         self.notify(f"Synced: {result.downloads} ↓ {result.uploads} ↑")
 
@@ -116,12 +135,16 @@ def main():
 MiniDataHubApp
 ├── HomeView (landing screen)
 ├── SearchView (search interface)
-├── CloudFilesView (cloud file browser)
+├── AboutView (project info - new in v0.60)
 ├── CreateDatasetView (new dataset form)
 ├── EditDatasetView (edit existing dataset)
-├── SettingsView (app settings)
-└── OutboxView (failed uploads queue)
+├── DatasetDetailView (dataset details)
+└── SettingsView (WebDAV settings)
 ```
+
+!!! warning "Removed in v0.60"
+    - **OutboxView** - Removed (direct WebDAV sync replaces it)
+    - **CloudFilesView** - Removed (replaced by integrated cloud features)
 
 ---
 
@@ -199,7 +222,7 @@ class HomeView(Screen):
 
 ### Custom Widgets
 
-**Location:** `src/mini_datahub/ui/widgets/`
+**Location:** `src/hei_datahub/ui/widgets/`
 
 #### AutocompleteInput
 
@@ -413,7 +436,7 @@ class MiniDataHubApp(App):
 
 ## Styling (CSS)
 
-**Location:** `src/mini_datahub/ui/theme.css`
+**Location:** `src/hei_datahub/ui/theme.css`
 
 ```css
 /* Global styles */
@@ -621,7 +644,7 @@ class LargeDatasetTable(DataTable):
 # tests/ui/test_widgets.py
 
 from textual.app import App
-from mini_datahub.ui.widgets import AutocompleteInput
+from hei_datahub.ui.widgets import AutocompleteInput
 
 async def test_autocomplete_input():
     """Test autocomplete widget"""
@@ -643,7 +666,7 @@ async def test_autocomplete_input():
 ### View Testing
 
 ```python
-from mini_datahub.ui.views.home import HomeView
+from hei_datahub.ui.views.home import HomeView
 
 async def test_home_view_navigation():
     """Test home view button navigation"""
@@ -669,4 +692,4 @@ async def test_home_view_navigation():
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
