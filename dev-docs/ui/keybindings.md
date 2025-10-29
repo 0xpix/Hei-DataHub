@@ -1,8 +1,24 @@
 # Keybindings
 
+> **Version:** 0.60.0-beta — "Clean-up"
+> This documentation reflects the enhanced Vim-style navigation keybindings added in v0.60.
+
+!!! info "What this section covers"
+    This page describes all keyboard shortcuts in Hei-DataHub TUI and how they're implemented. Essential for understanding user interaction patterns and adding new keybindings.
+
 ## Introduction
 
 This document describes all keyboard shortcuts in Hei-DataHub TUI and how to customize them.
+
+!!! success "New in v0.60: Vim Navigation"
+    **Enhanced keyboard navigation:**
+    - `gg` - Jump to top of list
+    - `G` - Jump to bottom of list
+    - `Ctrl+a` - Show About screen
+    - `j/k` - Scroll up/down
+    - `d/u` - Page down/up (half page)
+
+    All Vim-style bindings work in scrollable screens (About, Help, Dataset Details, Settings).
 
 ---
 
@@ -10,21 +26,33 @@ This document describes all keyboard shortcuts in Hei-DataHub TUI and how to cus
 
 ### Application-Wide Shortcuts
 
+| Key | Action | Description | Version |
+|-----|--------|-------------|---------|
+| `q` | Quit | Exit application | All |
+| `Ctrl+C` | Quit | Force quit | All |
+| `?` | Help | Show help screen | All |
+| `/` | Search | Open search view | All |
+| `n` | New Dataset | Create new dataset | All |
+| `s` | Sync | Trigger manual sync | All |
+| `Ctrl+a` | About | Show About screen | v0.60+ |
+| `Ctrl+K` | Command Palette | Quick actions | All |
+| `ESC` | Back | Go to previous screen | All |
+
+**Vim-Style Navigation (v0.60+):**
+
 | Key | Action | Description |
 |-----|--------|-------------|
-| `q` | Quit | Exit application |
-| `Ctrl+C` | Quit | Force quit |
-| `?` | Help | Show help screen |
-| `/` | Search | Open search view |
-| `n` | New Dataset | Create new dataset |
-| `s` | Sync | Trigger manual sync |
-| `Ctrl+K` | Command Palette | Quick actions |
-| `ESC` | Back | Go to previous screen |
+| `j` | Scroll Down | Move down one line |
+| `k` | Scroll Up | Move up one line |
+| `gg` | Jump to Top | Go to first item/line |
+| `G` | Jump to Bottom | Go to last item/line |
+| `d` | Page Down | Scroll down half page |
+| `u` | Page Up | Scroll up half page |
 
 **Implementation:**
 
 ```python
-# src/mini_datahub/ui/app.py
+# src/hei_datahub/ui/app.py
 
 from textual.app import App
 from textual.binding import Binding
@@ -50,7 +78,7 @@ class MiniDataHubApp(App):
 
     def action_sync_now(self) -> None:
         """Trigger manual sync"""
-        from mini_datahub.services.sync import sync_now
+        from hei_datahub.services.sync import sync_now
         result = sync_now()
         self.notify(f"Synced: {result.downloads} ↓ {result.uploads} ↑")
 
@@ -433,4 +461,4 @@ async def test_save_keybinding():
 
 ---
 
-**Last Updated:** October 25, 2025 | **Version:** 0.59.0-beta "Privacy"
+**Last Updated:** October 29, 2025 | **Version:** 0.60.0-beta "Clean-up"
