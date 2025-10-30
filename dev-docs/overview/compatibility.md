@@ -61,8 +61,8 @@ mkdocs serve -f mkdocs-dev.yml
 ```
 
 **Published archives** (if available):
-- v0.56.x: [Current site](https://0xpix.github.io/Hei-DataHub/dev)
-- v0.55.x: [Archive (if published)](https://0xpix.github.io/Hei-DataHub/dev/v0.55)
+- v0.56.x: [Current site](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1)
+- v0.55.x: [Archive (if published)](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/v0.55)
 
 ---
 

@@ -22,7 +22,7 @@
     scrollSmooth: true,
     enableInInputs: false,
     userDocsUrl: 'https://0xpix.github.io/Hei-DataHub/',
-    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/',
+    devDocsUrl: 'https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1',
   };
 
   // State

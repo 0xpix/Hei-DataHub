@@ -1,7 +1,7 @@
 # MkDocs Configuration for Hei-DataHub Tutorial Documentation
 # This site contains tutorials and learning guides for Hei-DataHub
 # User-facing documentation: https://0xpix.github.io/Hei-DataHub/
-# Developer documentation: https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/
+# Developer documentation: https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1
 
 site_name: Hei-DataHub Tutorials
 site_description: 'Tutorial documentation for Hei-DataHub v0.60.0 (beta) - Step-by-step guides for building with Hei-DataHub'

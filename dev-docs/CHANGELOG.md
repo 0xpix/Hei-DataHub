@@ -126,6 +126,6 @@ docs: update compatibility matrix for v0.56
 
 ## Links
 
-- [Developer Docs Site](https://0xpix.github.io/Hei-DataHub/dev)
+- [Developer Docs Site](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1)
 - [User Docs Site](https://0xpix.github.io/Hei-DataHub)
 - [GitHub Repository](https://github.com/0xpix/Hei-DataHub)

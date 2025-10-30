@@ -7,7 +7,7 @@
     **You are viewing the tutorial documentation.** This site contains step-by-step guides for learning how Hei-DataHub works.
 
     - Looking for user documentation? → [**User Manual**](https://0xpix.github.io/Hei-DataHub)
-    - Looking for API reference? → [**Developer Docs**](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/)
+    - Looking for API reference? → [**Developer Docs**](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1)
 
 !!! info "Version Compatibility"
     **Tutorial for v0.60.0-beta "Clean-up"**
@@ -271,7 +271,7 @@ After completing this tutorial, you will be able to:
 ## 🔗 Additional Resources
 
 - **User Documentation:** [Hei-DataHub Manual](https://0xpix.github.io/Hei-DataHub)
-- **Developer Reference:** [API Docs](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/)
+- **Developer Reference:** [API Docs](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1)
 - **GitHub Repository:** [0xpix/Hei-DataHub](https://github.com/0xpix/Hei-DataHub)
 - **Textual Framework:** [textual.textualize.io](https://textual.textualize.io/)
 - **SQLite FTS5:** [sqlite.org/fts5.html](https://www.sqlite.org/fts5.html)
@@ -459,7 +459,7 @@ After completing this tutorial, you will be able to:
 ## 🔗 Additional Resources
 
 - **User Documentation:** [Hei-DataHub Manual](https://0xpix.github.io/Hei-DataHub)
-- **Developer Reference:** [API Docs](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1/dev/)
+- **Developer Reference:** [API Docs](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1)
 - **GitHub Repository:** [0xpix/Hei-DataHub](https://github.com/0xpix/Hei-DataHub)
 - **Textual Framework:** [textual.textualize.io](https://textual.textualize.io/)
 - **SQLite FTS5:** [sqlite.org/fts5.html](https://www.sqlite.org/fts5.html)
