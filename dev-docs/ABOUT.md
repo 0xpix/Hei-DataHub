@@ -7,9 +7,11 @@
 
 This is the **developer documentation site** for Hei-DataHub. It lives on the `docs/v0.60-beta-update` branch and is published independently from the user-facing documentation.
 
-**🌐 Published Site:** https://0xpix.github.io/Hei-DataHub/dev
+**🌐 Published Site:** https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1
 
 **📖 User Docs (separate):** https://0xpix.github.io/Hei-DataHub
+
+**🎓 Tutorial Docs (separate):** https://0xpix.github.io/Hei-DataHub/tutorial
 
 ---
 
