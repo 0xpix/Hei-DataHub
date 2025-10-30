@@ -31,7 +31,7 @@ With the decision to split user and developer documentation (see [ADR-001](001-d
 
 **2. `docs/devs` branch**
 - Developer documentation
-- Published to: `https://0xpix.github.io/Hei-DataHub/dev` (or separate URL)
+- Published to: `https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1` (obfuscated path)
 - Config: `mkdocs-dev.yml`
 - Directory: `dev-docs/`
 
