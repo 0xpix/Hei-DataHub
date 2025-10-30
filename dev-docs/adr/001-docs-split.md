@@ -61,7 +61,7 @@ Previously, all documentation lived in a single MkDocs site (`docs/` folder, pub
 - **Branch:** `docs/devs`
 - **Config:** `mkdocs-dev.yml`
 - **Publishing:** GitHub Pages from `docs/devs` branch (independent workflow)
-- **URL:** `https://0xpix.github.io/Hei-DataHub/dev` or custom subdomain
+- **URL:** `https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1` (obfuscated path for developer docs)
 
 ### Site Switcher
 - Both sites will have a prominent **site switcher** at the top
