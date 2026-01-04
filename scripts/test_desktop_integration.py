@@ -16,11 +16,11 @@ def test_imports():
     print("Testing imports...")
     try:
         from hei_datahub.desktop_install import (
-            install_desktop_assets,
-            ensure_desktop_assets_once,
-            uninstall_desktop_assets,
-            get_desktop_assets_status,
-            get_install_paths_info,
+            ensure_desktop_assets_once,  # noqa: F401
+            get_desktop_assets_status,  # noqa: F401
+            get_install_paths_info,  # noqa: F401
+            install_desktop_assets,  # noqa: F401
+            uninstall_desktop_assets,  # noqa: F401
         )
         print("  ✓ All imports successful")
         return True

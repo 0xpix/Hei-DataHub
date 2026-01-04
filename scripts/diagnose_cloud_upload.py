@@ -17,7 +17,7 @@ def test_webdav_connection():
     print("=" * 60)
 
     try:
-        from mini_datahub.services.storage_manager import get_storage_backend
+        from hei_datahub.services.storage_manager import get_storage_backend
 
         storage = get_storage_backend()
         print(f"✓ Storage backend created: {type(storage).__name__}")
@@ -33,8 +33,8 @@ def test_webdav_connection():
             return False
 
         # Test write capability with a test file
-        import tempfile
         import os
+        import tempfile
 
         with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as tmp:
             tmp.write("test upload")
@@ -50,7 +50,7 @@ def test_webdav_connection():
             try:
                 storage.delete(test_remote_path)
                 print("✓ Test file deleted (cleanup successful)")
-            except:
+            except Exception:
                 print("⚠ Could not delete test file (may need manual cleanup)")
 
             return True
@@ -76,10 +76,12 @@ def test_dataset_edit_simulation():
     print("=" * 60)
 
     try:
-        from mini_datahub.services.storage_manager import get_storage_backend
-        import yaml
-        import tempfile
         import os
+        import tempfile
+
+        import yaml
+
+        from hei_datahub.services.storage_manager import get_storage_backend
 
         storage = get_storage_backend()
 
@@ -104,7 +106,7 @@ def test_dataset_edit_simulation():
             download_path = tmp.name
 
         # Parse metadata
-        with open(download_path, 'r', encoding='utf-8') as f:
+        with open(download_path, encoding='utf-8') as f:
             metadata = yaml.safe_load(f)
 
         print(f"Current metadata name: {metadata.get('name', 'N/A')}")
@@ -130,7 +132,7 @@ def test_dataset_edit_simulation():
                 storage.download(metadata_path, tmp.name)
                 verify_path = tmp.name
 
-            with open(verify_path, 'r', encoding='utf-8') as f:
+            with open(verify_path, encoding='utf-8') as f:
                 verify_metadata = yaml.safe_load(f)
 
             if '_test_edit' in verify_metadata:
@@ -156,7 +158,7 @@ def test_dataset_edit_simulation():
             os.unlink(upload_path)
             try:
                 os.unlink(verify_path)
-            except:
+            except Exception:
                 pass
 
     except Exception as e:
@@ -172,7 +174,7 @@ def test_index_cloud_detection():
     print("=" * 60)
 
     try:
-        from mini_datahub.services.fast_search import get_all_indexed
+        from hei_datahub.services.fast_search import get_all_indexed
 
         results = get_all_indexed()
 
@@ -230,8 +232,8 @@ def main():
         print(f"✓ All diagnostics passed ({passed}/{total})")
         print("\nCloud upload should be working correctly.")
         print("If you still have issues:")
-        print("  1. Check logs: ~/.local/share/Hei-DataHub/logs/mini-datahub.log")
-        print("  2. Run: python -m mini_datahub auth doctor")
+        print("  1. Check logs: ~/.local/share/Hei-DataHub/logs/hei-datahub.log")
+        print("  2. Run: python -m hei_datahub auth doctor")
         return 0
     else:
         print(f"✗ Some diagnostics failed ({passed}/{total} passed)")

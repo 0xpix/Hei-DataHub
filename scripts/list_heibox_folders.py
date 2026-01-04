@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from mini_datahub.services.storage_manager import get_storage_backend
+from hei_datahub.services.storage_manager import get_storage_backend
 
 storage = get_storage_backend()
 entries = storage.listdir("")

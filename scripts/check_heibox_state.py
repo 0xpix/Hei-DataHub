@@ -3,13 +3,15 @@
 Quick script to download and show current state of datasets on HeiBox.
 """
 import sys
-import yaml
 from pathlib import Path
+
+import yaml
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from mini_datahub.services.storage_manager import get_storage_backend
+
 
 def check_heibox():
     storage = get_storage_backend()
@@ -31,7 +33,7 @@ def check_heibox():
             storage.download(remote_path, tmp_path)
 
             # Read the YAML
-            with open(tmp_path, 'r') as f:
+            with open(tmp_path) as f:
                 metadata = yaml.safe_load(f)
 
             # Cleanup
