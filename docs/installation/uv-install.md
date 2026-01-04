@@ -345,7 +345,7 @@ hei-datahub paths
 **Solution:**
 ```bash
 # Manually trigger initialization
-python -c "from mini_datahub.infra.paths import initialize_workspace; initialize_workspace()"
+python -c "from hei_datahub.infra.paths import initialize_workspace; initialize_workspace()"
 
 # Reindex
 hei-datahub reindex

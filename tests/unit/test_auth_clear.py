@@ -49,21 +49,21 @@ some_setting = "value"
 class TestAuthClear:
     """Test cases for auth clear command."""
 
-    @patch("mini_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.auth.clear.platform.system")
     def test_non_linux_platform(self, mock_platform):
         """Test that clear fails on non-Linux platforms."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Windows"
         exit_code = run_clear()
 
         assert exit_code == 2
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     def test_no_config_file(self, mock_get_config_path, mock_platform, mock_config_path, capsys):
         """Test when config file doesn't exist."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_path  # File doesn't exist
@@ -74,11 +74,11 @@ class TestAuthClear:
         captured = capsys.readouterr()
         assert "Nothing to clear" in captured.out
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     def test_no_auth_section(self, mock_get_config_path, mock_platform, mock_config_without_auth, capsys):
         """Test when config exists but has no [auth] section."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_without_auth
@@ -89,12 +89,12 @@ class TestAuthClear:
         captured = capsys.readouterr()
         assert "Nothing to clear" in captured.out
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     @patch("builtins.input")
     def test_interactive_cancel(self, mock_input, mock_get_config_path, mock_platform, mock_config_with_auth, capsys):
         """Test interactive mode with user cancelling."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -106,13 +106,13 @@ class TestAuthClear:
         captured = capsys.readouterr()
         assert "Cancelled" in captured.out
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     @patch("builtins.input")
     @patch("keyring.delete_password")
     def test_interactive_confirm_keyring(self, mock_delete_password, mock_input, mock_get_config_path, mock_platform, mock_config_with_auth, capsys):
         """Test interactive mode with user confirming and keyring storage."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -139,12 +139,12 @@ class TestAuthClear:
         assert "auth" not in config
         assert "other" in config  # Other sections preserved
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     @patch("keyring.delete_password")
     def test_force_mode_keyring(self, mock_delete_password, mock_get_config_path, mock_platform, mock_config_with_auth, capsys):
         """Test force mode (no prompt) with keyring storage."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -159,11 +159,11 @@ class TestAuthClear:
         # Verify keyring delete was called
         mock_delete_password.assert_called_once()
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     def test_env_storage(self, mock_get_config_path, mock_platform, mock_config_path, capsys):
         """Test clearing with ENV storage (should show warning)."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         # Create config with env storage
         config_content = """
@@ -186,13 +186,13 @@ stored_in = "env"
         assert "✅ Cleared WebDAV credentials" in captured.out
         assert "Remove environment variable manually" in captured.out
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.infra.config_paths.get_user_config_dir")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.infra.config_paths.get_user_config_dir")
     @patch("keyring.delete_password")
     def test_clear_all_flag(self, mock_delete_password, mock_get_user_config_dir, mock_get_config_path, mock_platform, mock_config_with_auth, tmp_path, capsys):
         """Test --all flag to clear cached session files."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -213,12 +213,12 @@ stored_in = "env"
         assert "✅ Cleared WebDAV credentials" in captured.out
         assert "Removed" in captured.out and "cached file(s)" in captured.out
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     @patch("keyring.delete_password")
     def test_keyring_delete_failure(self, mock_delete_password, mock_get_config_path, mock_platform, mock_config_with_auth, capsys):
         """Test graceful handling when keyring delete fails."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -233,13 +233,13 @@ stored_in = "env"
         captured = capsys.readouterr()
         assert "✅ Cleared WebDAV credentials" in captured.out
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     @patch("builtins.input")
     @patch("keyring.delete_password")
     def test_preserve_other_config_sections(self, mock_delete_password, mock_input, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test that other config sections are preserved after clearing auth."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -262,11 +262,11 @@ stored_in = "env"
         assert "other" in config
         assert config["other"]["some_setting"] == "value"
 
-    @patch("mini_datahub.auth.clear.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.clear.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     def test_idempotent(self, mock_get_config_path, mock_platform, mock_config_with_auth, capsys):
         """Test that running clear multiple times is safe (idempotent)."""
-        from mini_datahub.auth.clear import run_clear
+        from hei_datahub.auth.clear import run_clear
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth

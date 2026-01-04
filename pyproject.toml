@@ -69,7 +69,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["mini_datahub*", "hei_datahub*"]
+include = ["hei_datahub*"]
 
 [tool.setuptools.package-data]
 hei_datahub = [
