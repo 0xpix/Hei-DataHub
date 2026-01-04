@@ -90,9 +90,6 @@ data/**/*.gdb
 # DataHub - local config (use ~/.mini-datahub instead)
 .datahub_config.json
 
-# DataHub - outbox for failed PRs
-.outbox/
-
 # DataHub - ignore data files but keep metadata
 # Keep the directory structure and metadata files, ignore actual data files
 data/**/*.csv
@@ -113,9 +110,6 @@ data/**/*.gdb
 
 # DataHub - local config (use ~/.mini-datahub instead)
 .datahub_config.json
-
-# DataHub - outbox for failed PRs
-.outbox/
 
 # Flask stuff:
 instance/
@@ -276,3 +270,4 @@ tests/__pycache__/
 tests/.pytest_cache/
 tests/*.pyc
 /dev-site/
+DEV/
