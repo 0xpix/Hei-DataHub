@@ -82,16 +82,21 @@ def _create_webdav_backend(config) -> WebDAVStorage:
                 key_id = auth_section.get("key_id")
                 stored_in = auth_section.get("stored_in")
 
-            # Library is in [cloud] section
-            if cloud_section:
+                # Library can be in auth section (new format) or cloud section (old format)
+                library = auth_section.get("library") or library
+
+            # Library fallback: check [cloud] section for backward compatibility
+            if cloud_section and not library:
                 library = cloud_section.get("library") or library
 
-                # Load credential from keyring or ENV
-                if key_id and stored_in:
-                    auth_store = get_auth_store(prefer_keyring=(stored_in == "keyring"))
-                    password = auth_store.load_secret(key_id)
-                    if not password:
-                        logger.warning(f"Could not load credential from {stored_in}: {key_id}")
+            # Load credential from keyring or ENV
+            if key_id:
+                # Default to keyring if stored_in not specified (for backward compatibility)
+                prefer_keyring = (stored_in != "env")
+                auth_store = get_auth_store(prefer_keyring=prefer_keyring)
+                password = auth_store.load_secret(key_id)
+                if not password:
+                    logger.warning(f"Could not load credential for key_id: {key_id}")
     except Exception as e:
         logger.debug(f"Could not load auth config: {e}")
 
