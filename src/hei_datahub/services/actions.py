@@ -18,7 +18,6 @@ class ActionContext(Enum):
     DETAILS = "details"
     SETTINGS = "settings"
     FORM = "form"
-    OUTBOX = "outbox"
 
 
 @dataclass
