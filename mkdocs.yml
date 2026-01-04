@@ -1,6 +1,6 @@
 # MkDocs Configuration for Hei-DataHub Manual
 site_name: Hei-DataHub Documentation
-site_description: 'Official documentation for Hei-DataHub v0.60.0 (beta) - A cloud-first TUI for managing datasets with inline editing and structured search'
+site_description: 'Official documentation for Hei-DataHub v0.60.1 (beta) - A cloud-first TUI for managing datasets with inline editing and structured search'
 site_author: Hei-DataHub Team
 site_url: https://0xpix.github.io/Hei-DataHub
 
