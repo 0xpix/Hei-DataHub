@@ -57,7 +57,6 @@ dev = [
 
 [project.scripts]
 hei-datahub = "hei_datahub.cli.main:main"
-mini-datahub = "hei_datahub.cli.main:main"  # Legacy alias
 
 [project.urls]
 Homepage = "https://github.com/0xpix/Hei-DataHub"
