@@ -72,17 +72,17 @@ echo ""
 pyinstaller \
     --onefile \
     --name hei-datahub \
-    --add-data "src/mini_datahub/infra/sql:mini_datahub/infra/sql" \
-    --add-data "src/mini_datahub/ui/styles:mini_datahub/ui/styles" \
-    --add-data "src/mini_datahub/ui/assets:mini_datahub/ui/assets" \
+    --add-data "src/hei_datahub/infra/sql:hei_datahub/infra/sql" \
+    --add-data "src/hei_datahub/ui/styles:hei_datahub/ui/styles" \
+    --add-data "src/hei_datahub/ui/assets:hei_datahub/ui/assets" \
     --add-data "src/hei_datahub/assets:hei_datahub/assets" \
-    --add-data "src/mini_datahub/version.yaml:mini_datahub" \
-    --hidden-import=mini_datahub \
-    --hidden-import=mini_datahub.cli.main \
+    --add-data "src/hei_datahub/version.yaml:hei_datahub" \
+    --hidden-import=hei_datahub \
+    --hidden-import=hei_datahub.cli.main \
     --hidden-import=textual \
     --collect-all textual \
     --clean \
-    src/mini_datahub/cli/main.py
+    src/hei_datahub/cli/main.py
 
 # Organize output
 mkdir -p dist/linux
