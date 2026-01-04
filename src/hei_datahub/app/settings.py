@@ -5,8 +5,7 @@ Lightweight configuration for application runtime settings.
 """
 import json
 import logging
-from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Optional
 
 from hei_datahub.infra.paths import CONFIG_DIR
 
@@ -33,7 +32,7 @@ class AppSettings:
             return
 
         try:
-            with open(CONFIG_FILE, "r") as f:
+            with open(CONFIG_FILE) as f:
                 data = json.load(f)
 
             self.auto_check_updates = data.get("auto_check_updates", True)
@@ -56,7 +55,7 @@ class AppSettings:
         with open(CONFIG_FILE, "w") as f:
             json.dump(data, f, indent=2)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Export config as dictionary."""
         return {
             "auto_check_updates": self.auto_check_updates,

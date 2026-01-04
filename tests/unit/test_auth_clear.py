@@ -3,8 +3,7 @@ Tests for auth clear command.
 
 Test interactive/force modes, keyring/env clearing, and edge cases.
 """
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import patch
 
 import pytest
 

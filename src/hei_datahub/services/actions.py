@@ -3,10 +3,10 @@ Action registry for command palette and keybindings.
 
 Provides a centralized registry of all available actions in the TUI.
 """
-from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Any
-from enum import Enum
 import logging
+from dataclasses import dataclass
+from enum import Enum
+from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +29,9 @@ class Action:
     id: str
     label: str
     description: str
-    contexts: List[ActionContext]
+    contexts: list[ActionContext]
     handler: Optional[Callable] = None
-    default_keys: List[str] = None
+    default_keys: list[str] = None
 
     def __post_init__(self):
         if self.default_keys is None:
@@ -48,8 +48,8 @@ class ActionRegistry:
     """
 
     def __init__(self):
-        self._actions: Dict[str, Action] = {}
-        self._recent_actions: List[str] = []
+        self._actions: dict[str, Action] = {}
+        self._recent_actions: list[str] = []
         self._max_recent = 10
         self._register_built_in_actions()
 
@@ -276,11 +276,11 @@ class ActionRegistry:
         """
         return self._actions.get(action_id)
 
-    def get_all(self) -> List[Action]:
+    def get_all(self) -> list[Action]:
         """Get all registered actions."""
         return list(self._actions.values())
 
-    def get_for_context(self, context: ActionContext) -> List[Action]:
+    def get_for_context(self, context: ActionContext) -> list[Action]:
         """
         Get all actions available in a context.
 
@@ -295,7 +295,7 @@ class ActionRegistry:
             if action.is_available_in(context)
         ]
 
-    def search(self, query: str, context: Optional[ActionContext] = None) -> List[Action]:
+    def search(self, query: str, context: Optional[ActionContext] = None) -> list[Action]:
         """
         Search for actions by label or description.
 
@@ -330,7 +330,7 @@ class ActionRegistry:
         self._recent_actions.insert(0, action_id)
         self._recent_actions = self._recent_actions[:self._max_recent]
 
-    def get_recent(self, limit: int = 5) -> List[Action]:
+    def get_recent(self, limit: int = 5) -> list[Action]:
         """
         Get recently used actions.
 

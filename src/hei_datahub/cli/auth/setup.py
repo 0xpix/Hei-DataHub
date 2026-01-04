@@ -129,7 +129,7 @@ def run_setup_wizard(
 
         # Library name - ask after authentication method
         library_suggestion = "datahub"
-        print(f"\n📁 Library/folder name")
+        print("\n📁 Library/folder name")
         print(f"   Default: {library_suggestion}")
         library = input("   > ").strip()
         if not library:
@@ -140,7 +140,7 @@ def run_setup_wizard(
         return 2
 
     # Determine storage backend
-    from hei_datahub.cli.auth.credentials import get_auth_store, EnvAuthStore
+    from hei_datahub.cli.auth.credentials import EnvAuthStore, get_auth_store
 
     if store == "env":
         auth_store = EnvAuthStore()
@@ -235,12 +235,12 @@ def run_setup_wizard(
         return 1
 
     # Success message
-    print(f"\n✅ Configuration saved")
+    print("\n✅ Configuration saved")
     print(f"   📄 {config_path}")
     if use_keyring:
-        print(f"   🔐 Credentials stored in Linux keyring")
+        print("   🔐 Credentials stored in Linux keyring")
     else:
-        print(f"   💾 Credentials stored in environment variables")
+        print("   💾 Credentials stored in environment variables")
 
     # Status line for debugging (optional)
     if non_interactive:
@@ -341,7 +341,7 @@ def _write_config(config_path: Path, config_data: dict) -> None:
                 import tomli
             with open(config_path, "rb") as f:
                 existing = tomli.load(f)
-        except:
+        except Exception:
             existing = {}
     else:
         existing = {}

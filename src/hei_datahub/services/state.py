@@ -2,10 +2,10 @@
 State management for persistent application state.
 Tracks last indexed commit, session flags, and other transient state.
 """
-from typing import Optional
-from pathlib import Path
 import json
 from datetime import datetime
+from pathlib import Path
+from typing import Optional
 
 
 class StateManager:
@@ -41,7 +41,7 @@ class StateManager:
             return {}
 
         try:
-            with open(self.state_file, 'r') as f:
+            with open(self.state_file) as f:
                 return json.load(f)
         except Exception:
             return {}

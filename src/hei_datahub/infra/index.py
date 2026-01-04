@@ -2,9 +2,9 @@
 Index: FTS5 full-text search operations.
 """
 import json
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
-from hei_datahub.infra.db import get_connection, ensure_database
+from hei_datahub.infra.db import ensure_database, get_connection
 
 
 def upsert_dataset(dataset_id: str, metadata: dict) -> None:
@@ -117,7 +117,7 @@ def delete_dataset(dataset_id: str) -> None:
         logging.getLogger(__name__).warning(f"Failed to delete from fast search index: {e}")
 
 
-def get_dataset_from_store(dataset_id: str) -> Dict[str, Any]:
+def get_dataset_from_store(dataset_id: str) -> dict[str, Any]:
     """
     Get dataset payload from store.
 
@@ -143,7 +143,7 @@ def get_dataset_from_store(dataset_id: str) -> Dict[str, Any]:
         conn.close()
 
 
-def list_all_datasets(limit: int = 100) -> List[Dict[str, Any]]:
+def list_all_datasets(limit: int = 100) -> list[dict[str, Any]]:
     """
     List all datasets ordered by most recently updated.
 
@@ -188,7 +188,7 @@ def list_all_datasets(limit: int = 100) -> List[Dict[str, Any]]:
         conn.close()
 
 
-def reindex_all() -> Tuple[int, List[str]]:
+def reindex_all() -> tuple[int, list[str]]:
     """
     Reindex all datasets from the data directory.
 

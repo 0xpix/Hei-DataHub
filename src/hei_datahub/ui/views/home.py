@@ -4,16 +4,12 @@ TUI application using Textual framework with Neovim-style keybindings.
 import logging
 from typing import Optional
 
-try:
-    import tomllib as tomli
-except ImportError:
-    import tomli  # type:ignore
-
-logger = logging.getLogger(__name__)
-from textual.app import ComposeResult
 from textual import on
+from textual.app import ComposeResult
 from textual.containers import Container, Horizontal
+from textual.reactive import reactive
 from textual.screen import Screen
+from textual.timer import Timer
 from textual.widgets import (
     DataTable,
     Footer,
@@ -22,11 +18,12 @@ from textual.widgets import (
     Label,
     Static,
 )
-from textual.reactive import reactive
-from textual.timer import Timer
 
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.utils.keybindings import build_home_bindings
+
+logger = logging.getLogger(__name__)
+
 
 class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
@@ -93,8 +90,8 @@ class HomeScreen(Screen):
             logger.debug("Timer skipped: in search mode")
             return
 
-        from hei_datahub.services.indexer import get_indexer
         from hei_datahub.services.fast_search import get_all_indexed
+        from hei_datahub.services.indexer import get_indexer
 
         indexer = get_indexer()
         table = self.query_one("#results-table", DataTable)
@@ -132,14 +129,14 @@ class HomeScreen(Screen):
 
         # Update label with progress
         if not indexer.is_ready():
-            label.update(f"🔄 Loading...")
+            label.update("🔄 Loading...")
         else:
             label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
             # Stop timer once indexer is done
             try:
                 self.remove_timer("indexer_check")
                 logger.info(f"Indexing complete - {table.row_count} datasets")
-            except:
+            except Exception:
                 pass
 
     def _setup_search_autocomplete(self) -> None:
@@ -179,7 +176,7 @@ class HomeScreen(Screen):
         # Stop any existing indexer check timer
         try:
             self.remove_timer("indexer_check")
-        except:
+        except Exception:
             pass
 
         try:
@@ -207,11 +204,11 @@ class HomeScreen(Screen):
             from hei_datahub.services.indexer import get_indexer
             indexer = get_indexer()
             if not indexer.is_ready():
-                label.update(f"🔄 Loading cloud datasets... ☁️ 0 of ? datasets")
+                label.update("🔄 Loading cloud datasets... ☁️ 0 of ? datasets")
                 # Don't populate table yet - timer will do it incrementally
                 return
             elif len(cloud_results) == 0:
-                label.update(f"☁️ No cloud datasets found - Add one with Ctrl+A")
+                label.update("☁️ No cloud datasets found - Add one with Ctrl+A")
             else:
                 label.update(f"☁️ Cloud Datasets ({len(cloud_results)} total)")
 
@@ -250,10 +247,12 @@ class HomeScreen(Screen):
     def _load_cloud_files(self) -> None:
         """Load files from cloud storage and display in table."""
         try:
-            from hei_datahub.services.storage_manager import get_storage_backend
-            import yaml
-            import tempfile
             import os
+            import tempfile
+
+            import yaml
+
+            from hei_datahub.services.storage_manager import get_storage_backend
 
             storage = get_storage_backend()
             entries = storage.listdir("")
@@ -280,7 +279,7 @@ class HomeScreen(Screen):
 
                     # Parse metadata
                     try:
-                        with open(tmp_path, 'r', encoding='utf-8') as f:
+                        with open(tmp_path, encoding='utf-8') as f:
                             metadata = yaml.safe_load(f)
 
                         name = metadata.get('name', dataset_id)
@@ -419,11 +418,13 @@ class HomeScreen(Screen):
     def _search_cloud_files(self, query: str) -> None:
         """Search cloud files by name and metadata fields."""
         try:
-            from hei_datahub.services.storage_manager import get_storage_backend
-            from hei_datahub.core.queries import QueryParser
-            import yaml
-            import tempfile
             import os
+            import tempfile
+
+            import yaml
+
+            from hei_datahub.core.queries import QueryParser
+            from hei_datahub.services.storage_manager import get_storage_backend
 
             storage = get_storage_backend()
             entries = storage.listdir("")
@@ -436,7 +437,7 @@ class HomeScreen(Screen):
                 parser = QueryParser()
                 parsed = parser.parse(query)
                 has_field_queries = any(not term.is_free_text for term in parsed.terms)
-            except:
+            except Exception:
                 parsed = None
                 has_field_queries = False
 
@@ -455,7 +456,7 @@ class HomeScreen(Screen):
                         tmp_path = tmp.name
 
                     try:
-                        with open(tmp_path, 'r', encoding='utf-8') as f:
+                        with open(tmp_path, encoding='utf-8') as f:
                             metadata = yaml.safe_load(f)
 
                         if parsed and has_field_queries:
@@ -476,7 +477,7 @@ class HomeScreen(Screen):
 
                     finally:
                         os.unlink(tmp_path)
-                except:
+                except Exception:
                     # If metadata can't be loaded, do simple name match
                     if query_lower in dataset_id.lower():
                         matches.append((dataset_id, entry, None))
@@ -647,7 +648,7 @@ class HomeScreen(Screen):
                 badges_container.mount(badge)
                 logger.debug(f"Mounted badge for term: {term.value}")
 
-        except Exception as e:
+        except Exception:
             # If parsing fails, show raw query with color based on query text
             color_class = self._get_badge_color_class(query)
             badges_container.mount(Static(f"[dim]🔍 {query}[/dim]", classes=f"filter-badge {color_class}"))

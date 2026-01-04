@@ -15,10 +15,10 @@ Public API:
 """
 
 from .commands import (
+    handle_auth_clear,
+    handle_auth_doctor,
     handle_auth_setup,
     handle_auth_status,
-    handle_auth_doctor,
-    handle_auth_clear,
 )
 
 __all__ = [

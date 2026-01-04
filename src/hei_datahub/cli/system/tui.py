@@ -13,8 +13,8 @@ def handle_tui(args) -> int:
     # Import here to avoid loading heavy UI dependencies for CLI commands
     try:
         # Import the TUI runner on demand
-        from hei_datahub.ui.views.main import run_tui
         from hei_datahub.infra.db import ensure_database
+        from hei_datahub.ui.views.main import run_tui
 
         # Ensure database exists (workspace already initialized in main())
         ensure_database()

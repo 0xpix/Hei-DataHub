@@ -4,15 +4,13 @@ Provides local, indexed search for cloud datasets with <20ms queries.
 
 Cloud-only implementation - all indexed items are from WebDAV storage.
 """
-import asyncio
 import logging
 import os
 import sqlite3
 import time
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 from functools import lru_cache
+from pathlib import Path
+from typing import Any, Optional
 
 from hei_datahub.infra.paths import CACHE_DIR
 
@@ -34,9 +32,9 @@ class IndexService:
         """Initialize index service."""
         self.db_path = db_path or INDEX_DB_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._query_cache: Dict[Tuple[str, Optional[str]], List[Dict[str, Any]]] = {}
+        self._query_cache: dict[tuple[str, Optional[str]], list[dict[str, Any]]] = {}
         self._cache_timeout = 60  # seconds
-        self._cache_timestamps: Dict[Tuple[str, Optional[str]], float] = {}
+        self._cache_timestamps: dict[tuple[str, Optional[str]], float] = {}
         self._init_database()
 
     def _init_database(self) -> None:
@@ -134,7 +132,7 @@ class IndexService:
         tag_filter: Optional[str] = None,
         limit: int = INDEX_MAX_RESULTS,
         offset: int = 0
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Fast local search using FTS5 index.
 
@@ -160,7 +158,7 @@ class IndexService:
 
         conn = self.get_connection()
         try:
-            params: List[Any] = []
+            params: list[Any] = []
 
             # Build FTS query
             if query_text and query_text.strip():
@@ -181,7 +179,7 @@ class IndexService:
                 fts_query = " ".join(fts_tokens) if fts_tokens else query_text
 
                 # Build WHERE clauses for filters (applied to items table, not FTS)
-                where_clauses: List[str] = []
+                where_clauses: list[str] = []
 
                 if project_filter:
                     where_clauses.append("items.project LIKE ?")
@@ -228,7 +226,7 @@ class IndexService:
                 params = fts_params
             else:
                 # No text query, just apply filters
-                where_clauses: List[str] = []
+                where_clauses: list[str] = []
 
                 if project_filter:
                     where_clauses.append("items.project LIKE ?")
@@ -348,7 +346,7 @@ class IndexService:
         finally:
             conn.close()
 
-    def bulk_upsert(self, items: List[Dict[str, Any]]) -> int:
+    def bulk_upsert(self, items: list[dict[str, Any]]) -> int:
         """
         Bulk insert/update items in a transaction.
 
@@ -472,7 +470,7 @@ class IndexService:
             conn.close()
 
     @lru_cache(maxsize=100)
-    def get_project_suggestions(self, prefix: str = "") -> List[str]:
+    def get_project_suggestions(self, prefix: str = "") -> list[str]:
         """Get project autocomplete suggestions."""
         conn = self.get_connection()
         try:

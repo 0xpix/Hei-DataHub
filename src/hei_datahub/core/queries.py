@@ -9,11 +9,11 @@ Supports syntax like:
 - tag:climate
 - "quoted terms"
 """
+import re
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
-from typing import Any, List, Optional
-import re
+from typing import Optional
 
 
 class QueryOperator(Enum):
@@ -38,14 +38,14 @@ class QueryTerm:
 @dataclass
 class ParsedQuery:
     """Parsed and structured query."""
-    terms: List[QueryTerm]
+    terms: list[QueryTerm]
     free_text_query: str = ""  # Combined free text for FTS
 
     def has_field_filters(self) -> bool:
         """Check if query has any field-specific filters."""
         return any(not term.is_free_text for term in self.terms)
 
-    def get_field_terms(self, field: str) -> List[QueryTerm]:
+    def get_field_terms(self, field: str) -> list[QueryTerm]:
         """Get all terms for a specific field."""
         return [t for t in self.terms if t.field == field]
 
@@ -102,7 +102,7 @@ class QueryParser:
         if not query or not query.strip():
             return ParsedQuery(terms=[], free_text_query="")
 
-        terms: List[QueryTerm] = []
+        terms: list[QueryTerm] = []
         remaining = query
 
         # Extract field:value patterns
@@ -226,7 +226,7 @@ class QueryParser:
         return int(number * multipliers[unit])
 
 
-def suggest_field_completions(partial: str) -> List[str]:
+def suggest_field_completions(partial: str) -> list[str]:
     """
     Suggest field names for autocomplete.
 
@@ -243,7 +243,7 @@ def suggest_field_completions(partial: str) -> List[str]:
     ]
 
 
-def suggest_operator_completions(field: str) -> List[str]:
+def suggest_operator_completions(field: str) -> list[str]:
     """
     Suggest operators for a field.
 

@@ -5,14 +5,13 @@ import logging
 from pathlib import Path
 from typing import Any
 
-logger = logging.getLogger(__name__)
 from textual import on, work
 from textual.app import ComposeResult
-from textual.containers import Container, VerticalScroll, Horizontal
+from textual.containers import Container, Horizontal, VerticalScroll
 from textual.screen import Screen
 from textual.widgets import (
-    Footer,
     Button,
+    Footer,
     Header,
     Input,
     Label,
@@ -21,6 +20,9 @@ from textual.widgets import (
 )
 
 from hei_datahub.ui.views.dataset_detail import CloudDatasetDetailsScreen
+
+logger = logging.getLogger(__name__)
+
 
 class CloudEditDetailsScreen(Screen):
     """Screen for editing cloud dataset metadata with WebDAV storage."""
@@ -298,10 +300,12 @@ class CloudEditDetailsScreen(Screen):
     def save_to_cloud(self) -> None:
         """Save dataset to cloud storage (WebDAV)."""
         try:
-            from hei_datahub.services.storage_manager import get_storage_backend
-            import yaml
-            import tempfile
             import os
+            import tempfile
+
+            import yaml
+
+            from hei_datahub.services.storage_manager import get_storage_backend
 
             self.app.call_from_thread(self.app.notify, "Uploading changes to cloud...", timeout=2)
 
@@ -406,10 +410,10 @@ class CloudEditDetailsScreen(Screen):
 
                 # Refresh the parent CloudDatasetDetailsScreen
                 def refresh_parent():
-                    from .home import HomeScreen
-
                     # Small delay to ensure index cache is cleared
                     import time
+
+                    from .home import HomeScreen
                     time.sleep(0.1)
 
                     logger.info(f"Screen stack has {len(self.app.screen_stack)} screens")

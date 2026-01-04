@@ -1,18 +1,17 @@
 """
 TUI application using Textual framework with Neovim-style keybindings.
 """
-import os
-import yaml
 import logging
+import os
 import tempfile
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
-logger = logging.getLogger(__name__)
+import yaml
 from textual import on, work
-from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, VerticalScroll
+from textual.screen import Screen
 from textual.widgets import (
     Button,
     Footer,
@@ -22,14 +21,17 @@ from textual.widgets import (
     TextArea,
 )
 
-from .dataset_detail import CloudDatasetDetailsScreen
-from .home import HomeScreen
-
 # TODO: CHANGE WHEN ADD FILES IN INFRA AND SERVICES
 from hei_datahub.infra.store import validate_metadata
 from hei_datahub.services.catalog import generate_id as generate_unique_id
-from hei_datahub.services.storage_manager import get_storage_backend
 from hei_datahub.services.index_service import get_index_service
+from hei_datahub.services.storage_manager import get_storage_backend
+
+from .dataset_detail import CloudDatasetDetailsScreen
+from .home import HomeScreen
+
+logger = logging.getLogger(__name__)
+
 
 class AddDataScreen(Screen):
     """Screen to add a new dataset with scrolling support and Neovim keys."""

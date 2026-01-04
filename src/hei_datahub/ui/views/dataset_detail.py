@@ -2,11 +2,10 @@
 Cloud dataset details screen.
 """
 import logging
-import yaml
-import tempfile
 import os
+import tempfile
 
-logger = logging.getLogger(__name__)
+import yaml
 from textual import work
 from textual.app import ComposeResult
 from textual.containers import VerticalScroll
@@ -18,11 +17,12 @@ from textual.widgets import (
     Static,
 )
 
-from hei_datahub.ui.utils.actions import NavActionsMixin, UrlActionsMixin, ClipboardActionsMixin
-
-from hei_datahub.services.storage_manager import get_storage_backend
-from hei_datahub.services.index_service import get_index_service
 from hei_datahub.infra.index import delete_dataset
+from hei_datahub.services.index_service import get_index_service
+from hei_datahub.services.storage_manager import get_storage_backend
+from hei_datahub.ui.utils.actions import ClipboardActionsMixin, NavActionsMixin, UrlActionsMixin
+
+logger = logging.getLogger(__name__)
 
 
 class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActionsMixin, Screen):
@@ -98,7 +98,7 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
                 return
 
             # Fallback: If not in index, download from cloud (slower)
-            logger.info(f"Dataset not in index, downloading metadata from cloud")
+            logger.info("Dataset not in index, downloading metadata from cloud")
 
             storage = get_storage_backend()
             metadata_path = f"{self.dataset_id}/metadata.yaml"
@@ -109,7 +109,7 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
                 tmp_path = tmp.name
 
             try:
-                with open(tmp_path, 'r', encoding='utf-8') as f:
+                with open(tmp_path, encoding='utf-8') as f:
                     self.metadata = yaml.safe_load(f)
 
                 # Update UI on main thread

@@ -34,8 +34,9 @@ def handle_auth_status(args) -> int:
     Returns:
         int: 0 if configured, 1 if not configured or error
     """
-    from hei_datahub.infra.config_paths import get_config_path
     import sys
+
+    from hei_datahub.infra.config_paths import get_config_path
 
     config_path = get_config_path()
 

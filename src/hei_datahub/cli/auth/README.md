@@ -53,8 +53,8 @@ hei-datahub auth status
 ### Programmatic
 
 ```python
-from mini_datahub.auth.credentials import get_auth_store
-from mini_datahub.auth.validator import validate_credentials
+from hei_datahub.cli.auth.credentials import get_auth_store
+from hei_datahub.cli.auth.validator import validate_credentials
 
 # Get auth store
 store = get_auth_store(prefer_keyring=True)
@@ -198,7 +198,7 @@ hei-datahub auth status
 
 # Test keyring availability
 python3 -c "
-from mini_datahub.auth.credentials import KeyringAuthStore
+from hei_datahub.cli.auth.credentials import KeyringAuthStore
 store = KeyringAuthStore()
 print(f'Keyring available: {store.available()}')
 print(f'Strategy: {store.strategy}')

@@ -4,7 +4,7 @@ Storage: YAML read/write operations for dataset metadata.
 import json
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import yaml
 from jsonschema import ValidationError as JSONSchemaValidationError
@@ -29,7 +29,7 @@ def get_dataset_path(dataset_id: str) -> Path:
 
 def load_json_schema() -> dict:
     """Load the JSON Schema for validation."""
-    with open(SCHEMA_JSON, "r") as f:
+    with open(SCHEMA_JSON) as f:
         return json.load(f)
 
 
@@ -92,7 +92,7 @@ def validate_metadata(data: dict) -> tuple[bool, Optional[str], Optional[Dataset
         return False, f"Unexpected validation error: {str(e)}", None
 
 
-def read_dataset(dataset_id: str) -> Optional[Dict[str, Any]]:
+def read_dataset(dataset_id: str) -> Optional[dict[str, Any]]:
     """
     Read dataset metadata from YAML file.
 
@@ -106,7 +106,7 @@ def read_dataset(dataset_id: str) -> Optional[Dict[str, Any]]:
     if not path.exists():
         return None
 
-    with open(path, "r") as f:
+    with open(path) as f:
         data = yaml.safe_load(f)
 
     # Convert date objects to strings for consistency
@@ -142,7 +142,7 @@ def write_dataset(dataset_id: str, metadata: dict) -> None:
         yaml.safe_dump(metadata_copy, f, default_flow_style=False, sort_keys=False)
 
 
-def list_datasets() -> List[str]:
+def list_datasets() -> list[str]:
     """
     List all dataset IDs (subdirectories with metadata.yaml).
 

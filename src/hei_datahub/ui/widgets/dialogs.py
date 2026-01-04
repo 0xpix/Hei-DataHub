@@ -52,7 +52,7 @@ class ConfirmCancelDialog(Screen):
     def compose(self) -> ComposeResult:
         yield Container(
             Vertical(
-                Static(f"[bold yellow]Discard Changes?[/bold yellow]", classes="dialog-title"),
+                Static("[bold yellow]Discard Changes?[/bold yellow]", classes="dialog-title"),
                 Static(f"\nYou have {self.dirty_count} unsaved change(s) to [cyan]{self.dataset_id}[/cyan].\n", classes="dialog-text"),
                 Static("Press [bold]Y[/bold] to discard changes or [bold]N[/bold] to keep editing.", classes="dialog-text"),
                 id="confirm-dialog",
@@ -112,7 +112,7 @@ class ConfirmDeleteDialog(Screen):
     def compose(self) -> ComposeResult:
         yield Container(
             Vertical(
-                Static(f"[bold red]Delete Dataset?[/bold red]", classes="dialog-title"),
+                Static("[bold red]Delete Dataset?[/bold red]", classes="dialog-title"),
                 Static(f"\nAre you sure you want to delete [cyan]{self.dataset_id}[/cyan]?\n", classes="dialog-text"),
                 Static("[bold red]This action cannot be undone![/bold red]", classes="dialog-text"),
                 Static("\nPress [bold]Y[/bold] to delete or [bold]N[/bold] to cancel.", classes="dialog-text"),

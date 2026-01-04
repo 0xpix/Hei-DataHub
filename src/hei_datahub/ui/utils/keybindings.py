@@ -4,15 +4,15 @@ Keybinding utilities for dynamically binding actions from config.
 Provides generic binding utilities and screen-specific binding builders.
 """
 import logging
-from typing import Dict
+
 from textual.binding import Binding
 
 logger = logging.getLogger(__name__)
 
 
 def bind_actions_from_config(
-    action_map: Dict[str, tuple],
-    keys_cfg: Dict[str, list[str]]
+    action_map: dict[str, tuple],
+    keys_cfg: dict[str, list[str]]
 ) -> list[Binding]:
     """
     Build Textual bindings from config and action map.
@@ -62,7 +62,7 @@ def bind_actions_from_config(
     return bindings
 
 
-def get_action_display_map_home() -> Dict[str, tuple]:
+def get_action_display_map_home() -> dict[str, tuple]:
     """Get action display map for home screen."""
     return {
         "add_dataset": ("Add Dataset", "a", True),
@@ -83,7 +83,7 @@ def get_action_display_map_home() -> Dict[str, tuple]:
     }
 
 
-def get_action_display_map_add_form() -> Dict[str, tuple]:
+def get_action_display_map_add_form() -> dict[str, tuple]:
     """Get action display map for add data form."""
     return {
         "cancel": ("Cancel", "esc", True),
@@ -97,7 +97,7 @@ def get_action_display_map_add_form() -> Dict[str, tuple]:
     }
 
 
-def get_action_display_map_settings() -> Dict[str, tuple]:
+def get_action_display_map_settings() -> dict[str, tuple]:
     """Get action display map for settings screen."""
     return {
         "back": ("Back", "esc", True),

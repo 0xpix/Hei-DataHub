@@ -16,8 +16,9 @@ def handle_update(args) -> int:
     Returns:
         int: exit code from update operation
     """
-    from rich.console import Console
     import sys
+
+    from rich.console import Console
 
     console = Console()
 

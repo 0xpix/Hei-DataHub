@@ -15,7 +15,7 @@ import os
 import platform
 import re
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 
 def get_os_type() -> str:
@@ -61,7 +61,7 @@ def get_os_default_data_dir() -> Path:
         return Path.home() / ".local" / "share" / "Hei-DataHub"
 
 
-def resolve_data_directory(cli_override: Optional[str] = None) -> Tuple[Path, str]:
+def resolve_data_directory(cli_override: Optional[str] = None) -> tuple[Path, str]:
     """
     Resolve data directory with proper precedence.
 

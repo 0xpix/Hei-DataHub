@@ -6,7 +6,6 @@ try:
 except ImportError:
     import tomli  # type:ignore
 
-from textual.screen import Screen
 
 from hei_datahub.infra.config_paths import get_config_path
 

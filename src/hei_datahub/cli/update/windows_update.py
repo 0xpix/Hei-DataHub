@@ -1,9 +1,8 @@
 """Windows-specific update logic using external batch script to avoid file locks."""
 
+import os
 import sys
 import tempfile
-import os
-from rich.panel import Panel
 
 
 def windows_update(args, console):

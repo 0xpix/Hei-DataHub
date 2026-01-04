@@ -12,9 +12,9 @@ Config still uses XDG on all platforms:
 - Cache: ~/.cache/hei-datahub/
 - State: ~/.local/state/hei-datahub/
 """
-from pathlib import Path
 import os
-import sys
+from pathlib import Path
+
 
 def _is_installed_package() -> bool:
     """Check if running from an installed package (not development mode)."""
@@ -38,31 +38,23 @@ def _is_dev_mode() -> bool:
             (potential_repo / "pyproject.toml").exists() and
             "site-packages" not in str(package_path)
         )
-    except:
+    except Exception:
         return False
 
 # XDG Base Directory paths (for config/cache/state - used on all platforms)
 XDG_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
-XDG_DATA_HOME = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
 XDG_CACHE_HOME = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
 XDG_STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
-
-# Get CLI override from command line args (if available)
-_CLI_DATA_DIR_OVERRIDE = None
-for i, arg in enumerate(sys.argv):
-    if arg == '--data-dir' and i + 1 < len(sys.argv):
-        _CLI_DATA_DIR_OVERRIDE = sys.argv[i + 1]
-        break
 
 # Determine base directories based on install mode
 if _is_installed_package():
     # Installed package: Use platform-aware data directory
     from hei_datahub.infra.platform_paths import resolve_data_directory
-    PLATFORM_DATA_DIR, _ = resolve_data_directory(_CLI_DATA_DIR_OVERRIDE)
+    PLATFORM_DATA_DIR, _ = resolve_data_directory(None)
 
     CONFIG_DIR = XDG_CONFIG_HOME / "hei-datahub"
-    DATA_DIR = PLATFORM_DATA_DIR / "datasets"
     CACHE_DIR = XDG_CACHE_HOME / "hei-datahub"
+    DATA_DIR = CACHE_DIR / "datasets"  # Treat local data as cache
     STATE_DIR = XDG_STATE_HOME / "hei-datahub"
     PROJECT_ROOT = PLATFORM_DATA_DIR
 elif _is_dev_mode():
@@ -71,19 +63,31 @@ elif _is_dev_mode():
     # Go up 4 levels: infra -> hei_datahub -> src -> repo_root
     PROJECT_ROOT = package_path.parent.parent.parent.parent
     CONFIG_DIR = PROJECT_ROOT
-    DATA_DIR = PROJECT_ROOT / "data"
     CACHE_DIR = PROJECT_ROOT / ".cache"
+    DATA_DIR = CACHE_DIR / "datasets"
     STATE_DIR = PROJECT_ROOT
 else:
     # Fallback: Use XDG directories
     CONFIG_DIR = XDG_CONFIG_HOME / "hei-datahub"
-    DATA_DIR = XDG_DATA_HOME / "hei-datahub" / "datasets"
     CACHE_DIR = XDG_CACHE_HOME / "hei-datahub"
+    DATA_DIR = CACHE_DIR / "datasets"
     STATE_DIR = XDG_STATE_HOME / "hei-datahub"
-    PROJECT_ROOT = XDG_DATA_HOME / "hei-datahub"
+    PROJECT_ROOT = CACHE_DIR
 
 # Database (in data directory)
 DB_PATH = PROJECT_ROOT / "db.sqlite"
+
+
+def get_data_dir() -> Path:
+    """Get the root data directory."""
+    if _is_installed_package():
+        from hei_datahub.infra.platform_paths import resolve_data_directory
+        path, _ = resolve_data_directory(None)
+        return path
+    elif _is_dev_mode():
+        return PROJECT_ROOT
+    else:
+        return CACHE_DIR
 
 # Schema paths
 def _get_schema_path() -> Path:
@@ -105,14 +109,11 @@ SCHEMA_JSON = _get_schema_path()
 SQL_SCHEMA_PATH = Path(__file__).parent / "sql" / "schema.sql"
 
 # Config files
-CONFIG_FILE = CONFIG_DIR / "config.json"
-KEYMAP_FILE = CONFIG_DIR / "keymap.json"
+CONFIG_FILE = CONFIG_DIR / "config.yaml"
+KEYMAP_FILE = CONFIG_DIR / "keybindings.yaml"
 
 # Logs
 LOG_DIR = STATE_DIR / "logs"
-
-# Outbox for failed operations
-OUTBOX_DIR = STATE_DIR / "outbox"
 
 # Assets (templates, etc.)
 ASSETS_DIR = PROJECT_ROOT / "assets" if _is_installed_package() else PROJECT_ROOT / "assets"
@@ -163,7 +164,7 @@ def initialize_workspace():
             if not templates_dest.exists():
                 shutil.copytree(packaged_templates, templates_dest)
                 print(f"✓ Initialized templates in {ASSETS_DIR}")
-    except Exception as e:
+    except Exception:
         pass  # Templates are optional
 
 

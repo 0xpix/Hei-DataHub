@@ -1,19 +1,18 @@
 """
 Catalog service: Orchestrates dataset operations (add, update, validate).
 """
-from typing import Optional, Tuple
+from typing import Optional
 
-from hei_datahub.core.models import DatasetMetadata
-from hei_datahub.infra.store import (
-    validate_metadata,
-    read_dataset,
-    write_dataset,
-    make_unique_id,
-)
 from hei_datahub.infra.index import upsert_dataset
+from hei_datahub.infra.store import (
+    make_unique_id,
+    read_dataset,
+    validate_metadata,
+    write_dataset,
+)
 
 
-def save_dataset(dataset_id: str, metadata: dict) -> Tuple[bool, Optional[str]]:
+def save_dataset(dataset_id: str, metadata: dict) -> tuple[bool, Optional[str]]:
     """
     Save dataset: validate, write to YAML, and index.
 

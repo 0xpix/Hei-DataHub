@@ -2,22 +2,16 @@
 TUI application using Textual framework with Neovim-style keybindings.
 """
 import logging
-try:
-    import tomllib as tomli
-except ImportError:
-    import tomli  # type:ignore
 
-logger = logging.getLogger(__name__)
 from textual import work
 from textual.app import App
-from textual.widgets import (
-    Static,
-)
 from textual.reactive import reactive
 
 from hei_datahub.infra.db import ensure_database
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.views.home import HomeScreen
+
+logger = logging.getLogger(__name__)
 
 
 class DataHubApp(App):
@@ -31,8 +25,8 @@ class DataHubApp(App):
     def on_mount(self) -> None:
         """Initialize the app."""
         # Initialize logging
-        from hei_datahub.app.runtime import setup_logging, log_startup
         from hei_datahub import __version__
+        from hei_datahub.app.runtime import log_startup, setup_logging
         from hei_datahub.app.settings import get_github_config
 
         config = get_github_config()
@@ -61,7 +55,8 @@ class DataHubApp(App):
 
         # Start background indexer (FAST - non-blocking)
         import asyncio
-        from hei_datahub.services.indexer import start_background_indexer, get_indexer
+
+        from hei_datahub.services.indexer import get_indexer, start_background_indexer
         try:
             # Force a fresh index on every startup for cloud datasets
             logger.info("Forcing fresh reindex on startup")
@@ -139,8 +134,9 @@ class DataHubApp(App):
                 return
 
             # Quick connection test (HEAD request to server)
-            import requests
             from urllib.parse import urlparse
+
+            import requests
 
             parsed = urlparse(url)
             test_url = f"{parsed.scheme}://{parsed.netloc}"
@@ -197,7 +193,7 @@ class DataHubApp(App):
             # Config is now available for use throughout the app
             # Keybindings are already loaded when HomeScreen class is defined
             # Settings like search debounce, auto_sync, etc. can be accessed via self.config.get()
-        except Exception as e:
+        except Exception:
             # Config system optional - app works without it
             self.config = None
 
@@ -255,13 +251,13 @@ class DataHubApp(App):
                 # Create a new HomeScreen instance which will pick up the updated bindings
 
                 # Store current state if needed (search text, etc.)
-                old_screen = self.screen
 
                 # Pop current home screen
                 self.pop_screen()
 
                 # Reload the module to pick up new bindings
                 import importlib
+
                 import hei_datahub.ui.views.home as home_module
                 importlib.reload(home_module)
 

@@ -18,7 +18,6 @@ from typing import Optional
 import pyperclip
 
 # Re-export ActionContext and ActionRegistry from services
-from hei_datahub.services.actions import ActionContext, ActionRegistry, get_action_registry
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +95,6 @@ def bindings_from(*mixins, extra=None):
     Returns:
         Combined list of Binding objects
     """
-    from textual.binding import Binding
 
     bindings = []
     for mixin in mixins:

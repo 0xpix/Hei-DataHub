@@ -10,7 +10,12 @@
     - Looking for API reference? → [**Developer Docs**](https://0xpix.github.io/Hei-DataHub/x9k2m7n4p8q1)
 
 !!! info "Version Compatibility"
-    **Tutorial for v0.60.0-beta "Clean-up"**
+        <div class="hero-content">
+    <h1>Hei-DataHub Tutorials</h1>
+    <p>Master local data management with our step-by-step guides.</p>
+    **Tutorial for v0.60.1-beta "Clean-up"**
+    </div>
+</div>
     Compatible with app releases v0.60.x
     Updated: October 28, 2025
 

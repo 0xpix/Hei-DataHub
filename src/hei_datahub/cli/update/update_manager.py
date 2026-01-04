@@ -20,20 +20,20 @@ and clear error messages if something goes wrong.
 """
 
 import os
-import sys
 import shutil
 import subprocess
+import sys
 import time
 import uuid
-from pathlib import Path
-from typing import Optional, Dict, Tuple
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
 
+from rich import box
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.prompt import Confirm
-from rich import box
+from rich.table import Table
 
 
 @dataclass
@@ -166,7 +166,7 @@ class AtomicUpdateManager:
                 self.console.print("\nYou can now run: [cyan]hei-datahub[/cyan]")
                 return True
             else:
-                self.console.print(f"  [red]✗ Reinstallation failed[/red]")
+                self.console.print("  [red]✗ Reinstallation failed[/red]")
                 self.console.print(f"\n[dim]Error:[/dim] {result.stderr[:500]}")
                 return False
 
@@ -268,7 +268,7 @@ class AtomicUpdateManager:
                 shutil.rmtree(self.staging_dir, ignore_errors=True)
             sys.exit(1)
 
-    def run_preflight_checks(self, force: bool = False) -> Dict:
+    def run_preflight_checks(self, force: bool = False) -> dict:
         """
         Run comprehensive preflight checks.
 
@@ -317,7 +317,7 @@ class AtomicUpdateManager:
 
         return checks
 
-    def _check_command(self, command: str, *args) -> Dict:
+    def _check_command(self, command: str, *args) -> dict:
         """Check if a command is available and working."""
         try:
             result = subprocess.run(
@@ -377,7 +377,7 @@ class AtomicUpdateManager:
         except Exception:
             return False
 
-    def _check_running_processes(self) -> Dict:
+    def _check_running_processes(self) -> dict:
         """Check for running hei-datahub processes (excluding current process)."""
         try:
             import psutil
@@ -416,7 +416,7 @@ class AtomicUpdateManager:
                 "note": "psutil not available, could not check"
             }
 
-    def _check_disk_space(self, required_mb: int = 100) -> Dict:
+    def _check_disk_space(self, required_mb: int = 100) -> dict:
         """Check if sufficient disk space available."""
         try:
             stat = shutil.disk_usage(self.temp_dir)
@@ -433,7 +433,7 @@ class AtomicUpdateManager:
                 "error": str(e)
             }
 
-    def _check_write_permissions(self) -> Dict:
+    def _check_write_permissions(self) -> dict:
         """Check write permissions to critical paths."""
         if self.is_windows:
             paths_to_check = [
@@ -467,7 +467,7 @@ class AtomicUpdateManager:
             "paths": checked
         }
 
-    def _check_installation_locks(self) -> Dict:
+    def _check_installation_locks(self) -> dict:
         """Check if installation directory is locked or can be accessed."""
         if self.is_windows:
             install_dir = Path(os.environ.get("LOCALAPPDATA", "")) / "uv" / "tools" / "hei-datahub"
@@ -494,7 +494,7 @@ class AtomicUpdateManager:
             if file_path.exists():
                 try:
                     # Try to open file for reading to check if locked
-                    with open(file_path, 'rb') as f:
+                    with open(file_path, 'rb'):
                         pass
                 except PermissionError:
                     locked_files.append(str(file_path))
@@ -507,7 +507,7 @@ class AtomicUpdateManager:
             "note": "Installation files accessible" if len(locked_files) == 0 else f"{len(locked_files)} files locked"
         }
 
-    def _check_long_paths_enabled(self) -> Dict:
+    def _check_long_paths_enabled(self) -> dict:
         """Windows: Check if long paths are enabled."""
         try:
             import winreg
@@ -532,7 +532,7 @@ class AtomicUpdateManager:
                 "note": "Could not check (registry access denied?)"
             }
 
-    def _check_defender_status(self) -> Dict:
+    def _check_defender_status(self) -> dict:
         """Windows: Check Defender exclusions."""
         try:
             # Check if UV tools dir is in exclusions
@@ -562,7 +562,7 @@ class AtomicUpdateManager:
             "note": "Could not check Defender status"
         }
 
-    def _display_preflight_results(self, results: Dict) -> None:
+    def _display_preflight_results(self, results: dict) -> None:
         """Display preflight check results in a nice table."""
         table = Table(
             title="[bold]Preflight Check Results[/bold]",
@@ -813,12 +813,13 @@ class AtomicUpdateManager:
                 timeout=5
             )
             current_version = current_version_result.stdout.strip() if current_version_result.returncode == 0 else "unknown"
-        except:
+        except Exception:
             current_version = "unknown"
 
         try:
-            from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskID
             import time
+
+            from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 
             with Progress(
                 SpinnerColumn(),
@@ -964,7 +965,7 @@ class AtomicUpdateManager:
             # Silently check if already up to date
             if "already installed" in output.lower():
                 self.already_up_to_date = True
-                self.console.print(f"[green]✓ Already up to date[/green]")
+                self.console.print("[green]✓ Already up to date[/green]")
             else:
                 # Silently check if version changed
                 try:
@@ -978,11 +979,11 @@ class AtomicUpdateManager:
 
                     if current_version == new_version:
                         self.already_up_to_date = True
-                        self.console.print(f"[green]✓ Already up to date[/green]")
+                        self.console.print("[green]✓ Already up to date[/green]")
                     else:
-                        self.console.print(f"[green]✓ Installation completed[/green]")
-                except:
-                    self.console.print(f"[green]✓ Installation completed[/green]")
+                        self.console.print("[green]✓ Installation completed[/green]")
+                except Exception:
+                    self.console.print("[green]✓ Installation completed[/green]")
 
             return staging_dir
 
@@ -1028,7 +1029,7 @@ class AtomicUpdateManager:
                     details=result.stderr or result.stdout
                 )
 
-            self.console.print(f"[green]✓ Verification passed[/green]")
+            self.console.print("[green]✓ Verification passed[/green]")
 
         except subprocess.TimeoutExpired:
             raise UpdateError(
@@ -1090,12 +1091,12 @@ class AtomicUpdateManager:
             try:
                 # Step 1: Backup current (if exists)
                 if target_dir.exists():
-                    self.console.print(f"[dim]Creating backup...[/dim]")
+                    self.console.print("[dim]Creating backup...[/dim]")
                     shutil.move(str(target_dir), str(backup_dir))
                     self.console.print(f"[green]✓ Backup created: {backup_dir.name}[/green]")
 
                 # Step 2: Move staged to target
-                self.console.print(f"[dim]Installing new version...[/dim]")
+                self.console.print("[dim]Installing new version...[/dim]")
                 shutil.move(str(source_dir), str(target_dir))
 
                 # Step 3: Verify installation
@@ -1242,9 +1243,9 @@ def format_error_panel(error: UpdateError, console: Optional[Console] = None) ->
             "[bold]File access issue:[/bold]\n"
             "• Close all Hei-DataHub windows\n"
             f"• Check {'Task Manager' if is_windows else 'process list'} for running processes\n"
-            + (f"• Check Windows Defender hasn't quarantined files\n" if is_windows else "")
-            + f"• Ensure write permissions to installation directory\n"
-            + (f"• Try running PowerShell as Administrator\n" if is_windows else "")
+            + ("• Check Windows Defender hasn't quarantined files\n" if is_windows else "")
+            + "• Ensure write permissions to installation directory\n"
+            + ("• Try running PowerShell as Administrator\n" if is_windows else "")
         )
     }
 

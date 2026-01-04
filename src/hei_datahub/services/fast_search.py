@@ -3,15 +3,15 @@ Unified fast search using the local index.
 This module provides the main search interface that never hits the network.
 """
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from hei_datahub.services.index_service import get_index_service
 from hei_datahub.core.queries import QueryParser
+from hei_datahub.services.index_service import get_index_service
 
 logger = logging.getLogger(__name__)
 
 
-def search_indexed(query: str, limit: int = 50) -> List[Dict[str, Any]]:
+def search_indexed(query: str, limit: int = 50) -> list[dict[str, Any]]:
     """
     Fast search using the local index (never hits network).
 
@@ -100,7 +100,7 @@ def search_indexed(query: str, limit: int = 50) -> List[Dict[str, Any]]:
     return formatted_results
 
 
-def get_all_indexed(limit: int = 200) -> List[Dict[str, Any]]:
+def get_all_indexed(limit: int = 200) -> list[dict[str, Any]]:
     """
     Get all indexed items.
 

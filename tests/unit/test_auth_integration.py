@@ -3,12 +3,10 @@ Integration tests for authentication flows.
 
 Tests GUI wizard, CLI setup, and storage manager compatibility.
 """
-import os
-import tempfile
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
+
 try:
     import tomllib as tomli
 except ImportError:
@@ -38,7 +36,6 @@ class TestGUIAuthWizard:
 
     def test_gui_wizard_saves_correct_format(self, temp_config_dir, mock_auth_store):
         """Test that GUI wizard saves config in CLI-compatible format."""
-        from hei_datahub.ui.widgets.settings_wizard import SettingsWizard
 
         # Simulate wizard saving credentials
         url = "https://heibox.uni-heidelberg.de/seafdav"
@@ -55,8 +52,9 @@ class TestGUIAuthWizard:
         with patch("hei_datahub.ui.widgets.settings_wizard.get_config_path", return_value=config_path):
             with patch("hei_datahub.ui.widgets.settings_wizard.get_auth_store", return_value=mock_auth_store):
                 # Simulate the save logic from the wizard
-                import tomli_w
                 from urllib.parse import urlparse
+
+                import tomli_w
 
                 parsed = urlparse(url)
                 host = parsed.hostname or "unknown"
@@ -133,8 +131,9 @@ class TestCLIAuthSetup:
         config_path = temp_config_dir / "config.toml"
 
         # Simulate CLI save operation
-        import tomli_w
         from urllib.parse import urlparse
+
+        import tomli_w
 
         url = "https://heibox.uni-heidelberg.de/seafdav"
         username = "testuser"
@@ -239,7 +238,7 @@ class TestStorageManagerAuthCheck:
             config = tomli.load(f)
 
         auth_section = config.get("auth", {})
-        cloud_section = config.get("cloud", {})
+        config.get("cloud", {})
 
         # Extract values as storage_manager does
         base_url = auth_section.get("url")
@@ -334,11 +333,11 @@ class TestStorageManagerAuthCheck:
 
         auth_section = config.get("auth", {})
         stored_in = auth_section.get("stored_in")
-        key_id = auth_section.get("key_id")
+        auth_section.get("key_id")
 
         # Should default to keyring if stored_in not specified
         prefer_keyring = (stored_in != "env")
-        assert prefer_keyring == True, "Should default to keyring when stored_in is missing"
+        assert prefer_keyring, "Should default to keyring when stored_in is missing"
 
 
 class TestDatasetCreationFlow:

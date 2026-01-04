@@ -2,9 +2,15 @@
 Database: SQLite connection and schema initialization.
 """
 import sqlite3
+from pathlib import Path
 from typing import Optional
 
 from hei_datahub.infra.paths import DB_PATH, get_schema_sql
+
+
+def get_db_path() -> Path:
+    """Get the path to the SQLite database file."""
+    return DB_PATH
 
 
 def get_connection() -> sqlite3.Connection:

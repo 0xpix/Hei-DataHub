@@ -2,13 +2,10 @@
 Autocomplete system for form fields.
 Extracts and suggests common values from existing datasets.
 """
-from typing import List, Set, Dict, Optional
-from collections import Counter
 from pathlib import Path
-import yaml
+from typing import Optional
 
 from hei_datahub.infra.index import list_all_datasets
-from hei_datahub.infra.store import list_datasets
 
 
 class AutocompleteManager:
@@ -16,10 +13,10 @@ class AutocompleteManager:
 
     def __init__(self):
         """Initialize autocomplete manager."""
-        self.projects: Set[str] = set()
-        self.data_types: Set[str] = set()
-        self.file_formats: Set[str] = set()
-        self.sources: Set[str] = set()
+        self.projects: set[str] = set()
+        self.data_types: set[str] = set()
+        self.file_formats: set[str] = set()
+        self.sources: set[str] = set()
 
         # Normalized canonical values (lowercase -> proper case)
         self.canonical_formats = {
@@ -135,7 +132,7 @@ class AutocompleteManager:
 
         return count
 
-    def suggest_projects(self, query: str, limit: int = 10) -> List[str]:
+    def suggest_projects(self, query: str, limit: int = 10) -> list[str]:
         """
         Get project suggestions matching query.
 
@@ -158,7 +155,7 @@ class AutocompleteManager:
         results = sorted(prefix_matches) + sorted(contains_matches)
         return results[:limit]
 
-    def suggest_data_types(self, query: str, limit: int = 10) -> List[str]:
+    def suggest_data_types(self, query: str, limit: int = 10) -> list[str]:
         """
         Get data type suggestions matching query.
 
@@ -180,7 +177,7 @@ class AutocompleteManager:
         results = sorted(prefix_matches) + sorted(contains_matches)
         return results[:limit]
 
-    def suggest_file_formats(self, query: str, limit: int = 10) -> List[str]:
+    def suggest_file_formats(self, query: str, limit: int = 10) -> list[str]:
         """
         Get file format suggestions matching query.
 

@@ -12,7 +12,7 @@ import sqlite3
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Optional
 
 from hei_datahub.services.index_service import INDEX_DB_PATH
 
@@ -62,8 +62,8 @@ class SuggestionService:
         self.cache_ttl = cache_ttl
 
         # Caches with timestamps
-        self._cache: Dict[str, List[str]] = {}
-        self._cache_time: Dict[str, float] = {}
+        self._cache: dict[str, list[str]] = {}
+        self._cache_time: dict[str, float] = {}
 
         # Usage tracking
         self._init_usage_table()
@@ -92,7 +92,7 @@ class SuggestionService:
         finally:
             conn.close()
 
-    def _get_cached_or_fetch(self, cache_key: str, fetch_fn) -> List[str]:
+    def _get_cached_or_fetch(self, cache_key: str, fetch_fn) -> list[str]:
         """Get from cache or fetch fresh data."""
         now = time.time()
 
@@ -114,7 +114,7 @@ class SuggestionService:
         self._cache_time.clear()
         logger.debug("Suggestion cache invalidated")
 
-    def _get_distinct_values(self, field: str) -> List[str]:
+    def _get_distinct_values(self, field: str) -> list[str]:
         """Get distinct non-null values for a field."""
         conn = sqlite3.connect(self.db_path)
         try:
@@ -125,12 +125,12 @@ class SuggestionService:
         finally:
             conn.close()
 
-    def _get_distinct_tags(self) -> List[str]:
+    def _get_distinct_tags(self) -> list[str]:
         """Get distinct tags (tags are stored as comma-separated)."""
         conn = sqlite3.connect(self.db_path)
         try:
             cursor = conn.execute("SELECT DISTINCT tags FROM items WHERE tags IS NOT NULL AND tags != ''")
-            tags_set: Set[str] = set()
+            tags_set: set[str] = set()
             for row in cursor.fetchall():
                 tags_str = row[0]
                 if tags_str:
@@ -150,7 +150,7 @@ class SuggestionService:
                 return bucket_name
         return None
 
-    def _get_size_distribution(self) -> Dict[str, int]:
+    def _get_size_distribution(self) -> dict[str, int]:
         """Get count of datasets in each size bucket."""
         conn = sqlite3.connect(self.db_path)
         try:
@@ -167,7 +167,7 @@ class SuggestionService:
         finally:
             conn.close()
 
-    def _get_usage_stats(self, key: str, value: str) -> Tuple[int, int]:
+    def _get_usage_stats(self, key: str, value: str) -> tuple[int, int]:
         """
         Get usage statistics for a key:value pair.
 
@@ -256,7 +256,7 @@ class SuggestionService:
         key: Optional[str],
         typed: str,
         max_suggestions: int = 10
-    ) -> List[Suggestion]:
+    ) -> list[Suggestion]:
         """
         Get ranked suggestions for a key prefix.
 
@@ -281,7 +281,7 @@ class SuggestionService:
         else:
             return self._get_free_text_suggestions(typed, max_suggestions)
 
-    def _get_size_suggestions(self, typed: str, max_suggestions: int) -> List[Suggestion]:
+    def _get_size_suggestions(self, typed: str, max_suggestions: int) -> list[Suggestion]:
         """Get size bucket suggestions."""
         distribution = self._get_cached_or_fetch("size_distribution", self._get_size_distribution)
 
@@ -303,7 +303,7 @@ class SuggestionService:
         suggestions.sort(key=lambda s: s.score, reverse=True)
         return suggestions[:max_suggestions]
 
-    def _get_tag_suggestions(self, typed: str, max_suggestions: int) -> List[Suggestion]:
+    def _get_tag_suggestions(self, typed: str, max_suggestions: int) -> list[Suggestion]:
         """Get tag suggestions."""
         all_tags = self._get_cached_or_fetch("tags", self._get_distinct_tags)
 
@@ -338,7 +338,7 @@ class SuggestionService:
         suggestions.sort(key=lambda s: s.score, reverse=True)
         return suggestions[:max_suggestions]
 
-    def _get_field_suggestions(self, field: str, typed: str, max_suggestions: int) -> List[Suggestion]:
+    def _get_field_suggestions(self, field: str, typed: str, max_suggestions: int) -> list[Suggestion]:
         """Get suggestions for a specific field (project, source, owner)."""
         all_values = self._get_cached_or_fetch(field, lambda: self._get_distinct_values(field))
 
@@ -373,7 +373,7 @@ class SuggestionService:
         suggestions.sort(key=lambda s: s.score, reverse=True)
         return suggestions[:max_suggestions]
 
-    def _get_free_text_suggestions(self, typed: str, max_suggestions: int) -> List[Suggestion]:
+    def _get_free_text_suggestions(self, typed: str, max_suggestions: int) -> list[Suggestion]:
         """Get free text suggestions (recent queries, frequent terms)."""
         # For now, return empty - can be enhanced with recent query history
         return []
