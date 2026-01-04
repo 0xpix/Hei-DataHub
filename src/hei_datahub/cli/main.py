@@ -2,6 +2,7 @@
 CLI entrypoint for Hei-DataHub.
 """
 import argparse
+import os
 import sys
 
 from hei_datahub.version import __version__, __app_name__, print_version_info
@@ -351,21 +352,25 @@ def main():
 
     # Initialize workspace on first run (creates dirs, copies packaged datasets)
     # This happens BEFORE any command to ensure data is always available
-    from hei_datahub.infra.paths import initialize_workspace
+    from hei_datahub.infra.paths import initialize_workspace, _is_dev_mode
     initialize_workspace()
 
     # Ensure desktop assets are installed (Linux only, idempotent, fast)
     # This happens automatically on first run after workspace initialization
-    try:
-        from hei_datahub.desktop_install import ensure_desktop_assets_once
-        # Only show message if actually installing (not if already present)
-        if ensure_desktop_assets_once(verbose=False):
-            # Installed for first time - show a subtle message
-            print("✓ Desktop integration installed")
-    except ImportError:
-        pass  # Desktop integration module not available
-    except Exception:
-        pass  # Silently ignore errors during auto-install
+    # Skip in dev mode, if explicitly disabled, or if running from repo root (dev heuristic)
+    is_repo_root = (Path.cwd() / "pyproject.toml").exists() and (Path.cwd() / "src" / "hei_datahub").exists()
+
+    if not _is_dev_mode() and not os.environ.get("HEI_DATAHUB_SKIP_DESKTOP_INSTALL") and not is_repo_root:
+        try:
+            from hei_datahub.desktop_install import ensure_desktop_assets_once
+            # Only show message if actually installing (not if already present)
+            if ensure_desktop_assets_once(verbose=False):
+                # Installed for first time - show a subtle message
+                print("✓ Desktop integration installed")
+        except ImportError:
+            pass  # Desktop integration module not available
+        except Exception:
+            pass  # Silently ignore errors during auto-install
 
     # Apply CLI config overrides
     if hasattr(args, 'set') and args.set:
