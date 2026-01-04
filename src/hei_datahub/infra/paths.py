@@ -154,49 +154,6 @@ def initialize_workspace():
         except Exception as e:
             print(f"⚠ Could not copy schema: {e}")
 
-    # Copy packaged datasets on first run
-    if not list(DATA_DIR.iterdir()):
-        try:
-            packaged_data = Path(__file__).parent.parent / "data"
-            if packaged_data.exists() and list(packaged_data.iterdir()):
-                import shutil
-                dataset_count = 0
-                for item in packaged_data.iterdir():
-                    if item.is_dir():
-                        dest = DATA_DIR / item.name
-                        if not dest.exists():
-                            shutil.copytree(item, dest)
-                            dataset_count += 1
-                if dataset_count > 0:
-                    print(f"✓ Initialized {dataset_count} datasets in {DATA_DIR}")
-                    print("  Indexing datasets...")
-                    # Trigger reindex after copying datasets
-                    try:
-                        from hei_datahub.infra.db import ensure_database
-                        from hei_datahub.infra.store import list_datasets, read_dataset
-                        from hei_datahub.infra.index import upsert_dataset
-
-                        # Ensure database exists
-                        ensure_database()
-
-                        # Index all copied datasets
-                        indexed_count = 0
-                        for dataset_id in list_datasets():
-                            try:
-                                metadata = read_dataset(dataset_id)
-                                if metadata:
-                                    upsert_dataset(dataset_id, metadata)
-                                    indexed_count += 1
-                            except Exception as e:
-                                print(f"  ⚠ Could not index {dataset_id}: {e}")
-
-                        print(f"  ✓ Indexed {indexed_count} datasets")
-                    except Exception as reindex_error:
-                        print(f"  ⚠ Reindex failed: {reindex_error}")
-                        print(f"  Please run 'hei-datahub reindex' manually")
-        except Exception as e:
-            print(f"⚠ Could not copy datasets: {e}")
-
     # Copy assets/templates if they exist
     try:
         packaged_templates = Path(__file__).parent.parent / "templates"
