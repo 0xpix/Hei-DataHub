@@ -124,8 +124,7 @@ pyinstaller \
     --add-data "src/hei_datahub/ui/styles:hei_datahub/ui/styles" \
     --add-data "src/hei_datahub/ui/assets:hei_datahub/ui/assets" \
     --add-data "src/hei_datahub/assets:hei_datahub/assets" \
-    --add-data "version.yaml:hei_datahub" \
-    --add-data "schema.json:hei_datahub" \
+    --add-data "src/hei_datahub/version.yaml:hei_datahub" \
     --hidden-import=hei_datahub \
     --hidden-import=hei_datahub.cli.main \
     --hidden-import=textual \
@@ -133,32 +132,7 @@ pyinstaller \
     --hidden-import=textual.containers \
     --collect-all textual \
     --clean \
-    src/hei_datahub/cli/main.py \
-    >/dev/null 2>&1 &
-
-if ! show_spinner $! "Building binary (this may take 1-2 minutes)"; then
-    echo ""
-    echo "❌ PyInstaller build failed. Running with output:"
-    echo ""
-    pyinstaller \
-        --onefile \
-        --name hei-datahub \
-        --add-data "src/hei_datahub/infra/sql:hei_datahub/infra/sql" \
-        --add-data "src/hei_datahub/ui/styles:hei_datahub/ui/styles" \
-        --add-data "src/hei_datahub/ui/assets:hei_datahub/ui/assets" \
-        --add-data "src/hei_datahub/assets:hei_datahub/assets" \
-        --add-data "version.yaml:hei_datahub" \
-        --add-data "schema.json:hei_datahub" \
-        --hidden-import=hei_datahub \
-        --hidden-import=hei_datahub.cli.main \
-        --hidden-import=textual \
-        --hidden-import=textual.widgets \
-        --hidden-import=textual.containers \
-        --collect-all textual \
-        --clean \
-        src/hei_datahub/cli/main.py
-    exit 1
-fi
+    src/hei_datahub/cli/main.py
 
 # Organize output
 show_progress "Organizing output"
