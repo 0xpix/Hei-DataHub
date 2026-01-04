@@ -526,4 +526,3 @@ def reload_config() -> ConfigManager:
     global _config_manager
     _config_manager = ConfigManager()
     return _config_manager
-
