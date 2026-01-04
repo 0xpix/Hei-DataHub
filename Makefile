@@ -16,17 +16,17 @@ test:  ## Run tests
 	pytest tests/ -v
 
 test-coverage:  ## Run tests with coverage report
-	pytest tests/ -v --cov=mini_datahub --cov-report=html --cov-report=term
+	pytest tests/ -v --cov=hei_datahub --cov-report=html --cov-report=term
 
 lint:  ## Run linters (ruff + mypy)
-	ruff check mini_datahub tests
-	mypy mini_datahub || true
+	ruff check hei_datahub tests
+	mypy hei_datahub || true
 
 format:  ## Format code with black
-	black mini_datahub tests
+	black hei_datahub tests
 
 format-check:  ## Check code formatting without modifying
-	black --check mini_datahub tests
+	black --check hei_datahub tests
 
 clean:  ## Clean up generated files
 	rm -rf build/ dist/ *.egg-info

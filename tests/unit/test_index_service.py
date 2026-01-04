@@ -5,7 +5,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from mini_datahub.services.index_service import IndexService
+from hei_datahub.services.index_service import IndexService
 
 
 @pytest.fixture

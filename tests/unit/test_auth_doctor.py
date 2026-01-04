@@ -37,21 +37,21 @@ stored_in = "keyring"
 class TestAuthDoctor:
     """Test cases for auth doctor command."""
 
-    @patch("mini_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.auth.doctor.platform.system")
     def test_non_linux_platform(self, mock_platform):
         """Test that doctor fails on non-Linux platforms."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Windows"
         exit_code = run_doctor()
 
         assert exit_code == 2
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     def test_config_missing(self, mock_get_config_path, mock_platform, mock_config_path):
         """Test when config file doesn't exist."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_path  # File doesn't exist
@@ -60,11 +60,11 @@ class TestAuthDoctor:
 
         assert exit_code == 2  # Config issue
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
     def test_config_missing_auth_section(self, mock_get_config_path, mock_platform, mock_config_path):
         """Test when config file exists but has no [auth] section."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_path
@@ -76,12 +76,12 @@ class TestAuthDoctor:
 
         assert exit_code == 2  # Config issue
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     def test_credentials_not_found(self, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test when credentials are not found in keyring/env."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -95,13 +95,13 @@ class TestAuthDoctor:
 
         assert exit_code == 2  # Config/credential issue
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     @patch("socket.gethostbyname")
     def test_dns_resolution_failure(self, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test DNS resolution failure."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
         import socket
 
         mock_platform.return_value = "Linux"
@@ -119,15 +119,15 @@ class TestAuthDoctor:
 
         assert exit_code == 5  # Network issue
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     @patch("socket.gethostbyname")
     @patch("socket.socket")
     @patch("requests.Session")
     def test_webdav_auth_401(self, mock_session_class, mock_socket_class, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test WebDAV authentication failure (401)."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -156,15 +156,15 @@ class TestAuthDoctor:
 
         assert exit_code == 3  # Auth issue
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     @patch("socket.gethostbyname")
     @patch("socket.socket")
     @patch("requests.Session")
     def test_webdav_auth_success_skip_write(self, mock_session_class, mock_socket_class, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test successful WebDAV auth with --no-write flag."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -193,15 +193,15 @@ class TestAuthDoctor:
 
         assert exit_code == 0  # Success
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     @patch("socket.gethostbyname")
     @patch("socket.socket")
     @patch("requests.Session")
     def test_webdav_auth_success_with_write(self, mock_session_class, mock_socket_class, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test successful WebDAV auth with write permission check."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -241,15 +241,15 @@ class TestAuthDoctor:
 
         assert exit_code == 0  # Success
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     @patch("socket.gethostbyname")
     @patch("socket.socket")
     @patch("requests.Session")
     def test_json_output(self, mock_session_class, mock_socket_class, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth, capsys):
         """Test JSON output format."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth
@@ -286,15 +286,15 @@ class TestAuthDoctor:
         assert "overall" in output
         assert output["overall"] == "PASS"
 
-    @patch("mini_datahub.auth.doctor.platform.system")
-    @patch("mini_datahub.infra.config_paths.get_config_path")
-    @patch("mini_datahub.auth.credentials.get_auth_store")
+    @patch("hei_datahub.auth.doctor.platform.system")
+    @patch("hei_datahub.infra.config_paths.get_config_path")
+    @patch("hei_datahub.auth.credentials.get_auth_store")
     @patch("socket.gethostbyname")
     @patch("socket.socket")
     @patch("requests.Session")
     def test_permission_denied(self, mock_session_class, mock_socket_class, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test write permission denied."""
-        from mini_datahub.auth.doctor import run_doctor
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth

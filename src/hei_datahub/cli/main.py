@@ -25,7 +25,7 @@ from hei_datahub.cli.auth import (
 def main():
     """Main CLI entrypoint."""
     parser = argparse.ArgumentParser(
-        prog="mini-datahub",
+        prog="hei-datahub",
         description=f"{__app_name__} - A local-first TUI for managing datasets",
     )
 

@@ -38,8 +38,15 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Install Hei-DataHub (SSH recommended)
 uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
-# Launch
+# With HTTPS + Token
+export GH_PAT=ghp_xxxxxxxxxxxxx
+uv tool install "git+https://${GH_PAT}@github.com/0xpix/Hei-DataHub@main"
+
+# Run the application
 hei-datahub
+
+# Configure WebDAV for cloud storage (optional, interactive wizard)
+hei-datahub auth setup
 ```
 
 **Try before installing:**
@@ -109,7 +116,7 @@ cd Hei-DataHub
 uv sync --dev && source .venv/bin/activate
 
 # Run from source
-hei-datahub     # or: mini-datahub
+hei-datahub
 ```
 
 **macOS/Windows:** Coming soon in future releases.

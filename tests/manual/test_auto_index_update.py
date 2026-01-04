@@ -11,8 +11,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 def test_add_dataset():
     """Test that adding a dataset updates the index automatically."""
-    from mini_datahub.services.catalog import save_dataset
-    from mini_datahub.services.index_service import get_index_service
+    from hei_datahub.services.catalog import save_dataset
+    from hei_datahub.services.index_service import get_index_service
 
     print("\n" + "=" * 60)
     print("TEST: Add Dataset (Auto Index Update)")
@@ -61,8 +61,8 @@ def test_add_dataset():
 
 def test_delete_dataset():
     """Test that deleting a dataset updates the index automatically."""
-    from mini_datahub.infra.index import delete_dataset
-    from mini_datahub.services.index_service import get_index_service
+    from hei_datahub.infra.index import delete_dataset
+    from hei_datahub.services.index_service import get_index_service
 
     print("\n" + "=" * 60)
     print("TEST: Delete Dataset (Auto Index Update)")

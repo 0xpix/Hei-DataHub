@@ -118,7 +118,7 @@ OUTBOX_DIR = STATE_DIR / "outbox"
 ASSETS_DIR = PROJECT_ROOT / "assets" if _is_installed_package() else PROJECT_ROOT / "assets"
 
 # Keyring settings
-KEYRING_SERVICE = "mini-datahub"
+KEYRING_SERVICE = "hei-datahub"
 KEYRING_USERNAME = "github-token"
 
 

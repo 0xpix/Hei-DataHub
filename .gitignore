@@ -87,7 +87,7 @@ data/**/*.gpkg
 data/**/*.gdb
 # Add more data file extensions as needed, but keep metadata.yaml
 
-# DataHub - local config (use ~/.mini-datahub instead)
+# DataHub - local config (use ~/.hei-datahub instead)
 .datahub_config.json
 
 # DataHub - ignore data files but keep metadata
@@ -108,7 +108,7 @@ data/**/*.gpkg
 data/**/*.gdb
 # Add more data file extensions as needed, but metadata.yaml and README.md are tracked
 
-# DataHub - local config (use ~/.mini-datahub instead)
+# DataHub - local config (use ~/.hei-datahub instead)
 .datahub_config.json
 
 # Flask stuff:
