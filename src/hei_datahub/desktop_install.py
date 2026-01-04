@@ -268,6 +268,32 @@ def _refresh_icon_cache(icons_base: Path, verbose: bool = False) -> bool:
     return success
 
 
+def _check_icon_theme_match() -> bool:
+    """Check if installed icon matches current system theme."""
+    try:
+        install_paths = _get_install_paths()
+        asset_paths = _get_asset_paths()
+
+        if not install_paths["icon_svg"].exists():
+            return False
+
+        theme = _detect_system_theme()
+        expected_source = asset_paths["logo_dark"] if theme == "dark" else asset_paths["logo_light"]
+
+        # Compare file contents
+        installed_bytes = install_paths["icon_svg"].read_bytes()
+
+        if hasattr(expected_source, "read_bytes"):
+            expected_bytes = expected_source.read_bytes()
+        else:
+            with expected_source.open("rb") as f:
+                expected_bytes = f.read()
+
+        return installed_bytes == expected_bytes
+    except Exception:
+        return False
+
+
 def get_desktop_assets_status() -> dict[str, any]:
     """
     Get current status of desktop assets installation.
@@ -301,9 +327,12 @@ def get_desktop_assets_status() -> dict[str, any]:
     }
 
     all_installed = all(files_status.values())
+    icon_match = _check_icon_theme_match()
+
     needs_update = (
         not all_installed or
-        installed_version != current_version
+        installed_version != current_version or
+        not icon_match
     )
 
     return {
@@ -357,7 +386,7 @@ def install_desktop_assets(
 
     if not force and installed_version == current_version:
         status = get_desktop_assets_status()
-        if status["installed"]:
+        if status["installed"] and not status["needs_update"]:
             return {
                 "success": True,
                 "installed_files": [],
