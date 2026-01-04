@@ -52,6 +52,30 @@ def _get_version_stamp_path() -> Path:
     return _get_app_data_dir() / ".desktop_assets_version"
 
 
+def _detect_system_theme() -> str:
+    """
+    Detect system theme (light/dark) on Linux.
+    Returns 'dark' or 'light'. Defaults to 'dark' on failure.
+    """
+    try:
+        # Try GTK/GNOME settings via gsettings
+        if shutil.which("gsettings"):
+            result = subprocess.run(
+                ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"],
+                capture_output=True, text=True, timeout=2, check=False
+            )
+            if result.returncode == 0:
+                output = result.stdout.strip().strip("'")
+                if "light" in output.lower():
+                    return "light"
+                if "dark" in output.lower():
+                    return "dark"
+    except Exception:
+        pass
+
+    return "dark"  # Default to dark
+
+
 def _get_current_version() -> str:
     """Get current application version."""
     try:
@@ -93,8 +117,8 @@ def _get_asset_paths() -> dict[str, Path]:
         desktop_dir = assets_root / "desktop"
 
         return {
-            "logo_svg": icons_dir / "logo-full.svg",
-            "logo_png": icons_dir / "logo-full-256.png",
+            "logo_light": icons_dir / "logo-full-light.svg",
+            "logo_dark": icons_dir / "logo-full-dark.svg",
             "symbolic": icons_dir / "hei-datahub-symbolic.svg",
             "desktop_template": desktop_dir / "hei-datahub.desktop.tmpl",
         }
@@ -109,7 +133,6 @@ def _get_install_paths() -> dict[str, Path]:
 
     return {
         "icon_svg": icons_base / "scalable" / "apps" / "hei-datahub.svg",
-        "icon_png": icons_base / "256x256" / "apps" / "hei-datahub.png",
         "icon_symbolic": icons_base / "scalable" / "status" / "hei-datahub-symbolic.svg",
         "desktop_entry": data_home / "applications" / "hei-datahub.desktop",
         "icons_base": icons_base,
@@ -273,7 +296,6 @@ def get_desktop_assets_status() -> dict[str, any]:
 
     files_status = {
         "icon_svg": install_paths["icon_svg"].exists(),
-        "icon_png": install_paths["icon_png"].exists(),
         "icon_symbolic": install_paths["icon_symbolic"].exists(),
         "desktop_entry": install_paths["desktop_entry"].exists(),
     }
@@ -364,17 +386,16 @@ def install_desktop_assets(
     installed_files = []
 
     try:
+        # Detect theme and select logo
+        theme = _detect_system_theme()
+        logo_source = asset_paths["logo_dark"] if theme == "dark" else asset_paths["logo_light"]
+
         # Install SVG icon
         if verbose:
+            print(f"  → Detected system theme: {theme}")
             print(f"  → Installing icon (SVG): {install_paths['icon_svg']}")
-        _atomic_write(asset_paths["logo_svg"], install_paths["icon_svg"])
+        _atomic_write(logo_source, install_paths["icon_svg"])
         installed_files.append(install_paths["icon_svg"])
-
-        # Install PNG icon
-        if verbose:
-            print(f"  → Installing icon (PNG): {install_paths['icon_png']}")
-        _atomic_write(asset_paths["logo_png"], install_paths["icon_png"])
-        installed_files.append(install_paths["icon_png"])
 
         # Install symbolic icon
         if verbose:
@@ -484,7 +505,6 @@ def uninstall_desktop_assets(verbose: bool = False) -> dict[str, any]:
     # Remove files (don't fail if missing)
     files_to_remove = [
         install_paths["icon_svg"],
-        install_paths["icon_png"],
         install_paths["icon_symbolic"],
         install_paths["desktop_entry"],
         _get_version_stamp_path(),
