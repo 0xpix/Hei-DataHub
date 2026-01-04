@@ -14,7 +14,7 @@
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/Version-0.60.0--beta-blue.svg)
+![Version](https://img.shields.io/badge/Version-0.60.1--beta-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
