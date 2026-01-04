@@ -1,0 +1,74 @@
+# Hei-DataHub Configuration
+# This file is auto-generated on first run.
+# Edit any values to customize your experience.
+
+config_version: 2
+
+# UI Customization
+ui:
+  logo:
+    path: null  # Custom logo path (null = use default)
+    align: center  # left | center | right
+    color: cyan  # color name
+    padding_top: 0
+    padding_bottom: 1
+    show_version_tag: true  # Show version tag under logo
+    version_format: "v{version} — {codename}"  # Format: {version} {codename}
+    version_style: accent  # Rich markup style (accent, cyan, etc.)
+
+# Available themes: textual-dark, textual-light, gruvbox, monokai,
+# nord, dracula, catppuccin-mocha, catppuccin-latte, flexoki,
+# tokyo-night, solarized-light
+theme:
+  name: catppuccin-mocha
+  stylesheets: []  # List of custom TCSS file paths
+  tokens: null     # Path to design tokens YAML (optional)
+  stylesheets: []  # List of custom TCSS file paths
+  tokens: null     # Path to design tokens YAML (optional)
+
+# Keybindings: Customize any action with your preferred keys
+# Format: action_name: ["key1", "key2"]
+# Special keys: ctrl+key, shift+key, alt+key
+keybindings:
+  add_dataset: ["a"]
+  settings: ["s"]
+  open_details: ["o", "enter"]
+  outbox: ["p"]
+  pull_updates: ["u"]
+  refresh_data: ["r"]
+  quit: ["q"]
+  show_about: ["ctrl+a"]
+  move_down: ["j", "down"]
+  move_up: ["k", "up"]
+  jump_top: ["g"]
+  jump_bottom: ["G"]
+  focus_search: ["/"]
+  clear_search: ["escape"]
+  debug_console: [":"]
+  show_help: ["?"]
+
+# Search configuration
+search:
+  debounce_ms: 150
+  max_results: 50
+  highlight_enabled: True
+
+# Startup behavior
+startup:
+  check_updates: True
+  auto_reindex: False
+
+# Storage backend (WebDAV cloud storage only)
+storage:
+  backend: webdav  # webdav (cloud storage)
+  base_url: null  # WebDAV URL (e.g., https://heibox.uni-heidelberg.de/seafdav)
+  library: null  # Library/folder name
+  username: null  # WebDAV username (empty = use env)
+  password_env: HEIBOX_WEBDAV_TOKEN  # Env var for token/password
+  connect_timeout: 5  # seconds
+  read_timeout: 60  # seconds
+  max_retries: 3  # retry attempts
+
+# Telemetry (opt-in only, no data collected by default)
+telemetry:
+  opt_in: False
