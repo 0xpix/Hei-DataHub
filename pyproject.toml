@@ -42,6 +42,7 @@ dependencies = [
     "rich>=13.0.0",
     "mkdocs-terminal>=4.7.0",
     "mkdocs-dracula-theme>=1.0.8",
+    "pytest>=8.4.2",
 ]
 
 [project.optional-dependencies]

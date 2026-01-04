@@ -309,7 +309,7 @@ wheels = [
 
 [[package]]
 name = "hei-datahub"
-version = "0.59.0b0"
+version = "0.60.0b0"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
@@ -323,6 +323,7 @@ dependencies = [
     { name = "psutil" },
     { name = "pydantic" },
     { name = "pyperclip" },
+    { name = "pytest" },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "rich" },
@@ -356,6 +357,7 @@ requires-dist = [
     { name = "psutil", specifier = ">=5.9.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pyperclip", specifier = ">=1.8.2" },
+    { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "requests", specifier = ">=2.31.0" },
