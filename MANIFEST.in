@@ -18,6 +18,9 @@ recursive-include src/hei_datahub/data *
 # Include sample data templates
 recursive-include src/hei_datahub/templates *
 
+# Include desktop assets
+recursive-include src/hei_datahub/assets *
+
 # Include UI styles and assets
 recursive-include src/hei_datahub/ui *.tcss
 recursive-include src/hei_datahub/ui/assets/ascii *.txt
