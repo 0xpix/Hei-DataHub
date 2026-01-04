@@ -3,7 +3,7 @@
 !!! info "Version 0.60-beta "Clean-up""
     **Current stable release:** October 2025
 
-    This guide reflects version 0.60.0-beta with the latest features and improvements.
+    This guide reflects version 0.60.1-beta with the latest features and improvements.
 
 **Learning Goal**: Get Hei-DataHub running on your machine and understand what happens during initialization.
 

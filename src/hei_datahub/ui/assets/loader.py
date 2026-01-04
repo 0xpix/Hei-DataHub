@@ -7,7 +7,6 @@ from either user config paths or packaged defaults.
 import logging
 from pathlib import Path
 from typing import Optional
-from importlib import resources
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ def get_logo_text(config) -> str:
         user_path = Path(logo_path).expanduser()
         if user_path.exists():
             try:
-                with open(user_path, "r", encoding="utf-8") as f:
+                with open(user_path, encoding="utf-8") as f:
                     text = f.read()
                 logger.info(f"Loaded logo from user path: {user_path}")
                 return text
@@ -69,8 +68,9 @@ def _detect_version_codename():
         Tuple of (version, codename) as strings
     """
     try:
-        from hei_datahub.version import __version__ as VERSION, CODENAME
-        return str(VERSION or ""), str(CODENAME or "")
+        from hei_datahub.version import CODENAME
+        from hei_datahub.version import __version__ as version
+        return str(version or ""), str(CODENAME or "")
     except Exception:
         return "", ""
 
@@ -88,7 +88,7 @@ def format_logo(text: str, config) -> str:
     """
     logo_config = config.get_logo_config()
     color = logo_config.get("color", "cyan")
-    align = logo_config.get("align", "center")
+    logo_config.get("align", "center")
     padding_top = logo_config.get("padding_top", 0)
     padding_bottom = logo_config.get("padding_bottom", 1)
 
@@ -200,7 +200,7 @@ def load_help_text(config) -> Optional[str]:
         return None
 
     try:
-        with open(help_path, "r", encoding="utf-8") as f:
+        with open(help_path, encoding="utf-8") as f:
             return f.read()
     except Exception as e:
         logger.error(f"Failed to load help file: {e}")

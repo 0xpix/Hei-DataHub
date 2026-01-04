@@ -7,7 +7,7 @@ Provides context-aware autocomplete with:
 """
 
 import logging
-from typing import Optional
+
 from textual.suggester import Suggester
 
 logger = logging.getLogger(__name__)

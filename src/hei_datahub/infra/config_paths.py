@@ -3,32 +3,18 @@ Configuration paths and user directory management.
 """
 from pathlib import Path
 from typing import Optional
-import os
+
+from hei_datahub.infra.paths import CONFIG_DIR
 
 
 def get_user_config_dir() -> Path:
     """
     Get the user configuration directory for Hei-DataHub.
 
-    Follows XDG Base Directory specification:
-    - Uses $XDG_CONFIG_HOME/hei-datahub if set
-    - Falls back to ~/.config/hei-datahub
-    - Can be overridden with $HEIDH_CONFIG_DIR
-
     Returns:
-        Path to config directory
+        Path to config directory (respects dev mode from infra.paths)
     """
-    # Check for environment variable override (highest priority)
-    if config_dir := os.getenv("HEIDH_CONFIG_DIR"):
-        return Path(config_dir).expanduser()
-
-    # Follow XDG Base Directory specification
-    xdg_config_home = os.getenv("XDG_CONFIG_HOME")
-    if xdg_config_home:
-        return Path(xdg_config_home) / "hei-datahub"
-
-    # Default to ~/.config/hei-datahub (XDG standard)
-    return Path.home() / ".config" / "hei-datahub"
+    return CONFIG_DIR
 
 
 def ensure_user_config_dir() -> Path:

@@ -2,7 +2,7 @@
 Pydantic models mirroring the JSON Schema for type-safe validation.
 """
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -60,20 +60,20 @@ class DatasetMetadata(BaseModel):
     # Optional fields
     file_format: Optional[str] = Field(None, alias="file_format")
     size: Optional[str] = Field(None, alias="size")
-    data_types: Optional[List[str]] = Field(None, alias="data_types")
-    used_in_projects: Optional[List[str]] = Field(None, alias="used_in_projects")
-    schema_fields: Optional[List[SchemaField]] = Field(None, alias="schema_fields")
+    data_types: Optional[list[str]] = Field(None, alias="data_types")
+    used_in_projects: Optional[list[str]] = Field(None, alias="used_in_projects")
+    schema_fields: Optional[list[SchemaField]] = Field(None, alias="schema_fields")
     last_updated: Optional[date] = Field(None, alias="last_updated")
     dependencies: Optional[str] = Field(None, alias="dependencies")
     preprocessing_steps: Optional[str] = Field(None, alias="preprocessing_steps")
-    linked_documentation: Optional[List[str]] = Field(None, alias="linked_documentation")
+    linked_documentation: Optional[list[str]] = Field(None, alias="linked_documentation")
     cite: Optional[str] = Field(None, alias="cite")
     spatial_resolution: Optional[str] = Field(None, alias="spatial_resolution")
     temporal_resolution: Optional[str] = Field(None, alias="temporal_resolution")
     temporal_coverage: Optional[str] = Field(None, alias="temporal_coverage")
     spatial_coverage: Optional[str] = Field(None, alias="spatial_coverage")
-    codes: Optional[List[str]] = Field(None, alias="codes")
-    extras: Optional[Dict[str, Any]] = Field(None, alias="extras")
+    codes: Optional[list[str]] = Field(None, alias="codes")
+    extras: Optional[dict[str, Any]] = Field(None, alias="extras")
 
     class Config:
         populate_by_name = True

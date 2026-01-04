@@ -11,8 +11,7 @@ import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Dict, Literal, Optional, Tuple
+from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -27,7 +26,7 @@ class DiagnosticResult:
     check: str
     passed: bool
     message: str
-    details: Optional[Dict] = None
+    details: Optional[dict] = None
 
 
 class AuthDoctor:

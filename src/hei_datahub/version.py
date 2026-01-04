@@ -4,9 +4,9 @@ Version information for Hei-DataHub.
 This module reads version data directly from version.yaml at runtime.
 For version updates, simply edit version.yaml - no sync step needed!
 """
-import yaml
 from pathlib import Path
-from typing import Tuple
+
+import yaml
 
 
 def _load_version_data() -> dict:
@@ -37,7 +37,7 @@ def _load_version_data() -> dict:
         }
 
     try:
-        with open(version_file, "r", encoding="utf-8") as f:
+        with open(version_file, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
     except Exception:
         # Return defaults on any error
@@ -56,7 +56,7 @@ def _load_version_data() -> dict:
 _VERSION_DATA = _load_version_data()
 
 
-def _parse_version(version_str: str) -> Tuple[int, ...]:
+def _parse_version(version_str: str) -> tuple[int, ...]:
     """Parse version string into tuple."""
     parts = version_str.split("-")[0].split(".")
     try:
@@ -124,10 +124,11 @@ def get_version_info() -> dict:
 def print_version_info(verbose: bool = False) -> None:
     """Print version information to stdout with beautiful formatting."""
     try:
-        from rich.console import Console
-        from pathlib import Path
-        import sys
         import platform
+        import sys
+        from pathlib import Path
+
+        from rich.console import Console
 
         console = Console()
 
@@ -158,9 +159,9 @@ def print_version_info(verbose: bool = False) -> None:
                 f"[bold]Python:[/bold] {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
                 f"[bold]Platform:[/bold] {platform.system()} {platform.machine()}",
                 "",
-                f"[bold]Repository:[/bold]",
+                "[bold]Repository:[/bold]",
                 f"  [link={GITHUB_URL}]{GITHUB_URL}[/link]",
-                f"[bold]Documentation:[/bold]",
+                "[bold]Documentation:[/bold]",
                 f"  [link={DOCS_URL}]{DOCS_URL}[/link]",
             ]
         else:
@@ -177,7 +178,7 @@ def print_version_info(verbose: bool = False) -> None:
                 f"[bold]Version:[/bold] [green]{__version__}[/green]",
                 f"[bold]Codename:[/bold] [yellow]{CODENAME}[/yellow]",
                 "",
-                f"[dim]Use --version-info for details[/dim]",
+                "[dim]Use --version-info for details[/dim]",
             ]
 
         # Calculate max width of dog ASCII (for padding)

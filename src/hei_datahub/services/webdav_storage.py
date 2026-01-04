@@ -6,13 +6,12 @@ Credentials are read from environment variables for security.
 """
 import logging
 import os
-import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
-from urllib.parse import quote, urljoin, urlparse
+from typing import Optional
+from urllib.parse import quote, urlparse
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -158,7 +157,7 @@ class WebDAVStorage:
         encoded_path = "/".join(quote(part, safe="") for part in path.split("/"))
         return f"{self.root_url}/{encoded_path}" if encoded_path else self.root_url
 
-    def listdir(self, path: str = "") -> List[FileEntry]:
+    def listdir(self, path: str = "") -> list[FileEntry]:
         """
         List directory contents using WebDAV PROPFIND.
 
@@ -219,7 +218,7 @@ class WebDAVStorage:
         except Exception as e:
             raise StorageError(f"PROPFIND failed: {str(e)}")
 
-    def _parse_propfind_response(self, xml_text: str, request_path: str) -> List[FileEntry]:
+    def _parse_propfind_response(self, xml_text: str, request_path: str) -> list[FileEntry]:
         """Parse WebDAV PROPFIND XML response."""
         try:
             root = ET.fromstring(xml_text)

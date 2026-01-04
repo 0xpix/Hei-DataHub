@@ -1,17 +1,17 @@
 """
 Search: Query policy and search operations with structured query support.
 """
-from typing import Any, Dict, List
 import json
 import logging
+from typing import Any
 
+from hei_datahub.core.queries import ParsedQuery, QueryOperator, QueryParser
 from hei_datahub.infra.db import get_connection
-from hei_datahub.core.queries import QueryParser, ParsedQuery, QueryOperator
 
 logger = logging.getLogger(__name__)
 
 
-def search_datasets(query: str, limit: int = 50) -> List[Dict[str, Any]]:
+def search_datasets(query: str, limit: int = 50) -> list[dict[str, Any]]:
     """
     Search datasets using FTS5 with BM25 ranking and structured query support.
 
@@ -50,7 +50,7 @@ def search_datasets(query: str, limit: int = 50) -> List[Dict[str, Any]]:
     return _structured_search(parsed, limit)
 
 
-def _simple_fts_search(query: str, limit: int) -> List[Dict[str, Any]]:
+def _simple_fts_search(query: str, limit: int) -> list[dict[str, Any]]:
     """
     Simple FTS5 search without structured filters.
 
@@ -143,7 +143,7 @@ def _simple_fts_search(query: str, limit: int) -> List[Dict[str, Any]]:
         conn.close()
 
 
-def _structured_search(parsed: ParsedQuery, limit: int) -> List[Dict[str, Any]]:
+def _structured_search(parsed: ParsedQuery, limit: int) -> list[dict[str, Any]]:
     """
     Execute a structured search with field filters.
 
@@ -304,7 +304,7 @@ def _structured_search(parsed: ParsedQuery, limit: int) -> List[Dict[str, Any]]:
         conn.close()
 
 
-def get_all_datasets(limit: int = 200) -> List[Dict[str, Any]]:
+def get_all_datasets(limit: int = 200) -> list[dict[str, Any]]:
     """
     Get all datasets (no search filter).
 

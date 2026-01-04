@@ -8,10 +8,11 @@ import asyncio
 import logging
 import os
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
+
 import yaml
 
-from hei_datahub.services.index_service import get_index_service, SYNC_INTERVAL_SEC
+from hei_datahub.services.index_service import SYNC_INTERVAL_SEC, get_index_service
 
 logger = logging.getLogger(__name__)
 
@@ -162,7 +163,7 @@ class BackgroundIndexer:
                             mtime=int(entry.modified.timestamp()) if entry.modified else None,
                         )
                         count += 1
-                    except:
+                    except Exception:
                         pass
 
             logger.info(f"Indexed {count} cloud datasets")
@@ -170,7 +171,7 @@ class BackgroundIndexer:
         except Exception as e:
             logger.error(f"Cloud indexing failed: {e}", exc_info=True)
 
-    async def _fetch_metadata(self, storage, metadata_path: str) -> Optional[Dict[str, Any]]:
+    async def _fetch_metadata(self, storage, metadata_path: str) -> Optional[dict[str, Any]]:
         """Fetch and parse metadata.yaml from cloud storage."""
         try:
             import tempfile
@@ -181,14 +182,14 @@ class BackgroundIndexer:
             try:
                 await asyncio.to_thread(storage.download, metadata_path, tmp_path)
 
-                with open(tmp_path, 'r', encoding='utf-8') as f:
+                with open(tmp_path, encoding='utf-8') as f:
                     metadata = yaml.safe_load(f)
 
                 return metadata
             finally:
                 try:
                     os.unlink(tmp_path)
-                except:
+                except Exception:
                     pass
 
         except Exception as e:
@@ -285,7 +286,7 @@ class BackgroundIndexer:
         """Check if initial indexing is complete."""
         return self._indexed
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get indexer status."""
         total = self.index_service.get_item_count()
         return {

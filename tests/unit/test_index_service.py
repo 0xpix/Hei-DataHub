@@ -1,9 +1,10 @@
 """
 Unit tests for the index service.
 """
-import pytest
 import tempfile
 from pathlib import Path
+
+import pytest
 
 from hei_datahub.services.index_service import IndexService
 

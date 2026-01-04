@@ -9,8 +9,9 @@ def handle_paths(args) -> int:
     Returns:
         int: exit code (0 success)
     """
-    from hei_datahub.infra import paths
     import os
+
+    from hei_datahub.infra import paths
 
     print("Hei-DataHub Paths Diagnostic")
     print("=" * 60)
@@ -20,7 +21,7 @@ def handle_paths(args) -> int:
     is_installed = paths._is_installed_package()
     is_dev = paths._is_dev_mode()
 
-    print(f"Installation Mode:")
+    print("Installation Mode:")
     if is_installed:
         print("  ✓ Installed package (standalone)")
     elif is_dev:
@@ -30,22 +31,16 @@ def handle_paths(args) -> int:
     print()
 
     # XDG directories
-    print(f"XDG Base Directories:")
+    print("XDG Base Directories:")
     print(f"  XDG_CONFIG_HOME: {paths.XDG_CONFIG_HOME}")
-    print(f"  XDG_DATA_HOME:   {paths.XDG_DATA_HOME}")
     print(f"  XDG_CACHE_HOME:  {paths.XDG_CACHE_HOME}")
     print(f"  XDG_STATE_HOME:  {paths.XDG_STATE_HOME}")
     print()
 
     # Application paths
-    print(f"Application Paths:")
+    print("Application Paths:")
     print(f"  Config:    {paths.CONFIG_DIR}")
     print(f"    Exists:  {'✓' if paths.CONFIG_DIR.exists() else '✗'}")
-    print(f"  Data:      {paths.DATA_DIR}")
-    print(f"    Exists:  {'✓' if paths.DATA_DIR.exists() else '✗'}")
-    if paths.DATA_DIR.exists():
-        dataset_count = len(list(paths.DATA_DIR.iterdir()))
-        print(f"    Datasets: {dataset_count}")
     print(f"  Cache:     {paths.CACHE_DIR}")
     print(f"    Exists:  {'✓' if paths.CACHE_DIR.exists() else '✗'}")
     print(f"  State:     {paths.STATE_DIR}")
@@ -55,7 +50,7 @@ def handle_paths(args) -> int:
     print()
 
     # Important files
-    print(f"Important Files:")
+    print("Important Files:")
     print(f"  Database:  {paths.DB_PATH}")
     print(f"    Exists:  {'✓' if paths.DB_PATH.exists() else '✗'}")
     if paths.DB_PATH.exists():
@@ -66,13 +61,13 @@ def handle_paths(args) -> int:
     print(f"    Exists:  {'✓' if paths.SCHEMA_JSON.exists() else '✗'}")
     print(f"  Config:    {paths.CONFIG_FILE}")
     print(f"    Exists:  {'✓' if paths.CONFIG_FILE.exists() else '✗'}")
-    print(f"  Keymap:    {paths.KEYMAP_FILE}")
+    print(f"  Keymap:    {paths.KEYMAP_FILE} (Optional)")
     print(f"    Exists:  {'✓' if paths.KEYMAP_FILE.exists() else '✗'}")
     print()
 
     # Environment variables
-    print(f"Environment Variables:")
-    for var in ['XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_CACHE_HOME', 'XDG_STATE_HOME']:
+    print("Environment Variables:")
+    for var in ['XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_STATE_HOME']:
         val = os.environ.get(var, '<not set>')
         print(f"  {var}: {val}")
     print()

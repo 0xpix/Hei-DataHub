@@ -13,7 +13,7 @@ Public API:
 """
 
 from .doctor import handle_doctor
-from .tui import handle_tui
 from .paths import handle_paths
+from .tui import handle_tui
 
 __all__ = ["handle_doctor", "handle_tui", "handle_paths"]

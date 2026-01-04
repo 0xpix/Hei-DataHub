@@ -7,7 +7,6 @@ import logging
 import platform
 import sys
 from pathlib import Path
-from typing import Literal, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +85,7 @@ def run_clear(force: bool = False, clear_all: bool = False) -> int:
 
     # Clear credentials from keyring/env
     try:
-        from hei_datahub.cli.auth.credentials import get_auth_store, KeyringAuthStore
+        from hei_datahub.cli.auth.credentials import KeyringAuthStore
 
         key_id = auth_config.get("key_id")
         stored_in = auth_config.get("stored_in", "keyring")

@@ -4,15 +4,14 @@ WebDAV credential validation client.
 Linux-only HTTP client for testing WebDAV credentials.
 """
 import logging
-from typing import Optional, Tuple
-from urllib.parse import urlparse
+from typing import Optional
 
 import requests
 
 logger = logging.getLogger(__name__)
 
 
-ValidationResult = Tuple[bool, str, int]  # (success, message, status_code)
+ValidationResult = tuple[bool, str, int]  # (success, message, status_code)
 
 
 class WebDAVValidator:

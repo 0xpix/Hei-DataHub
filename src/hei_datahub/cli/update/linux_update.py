@@ -2,10 +2,12 @@
 
 import sys
 from pathlib import Path
-from rich.panel import Panel
+
 from rich.align import Align
-from hei_datahub.cli.update_manager import AtomicUpdateManager, UpdateError, format_error_panel
+from rich.panel import Panel
+
 from hei_datahub import __version__
+from hei_datahub.cli.update_manager import AtomicUpdateManager, UpdateError, format_error_panel
 
 
 def linux_update(args, console):
@@ -27,7 +29,7 @@ def linux_update(args, console):
             logo_text = logo_path.read_text()
         else:
             logo_text = None
-    except:
+    except Exception:
         logo_text = None
 
     # Display beautiful header with logo
@@ -72,8 +74,8 @@ def linux_update(args, console):
         )
 
         # Success - show next steps
-        from rich.table import Table
         from rich import box
+        from rich.table import Table
 
         console.print()
         next_steps = Table(

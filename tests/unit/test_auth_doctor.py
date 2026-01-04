@@ -4,9 +4,7 @@ Tests for auth doctor command.
 Test various scenarios including config missing, auth failures, network errors, and JSON output.
 """
 import json
-import tempfile
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -101,8 +99,9 @@ class TestAuthDoctor:
     @patch("socket.gethostbyname")
     def test_dns_resolution_failure(self, mock_gethostbyname, mock_get_auth_store, mock_get_config_path, mock_platform, mock_config_with_auth):
         """Test DNS resolution failure."""
-        from hei_datahub.auth.doctor import run_doctor
         import socket
+
+        from hei_datahub.auth.doctor import run_doctor
 
         mock_platform.return_value = "Linux"
         mock_get_config_path.return_value = mock_config_with_auth

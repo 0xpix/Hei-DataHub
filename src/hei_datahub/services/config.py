@@ -5,13 +5,12 @@ Precedence: CLI args > ENV vars > user config > defaults
 """
 import logging
 import os
-from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import yaml
 from pydantic import BaseModel, Field, field_validator
 
-from hei_datahub.infra.config_paths import get_user_config_file, ensure_user_config_dir
+from hei_datahub.infra.config_paths import ensure_user_config_dir, get_user_config_file
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +48,7 @@ class LogoConfig(BaseModel):
 class ThemeConfig(BaseModel):
     """Theme configuration."""
     name: str = Field(default="catppuccin-mocha")
-    overrides: Dict[str, str] = Field(default_factory=dict)
+    overrides: dict[str, str] = Field(default_factory=dict)
     stylesheets: list[str] = Field(default_factory=list)  # User TCSS files
     tokens: Optional[str] = None  # Path to tokens YAML file
     stylesheets: list[str] = Field(default_factory=list)  # User TCSS files
@@ -100,7 +99,7 @@ class StorageConfig(BaseModel):
         return v
 
 
-def get_default_keybindings() -> Dict[str, list[str]]:
+def get_default_keybindings() -> dict[str, list[str]]:
     """Get default keybindings configuration."""
     return {
         "add_dataset": ["a"],
@@ -132,7 +131,7 @@ class UserConfig(BaseModel):
     theme: ThemeConfig = Field(default_factory=ThemeConfig)
     ui: UIConfig = Field(default_factory=UIConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
-    keybindings: Dict[str, list[str]] = Field(default_factory=get_default_keybindings)
+    keybindings: dict[str, list[str]] = Field(default_factory=get_default_keybindings)
     search: SearchDefaults = Field(default_factory=SearchDefaults)
     startup: StartupConfig = Field(default_factory=StartupConfig)
     telemetry: TelemetryConfig = Field(default_factory=TelemetryConfig)
@@ -148,7 +147,7 @@ class ConfigManager:
 
     def __init__(self):
         self._user_config: UserConfig = self._load_user_config()
-        self._cli_overrides: Dict[str, Any] = {}
+        self._cli_overrides: dict[str, Any] = {}
 
     def _load_user_config(self) -> UserConfig:
         """Load user config from file or create defaults."""
@@ -156,7 +155,7 @@ class ConfigManager:
 
         if config_file.exists():
             try:
-                with open(config_file, "r", encoding="utf-8") as f:
+                with open(config_file, encoding="utf-8") as f:
                     data = yaml.safe_load(f) or {}
 
                 # Migrate config if needed
@@ -182,7 +181,7 @@ class ConfigManager:
             self._save_user_config(config)
             return config
 
-    def _migrate_config(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _migrate_config(self, data: dict[str, Any]) -> dict[str, Any]:
         """Migrate config from v1 to v2 non-destructively."""
         current_version = data.get("config_version", 1)
 
@@ -433,15 +432,15 @@ class ConfigManager:
         """Get current theme name."""
         return self.get("theme.name", "gruvbox")
 
-    def get_theme_overrides(self) -> Dict[str, str]:
+    def get_theme_overrides(self) -> dict[str, str]:
         """Get theme overrides."""
         return self.get("theme.overrides", {})
 
-    def get_keybindings(self) -> Dict[str, list[str]]:
+    def get_keybindings(self) -> dict[str, list[str]]:
         """Get user keybindings."""
         return self.get("keybindings", {})
 
-    def get_logo_config(self) -> Dict[str, Any]:
+    def get_logo_config(self) -> dict[str, Any]:
         """Get logo configuration with defaults."""
         return {
             "path": self.get("ui.logo.path"),
@@ -466,7 +465,7 @@ class ConfigManager:
         """Get path to custom help file."""
         return self.get("ui.help_file")
 
-    def update_user_config(self, updates: Dict[str, Any]) -> None:
+    def update_user_config(self, updates: dict[str, Any]) -> None:
         """
         Update user config and save to file.
 
@@ -528,8 +527,3 @@ def reload_config() -> ConfigManager:
     _config_manager = ConfigManager()
     return _config_manager
 
-
-def reload_config() -> None:
-    """Reload configuration from disk."""
-    global _config_manager
-    _config_manager = ConfigManager()

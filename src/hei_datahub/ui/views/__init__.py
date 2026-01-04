@@ -4,10 +4,10 @@ TUI views for Hei-DataHub.
 This package contains modular screen implementations split from the monolithic home.py.
 """
 
-from .home import HomeScreen
+from .dataset_add import AddDataScreen
 from .dataset_detail import CloudDatasetDetailsScreen
 from .dataset_edit import CloudEditDetailsScreen
-from .dataset_add import AddDataScreen
+from .home import HomeScreen
 from .settings import SettingsScreen
 
 # Note: HelpScreen, SettingsWizard, and dialogs are in ui/widgets/

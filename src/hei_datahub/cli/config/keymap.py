@@ -11,9 +11,10 @@ def handle_keymap_export(args) -> int:
     Returns:
         int: 0 on success, 1 on error
     """
-    from hei_datahub.services.config import get_config
-    from hei_datahub.infra.config_paths import get_keybindings_export_path
     import sys
+
+    from hei_datahub.infra.config_paths import get_keybindings_export_path
+    from hei_datahub.services.config import get_config
 
     config = get_config()
     keybindings = config.get_keybindings()
@@ -36,14 +37,15 @@ def handle_keymap_import(args) -> int:
     Returns:
         int: 0 on success, 1 on error
     """
-    from hei_datahub.services.config import get_config
     import sys
+
+    from hei_datahub.services.config import get_config
 
     config = get_config()
     input_path = args.input
 
     try:
-        with open(input_path, 'r', encoding='utf-8') as f:
+        with open(input_path, encoding='utf-8') as f:
             data = yaml.safe_load(f)
 
         keybindings = data.get('keybindings', {})

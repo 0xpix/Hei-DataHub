@@ -12,10 +12,10 @@ Public API:
 """
 import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Optional, Tuple
-import subprocess
+from typing import Optional
 
 
 def _is_linux() -> bool:
@@ -82,7 +82,7 @@ def _write_version_stamp(version: str) -> None:
         print(f"Warning: Could not write version stamp: {e}", file=sys.stderr)
 
 
-def _get_asset_paths() -> Dict[str, Path]:
+def _get_asset_paths() -> dict[str, Path]:
     """Get paths to packaged assets using importlib.resources."""
     try:
         # Python 3.9+ compatible way
@@ -102,7 +102,7 @@ def _get_asset_paths() -> Dict[str, Path]:
         raise RuntimeError(f"Failed to locate packaged assets: {e}")
 
 
-def _get_install_paths() -> Dict[str, Path]:
+def _get_install_paths() -> dict[str, Path]:
     """Get installation paths for desktop assets (XDG compliant)."""
     data_home = _get_xdg_data_home()
     icons_base = data_home / "icons" / "hicolor"
@@ -245,7 +245,7 @@ def _refresh_icon_cache(icons_base: Path, verbose: bool = False) -> bool:
     return success
 
 
-def get_desktop_assets_status() -> Dict[str, any]:
+def get_desktop_assets_status() -> dict[str, any]:
     """
     Get current status of desktop assets installation.
 
@@ -298,7 +298,7 @@ def install_desktop_assets(
     user_scope: bool = True,
     force: bool = False,
     verbose: bool = False
-) -> Dict[str, any]:
+) -> dict[str, any]:
     """
     Install desktop assets (icons and .desktop entry) to XDG paths.
 
@@ -458,7 +458,7 @@ def ensure_desktop_assets_once(verbose: bool = False) -> bool:
     return False
 
 
-def uninstall_desktop_assets(verbose: bool = False) -> Dict[str, any]:
+def uninstall_desktop_assets(verbose: bool = False) -> dict[str, any]:
     """
     Remove all desktop integration files.
 
@@ -527,13 +527,13 @@ def get_install_paths_info() -> str:
     install_paths = _get_install_paths()
 
     info = "Desktop Assets Installation Paths:\n"
-    info += f"  Icons:\n"
+    info += "  Icons:\n"
     info += f"    • SVG (scalable): {install_paths['icon_svg']}\n"
     info += f"    • PNG (256x256):  {install_paths['icon_png']}\n"
     info += f"    • Symbolic:       {install_paths['icon_symbolic']}\n"
-    info += f"  Desktop Entry:\n"
+    info += "  Desktop Entry:\n"
     info += f"    • {install_paths['desktop_entry']}\n"
-    info += f"  Version Stamp:\n"
+    info += "  Version Stamp:\n"
     info += f"    • {_get_version_stamp_path()}\n"
 
     return info

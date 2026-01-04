@@ -12,26 +12,23 @@ Key points:
 """
 import logging
 
-logger = logging.getLogger(__name__)
-
 try:
     import tomllib as tomli
 except ImportError:
     import tomli  # type:ignore
-import tomli_w
-from typing import Optional
 
-from textual import on, work
+import tomli_w
 from textual.app import ComposeResult
-from textual.binding import Binding
 from textual.containers import Container, Horizontal, VerticalScroll
-from textual.screen import Screen
-from textual.widgets import Button, Input, Label, Static
 from textual.reactive import reactive
+from textual.screen import Screen
+from textual.widgets import Button, Input, Static
 
 from hei_datahub.cli.auth.credentials import get_auth_store
-from hei_datahub.services.webdav_storage import WebDAVStorage
 from hei_datahub.infra.config_paths import get_config_path
+from hei_datahub.services.webdav_storage import WebDAVStorage
+
+logger = logging.getLogger(__name__)
 
 
 class SettingsWizard(Screen):
@@ -612,7 +609,7 @@ class SettingsWizard(Screen):
                 try:
                     input_widget = card.query_one("Input", Input)
                     input_widget.focus()
-                except:
+                except Exception:
                     pass
             else:
                 card.remove_class("active")

@@ -14,9 +14,9 @@ def handle_setup_desktop(args) -> int:
 
     try:
         from hei_datahub.desktop_install import (
-            install_desktop_assets,
-            get_install_paths_info,
             get_desktop_assets_status,
+            get_install_paths_info,
+            install_desktop_assets,
         )
     except ImportError:
         print("❌ Desktop integration module not available", file=sys.stderr)
@@ -48,7 +48,7 @@ def handle_setup_desktop(args) -> int:
 
     # Perform installation
     force = getattr(args, 'force', False)
-    no_cache_refresh = getattr(args, 'no_cache_refresh', False)
+    getattr(args, 'no_cache_refresh', False)
 
     print("Installing desktop assets...")
     print()

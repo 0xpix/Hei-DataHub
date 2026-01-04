@@ -2,18 +2,15 @@
 Debug console for developer commands.
 Provides a command palette accessible via ':' key.
 """
+from pathlib import Path
+
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Container, Vertical
 from textual.screen import Screen
-from textual.widgets import Input, Static, Label
-from textual.binding import Binding
-from rich.syntax import Syntax
-from rich.text import Text
+from textual.widgets import Input, Label, Static
 
-from hei_datahub import __version__, __app_name__, GITHUB_REPO
-from hei_datahub.app.settings import load_config
-from pathlib import Path
-import subprocess
+from hei_datahub import GITHUB_REPO, __app_name__, __version__
 
 
 class DebugConsoleScreen(Screen):
@@ -169,7 +166,7 @@ Press [bold]Escape[/bold] or [bold]Ctrl+C[/bold] to close."""
                 lines = int(args[0])
 
             # Read last N lines
-            with open(log_file, 'r') as f:
+            with open(log_file) as f:
                 all_lines = f.readlines()
                 recent = all_lines[-lines:]
 

@@ -6,20 +6,20 @@ import os
 import sys
 from pathlib import Path
 
-from hei_datahub.version import __version__, __app_name__, print_version_info
+from hei_datahub.cli.auth import (
+    handle_auth_clear,
+    handle_auth_doctor,
+    handle_auth_setup,
+    handle_auth_status,
+)
+from hei_datahub.cli.config import handle_keymap_export, handle_keymap_import
 
 # Import handlers from organized modules
 from hei_datahub.cli.data import handle_reindex
-from hei_datahub.cli.config import handle_keymap_export, handle_keymap_import
-from hei_datahub.cli.system import handle_tui, handle_paths, handle_doctor
 from hei_datahub.cli.desktop import handle_setup_desktop, handle_uninstall
+from hei_datahub.cli.system import handle_doctor, handle_paths, handle_tui
 from hei_datahub.cli.update import handle_update
-from hei_datahub.cli.auth import (
-    handle_auth_setup,
-    handle_auth_status,
-    handle_auth_doctor,
-    handle_auth_clear,
-)
+from hei_datahub.version import __app_name__, print_version_info
 
 
 def main():
@@ -42,20 +42,6 @@ def main():
     )
 
     parser.add_argument(
-        "--data-dir",
-        type=str,
-        default=None,
-        metavar="PATH",
-        help=(
-            "Override data directory location. "
-            "Examples: "
-            "Linux: ~/.local/share/Hei-DataHub | "
-            "macOS: ~/Library/Application Support/Hei-DataHub | "
-            "Windows: C:\\Users\\<User>\\AppData\\Local\\Hei-DataHub"
-        ),
-    )
-
-    parser.add_argument(
         "--set",
         action="append",
         metavar="KEY=VALUE",
@@ -67,7 +53,7 @@ def main():
     # Reindex command
     parser_reindex = subparsers.add_parser(
         "reindex",
-        help="Reindex all datasets from the data directory"
+        help="Reindex all datasets"
     )
     parser_reindex.set_defaults(func=handle_reindex)
 
@@ -353,7 +339,7 @@ def main():
 
     # Initialize workspace on first run (creates dirs, copies packaged datasets)
     # This happens BEFORE any command to ensure data is always available
-    from hei_datahub.infra.paths import initialize_workspace, _is_dev_mode
+    from hei_datahub.infra.paths import _is_dev_mode, initialize_workspace
     initialize_workspace()
 
     # Ensure desktop assets are installed (Linux only, idempotent, fast)

@@ -10,12 +10,13 @@ def handle_reindex(args) -> int:
     Returns:
         int: 0 on success, 1 if errors occurred
     """
+    import yaml
+
     from hei_datahub.infra.db import ensure_database, get_connection
     from hei_datahub.infra.index import upsert_dataset
     from hei_datahub.services.storage_manager import get_storage_backend
-    import yaml
 
-    print(f"Reindexing datasets from WebDAV cloud storage...")
+    print("Reindexing datasets from WebDAV cloud storage...")
 
     # Ensure database exists
     ensure_database()

@@ -2,15 +2,16 @@
 Update checker for new releases.
 Queries GitHub API to check for newer versions.
 """
-from typing import Optional, Tuple
 from datetime import datetime, timedelta
+from typing import Optional
+
 import requests
+from hei_datahub.state_manager import get_state_manager  # type: ignore
 
-from hei_datahub import __version__, UPDATE_CHECK_URL
-from hei_datahub.state_manager import get_state_manager # type: ignore
+from hei_datahub import UPDATE_CHECK_URL, __version__
 
 
-def parse_version(version_str: str) -> Tuple[int, ...]:
+def parse_version(version_str: str) -> tuple[int, ...]:
     """
     Parse semantic version string to tuple.
 

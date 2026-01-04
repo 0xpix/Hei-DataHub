@@ -4,10 +4,10 @@ About screen showing project information, logo, and story.
 Redesigned with a minimalistic, retro-inspired aesthetic for terminal elegance.
 """
 from textual.app import ComposeResult
-from textual.containers import Container, Vertical, Horizontal, Center, ScrollableContainer
-from textual.screen import Screen
-from textual.widgets import Header, Footer, Static
 from textual.binding import Binding
+from textual.containers import Container, ScrollableContainer, Vertical
+from textual.screen import Screen
+from textual.widgets import Footer, Header, Static
 
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.assets.loader import get_logo_widget_text
@@ -38,7 +38,7 @@ class AboutScreen(Screen):
         from hei_datahub.version import __version__
 
         # Load logo from config
-        logo_text = get_logo_widget_text(get_config())
+        get_logo_widget_text(get_config())
 
         yield Header()
 

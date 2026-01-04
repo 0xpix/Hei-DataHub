@@ -8,7 +8,7 @@ import os
 from typing import Optional
 
 from hei_datahub.services.config import get_config
-from hei_datahub.services.webdav_storage import WebDAVStorage, StorageError
+from hei_datahub.services.webdav_storage import StorageError, WebDAVStorage
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +58,8 @@ def _create_webdav_backend(config) -> WebDAVStorage:
 
     # Try to load from auth setup first (keyring or ENV)
     try:
-        from hei_datahub.infra.config_paths import get_config_path
         from hei_datahub.cli.auth.credentials import get_auth_store
+        from hei_datahub.infra.config_paths import get_config_path
 
         auth_config_path = get_config_path()
         if auth_config_path.exists():
@@ -115,7 +115,7 @@ def _create_webdav_backend(config) -> WebDAVStorage:
     if not username:
         errors.append("storage.username is not set (config or HEIBOX_USERNAME env)")
     if not password:
-        errors.append(f"Credential not found. Run: hei-datahub auth setup")
+        errors.append("Credential not found. Run: hei-datahub auth setup")
 
     if errors:
         error_msg = "WebDAV backend misconfigured:\n  " + "\n  ".join(errors)

@@ -5,9 +5,9 @@ try:
     import tomllib as tomli
 except ImportError:
     import tomli  # type:ignore
-import tomli_w
 from urllib.parse import urlparse
 
+import tomli_w
 from textual import on, work
 from textual.app import ComposeResult
 from textual.binding import Binding
@@ -22,8 +22,8 @@ from textual.widgets import (
 )
 
 from hei_datahub.cli.auth.credentials import get_auth_store
-from hei_datahub.services.webdav_storage import WebDAVStorage
 from hei_datahub.infra.config_paths import get_config_path
+from hei_datahub.services.webdav_storage import WebDAVStorage
 
 
 class SettingsScreen(Screen):
@@ -174,7 +174,7 @@ class SettingsScreen(Screen):
                     self.query_one("#input-token", Input).value = ""
                     self.query_one("#status-message", Label).update("[yellow]Credentials cleared[/yellow]")
                     self.app.notify("Credentials cleared. Use CLI 'auth clear' for complete removal.", timeout=5)
-                except:
+                except Exception:
                     self.query_one("#status-message", Label).update("[yellow]No credentials found[/yellow]")
                     self.app.notify("No credentials to clear", timeout=3)
         except Exception as e:
@@ -222,7 +222,7 @@ class SettingsScreen(Screen):
                 try:
                     with open(config_path, "rb") as f:
                         config = tomli.load(f)
-                except:
+                except Exception:
                     pass
 
             # Store credential if provided
