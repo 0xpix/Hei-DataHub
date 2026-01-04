@@ -13,20 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed issue where desktop shortcuts were installed even in development environments (added repo root check).
-- Fixed crash caused by missing data directory on first run (removed dataset seeding functionality).
+- Fixed issue where desktop integration was installed.
+- Fixed crash caused by missing data directory on first run.
 - Resolved multiple issues with Authentication Wizard:
   - Explicitly asks for HeiBox WebDAV credentials instead of generic username/password.
   - Fixed compatibility between GUI and CLI authentication.
   - Fixed "Auth Setup Required" bug that persisted even after successful in-app setup.
-- Fixed save function failure in dataset creation by adding proper error handling and auth checks.
+- Fixed save function failure in dataset creation.
 - Fixed `hei-datahub --version` showing "0.0.0-dev" in installed packages.
 
 ### Changed
 
 - Removed automatic dataset seeding on first run (Cloud-Only Mode).
 - Completely removed `mini-datahub` alias and legacy code references.
-- Removed automatic theme detection for icons (now defaults to dark variant).
 - `version.yaml` is now correctly bundled with the package.
 
 ## [0.60.0-beta] - 2025-10-28 - Clean-up
