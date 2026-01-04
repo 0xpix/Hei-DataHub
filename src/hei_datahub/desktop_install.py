@@ -580,7 +580,6 @@ def get_install_paths_info() -> str:
     info = "Desktop Assets Installation Paths:\n"
     info += "  Icons:\n"
     info += f"    • SVG (scalable): {install_paths['icon_svg']}\n"
-    info += f"    • PNG (256x256):  {install_paths['icon_png']}\n"
     info += f"    • Symbolic:       {install_paths['icon_symbolic']}\n"
     info += "  Desktop Entry:\n"
     info += f"    • {install_paths['desktop_entry']}\n"
