@@ -1,5 +1,14 @@
 """
 Guided settings wizard with step-by-step WebDAV configuration.
+
+This wizard configures WebDAV authentication for cloud storage.
+It stores credentials in the same format as the CLI `hei-datahub auth setup` command.
+
+Key points:
+- Credentials are stored in the system keyring (encrypted)
+- Config file stores non-sensitive metadata (URL, username, key_id, etc.)
+- Uses same key_id format as CLI: webdav:{method}:{username}@{host}
+- Compatible with storage_manager.py authentication checks
 """
 import logging
 
@@ -101,7 +110,7 @@ class SettingsWizard(Screen):
                 Static("⚙️  WebDAV Setup - Step 3 of 4", classes="step-header"),
                 Static("👤 Username", classes="step-title"),
                 Static(
-                    "Enter your WebDAV username.\n"
+                    "Enter your HeiBox username.\n"
                     "This is usually your university/organization username.",
                     classes="step-description"
                 ),
@@ -123,14 +132,14 @@ class SettingsWizard(Screen):
             # Step 4: Password & Test
             Container(
                 Static("⚙️  WebDAV Setup - Step 4 of 4", classes="step-header"),
-                Static("🔐 Password / Token", classes="step-title"),
+                Static("🔐 HeiBox WebDAV Password", classes="step-title"),
                 Static(
-                    "Enter your WebDAV password or access token.\n"
-                    "Credentials are stored securely in your system keyring.",
+                    "Enter your HeiBox WebDAV password (NOT your login password).\n"
+                    "Find it in HeiBox web interface: Settings → WebDAV Password.",
                     classes="step-description"
                 ),
                 Input(
-                    placeholder="your-password-or-token",
+                    placeholder="your-webdav-password",
                     password=True,
                     id="step4-password",
                     classes="wizard-input"
@@ -396,9 +405,12 @@ class SettingsWizard(Screen):
                 config = {}
 
             status_label.update("💾 Generating credentials...")
-            # Generate key_id for credential storage
-            import uuid
-            key_id = f"webdav_{uuid.uuid4().hex[:8]}"
+            # Generate key_id for credential storage (same format as CLI)
+            from urllib.parse import urlparse
+            parsed = urlparse(url)
+            host = parsed.hostname or "unknown"
+            method = "password"  # GUI wizard uses password authentication
+            key_id = f"heibox:{method}:{username}@{host}"
 
             status_label.update("💾 Storing password securely...")
             # Store password in keyring
@@ -406,14 +418,17 @@ class SettingsWizard(Screen):
             store.store_secret(key_id, password)
 
             status_label.update("💾 Updating config file...")
-            # Update config with auth section
+            # Update config with auth section (compatible with CLI format)
             config["auth"] = {
+                "method": method,
                 "url": url,
                 "username": username,
-                "key_id": key_id
+                "library": library,
+                "key_id": key_id,
+                "stored_in": store.strategy,
             }
 
-            # Update cloud section
+            # Update cloud section (for backward compatibility)
             config["cloud"] = {
                 "library": library
             }
@@ -531,24 +546,30 @@ class SettingsWizard(Screen):
                 logger.info("Creating new config...")
                 config = {}
 
-            # Generate key_id for credential storage
-            import uuid
-            key_id = f"webdav_{uuid.uuid4().hex[:8]}"
+            # Generate key_id for credential storage (same format as CLI)
+            from urllib.parse import urlparse
+            parsed = urlparse(url)
+            host = parsed.hostname or "unknown"
+            method = "password"  # GUI wizard uses password authentication
+            key_id = f"webdav:{method}:{username}@{host}"
             logger.info(f"Generated key_id: {key_id}")
 
             # Store password in keyring
             logger.info("Storing password in keyring...")
             store = get_auth_store(prefer_keyring=True)
-            store.save_secret(key_id, password)
+            store.store_secret(key_id, password)
 
-            # Update config with auth section
+            # Update config with auth section (compatible with CLI format)
             config["auth"] = {
+                "method": method,
                 "url": url,
                 "username": username,
-                "key_id": key_id
+                "library": library,
+                "key_id": key_id,
+                "stored_in": store.strategy,
             }
 
-            # Update cloud section
+            # Update cloud section (for backward compatibility)
             config["cloud"] = {
                 "library": library
             }
