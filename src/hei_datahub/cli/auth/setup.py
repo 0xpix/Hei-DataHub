@@ -22,12 +22,12 @@ def _derive_key_id(method: Literal["token", "password"], username: Optional[str]
     """
     Derive key ID for keyring storage.
 
-    Format: webdav:{method}:{username_or_dash}@{host}
+    Format: heibox:{method}:{username_or_dash}@{host}
     """
     parsed = urlparse(url)
     host = parsed.hostname or "unknown"
     user_part = username if username else "-"
-    return f"webdav:{method}:{user_part}@{host}"
+    return f"heibox:{method}:{user_part}@{host}"
 
 
 def run_setup_wizard(
@@ -115,19 +115,20 @@ def run_setup_wizard(
             url = DEFAULT_WEBDAV_URL
 
         print("\n👤 Enter username")
-        print("   (e.g., username@auth.local)")
+        print("   (e.g., username)")
         username = input("   > ").strip()
         if not username:
             print("❌ Username is required", file=sys.stderr)
             return 2
 
-        print("\n🔑 Enter WebDAV password")
-        print("   (from Heibox Settings → WebDAV Password)")
+        print("\n🔑 Enter HeiBox WebDAV password")
+        print("   (Found in HeiBox Settings → WebDAV Password)")
+        print("   (Note: This is NOT your university login password)")
         credential = getpass.getpass("   > ")
         method = "password"
 
         # Library name - ask after authentication method
-        library_suggestion = "Testing-hei-datahub"
+        library_suggestion = "datahub"
         print(f"\n📁 Library/folder name")
         print(f"   Default: {library_suggestion}")
         library = input("   > ").strip()
