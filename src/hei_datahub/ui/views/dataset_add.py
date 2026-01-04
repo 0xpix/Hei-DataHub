@@ -179,7 +179,20 @@ class AddDataScreen(Screen):
         """Save dataset to cloud storage (WebDAV)."""
         try:
             self.app.call_from_thread(self.app.notify, "Uploading to cloud...", timeout=2)
-            storage = get_storage_backend()
+            logger.info(f"Starting upload for dataset {dataset_id}")
+
+            # Get storage backend - this might fail if auth is not configured
+            try:
+                storage = get_storage_backend()
+            except Exception as auth_err:
+                logger.error(f"Failed to get storage backend: {auth_err}")
+                self.app.call_from_thread(
+                    self.app.notify,
+                    f"Authentication Error: {str(auth_err)}\nPlease run 'hei-datahub auth setup' or configure Settings.",
+                    severity="error",
+                    timeout=10
+                )
+                return
 
             # Create dataset directory
             remote_dir = dataset_id
@@ -187,6 +200,7 @@ class AddDataScreen(Screen):
                 storage.mkdir(remote_dir)
             except Exception as e:
                 # Directory might already exist, that's okay
+                logger.debug(f"Directory creation failed (might exist): {e}")
                 pass
 
             # Create metadata.yaml in temp file
@@ -206,6 +220,7 @@ class AddDataScreen(Screen):
             try:
                 # Upload metadata.yaml
                 remote_path = f"{dataset_id}/metadata.yaml"
+                logger.info(f"Uploading metadata to {remote_path}")
                 storage.upload(Path(tmp_path), remote_path)
 
                 # Update fast search index for cloud dataset
@@ -256,14 +271,14 @@ class AddDataScreen(Screen):
 
             finally:
                 # Cleanup temp file
-                os.unlink(tmp_path)
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
 
         except Exception as e:
+            logger.error(f"Upload failed: {e}", exc_info=True)
             self.app.call_from_thread(
                 self.app.notify,
                 f"Error uploading to cloud: {str(e)}",
                 severity="error",
-                timeout=5
+                timeout=10
             )
-            import traceback
-            traceback.print_exc()
