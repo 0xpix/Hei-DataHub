@@ -4,6 +4,7 @@ CLI entrypoint for Hei-DataHub.
 import argparse
 import os
 import sys
+from pathlib import Path
 
 from hei_datahub.version import __version__, __app_name__, print_version_info
 
