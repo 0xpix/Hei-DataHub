@@ -226,15 +226,15 @@ Make sure it's executable:
 chmod +x dist/linux/hei-datahub
 ```
 
-**Issue:** "No module named 'mini_datahub'"
+**Issue:** "No module named 'hei_datahub'"
 
 **Solution:**
 The build didn't include all dependencies. Try:
 ```bash
 pyinstaller --clean --onefile --name hei-datahub \
-  --collect-all mini_datahub \
+  --collect-all hei_datahub \
   --collect-all textual \
-  src/mini_datahub/cli/main.py
+  src/hei_datahub/cli/main.py
 ```
 
 **Issue:** "libstdc++.so.6: version GLIBCXX not found"
