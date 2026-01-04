@@ -56,7 +56,11 @@ uvx "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 
 **Pin to specific version:**
 ```bash
-uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.60.0-beta"
+# Install specific version
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@v0.60.1-beta"
+
+# Install from feature branch
+uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@release/0.60-beta"
 ```
 
 ---
