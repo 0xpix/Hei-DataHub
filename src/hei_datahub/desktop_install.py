@@ -79,30 +79,6 @@ def _get_version_stamp_path() -> Path:
     return _get_app_data_dir() / ".desktop_assets_version"
 
 
-def _detect_system_theme() -> str:
-    """
-    Detect system theme (light/dark) on Linux.
-    Returns 'dark' or 'light'. Defaults to 'dark' on failure.
-    """
-    try:
-        # Try GTK/GNOME settings via gsettings
-        if shutil.which("gsettings"):
-            result = subprocess.run(
-                ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"],
-                capture_output=True, text=True, timeout=2, check=False
-            )
-            if result.returncode == 0:
-                output = result.stdout.strip().strip("'")
-                if "light" in output.lower():
-                    return "light"
-                if "dark" in output.lower():
-                    return "dark"
-    except Exception:
-        pass
-
-    return "dark"  # Default to dark
-
-
 def _get_current_version() -> str:
     """Get current application version."""
     try:
@@ -295,32 +271,6 @@ def _refresh_icon_cache(icons_base: Path, verbose: bool = False) -> bool:
     return success
 
 
-def _check_icon_theme_match() -> bool:
-    """Check if installed icon matches current system theme."""
-    try:
-        install_paths = _get_install_paths()
-        asset_paths = _get_asset_paths()
-
-        if not install_paths["icon_svg"].exists():
-            return False
-
-        theme = _detect_system_theme()
-        expected_source = asset_paths["logo_dark"] if theme == "dark" else asset_paths["logo_light"]
-
-        # Compare file contents
-        installed_bytes = install_paths["icon_svg"].read_bytes()
-
-        if hasattr(expected_source, "read_bytes"):
-            expected_bytes = expected_source.read_bytes()
-        else:
-            with expected_source.open("rb") as f:
-                expected_bytes = f.read()
-
-        return installed_bytes == expected_bytes
-    except Exception:
-        return False
-
-
 def get_desktop_assets_status() -> dict[str, any]:
     """
     Get current status of desktop assets installation.
@@ -354,12 +304,10 @@ def get_desktop_assets_status() -> dict[str, any]:
     }
 
     all_installed = all(files_status.values())
-    icon_match = _check_icon_theme_match()
 
     needs_update = (
         not all_installed or
-        installed_version != current_version or
-        not icon_match
+        installed_version != current_version
     )
 
     return {
@@ -442,15 +390,10 @@ def install_desktop_assets(
     installed_files = []
 
     try:
-        # Detect theme and select logo
-        theme = _detect_system_theme()
-        logo_source = asset_paths["logo_dark"] if theme == "dark" else asset_paths["logo_light"]
-
-        # Install SVG icon
+        # Install SVG icon (using dark variant as default)
         if verbose:
-            print(f"  → Detected system theme: {theme}")
             print(f"  → Installing icon (SVG): {install_paths['icon_svg']}")
-        _atomic_write(logo_source, install_paths["icon_svg"])
+        _atomic_write(asset_paths["logo_dark"], install_paths["icon_svg"])
         installed_files.append(install_paths["icon_svg"])
 
         # Install symbolic icon
