@@ -105,7 +105,6 @@ def get_default_keybindings() -> dict[str, list[str]]:
         "add_dataset": ["a"],
         "settings": ["s"],
         "open_details": ["o", "enter"],
-        "outbox": ["p"],
         "pull_updates": ["u"],
         "refresh_data": ["r"],
         "quit": ["q"],
