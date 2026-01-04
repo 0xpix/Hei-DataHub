@@ -342,22 +342,8 @@ def main():
     from hei_datahub.infra.paths import _is_dev_mode, initialize_workspace
     initialize_workspace()
 
-    # Ensure desktop assets are installed (Linux only, idempotent, fast)
-    # This happens automatically on first run after workspace initialization
-    # Skip in dev mode, if explicitly disabled, or if running from repo root (dev heuristic)
-    is_repo_root = (Path.cwd() / "pyproject.toml").exists() and (Path.cwd() / "src" / "hei_datahub").exists()
-
-    if not _is_dev_mode() and not os.environ.get("HEI_DATAHUB_SKIP_DESKTOP_INSTALL") and not is_repo_root:
-        try:
-            from hei_datahub.desktop_install import ensure_desktop_assets_once
-            # Only show message if actually installing (not if already present)
-            if ensure_desktop_assets_once(verbose=False):
-                # Installed for first time - show a subtle message
-                print("✓ Desktop integration installed")
-        except ImportError:
-            pass  # Desktop integration module not available
-        except Exception:
-            pass  # Silently ignore errors during auto-install
+    # Desktop integration is now manual-only via `hei-datahub desktop install`
+    # Auto-install removed to prevent unwanted system modifications
 
     # Apply CLI config overrides
     if hasattr(args, 'set') and args.set:
