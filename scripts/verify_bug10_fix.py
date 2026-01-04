@@ -10,7 +10,7 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from mini_datahub.core.queries import QueryParser
+from hei_datahub.core.queries import QueryParser
 
 
 def test_query(query_str: str):
@@ -23,12 +23,12 @@ def test_query(query_str: str):
     print(f"{'='*60}")
 
     # Show parsed structure
-    print(f"\nParsed structure:")
+    print("\nParsed structure:")
     print(f"  Total terms: {len(parsed.terms)}")
     print(f"  Free text query: '{parsed.free_text_query}'")
 
     # Show individual terms
-    print(f"\n  Terms breakdown:")
+    print("\n  Terms breakdown:")
     for i, term in enumerate(parsed.terms, 1):
         if term.is_free_text:
             print(f"    {i}. FREE TEXT: '{term.value}'")
@@ -36,7 +36,7 @@ def test_query(query_str: str):
             print(f"    {i}. FIELD FILTER: {term.field}{term.operator.name}'{term.value}'")
 
     # Simulate badge creation
-    print(f"\n  Badges that would be displayed:")
+    print("\n  Badges that would be displayed:")
     badge_count = 0
 
     # Field filters
@@ -99,12 +99,12 @@ def main():
     for query, count in results:
         print(f"  '{query}' → {count} badges")
 
-    print(f"\n✓ All tests completed!")
-    print(f"✓ Fix is working correctly in code")
-    print(f"\nNote: If the UI still shows only 1 badge:")
-    print(f"  1. Restart the hei-datahub application")
-    print(f"  2. Check for any exceptions in logs")
-    print(f"  3. Verify you're running the updated code")
+    print("\n✓ All tests completed!")
+    print("✓ Fix is working correctly in code")
+    print("\nNote: If the UI still shows only 1 badge:")
+    print("  1. Restart the hei-datahub application")
+    print("  2. Check for any exceptions in logs")
+    print("  3. Verify you're running the updated code")
 
 
 if __name__ == "__main__":

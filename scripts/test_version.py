@@ -13,12 +13,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 try:
     from hei_datahub.version import (
+        BUILD_NUMBER,
+        CODENAME,
+        GITHUB_URL,
+        RELEASE_DATE,
         __version__,
         __version_info__,
-        CODENAME,
-        RELEASE_DATE,
-        BUILD_NUMBER,
-        GITHUB_URL,
     )
 
     print("✅ Version module imported successfully!")

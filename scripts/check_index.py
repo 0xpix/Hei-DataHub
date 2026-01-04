@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from mini_datahub.services.index_service import get_index_service
 
+
 def main():
     index = get_index_service()
 

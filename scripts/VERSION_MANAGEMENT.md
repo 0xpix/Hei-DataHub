@@ -42,9 +42,12 @@ Hei-DataHub/
 ### 1. Single Source of Truth: `version.yaml`
 
 ```yaml
-version: "0.60.0-beta"
+# Example version.yaml
+version: "0.60.1-beta"
 codename: "Clean-up"
-release_date: "2025-10-28"
+release_date: "2026-01-04"
+compatibility: "Hei-DataHub v0.60.x (beta)"
+notes: "Clean-up release - UI polish, enhanced navigation, and codebase cleanup"
 # ... other metadata
 ```
 
@@ -52,9 +55,10 @@ release_date: "2025-10-28"
 
 ```python
 # Loads version.yaml at module import
-from hei_datahub.version import __version__, CODENAME
+from hei_datahub.version import __version__
 
-print(__version__)  # "0.60.0-beta"
+print(__version__)  # "0.60.1-beta"
+```
 print(CODENAME)     # "Clean-up"
 ```
 
@@ -72,8 +76,11 @@ python scripts/test_version.py
 
 **Output:**
 ```
+**Output:**
+```
 ✅ Version module imported successfully!
-  Version:      0.60.0-beta
+  Version:      0.60.1-beta
+```
   Codename:     Clean-up
   Build Number: 006000
 
