@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.60.1-beta] - 2026-01-04
+
+**Hotfix Release** - Critical fixes for authentication, installation, and legacy code removal.
+
+### Fixed
+
+- **Authentication Wizard**: Resolved compatibility issues between GUI and CLI authentication.
+- **Dataset Creation**: Fixed "Auth Setup Required" bug that persisted even after successful setup.
+- **Desktop Integration**: Fixed issue where desktop shortcuts were installed even in development environments.
+- **Version Reporting**: Fixed `hei-datahub --version` showing "0.0.0-dev" in installed packages.
+- **Crash on Start**: Fixed crash caused by missing data directory on first run.
+
+### Changed
+
+- **Cloud-Only Mode**: Removed automatic dataset seeding on first run.
+- **Legacy Removal**: Completely removed `mini-datahub` alias and legacy code references.
+- **Installation**: `version.yaml` is now correctly bundled with the package.
+
 ## [0.60.0-beta] - 2025-10-28 - Clean-up
 
 **UI polish and codebase cleanup!** This release focuses on refining the user experience, streamlining the TUI, and removing legacy code.
