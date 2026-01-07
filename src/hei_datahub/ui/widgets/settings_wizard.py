@@ -584,6 +584,10 @@ class SettingsWizard(Screen):
             # Notify parent app
             self.app.notify("✅ WebDAV settings configured successfully!", timeout=3)
 
+            # Reload app configuration to refresh connection and data
+            if hasattr(self.app, "reload_configuration"):
+                self.app.reload_configuration()
+
             # Close wizard after a brief delay
             self.set_timer(1.5, self.action_cancel)
 
