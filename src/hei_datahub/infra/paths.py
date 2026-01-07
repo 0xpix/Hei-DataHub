@@ -13,11 +13,14 @@ Config still uses XDG on all platforms:
 - State: ~/.local/state/hei-datahub/
 """
 import os
+import sys
 from pathlib import Path
 
 
 def _is_installed_package() -> bool:
     """Check if running from an installed package (not development mode)."""
+    if getattr(sys, 'frozen', False):
+        return True
     package_path = Path(__file__).resolve()
     return "site-packages" in str(package_path) or ".local/share/uv" in str(package_path)
 
@@ -97,6 +100,18 @@ def _get_schema_path() -> Path:
         user_schema = PROJECT_ROOT / "schema.json"
         if user_schema.exists():
             return user_schema
+
+        # Check if PyInstaller bundled
+        if getattr(sys, 'frozen', False):
+             # sys._MEIPASS is the temp folder where PyInstaller extracts files
+             bundled_schema = Path(sys._MEIPASS) / "hei_datahub" / "schema.json"
+             if bundled_schema.exists():
+                 return bundled_schema
+             # Fallback check
+             bundled_schema_root = Path(sys._MEIPASS) / "schema.json"
+             if bundled_schema_root.exists():
+                 return bundled_schema_root
+
         # Return packaged schema path
         return Path(__file__).parent.parent / "schema.json"
     else:
@@ -147,7 +162,14 @@ def initialize_workspace():
     user_schema = PROJECT_ROOT / "schema.json"
     if not user_schema.exists():
         try:
-            package_schema = Path(__file__).parent.parent / "schema.json"
+            if getattr(sys, 'frozen', False):
+                 # Handle PyInstaller path
+                 package_schema = Path(sys._MEIPASS) / "hei_datahub" / "schema.json"
+                 if not package_schema.exists():
+                     package_schema = Path(sys._MEIPASS) / "schema.json"
+            else:
+                package_schema = Path(__file__).parent.parent / "schema.json"
+
             if package_schema.exists():
                 import shutil
                 shutil.copy(package_schema, user_schema)
