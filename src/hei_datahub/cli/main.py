@@ -24,6 +24,15 @@ from hei_datahub.version import __app_name__, print_version_info
 
 def main():
     """Main CLI entrypoint."""
+    # Set AppUserModelID on Windows to ensure correct taskbar icon
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            appid = f"heidatahub.app.{__app_name__}.version" # Arbitrary ID
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appid)
+        except Exception:
+            pass
+
     parser = argparse.ArgumentParser(
         prog="hei-datahub",
         description=f"{__app_name__} - A local-first TUI for managing datasets",
