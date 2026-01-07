@@ -197,6 +197,40 @@ class DataHubApp(App):
             # Config system optional - app works without it
             self.config = None
 
+    def reload_configuration(self) -> None:
+        """Reload configuration and refresh app state (e.g. after auth setup)."""
+        logger.info("Reloading configuration...")
+
+        # 1. Reload global config
+        self._load_config()
+
+        # 2. Check connection
+        self.check_heibox_connection()
+
+        # 3. Trigger background re-index
+        import asyncio
+        from hei_datahub.services.indexer import start_background_indexer
+
+        # We need to reset the indexer state correctly
+        try:
+            from hei_datahub.services.indexer import get_indexer
+            indexer = get_indexer()
+            indexer._remote_indexed = False
+            # We don't necessarily want to wipe local index, but we do want to fetch remote
+        except Exception:
+            pass
+
+        asyncio.create_task(start_background_indexer())
+
+        # 4. Refresh Home Screen (if active)
+        if hasattr(self, 'screen_stack'):
+            for screen in self.screen_stack:
+                if isinstance(screen, HomeScreen):
+                    screen.update_heibox_status()
+                    # Force a check of the indexer which should pick up new data
+                    if hasattr(screen, '_check_indexer_and_reload'):
+                        screen._check_indexer_and_reload()
+
     def apply_theme(self, theme_name: str) -> None:
         """
         Apply a theme dynamically without restart.
