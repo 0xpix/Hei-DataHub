@@ -1,0 +1,55 @@
+name: Build Windows Binary
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'fix/**'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '0.61-beta'
+        required: false
+        default: 'main'
+
+jobs:
+  build-windows-binary:
+    name: Build Windows Binary
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.version || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install UV
+        run: |
+          pip install uv
+
+      - name: Build binary
+        run: |
+          .\scripts\build_windows_exe.ps1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hei-datahub-windows-binary
+          path: dist/windows/hei-datahub.exe
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/windows/hei-datahub.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
