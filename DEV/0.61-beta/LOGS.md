@@ -1,13 +1,15 @@
 # 0.61-beta issues
 
 ## TO ADD
-- [ ] Windows/MacOs support for the app
+- [ ] Windows support for the app
 
 ## TO CHANGE
 - None yet
 
 ## TO FIX
-- [ ] Documentation issues like I can access the tutorial documentation via `:tutorial` in the user/dev documentation
+- [x] Auth setup is only supported in linux
+- [x] The exe doesn't install the app, it just runs it
 
 ## FIXED
-- None yet
+- Enabled Windows authentication support using Keyring and Credential Locker.
+- Added Inno Setup installer creation for Windows.
