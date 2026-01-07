@@ -61,11 +61,11 @@ def run_setup_wizard(
         Exit code: 0 success, 1 validation/abort, 2 usage error
     """
     # Platform check
-    if platform.system() != "Linux":
-        print("❌ Error: auth setup is only supported on Linux.", file=sys.stderr)
+    if platform.system() not in ["Linux", "Windows"]:
+        print(f"❌ Error: auth setup is only supported on Linux and Windows (current: {platform.system()}).", file=sys.stderr)
         return 2
 
-    print("🔐 Hei-DataHub WebDAV Authentication Setup (Linux)\n")
+    print("🔐 Hei-DataHub WebDAV Authentication Setup\n")
 
     # Get config path
     from hei_datahub.infra.config_paths import get_config_path
