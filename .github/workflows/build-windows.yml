@@ -15,6 +15,9 @@ on:
         required: false
         default: 'main'
 
+permissions:
+  contents: write
+
 jobs:
   build-windows-binary:
     name: Build Windows Binary
