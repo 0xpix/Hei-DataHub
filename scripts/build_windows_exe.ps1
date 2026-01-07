@@ -72,6 +72,7 @@ $PyInstallerArgs = @(
     "--add-data=src/hei_datahub/ui/assets;hei_datahub/ui/assets",
     "--add-data=src/hei_datahub/assets;hei_datahub/assets",
     "--add-data=src/hei_datahub/version.yaml;hei_datahub",
+    "--add-data=src/hei_datahub/schema.json;hei_datahub",
     "--hidden-import=hei_datahub",
     "--hidden-import=hei_datahub.cli.main",
     "--hidden-import=textual",
