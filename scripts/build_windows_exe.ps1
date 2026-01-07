@@ -66,6 +66,7 @@ Write-Host "  Building binary (this may take a while)..."
 $PyInstallerArgs = @(
     "--onefile",
     "--name=hei-datahub",
+    "--icon=win-icon.ico",
     "--add-data=src/hei_datahub/infra/sql;hei_datahub/infra/sql",
     "--add-data=src/hei_datahub/ui/styles;hei_datahub/ui/styles",
     "--add-data=src/hei_datahub/ui/assets;hei_datahub/ui/assets",
