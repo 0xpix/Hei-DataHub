@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import requests
-from hei_datahub.state_manager import get_state_manager  # type: ignore
+from hei_datahub.services.state import get_state_manager  # type: ignore
 
 from hei_datahub import UPDATE_CHECK_URL, __version__
 
@@ -66,15 +66,32 @@ def check_for_updates(force: bool = False) -> Optional[dict]:
             headers={"Accept": "application/vnd.github.v3+json"}
         )
 
+        if response.status_code == 404:
+            # No releases yet - treat as "up to date"
+            return {
+                "has_update": False,
+                "current_version": __version__,
+                "latest_version": __version__,
+                "release_url": "",
+                "release_notes": "No releases published yet"
+            }
+
         if response.status_code != 200:
-            return None
+            return {"error": f"GitHub API returned {response.status_code}"}
 
         release_data = response.json()
 
         # Extract version
         latest_version = release_data.get("tag_name", "").lstrip('v')
         if not latest_version:
-            return None
+            # No version tag - treat as up to date
+            return {
+                "has_update": False,
+                "current_version": __version__,
+                "latest_version": __version__,
+                "release_url": "",
+                "release_notes": "Release has no version tag"
+            }
 
         # Update last check timestamp
         state_manager.set_last_update_check()
@@ -93,9 +110,12 @@ def check_for_updates(force: bool = False) -> Optional[dict]:
             "release_notes": release_data.get("body", "")[:500]  # Truncate notes
         }
 
-    except Exception:
-        # Silently fail - network issues shouldn't break the app
-        return None
+    except requests.exceptions.Timeout:
+        return {"error": "Connection timed out"}
+    except requests.exceptions.ConnectionError:
+        return {"error": "No internet connection"}
+    except Exception as e:
+        return {"error": f"Update check failed: {str(e)}"}
 
 
 def format_update_message(update_info: dict) -> str:
