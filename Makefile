@@ -52,21 +52,6 @@ setup:  ## Run automated setup script
 
 check-all: format-check lint test  ## Run all checks (format, lint, test)
 
-docs-serve:  ## Serve user documentation locally (http://localhost:8000)
-	mkdocs serve
-
-docs-dev-serve:  ## Serve developer documentation locally (http://localhost:8001)
-	mkdocs serve -f mkdocs-dev.yml -a localhost:8001
-
-docs-tutorial-serve:  ## Serve tutorial documentation locally (http://localhost:8002)
-	mkdocs serve -f mkdocs-tutorial.yml -a localhost:8002
-
-docs-serve-all:  ## Serve all documentation (requires 3 terminals or tmux)
-	@echo "Run these in separate terminals:"
-	@echo "  make docs-serve          # User docs on :8000"
-	@echo "  make docs-dev-serve      # Dev docs on :8001"
-	@echo "  make docs-tutorial-serve # Tutorial docs on :8002"
-
 build-windows:  ## Build Windows exe and installer (run from WSL, requires PowerShell)
 	@echo "Building Windows executable and installer..."
 	powershell.exe -ExecutionPolicy Bypass -File ./scripts/build_windows.ps1
