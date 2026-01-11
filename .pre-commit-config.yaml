@@ -10,21 +10,12 @@ repos:
         pass_filenames: false
         always_run: false
 
-      - id: mkdocs-build-check
-        name: Check MkDocs builds without errors
-        entry: mkdocs build --strict
-        language: system
-        files: ^(mkdocs\.yml|docs/)
-        pass_filenames: false
-        always_run: false
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-        args: ['--unsafe']  # Allow custom YAML tags in mkdocs.yml
       - id: check-added-large-files
         args: ['--maxkb=1000']
       - id: check-merge-conflict
