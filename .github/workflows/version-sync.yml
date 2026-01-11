@@ -7,7 +7,6 @@ on:
       - 'src/hei_datahub/version.py'
       - 'pyproject.toml'
       - 'README.md'
-      - 'docs/_includes/version.md'
   push:
     branches:
       - main
