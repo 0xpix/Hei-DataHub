@@ -9,6 +9,7 @@ from textual.app import ComposeResult
 from textual.containers import Container, Horizontal
 from textual.reactive import reactive
 from textual.screen import Screen
+from textual.binding import Binding
 from textual.timer import Timer
 from textual.widgets import (
     DataTable,
@@ -29,7 +30,7 @@ class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
 
     # Load bindings from config file
-    BINDINGS = build_home_bindings()
+    BINDINGS = build_home_bindings() + [Binding("U", "check_updates", "Update", key_display="U", show=True)]
 
     # Load CSS from styles directory
     ENABLE_COMMAND_PALETTE = True
@@ -815,6 +816,12 @@ class HomeScreen(Screen):
     def action_pull_updates(self) -> None:
         """Start pull updates task."""
         self.app.pull_updates()
+
+    def action_check_updates(self) -> None:
+        """Check for app updates and show update screen (Shift+U key)."""
+        from hei_datahub.ui.views.update import UpdateScreen
+        self.app.push_screen(UpdateScreen(auto_start=True))
+
 
     def action_refresh_data(self) -> None:
         """Refresh/reload all datasets."""
