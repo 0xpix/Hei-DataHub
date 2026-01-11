@@ -67,4 +67,14 @@ docs-serve-all:  ## Serve all documentation (requires 3 terminals or tmux)
 	@echo "  make docs-dev-serve      # Dev docs on :8001"
 	@echo "  make docs-tutorial-serve # Tutorial docs on :8002"
 
+build-windows:  ## Build Windows exe and installer (run from WSL, requires PowerShell)
+	@echo "Building Windows executable and installer..."
+	powershell.exe -ExecutionPolicy Bypass -File ./scripts/build_windows.ps1
+
+build-linux:  ## Build Linux binary
+	./scripts/build_desktop_binary.sh
+
+generate-icon:  ## Generate Windows icon from SVG
+	python scripts/generate_icon.py
+
 .DEFAULT_GOAL := help
