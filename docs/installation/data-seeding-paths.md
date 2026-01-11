@@ -111,7 +111,7 @@ uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git#egg=hei-datahub"
 
 ### Development Mode (Repository)
 
-**Detection:** Running from repository with `src/mini_datahub/` and `pyproject.toml`
+**Detection:** Running from repository with `src/hei_datahub/` and `pyproject.toml`
 
 **Uses repo paths:**
 ```
@@ -125,7 +125,7 @@ DB:      /path/to/Hei-DataHub/db.sqlite
 **How to run:**
 ```bash
 cd /path/to/Hei-DataHub
-python -m mini_datahub
+python -m hei_datahub
 # or
 hei-datahub  # (if installed with `pip install -e .`)
 ```
@@ -356,7 +356,7 @@ hei-datahub paths
 **Solution:**
 ```bash
 # Manually trigger initialization
-python -c "from mini_datahub.infra.paths import initialize_workspace; initialize_workspace()"
+python -c "from hei_datahub.infra.paths import initialize_workspace; initialize_workspace()"
 
 # Or reinstall
 uv tool uninstall hei-datahub
@@ -428,7 +428,7 @@ hei-datahub
 Access paths from Python:
 
 ```python
-from mini_datahub.infra.paths import (
+from hei_datahub.infra.paths import (
     CONFIG_DIR,
     DATA_DIR,
     CACHE_DIR,
@@ -443,7 +443,7 @@ print(f"Datasets: {DATA_DIR}")
 print(f"Database: {DB_PATH}")
 
 # Check if running in dev mode
-from mini_datahub.infra.paths import _is_dev_mode, _is_installed_package
+from hei_datahub.infra.paths import _is_dev_mode, _is_installed_package
 
 if _is_installed_package():
     print("Running as installed package")

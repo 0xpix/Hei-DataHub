@@ -311,7 +311,7 @@ Since environment variables are not yet supported, precedence is simple:
 
 1. **Config file:** `.datahub_config.json`
 2. **OS keyring:** GitHub PAT
-3. **Defaults:** Hardcoded in `mini_datahub/app/settings.py`
+3. **Defaults:** Hardcoded in `hei_datahub/app/settings.py`
 
 ---
 
@@ -623,7 +623,7 @@ cmdkey /delete:mini-datahub
     ```
 2. Or reload programmatically:
     ```python
-    from mini_datahub.app.settings import reload_github_config
+    from hei_datahub.app.settings import reload_github_config
     reload_github_config()
     ```
 

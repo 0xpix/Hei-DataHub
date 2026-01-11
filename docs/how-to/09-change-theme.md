@@ -258,7 +258,7 @@ These terminals may have issues:
 If you want to experiment with custom colors today, you can:
 
 1. Fork the repo
-2. Edit `src/mini_datahub/ui/theme.py`
+2. Edit `src/hei_datahub/ui/theme.py`
 3. Add your custom theme definition
 
 (This requires Python knowledge and is not officially supported.)
