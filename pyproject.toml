@@ -1,11 +1,10 @@
-<<<<<<< HEAD
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "hei-datahub"
-version = "0.61.0-beta"
+version = "0.61-beta"
 description = "Hei-DataHub — lightweight local data hub with TUI for managing datasets"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -35,14 +34,9 @@ dependencies = [
     "keyring>=24.0.0",
     "tomli>=2.0.0; python_version<'3.11'",
     "tomli-w>=1.0.0",
-    "mkdocs-material>=9.6.21",
-    "mkdocs-macros-plugin>=1.0.0",
-    "mkdocs-simple-blog>=0.2.0",
     "mypy>=1.18.2",
     "psutil>=5.9.0",
     "rich>=13.0.0",
-    "mkdocs-terminal>=4.7.0",
-    "mkdocs-dracula-theme>=1.0.8",
     "pytest>=8.4.2",
     "ruff>=0.13.3",
 ]
@@ -111,117 +105,3 @@ disallow_untyped_defs = false
 dev = [
     "pyinstaller>=6.16.0",
 ]
-=======
-[build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "hei-datahub"
-version = "0.61.0-beta"
-description = "Hei-DataHub — lightweight local data hub with TUI for managing datasets"
-readme = "README.md"
-requires-python = ">=3.10"
-license = {text = "MIT"}
-authors = [
-    {name = "Aness Chelfat", email = "ns.chlfat@gmail.com"}
-]
-keywords = ["data", "catalog", "tui", "metadata", "search", "datahub"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-
-dependencies = [
-    "textual>=0.47.0",
-    "pydantic>=2.0.0",
-    "pyyaml>=6.0",
-    "jsonschema>=4.20.0",
-    "requests>=2.31.0",
-    "pyperclip>=1.8.2",
-    "keyring>=24.0.0",
-    "tomli>=2.0.0; python_version<'3.11'",
-    "tomli-w>=1.0.0",
-    "mkdocs-material>=9.6.21",
-    "mkdocs-macros-plugin>=1.0.0",
-    "mkdocs-simple-blog>=0.2.0",
-    "mypy>=1.18.2",
-    "psutil>=5.9.0",
-    "rich>=13.0.0",
-    "mkdocs-terminal>=4.7.0",
-    "mkdocs-dracula-theme>=1.0.8",
-    "pytest>=8.4.2",
-    "ruff>=0.13.3",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.7.0",
-    "types-pyyaml",
-    "types-requests",
-]
-
-[project.scripts]
-hei-datahub = "hei_datahub.cli.main:main"
-
-[project.urls]
-Homepage = "https://github.com/0xpix/Hei-DataHub"
-Repository = "https://github.com/0xpix/Hei-DataHub"
-Documentation = "https://0xpix.github.io/Hei-DataHub/"
-"Bug Tracker" = "https://github.com/0xpix/Hei-DataHub/issues"
-
-[tool.setuptools]
-include-package-data = true
-
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["hei_datahub*"]
-
-[tool.setuptools.package-data]
-hei_datahub = [
-    "infra/sql/*.sql",
-    "schema.json",
-    "version.yaml",
-    "data/**/*",
-    "templates/**/*",
-    "ui/views/*.tcss",
-    "ui/widgets/*.tcss",
-    "ui/styles/*.tcss",
-    "ui/assets/ascii/*.txt",
-    "assets/icons/*.svg",
-    "assets/icons/*.png",
-    "assets/desktop/*.tmpl"
-]
-
-[tool.black]
-line-length = 100
-target-version = ['py39']
-
-[tool.ruff]
-line-length = 100
-target-version = "py39"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
-ignore = ["E501"]
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-
-[dependency-groups]
-dev = [
-    "pyinstaller>=6.16.0",
-]
->>>>>>> origin/main
