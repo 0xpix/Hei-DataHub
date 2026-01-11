@@ -176,7 +176,7 @@ These must be present in every dataset YAML file:
 
 ### Search Query
 
-**Service:** `mini_datahub.services.search.search_datasets(query, limit)`
+**Service:** `hei_datahub.services.search.search_datasets(query, limit)`
 
 **SQL:**
 
@@ -209,7 +209,7 @@ LIMIT :limit;
 
 ### Get Dataset by ID
 
-**Service:** `mini_datahub.infra.index.get_dataset_from_store(dataset_id)`
+**Service:** `hei_datahub.infra.index.get_dataset_from_store(dataset_id)`
 
 **SQL:**
 
@@ -228,7 +228,7 @@ WHERE id = :dataset_id;
 
 ### List All Datasets
 
-**Service:** `mini_datahub.infra.index.list_all_datasets()`
+**Service:** `hei_datahub.infra.index.list_all_datasets()`
 
 **SQL:**
 
@@ -252,7 +252,7 @@ ORDER BY store.updated_at DESC;
 
 ### Upsert Dataset
 
-**Service:** `mini_datahub.infra.index.upsert_dataset(dataset_id, metadata)`
+**Service:** `hei_datahub.infra.index.upsert_dataset(dataset_id, metadata)`
 
 **SQL:**
 
@@ -347,7 +347,7 @@ cursor = conn.execute("SELECT * FROM datasets_store")
 **✅ Good:**
 
 ```python
-from mini_datahub.services.search import search_datasets
+from hei_datahub.services.search import search_datasets
 results = search_datasets("climate", limit=50)
 ```
 
@@ -383,7 +383,7 @@ cursor.execute(query, (user_input,))
 Always validate metadata before inserting:
 
 ```python
-from mini_datahub.infra.store import validate_metadata
+from hei_datahub.infra.store import validate_metadata
 
 # Validate against JSON Schema
 is_valid, errors = validate_metadata(metadata_dict)
@@ -443,7 +443,7 @@ INSERT INTO datasets_fts(datasets_fts) VALUES('optimize');
 
 ```python
 import sqlite3
-from mini_datahub.infra.paths import DB_PATH
+from hei_datahub.infra.paths import DB_PATH
 
 conn = sqlite3.connect(DB_PATH)
 conn.execute("INSERT INTO datasets_fts(datasets_fts) VALUES('optimize')")
