@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.61.0-beta] - 2026-01-07 - Windows-Compat
+## [0.61.0-beta] - 2026-01-07 - Windows-Compatibility
 
-**Windows Support Arrives!** This release brings full Windows compatibility to Hei-DataHub, along with automated build pipelines.
+**Windows Support Arrives!** This release brings full Windows compatibility to Hei-DataHub.
 
 ### Added
 
@@ -17,14 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automated build scripts (`scripts/build_windows_exe.ps1`).
   - Windows credential management integration.
   - Cross-platform path handling for data directories.
-- **CI/CD Improvements** - Automated binary builds via GitHub Actions.
-  - Triggers on pushes to `main` and `release/*`.
-  - Generates `.exe` for Windows and binaries for Linux.
 
 ### Changed
 
 - Updated authentication backend to support both Linux Keyring and Windows Credential Locker.
 - Refactored platform-specific checks in CLI tools to allow Windows execution.
+- Move the documentations to the main website.
 
 ## [0.60.1-beta] - 2026-01-04
 
