@@ -26,14 +26,14 @@ The `build_desktop_binary.sh` script creates a standalone PyInstaller binary for
 The binary packages all necessary files:
 
 ### Code & Dependencies
-- All Python source code from `src/mini_datahub` and `src/hei_datahub`
+- All Python source code from `src/hei_datahub`
 - All Python dependencies (textual, pydantic, etc.)
 - Python runtime (embedded in the binary)
 
 ### Data Files
-- **SQL schemas**: `src/mini_datahub/infra/sql/*.sql`
-- **CSS styles**: `src/mini_datahub/ui/styles/*.tcss`
-- **Assets**: `src/mini_datahub/ui/assets/` (ASCII art, etc.)
+- **SQL schemas**: `src/hei_datahub/infra/sql/*.sql`
+- **CSS styles**: `src/hei_datahub/ui/styles/*.tcss`
+- **Assets**: `src/hei_datahub/ui/assets/` (ASCII art, etc.)
 - **Desktop assets**: `src/hei_datahub/assets/` (icons, desktop entry template)
 
 ## Script Changes from Default
@@ -55,10 +55,10 @@ uv pip install pyinstaller
 ### Added Data Files
 ```bash
 pyinstaller \
-    --add-data "src/mini_datahub/infra/sql:mini_datahub/infra/sql" \
-    --add-data "src/mini_datahub/ui/styles:mini_datahub/ui/styles" \        # CSS files
-    --add-data "src/mini_datahub/ui/assets:mini_datahub/ui/assets" \        # ASCII art
-    --add-data "src/hei_datahub/assets:hei_datahub/assets" \                # Desktop assets
+    --add-data "src/hei_datahub/infra/sql:hei_datahub/infra/sql" \
+    --add-data "src/hei_datahub/ui/styles:hei_datahub/ui/styles" \        # CSS files
+    --add-data "src/hei_datahub/ui/assets:hei_datahub/ui/assets" \        # ASCII art
+    --add-data "src/hei_datahub/assets:hei_datahub/assets" \              # Desktop assets
     # ... other options
 ```
 
@@ -174,7 +174,7 @@ fpm -s dir -t rpm \
 ### 1. Make Changes
 ```bash
 # Edit code
-vim src/mini_datahub/...
+vim src/hei_datahub/...
 
 # Test normally
 hei-datahub
