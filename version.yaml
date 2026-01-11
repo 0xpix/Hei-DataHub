@@ -1,10 +1,10 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.60.1-beta"
-codename: "Clean-up"
+version: "0.61.0-beta"
+codename: "Windows Compatibility"
 release_date: "2026-01-04"
-compatibility: "Hei-DataHub v0.60.x (beta)"
+compatibility: "Hei-DataHub v0.61.x (beta)"
 notes: "Hotfix release - Authentication wizard fixes, desktop integration improvements, and removal of legacy code."
 
 # Additional metadata
