@@ -45,8 +45,14 @@
     background: $panel;
 }
 
-#search-container {
+#main-scroll {
     height: 100%;
+    scrollbar-gutter: stable;
+}
+
+#search-container {
+    height: auto;
+    min-height: 100%;
     padding: 1;
 }
 
@@ -105,7 +111,9 @@
 }
 
 #results-table {
-    height: 1fr;
+    height: auto;
+    min-height: 10;
+    max-height: 50;
     margin-top: 1;
 }
 
