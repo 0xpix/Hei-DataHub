@@ -82,7 +82,6 @@ def get_action_display_map_home() -> dict[str, tuple]:
         "focus_search": ("Search", "Ctrl+F", True),
         "clear_search": ("Clear", "Esc", False),
         "debug_console": ("Debug", ":", False),
-        "show_help": ("Help", "Ctrl+H", True),
     }
 
 
@@ -147,6 +146,4 @@ def build_home_bindings() -> list[Binding]:
             Binding("ctrl+f", "focus_search", "Search", key_display="Ctrl+F", priority=True),
             Binding("escape", "clear_search", "Clear", show=False),
             Binding(":", "debug_console", "Debug", show=False),
-            Binding("ctrl+h", "show_help", "Help", key_display="Ctrl+H", priority=True),
-            Binding("?", "show_help", "Help", show=False),
         ]
