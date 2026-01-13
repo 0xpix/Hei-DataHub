@@ -60,7 +60,6 @@ class HomeScreen(Screen):
                     Input(placeholder="Search datasets...", id="search-input"),
                     id="search-container"
                 ),
-                Static("[bold]Ctrl+P[/bold] Commands", id="search-help"),
                 id="hero-section"
             ),
 
