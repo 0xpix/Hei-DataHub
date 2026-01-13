@@ -63,7 +63,9 @@ class ThemeConfig(BaseModel):
             "textual-dark", "textual-light", "textual-ansi",
             "gruvbox", "monokai", "nord", "dracula",
             "catppuccin-mocha", "catppuccin-latte",
-            "flexoki", "tokyo-night", "solarized-light"
+            "flexoki", "tokyo-night", "solarized-light",
+            # Custom Hei-DataHub themes
+            "hei-datahub-light", "hei-datahub-dark"
         }
         if v not in allowed:
             logger.warning(f"Unknown theme '{v}', falling back to 'gruvbox'. Available: {', '.join(sorted(allowed))}")
