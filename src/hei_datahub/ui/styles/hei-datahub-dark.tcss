@@ -1,0 +1,507 @@
+/* ============================================================================
+   HEI-DATAHUB DARK THEME
+   High-contrast, accessible dark theme for reduced eye strain
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   1. SEMANTIC CSS VARIABLES
+   ---------------------------------------------------------------------------- */
+
+$bg-main: #0F1115;
+$bg-panel: #161A22;
+$border-default: #2A2F3A;
+
+$text-primary: #E6EAF2;
+$text-secondary: #A5ACBA;
+$text-muted: #6B7280;
+
+$accent-primary: #4C8DFF;
+$accent-success: #4ADE80;
+$accent-warning: #FBBF24;
+$accent-error: #F87171;
+$accent-focus: #233A72;
+
+/* ----------------------------------------------------------------------------
+   2. BASE SCREEN & CONTAINER STYLES
+   ---------------------------------------------------------------------------- */
+
+Screen {
+    background: $bg-main;
+    color: $text-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   3. COMMON CONTAINERS & PANELS
+   ---------------------------------------------------------------------------- */
+
+Container {
+    background: $bg-main;
+}
+
+Vertical {
+    background: $bg-main;
+}
+
+Horizontal {
+    background: $bg-main;
+}
+
+/* ----------------------------------------------------------------------------
+   4. HEADER & FOOTER
+   ---------------------------------------------------------------------------- */
+
+Header {
+    background: $bg-panel;
+    color: $text-primary;
+    border-bottom: solid $border-default;
+}
+
+Footer {
+    background: $bg-panel;
+    color: $text-secondary;
+    border-top: solid $border-default;
+}
+
+/* ----------------------------------------------------------------------------
+   5. TEXT WIDGETS
+   ---------------------------------------------------------------------------- */
+
+Label {
+    color: $text-primary;
+}
+
+Static {
+    color: $text-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   6. INPUT WIDGETS
+   ---------------------------------------------------------------------------- */
+
+Input {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+Input:focus {
+    border: tall $accent-primary;
+    background: $bg-panel;
+}
+
+Input.-invalid {
+    border: tall $accent-error;
+}
+
+Input > .input--placeholder {
+    color: $text-muted;
+}
+
+TextArea {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+TextArea:focus {
+    border: tall $accent-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   7. BUTTONS
+   ---------------------------------------------------------------------------- */
+
+Button {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+Button:hover {
+    background: $accent-focus;
+    border: tall $accent-primary;
+}
+
+Button:focus {
+    border: tall $accent-primary;
+    background: $accent-focus;
+}
+
+Button.-primary {
+    background: $accent-primary;
+    color: $bg-main;
+    border: tall $accent-primary;
+}
+
+Button.-primary:hover {
+    background: $accent-primary;
+}
+
+Button.-success {
+    background: $accent-success;
+    color: $bg-main;
+    border: tall $accent-success;
+}
+
+Button.-warning {
+    background: $accent-warning;
+    color: $bg-main;
+    border: tall $accent-warning;
+}
+
+Button.-error {
+    background: $accent-error;
+    color: $bg-main;
+    border: tall $accent-error;
+}
+
+/* ----------------------------------------------------------------------------
+   8. DATA TABLE
+   ---------------------------------------------------------------------------- */
+
+DataTable {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+DataTable > .datatable--header {
+    background: $bg-main;
+    color: $text-primary;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: $accent-focus;
+    color: $text-primary;
+}
+
+DataTable > .datatable--hover {
+    background: $accent-focus;
+}
+
+DataTable:focus > .datatable--cursor {
+    background: $accent-primary;
+    color: $bg-main;
+}
+
+/* ----------------------------------------------------------------------------
+   9. LIST VIEW & LIST ITEMS
+   ---------------------------------------------------------------------------- */
+
+ListView {
+    background: $bg-panel;
+    border: tall $border-default;
+}
+
+ListView:focus {
+    border: tall $accent-primary;
+}
+
+ListItem {
+    background: $bg-panel;
+    color: $text-primary;
+}
+
+ListItem.--highlight {
+    background: $accent-focus;
+}
+
+ListView > ListItem.--highlight {
+    background: $accent-focus;
+}
+
+ListView:focus > ListItem.--highlight {
+    background: $accent-primary;
+    color: $bg-main;
+}
+
+/* ----------------------------------------------------------------------------
+   10. OPTION LIST & SELECT
+   ---------------------------------------------------------------------------- */
+
+OptionList {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+OptionList:focus {
+    border: tall $accent-primary;
+}
+
+OptionList > .option-list--option-highlighted {
+    background: $accent-focus;
+    color: $text-primary;
+}
+
+OptionList:focus > .option-list--option-highlighted {
+    background: $accent-primary;
+    color: $bg-main;
+}
+
+Select {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+Select:focus {
+    border: tall $accent-primary;
+}
+
+SelectCurrent {
+    background: $bg-panel;
+    color: $text-primary;
+}
+
+SelectOverlay {
+    background: $bg-panel;
+    border: tall $accent-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   11. TREE & DIRECTORY TREE
+   ---------------------------------------------------------------------------- */
+
+Tree {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+Tree:focus {
+    border: tall $accent-primary;
+}
+
+Tree > .tree--cursor {
+    background: $accent-focus;
+    color: $text-primary;
+}
+
+Tree:focus > .tree--cursor {
+    background: $accent-primary;
+    color: $bg-main;
+}
+
+Tree > .tree--highlight {
+    background: $accent-focus;
+}
+
+DirectoryTree {
+    background: $bg-panel;
+    color: $text-primary;
+    border: tall $border-default;
+}
+
+DirectoryTree:focus {
+    border: tall $accent-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   12. TABS
+   ---------------------------------------------------------------------------- */
+
+Tabs {
+    background: $bg-main;
+}
+
+Tab {
+    background: $bg-panel;
+    color: $text-secondary;
+    border: tall $border-default;
+}
+
+Tab:hover {
+    background: $accent-focus;
+    color: $text-primary;
+}
+
+Tab.-active {
+    background: $bg-main;
+    color: $text-primary;
+    border: tall $accent-primary;
+}
+
+Tab:focus {
+    border: tall $accent-primary;
+}
+
+TabbedContent {
+    background: $bg-main;
+}
+
+ContentSwitcher {
+    background: $bg-main;
+}
+
+/* ----------------------------------------------------------------------------
+   13. CHECKBOX & RADIO
+   ---------------------------------------------------------------------------- */
+
+Checkbox {
+    background: $bg-main;
+    color: $text-primary;
+}
+
+Checkbox:focus {
+    color: $accent-primary;
+}
+
+Checkbox > .toggle--button {
+    background: $bg-panel;
+    color: $text-muted;
+    border: tall $border-default;
+}
+
+Checkbox.-on > .toggle--button {
+    background: $accent-primary;
+    color: $bg-main;
+}
+
+RadioButton {
+    background: $bg-main;
+    color: $text-primary;
+}
+
+RadioButton:focus {
+    color: $accent-primary;
+}
+
+RadioSet {
+    background: $bg-main;
+    border: tall $border-default;
+}
+
+RadioSet:focus {
+    border: tall $accent-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   14. PROGRESS BAR & LOADING
+   ---------------------------------------------------------------------------- */
+
+ProgressBar {
+    background: $bg-panel;
+}
+
+ProgressBar > .bar--bar {
+    background: $border-default;
+    color: $accent-primary;
+}
+
+ProgressBar > .bar--complete {
+    background: $accent-success;
+}
+
+LoadingIndicator {
+    background: $bg-main;
+    color: $accent-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   15. SCROLLBAR
+   ---------------------------------------------------------------------------- */
+
+ScrollBar {
+    background: $bg-panel;
+}
+
+ScrollBar > .scrollbar--bar {
+    background: $border-default;
+}
+
+ScrollBar > .scrollbar--bar:hover {
+    background: $text-muted;
+}
+
+ScrollBar > .scrollbar--bar.-active {
+    background: $accent-primary;
+}
+
+/* ----------------------------------------------------------------------------
+   16. MODAL & DIALOG
+   ---------------------------------------------------------------------------- */
+
+ModalScreen {
+    background: $bg-main 80%;
+}
+
+/* ----------------------------------------------------------------------------
+   17. NOTIFICATIONS
+   ---------------------------------------------------------------------------- */
+
+Notification {
+    background: $bg-panel;
+    border: round $accent-primary;
+    color: $text-primary;
+}
+
+Notification.-information {
+    border: round $accent-primary;
+    color: $accent-primary;
+}
+
+Notification.-warning {
+    border: round $accent-warning;
+    color: $accent-warning;
+}
+
+Notification.-error {
+    border: round $accent-error;
+    color: $accent-error;
+}
+
+/* ----------------------------------------------------------------------------
+   18. UTILITY CLASSES - TEXT
+   ---------------------------------------------------------------------------- */
+
+.text-primary {
+    color: $text-primary;
+}
+
+.text-secondary {
+    color: $text-secondary;
+}
+
+.text-muted {
+    color: $text-muted;
+}
+
+/* ----------------------------------------------------------------------------
+   19. UTILITY CLASSES - STATUS
+   ---------------------------------------------------------------------------- */
+
+.is-success {
+    color: $accent-success;
+}
+
+.is-warning {
+    color: $accent-warning;
+}
+
+.is-error {
+    color: $accent-error;
+}
+
+/* ----------------------------------------------------------------------------
+   20. UTILITY CLASSES - PANEL
+   ---------------------------------------------------------------------------- */
+
+.panel {
+    background: $bg-panel;
+    border: tall $border-default;
+}
+
+/* ----------------------------------------------------------------------------
+   21. UTILITY CLASSES - FOCUS
+   ---------------------------------------------------------------------------- */
+
+.focusable:focus {
+    border: tall $accent-primary;
+}
+
+/* Generic focus-within for containers */
+.focusable:focus-within {
+    border: tall $accent-primary;
+}
