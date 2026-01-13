@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.62.0-beta] - 2026-01-13 - Re-design
+
+**UI Overhaul & Keyboard Navigation!** This release brings a redesigned interface with improved keyboard navigation.
+
+### Added
+
+- New `Ctrl+P` command palette for quick access to all actions
+- Custom theme selector replacing Textual's default (`Ctrl+T`)
+- Confirmation dialog when pressing `Esc` on the main page
+- Dynamic shortcuts that change based on current screen/context
+  - Home: Add, Commands, Settings, Theme
+  - Results: Navigate (j/k), Top (gg), Bottom (G), Open, Clear
+  - Details: Edit, Delete, Copy URL, Open URL, Back
+  - Edit/Add: Save, Next/Prev Field, Cancel
+- Run the app with `hdh` or `hei-datahub`
+
+### Changed
+
+- Cleaner layout with improved visual
+- Enhanced metadata presentation
+- **New Keyboard Shortcuts**
+  - `Ctrl+N` Add Dataset, `Ctrl+Shift+S` Settings, `Ctrl+U` Check Updates
+  - `Ctrl+R` Refresh, `Ctrl+Q` Quit, `Ctrl+I` About
+- Removed `Ctrl+H` help shortcut (replaced by command palette)
+
+### Fixed
+
+- Search bar focus issues after pressing `Esc` or `Enter`
+- Accidental dataset selection when pressing `Enter` with unfocused search
+- Footer shortcuts persisting incorrectly after navigating between screens
+- Command palette not showing all shortcuts on home screen
+- About page footer shortcuts
+- Logo display on small terminal screens
+
 ## [0.61.0-beta] - 2026-01-07 - Windows-Compatibility
 
 **Windows Support Arrives!** This release brings full Windows compatibility to Hei-DataHub.
