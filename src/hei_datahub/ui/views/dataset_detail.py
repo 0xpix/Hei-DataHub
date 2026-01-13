@@ -11,7 +11,6 @@ from textual.app import ComposeResult
 from textual.containers import VerticalScroll
 from textual.screen import Screen
 from textual.widgets import (
-    Footer,
     Header,
     Label,
     Static,
@@ -21,6 +20,7 @@ from hei_datahub.infra.index import delete_dataset
 from hei_datahub.services.index_service import get_index_service
 from hei_datahub.services.storage_manager import get_storage_backend
 from hei_datahub.ui.utils.actions import ClipboardActionsMixin, NavActionsMixin, UrlActionsMixin
+from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,9 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
             Static(id="details-content"),
             id="details-container",
         )
-        yield Footer()
+        footer = ContextualFooter()
+        footer.set_context("details")
+        yield footer
 
     def on_mount(self) -> None:
         """Load metadata when screen is mounted."""
