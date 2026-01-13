@@ -104,21 +104,21 @@ class StorageConfig(BaseModel):
 def get_default_keybindings() -> dict[str, list[str]]:
     """Get default keybindings configuration."""
     return {
-        "add_dataset": ["a"],
-        "settings": ["s"],
+        "add_dataset": ["ctrl+n"],
+        "settings": ["ctrl+shift+s"],
         "open_details": ["o", "enter"],
-        "pull_updates": ["u"],
-        "refresh_data": ["r"],
-        "quit": ["q"],
-        "show_about": ["ctrl+a"],
+        "check_updates": ["ctrl+u"],
+        "refresh_data": ["ctrl+r"],
+        "quit": ["ctrl+q"],
+        "show_about": ["ctrl+i"],
         "move_down": ["j", "down"],
         "move_up": ["k", "up"],
         "jump_top": ["g"],
         "jump_bottom": ["G"],
-        "focus_search": ["/"],
+        "focus_search": ["/", "ctrl+f"],
         "clear_search": ["escape"],
         "debug_console": [":"],
-        "show_help": ["?"],
+        "show_help": ["ctrl+h", "?"],
     }
 
 
