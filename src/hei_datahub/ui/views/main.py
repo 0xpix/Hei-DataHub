@@ -5,6 +5,7 @@ import logging
 
 from textual import work
 from textual.app import App
+from textual.binding import Binding
 from textual.reactive import reactive
 
 from hei_datahub.infra.db import ensure_database
@@ -21,8 +22,8 @@ class DataHubApp(App):
     CSS_PATH = "../styles/base.tcss"
 
     BINDINGS = [
-        ("ctrl+p", "commands", "Open Command Palette"),
-        ("ctrl+t", "theme_palette", "Change Theme"),
+        Binding("ctrl+p", "commands", "Open Command Palette", priority=True),
+        Binding("ctrl+t", "theme_palette", "Change Theme", priority=True),
     ]
 
     # Track WebDAV/Heibox connection status
