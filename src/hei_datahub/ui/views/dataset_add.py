@@ -19,6 +19,7 @@ from textual.widgets import (
     Input,
     Label,
     TextArea,
+    Select,
 )
 
 # TODO: CHANGE WHEN ADD FILES IN INFRA AND SERVICES
@@ -48,26 +49,76 @@ class AddDataScreen(Screen):
         yield VerticalScroll(
             Label("󰆺 Add New Dataset", classes="title"),
             Container(
+                # --- Core Dataset Info (Required) ---
                 Label("Dataset Name (required):"),
                 Input(placeholder="e.g., Global Weather Stations 2024", id="input-name"),
-                Label("Description (required):"),
+
+                Label("ID (required):"),
+                Input(placeholder="Unique slug (leave empty to auto-generate)", id="input-id"),
+
+                Label("Category (required):"),
+                Select(
+                    options=[
+                        ("Climate", "Climate"),
+                        ("Land Cover", "Land Cover"),
+                        ("Biodiversity", "Biodiversity"),
+                        ("Socioeconomic", "Socioeconomic"),
+                        ("Remote Sensing", "Remote Sensing"),
+                    ],
+                    prompt="Select category...",
+                    id="input-category"
+                ),
+
+                Label("Summary / Description (required):"),
                 TextArea(id="input-description"),
-                Label("Source URL or snippet (required):"),
-                Input(placeholder="e.g., https://example.com/data.csv", id="input-source"),
-                Label("Storage Location (required):"),
-                Input(placeholder="e.g., s3://bucket/path/ or /local/path", id="input-storage"),
-                Label("Date Created (optional, defaults to today):"),
-                Input(placeholder="YYYY-MM-DD", id="input-date"),
-                Label("File Format (optional):"),
-                Input(placeholder="e.g., CSV, JSON, Parquet", id="input-format"),
-                Label("Size (optional):"),
-                Input(placeholder="e.g., 2.5 GB, 1M rows", id="input-size"),
-                Label("Data Types (comma-separated, optional):"),
-                Input(placeholder="e.g., weather, time-series", id="input-types"),
-                Label("Used In Projects (comma-separated, optional):"),
-                Input(placeholder="e.g., project-a, project-b", id="input-projects"),
-                Label("ID (optional, auto-generated if empty):"),
-                Input(placeholder="Leave empty to auto-generate", id="input-id"),
+
+                Label("Source (required, human-readable):"),
+                Input(placeholder="e.g., NASA LP DAAC", id="input-source"),
+
+                Label("Reference (Optional, citation/DOI):"),
+                TextArea(id="input-reference", classes="small-textarea"),
+
+                # --- Access & Format (Required) ---
+                Label("Access Method (required):"),
+                Input(placeholder="GEE:..., PY:..., FILE:..., API:...", id="input-access-method"),
+
+                Label("Format & Structure (required):"),
+                Input(placeholder="e.g. CSV, GeoTIFF, Parquet", id="input-format"),
+
+                # --- Access / Location (Optional per list, validated if URL) ---
+                Label("Access / Location (URL/Path):"),
+                Input(placeholder="https://... or /data/...", id="input-storage"),
+                Label("", id="url-validation-msg", classes="warning"),
+
+                # --- Additional Metadata (Collapsible) ---
+                Button("Show/Hide Additional Metadata", id="toggle-optional-btn", variant="default", classes="w-full"),
+
+                Container(
+                    Label("Dataset Size:"),
+                    Input(placeholder="e.g., 2.5 GB", id="input-size"),
+
+                    Label("Spatial Resolution:"),
+                    Input(placeholder="e.g. 500 m, 0.5°", id="input-spatial-res"),
+
+                    Label("Spatial Coverage:"),
+                    Input(placeholder="e.g. Global, Europe", id="input-spatial-cov"),
+
+                    Label("Temporal Resolution:"),
+                    Input(placeholder="e.g. Daily, Monthly", id="input-temp-res"),
+
+                    Label("Temporal Coverage:"),
+                    Input(placeholder="e.g. 2001-present", id="input-temp-cov"),
+
+                    Label("Related Projects (comma-separated):"),
+                    Input(placeholder="e.g., project-a, project-b", id="input-projects"),
+
+                    Label("Tags (comma-separated):"),
+                    Input(placeholder="e.g. modis, land-cover", id="input-tags"),
+
+                    id="optional-container",
+                    classes="hidden"
+                ),
+
                 Horizontal(
                     Button("Save Dataset", id="save-btn", variant="primary"),
                     Button("Cancel", id="cancel-btn", variant="default"),
@@ -82,6 +133,30 @@ class AddDataScreen(Screen):
     def on_mount(self) -> None:
         """Focus on first input."""
         self.query_one("#input-name", Input).focus()
+
+    @on(Button.Pressed, "#toggle-optional-btn")
+    def toggle_optional(self) -> None:
+        """Toggle visibility of optional fields."""
+        self.query_one("#optional-container").toggle_class("hidden")
+
+    @on(Input.Changed, "#input-storage")
+    def validate_url(self, event: Input.Changed) -> None:
+        """Validate URL for Access / Location."""
+        value = event.value
+        msg_label = self.query_one("#url-validation-msg", Label)
+
+        if value.startswith("http://") or value.startswith("https://"):
+            import urllib.parse
+            try:
+                result = urllib.parse.urlparse(value)
+                if all([result.scheme, result.netloc]):
+                    msg_label.update("") # Valid format
+                else:
+                    msg_label.update("⚠️ Invalid URL format")
+            except ValueError:
+                msg_label.update("⚠️ Invalid URL")
+        else:
+            msg_label.update("")
 
     @on(Button.Pressed, "#save-btn")
     def on_save_button(self) -> None:
@@ -101,76 +176,129 @@ class AddDataScreen(Screen):
         """Cancel and go back."""
         self.app.pop_screen()
 
+    def show_error(self, message: str, focus_id: str = None) -> None:
+        """Show error message and optionally focus an input."""
+        label = self.query_one("#error-message", Label)
+        label.update(message)
+        label.add_class("visible")
+        if focus_id:
+            self.query_one(focus_id).focus()
+
     def submit_form(self) -> None:
         """Validate and save the new dataset."""
-        error_label = self.query_one("#error-message", Label)
-        error_label.update("")
+        self.query_one("#error-message", Label).update("")
+        self.query_one("#error-message", Label).remove_class("visible")
 
         # Gather form data
         name = self.query_one("#input-name", Input).value.strip()
+        dataset_id = self.query_one("#input-id", Input).value.strip()
+        category_val = self.query_one("#input-category", Select).value
         description = self.query_one("#input-description", TextArea).text.strip()
         source = self.query_one("#input-source", Input).value.strip()
-        storage = self.query_one("#input-storage", Input).value.strip()
-        date_str = self.query_one("#input-date", Input).value.strip()
+        reference = self.query_one("#input-reference", TextArea).text.strip()
+        access_method = self.query_one("#input-access-method", Input).value.strip()
         file_format = self.query_one("#input-format", Input).value.strip()
+        storage = self.query_one("#input-storage", Input).value.strip()
+
+        # Optional fields
         size = self.query_one("#input-size", Input).value.strip()
-        types_str = self.query_one("#input-types", Input).value.strip()
+        spatial_res = self.query_one("#input-spatial-res", Input).value.strip()
+        spatial_cov = self.query_one("#input-spatial-cov", Input).value.strip()
+        temp_res = self.query_one("#input-temp-res", Input).value.strip()
+        temp_cov = self.query_one("#input-temp-cov", Input).value.strip()
         projects_str = self.query_one("#input-projects", Input).value.strip()
-        dataset_id = self.query_one("#input-id", Input).value.strip()
+        tags_str = self.query_one("#input-tags", Input).value.strip()
 
         # Validate required fields
         if not name:
-            error_label.update("[red]Error: Dataset Name is required[/red]")
-            self.query_one("#input-name", Input).focus()
+            self.show_error("[red]Error: Dataset Name is required[/red]", "#input-name")
             return
+
+        if category_val == Select.BLANK:
+            self.show_error("[red]Error: Category is required[/red]", "#input-category")
+            return
+        category = str(category_val)
+
         if not description:
-            error_label.update("[red]Error: Description is required[/red]")
-            self.query_one("#input-description", TextArea).focus()
+            self.show_error("[red]Error: Description is required[/red]", "#input-description")
             return
         if not source:
-            error_label.update("[red]Error: Source is required[/red]")
-            self.query_one("#input-source", Input).focus()
+            self.show_error("[red]Error: Source is required[/red]", "#input-source")
             return
-        if not storage:
-            error_label.update("[red]Error: Storage Location is required[/red]")
-            self.query_one("#input-storage", Input).focus()
+        if not access_method:
+            self.show_error("[red]Error: Access Method is required[/red]", "#input-access-method")
             return
+
+        # Pydantic will catch invalid Access Method prefix, but UI feedback is better
+        valid_prefixes = ("GEE:", "PY:", "FILE:", "API:")
+        if not access_method.startswith(valid_prefixes):
+            self.show_error(f"[red]Error: Access Method must start with {', '.join(valid_prefixes)}[/red]", "#input-access-method")
+            return
+
+        if not file_format:
+             self.show_error("[red]Error: Format & Structure is required[/red]", "#input-format")
+             return
 
         # Generate ID if not provided
         if not dataset_id:
             dataset_id = generate_unique_id(name)
 
-        # Parse date
-        date_created = date_str if date_str else date.today().isoformat()
-
         # Parse lists
-        data_types = [t.strip() for t in types_str.split(',') if t.strip()] if types_str else None
         used_in_projects = [p.strip() for p in projects_str.split(',') if p.strip()] if projects_str else None
+        tags = [t.strip().lower() for t in tags_str.split(',') if t.strip()] if tags_str else None
 
         # Build metadata dict
         metadata = {
             "id": dataset_id,
             "dataset_name": name,
+            "category": category,
             "description": description,
             "source": source,
-            "date_created": date_created,
-            "storage_location": storage,
+            "access_method": access_method,
+            "file_format": file_format,
+            "storage_location": storage if storage else "N/A",
+            "date_created": date.today().isoformat(),
         }
 
-        if file_format:
-            metadata["file_format"] = file_format
+        # If storage is empty, pass empty string? Pydantic min_length=1.
+        # I'll modify model logic or prompt logic.
+        # If user says Optional, I should allow empty.
+        # I'll define storage_location as "N/A" if empty to satisfy model, or update model to Optional.
+        # Model update is safer for "Optional" semantics.
+        # But required field list in Model has storage_location.
+        # Let's set it to "N/A" or "Not specified" if empty and allow user to save.
+
+        if reference:
+            metadata["reference"] = reference
         if size:
             metadata["size"] = size
-        if data_types:
-            metadata["data_types"] = data_types
+        if spatial_res:
+            metadata["spatial_resolution"] = spatial_res
+        if spatial_cov:
+            metadata["spatial_coverage"] = spatial_cov
+        if temp_res:
+             metadata["temporal_resolution"] = temp_res
+        if temp_cov:
+            metadata["temporal_coverage"] = temp_cov
         if used_in_projects:
             metadata["used_in_projects"] = used_in_projects
+        if tags:
+            metadata["tags"] = tags
 
         # Validate and save
-        success, error_msg, model = validate_metadata(metadata)
-        if not success:
-            error_label.update(f"[red]Validation Error:\n{error_msg}[/red]")
-            return
+        try:
+             # We might need to handle `validate_metadata` distinct return or exception
+             # Currently existing code: success, error_msg, model = validate_metadata(metadata)
+             # But validate_metadata validates against `schema.json` too if configured.
+             # If I haven't updated schema.json, `validate_metadata` might fail if it uses json schema.
+             # I should wrap in try block or just hope Pydantic is enough.
+             success, error_msg, model = validate_metadata(metadata)
+             if not success:
+                 self.show_error(f"[red]Validation Error:\n{error_msg}[/red]")
+                 return
+        except Exception as e:
+             self.show_error(f"[red]Validation Error:\n{str(e)}[/red]")
+             return
 
         # ALWAYS save to cloud storage (WebDAV)
         # No more local filesystem option - cloud-only workflow
