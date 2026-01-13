@@ -1,4 +1,4 @@
-# 0.60-beta issues
+# 0.60-beta
 
 ## TO FIX
 
