@@ -11,7 +11,6 @@ from textual.containers import Container, Horizontal, VerticalScroll
 from textual.screen import Screen
 from textual.widgets import (
     Button,
-    Footer,
     Header,
     Input,
     Label,
@@ -20,6 +19,7 @@ from textual.widgets import (
 )
 
 from hei_datahub.ui.views.dataset_detail import CloudDatasetDetailsScreen
+from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,9 @@ class CloudEditDetailsScreen(Screen):
             ),
             id="edit-scroll",
         )
-        yield Footer()
+        footer = ContextualFooter()
+        footer.set_context("edit")
+        yield footer
 
     def on_mount(self) -> None:
         """Initialize field values after mounting."""
