@@ -7,10 +7,11 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, ScrollableContainer, Vertical
 from textual.screen import Screen
-from textual.widgets import Footer, Header, Static
+from textual.widgets import Header, Static
 
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.assets.loader import get_logo_widget_text
+from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 
 class AboutScreen(Screen):
@@ -90,7 +91,9 @@ class AboutScreen(Screen):
                 # Footer hint
                 yield Static("Made with 󰋑 by PIX", id="footer-hint")
 
-        yield Footer()
+        footer = ContextualFooter()
+        footer.set_context("about")
+        yield footer
 
     def action_back(self) -> None:
         """Return to previous screen."""
