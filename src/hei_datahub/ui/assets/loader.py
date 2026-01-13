@@ -65,7 +65,7 @@ def _detect_version_codename():
     Detect version and codename from the package.
 
     Returns:
-        Tuple of (version, codename) as strings
+        version as strings
     """
     try:
         from hei_datahub.version import __version__ as version
