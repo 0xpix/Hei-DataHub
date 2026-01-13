@@ -97,25 +97,35 @@ class CustomCommandPalette(ModalScreen[str]):
             if label not in found_bindings:
                 found_bindings[label] = action
 
-        # 1. Collect from bindings (High priority) - ONLY SHORTCUTS
+        # 1. Collect from screen bindings
         if target_screen:
             try:
                 # active_bindings returns dict[str, ActiveBinding]
-                # Filter duplicates (e.g. from both App and Screen)
                 for active_binding in target_screen.active_bindings.values():
                     binding = active_binding.binding
-                    if binding.description and binding.show:
+                    # Show all bindings with descriptions in the command palette
+                    if binding.description:
                         add_command(binding.action, binding.action, binding.description, binding.key)
             except Exception:
                 pass
 
-        # NOTE: Removed collection of unbound actions from App and Screen
-        # per user request to only show "shortcuts not the commands"
-
-        # Add a special entry for Theme if not present (sometimes it might not appear if binding is overshadowed)
-        if "Change Theme (ctrl+t)" not in found_bindings:
-            # Check if App has it bound
+        # 2. Also collect from App-level bindings (for global shortcuts like theme, etc.)
+        try:
+            for binding in self.app.BINDINGS:
+                if hasattr(binding, 'description') and binding.description:
+                    add_command(binding.action, binding.action, binding.description, binding.key)
+        except Exception:
             pass
+
+        # 3. Add hardcoded important commands that should always be available
+        always_available = [
+            ("Change Theme", "theme_palette", "ctrl+t"),
+            ("Open Command Palette", "commands", "ctrl+p"),
+        ]
+        for desc, action, key in always_available:
+            label = f"{desc} ({key})"
+            if label not in found_bindings:
+                found_bindings[label] = action
 
         for label, action in found_bindings.items():
             self.commands.append((label, action))
