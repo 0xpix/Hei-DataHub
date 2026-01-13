@@ -274,3 +274,4 @@ DEV/
 logs/
 
 config.toml
+config.yaml
