@@ -122,8 +122,10 @@ class HomeScreen(Screen):
                 footer.set_context("results")
             elif search_input.has_focus and results_visible:
                 footer.set_context("results")  # Show results shortcuts while in search with results
+            elif search_input.has_focus:
+                footer.set_context("search")  # Typing in search, no results yet
             else:
-                footer.set_context("home")  # No shortcuts on home
+                footer.set_context("home")  # Home screen
         except Exception:
             pass  # Footer not mounted yet
 
@@ -808,11 +810,13 @@ class HomeScreen(Screen):
             # Exit insert mode - focus search bar (not table)
             search_input.focus()
             self.search_mode = False
+            self._update_footer_context()
         elif search_input.value:
             # Clear search and refocus search bar
             search_input.value = ""
-            self.load_all_datasets()
+            self._toggle_results_view(False)  # Hide results immediately
             search_input.focus()
+            self._update_footer_context()  # Update footer to home context
         elif table.has_focus:
             # Table is focused with no search - show exit confirmation
             self._show_exit_confirmation()
