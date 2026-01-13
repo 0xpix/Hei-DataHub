@@ -68,11 +68,10 @@ def _detect_version_codename():
         Tuple of (version, codename) as strings
     """
     try:
-        from hei_datahub.version import CODENAME
         from hei_datahub.version import __version__ as version
-        return str(version or ""), str(CODENAME or "")
+        return str(version or "") # Codename not implemented yet
     except Exception:
-        return "", ""
+        return ""
 
 
 def format_logo(text: str, config) -> str:
@@ -113,11 +112,11 @@ def format_logo(text: str, config) -> str:
 
     # Add version tag if enabled
     if logo_config.get("show_version_tag", True):
-        ver, code = _detect_version_codename()
-        if ver or code:
-            fmt = logo_config.get("version_format", "v{version} — {codename}")
+        ver = _detect_version_codename()
+        if ver:
+            fmt = logo_config.get("version_format", "v{version}")
             style = logo_config.get("version_style", None)
-            tag = fmt.format(version=ver, codename=code).strip()
+            tag = fmt.format(version=ver).strip()
 
             if style:
                 tag = f"[{style}]{tag}[/{style}]"
