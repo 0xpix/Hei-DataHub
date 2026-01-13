@@ -14,7 +14,6 @@ from textual.containers import Container, Horizontal, VerticalScroll
 from textual.screen import Screen
 from textual.widgets import (
     Button,
-    Footer,
     Header,
     Input,
     Label,
@@ -27,6 +26,7 @@ from hei_datahub.infra.store import validate_metadata
 from hei_datahub.services.catalog import generate_id as generate_unique_id
 from hei_datahub.services.index_service import get_index_service
 from hei_datahub.services.storage_manager import get_storage_backend
+from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 from .dataset_detail import CloudDatasetDetailsScreen
 from .home import HomeScreen
@@ -128,7 +128,9 @@ class AddDataScreen(Screen):
             ),
             id="add-data-scroll",
         )
-        yield Footer()
+        footer = ContextualFooter()
+        footer.set_context("add")
+        yield footer
 
     def on_mount(self) -> None:
         """Focus on first input."""
