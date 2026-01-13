@@ -51,14 +51,25 @@ class HomeScreen(Screen):
 
         yield Header()
         yield Container(
-            Static(logo_text, id="banner"),
-            Static("", id="update-status", classes="hidden"),
-            Static("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
-            Input(placeholder="Type / to search | Tab/→ for autocomplete | Enter to view", id="search-input"),
-            Horizontal(id="filter-badges-container", classes="filter-badges"),
-            Label("All Datasets", id="results-label"),
-            DataTable(id="results-table", cursor_type="row"),
-            id="search-container",
+            # Top "Hero" section with centered logo and search
+            Container(
+                Static(logo_text, id="banner"),
+                Static("", id="update-status", classes="hidden"),
+                Input(placeholder="Search datasets...", id="search-input"),
+                Static("Press [bold]?[/bold] for shortcuts", id="search-help"),
+                id="hero-section"
+            ),
+
+            # Results section (hidden until search or browse)
+            Container(
+                Static("🔍 Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
+                Horizontal(id="filter-badges-container", classes="filter-badges"),
+                Label("All Datasets", id="results-label"),
+                DataTable(id="results-table", cursor_type="row"),
+                id="results-section",
+                classes="hidden",
+            ),
+            id="main-container",
         )
         yield Footer()
 
@@ -68,8 +79,9 @@ class HomeScreen(Screen):
         table.add_columns("Name", "ID", "Description")
         table.cursor_type = "row"
         table.show_row_labels = False
-        # Start with table focused, but don't refocus it during searches
-        table.focus()
+
+        # Focus search input on start
+        self.query_one("#search-input").focus()
 
         # Setup search autocomplete
         self._setup_search_autocomplete()
@@ -318,9 +330,9 @@ class HomeScreen(Screen):
         """Update mode indicator when search mode changes."""
         indicator = self.query_one("#mode-indicator", Static)
         if mode:
-            indicator.update("🔍 Search Datasets  |  Mode: [bold green]Insert[/bold green]")
+            indicator.update("🔍 Mode: [bold green]Insert[/bold green]")
         else:
-            indicator.update("🔍 Search Datasets  |  Mode: [bold cyan]Normal[/bold cyan]")
+            indicator.update("🔍 Mode: [bold cyan]Normal[/bold cyan]")
 
     @on(Input.Changed, "#search-input")
     def on_search_input(self, event: Input.Changed) -> None:
@@ -336,17 +348,31 @@ class HomeScreen(Screen):
         # Set new timer for debounced search
         self._debounce_timer = self.set_timer(debounce_ms / 1000.0, lambda: self.perform_search(event.value))
 
+    def _toggle_results_view(self, show: bool) -> None:
+        """Toggle between splash screen and results view."""
+        results = self.query_one("#results-section")
+        hero = self.query_one("#hero-section")
+
+        if show:
+            results.remove_class("hidden")
+            hero.add_class("compact")
+        else:
+            results.add_class("hidden")
+            hero.remove_class("compact")
+
     def perform_search(self, query: str) -> None:
         """Execute search and update results table (FAST - never hits network)."""
         logger.info(f"perform_search called with query: '{query}'")
         table = self.query_one("#results-table", DataTable)
         table.clear()
-        logger.info(f"Table cleared, row count: {table.row_count}")
 
-        # If query is empty or very short, show all datasets
-        if not query.strip() or len(query.strip()) < 2:
+        # Determine visibility based on query
+        has_query = bool(query.strip())
+        self._toggle_results_view(has_query)
+
+        # If query is empty or very short, we effectively clear results (hide view)
+        if not has_query:
             self._update_filter_badges("")
-            self.load_all_datasets()
             return
 
         try:
