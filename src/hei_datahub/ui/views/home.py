@@ -754,7 +754,7 @@ class HomeScreen(Screen):
             self.search_mode = False
 
     def action_clear_search(self) -> None:
-        """Clear search or exit insert mode."""
+        """Clear search or exit insert mode, or confirm exit if nothing to clear."""
         search_input = self.query_one("#search-input", Input)
 
         if self.search_mode:
@@ -766,10 +766,23 @@ class HomeScreen(Screen):
             # Clear search
             search_input.value = ""
             self.load_all_datasets()
+        elif not search_input.has_focus:
+            # Nothing to clear and not in search input - show exit confirmation
+            self._show_exit_confirmation()
         else:
             # Focus table
             table = self.query_one("#results-table", DataTable)
             table.focus()
+
+    def _show_exit_confirmation(self) -> None:
+        """Show exit confirmation dialog."""
+        from hei_datahub.ui.widgets.dialogs import ConfirmExitDialog
+
+        def on_result(confirmed: bool) -> None:
+            if confirmed:
+                self.app.exit()
+
+        self.app.push_screen(ConfirmExitDialog(), callback=on_result)
 
     def action_move_down(self) -> None:
         """Move selection down (j key)."""
