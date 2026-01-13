@@ -21,7 +21,7 @@ class CustomCommandPalette(ModalScreen[str]):
         width: 60;
         height: 20;
         background: $surface;
-        border: wide $primary;
+        border: wide $accent;
         padding: 1;
     }
 
@@ -77,22 +77,33 @@ class CustomCommandPalette(ModalScreen[str]):
         """Load available commands from the active screen and app."""
         self.commands = []
 
-        # Only show these essential commands in the palette
-        essential_commands = [
-            ("Add Dataset", "add_dataset", "Ctrl+N"),
-            ("Settings", "settings", "Ctrl+Shift+S"),
-            ("Check Updates", "check_updates", "Ctrl+U"),
-            ("Change Theme", "theme_palette", "Ctrl+T"),
-            ("About", "show_about", "Ctrl+I"),
-            ("Refresh", "refresh_data", "Ctrl+R"),
-            ("Exit", "quit", "Ctrl+Q"),
+        # Commands organized by category: (description, action, key, category)
+        categorized_commands = [
+            # Data
+            ("Add Dataset", "add_dataset", "Ctrl+N", "Data"),
+            ("Refresh", "refresh_data", "Ctrl+R", "Data"),
+            # Navigation
+            ("Settings", "settings", "Ctrl+Shift+S", "Navigation"),
+            ("Check Updates", "check_updates", "Ctrl+U", "Navigation"),
+            ("About", "show_about", "Ctrl+I", "Navigation"),
+            # Appearance
+            ("Change Theme", "theme_palette", "Ctrl+T", "Appearance"),
+            # System
+            ("Exit", "quit", "Ctrl+Q", "System"),
         ]
 
-        for desc, action, key in essential_commands:
+        for desc, action, key, category in categorized_commands:
             label = f"{desc} ({key})"
-            self.commands.append((label, action))
+            self.commands.append((label, action, category))
 
-        self._update_list(self.commands, show_categories=False)
+        self._update_list(self.commands, show_categories=True)
+
+    def _get_category(self, action: str, commands: list) -> str:
+        """Get category for an action from commands list."""
+        for label, act, cat in commands:
+            if act == action:
+                return cat
+        return "General"
 
     def _update_list(self, commands, show_categories: bool = False) -> None:
         option_list = self.query_one(OptionList)
@@ -109,16 +120,18 @@ class CustomCommandPalette(ModalScreen[str]):
         added_ids = set()
 
         if show_categories:
-            # Group by category
+            # Group by category - commands are (label, action, category) tuples
             categories = {}
-            for label, action in commands:
-                cat = self._get_category(action)
+            for item in commands:
+                label, action = item[0], item[1]
+                cat = item[2] if len(item) > 2 else "General"
                 if cat not in categories:
                     categories[cat] = []
                 categories[cat].append((label, action))
 
-            # Sort categories
-            sorted_cats = sorted(categories.keys())
+            # Sort categories in specific order
+            category_order = ["Data", "Navigation", "Appearance", "System", "General"]
+            sorted_cats = sorted(categories.keys(), key=lambda x: category_order.index(x) if x in category_order else 99)
 
             for cat in sorted_cats:
                 # Add Header
@@ -131,19 +144,6 @@ class CustomCommandPalette(ModalScreen[str]):
 
                 # Add items
                 for label, action in categories[cat]:
-                    # Ensure we don't add duplicate action IDs in the OptionList
-                    # Textual OptionList doesn't allow duplicate IDs.
-                    # If we have same action but different labels, we need unique IDs.
-                    # Since we keyed found_bindings by Label, the Labels are unique, but Actions might be same?
-                    # Actually valid commands usually have unique Actions.
-                    # But if an action appears multiple times (e.g. same action, different label), we need to handle it.
-                    # Here we have list of (label, action).
-
-                    # Construct a unique ID if needed, or just skip if exactly same action is already there?
-                    # The traceback happened because "opencode" action was added twice?
-                    # No, likely because we were doing blindly.
-
-                    # We will rely on unique IDs. If action is duplicated, append suffix
                     option_id = action
                     counter = 1
                     while option_id in added_ids:
@@ -157,8 +157,9 @@ class CustomCommandPalette(ModalScreen[str]):
                         first_selectable_index = current_index
                     current_index += 1
         else:
-            # Flat list
-            for label, action in commands:
+            # Flat list - handle both 2-tuple and 3-tuple
+            for item in commands:
+                label, action = item[0], item[1]
                 option_id = action
                 counter = 1
                 while option_id in added_ids:
@@ -183,13 +184,13 @@ class CustomCommandPalette(ModalScreen[str]):
             return
 
         filtered = []
-        for label, action in self.commands:
-            # Match against label or action or category
-            cat = self._get_category(action).lower()
-            if (query in label.lower()) or (query in action.lower()) or (query in cat):
-                filtered.append((label, action))
+        for item in self.commands:
+            label, action = item[0], item[1]
+            category = item[2] if len(item) > 2 else "General"
+            # Match against label, action, or category
+            if (query in label.lower()) or (query in action.lower()) or (query in category.lower()):
+                filtered.append(item)  # Keep the full tuple with category
 
-        # Always show categories
         self._update_list(filtered, show_categories=True)
 
     @on(Input.Submitted)
