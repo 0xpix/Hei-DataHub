@@ -49,13 +49,16 @@ def bind_actions_from_config(
 
         # Add bindings for each key
         for i, key in enumerate(keys):
+            # Use priority=True for bindings with modifiers so they work even when Input has focus
+            has_modifier = any(mod in key.lower() for mod in ["ctrl+", "alt+", "shift+"])
             bindings.append(
                 Binding(
                     key,
                     action,
-                    display_name if i == 0 else "",  # Only show display for first key
+                    display_name,  # Always include description for command palette
                     key_display=key_display if i == 0 else key,
-                    show=show if i == 0 else False  # Only show first binding in footer
+                    show=show if i == 0 else False,  # Only show first binding in footer
+                    priority=has_modifier,  # Priority bindings work even when Input is focused
                 )
             )
 
@@ -65,21 +68,21 @@ def bind_actions_from_config(
 def get_action_display_map_home() -> dict[str, tuple]:
     """Get action display map for home screen."""
     return {
-        "add_dataset": ("Add Dataset", "a", True),
-        "settings": ("Settings", "s", True),
+        "add_dataset": ("Add Dataset", "Ctrl+N", True),
+        "settings": ("Settings", "Ctrl+Shift+S", True),
         "open_details": ("Open", "o", False),
-        "pull_updates": ("Pull", "u", False),
-        "refresh_data": ("Refresh", "r", True),
-        "quit": ("Quit", "^q", True),
-        "show_about": ("About", "^a", True),
+        "check_updates": ("Check Updates", "Ctrl+U", True),
+        "refresh_data": ("Refresh", "Ctrl+R", True),
+        "quit": ("Quit", "Ctrl+Q", True),
+        "show_about": ("About", "Ctrl+I", True),
         "move_down": ("Down", "j", False),
         "move_up": ("Up", "k", False),
         "jump_top": ("Top", "g g", False),
         "jump_bottom": ("Bottom", "G", False),
-        "focus_search": ("Search", "/", True),
-        "clear_search": ("Clear", "esc", False),
+        "focus_search": ("Search", "Ctrl+F", True),
+        "clear_search": ("Clear", "Esc", False),
         "debug_console": ("Debug", ":", False),
-        "show_help": ("Help", "?", True),
+        "show_help": ("Help", "Ctrl+H", True),
     }
 
 
@@ -124,23 +127,26 @@ def build_home_bindings() -> list[Binding]:
     except Exception as e:
         logger.warning(f"Failed to load keybindings from config: {e}, using defaults")
         # Fallback to hardcoded defaults if config fails
+        # priority=True ensures modifier bindings work even when Input widget is focused
         return [
-            Binding("a", "add_dataset", "Add Dataset", key_display="a"),
-            Binding("s", "settings", "Settings", key_display="s"),
+            Binding("ctrl+n", "add_dataset", "Add Dataset", key_display="Ctrl+N", priority=True),
+            Binding("ctrl+shift+s", "settings", "Settings", key_display="Ctrl+Shift+S", priority=True),
             Binding("o", "open_details", "Open", show=False),
             Binding("enter", "open_details", "View Details", show=False),
-            Binding("u", "pull_updates", "Update", key_display="u"),
-            Binding("r", "refresh_data", "Refresh", key_display="r"),
-            Binding("q", "quit", "Quit", key_display="^q"),
-            Binding("a", "show_about", "About", key_display="^a"),
+            Binding("ctrl+u", "check_updates", "Check Updates", key_display="Ctrl+U", priority=True),
+            Binding("ctrl+r", "refresh_data", "Refresh", key_display="Ctrl+R", priority=True),
+            Binding("ctrl+q", "quit", "Quit", key_display="Ctrl+Q", priority=True),
+            Binding("ctrl+i", "show_about", "About", key_display="Ctrl+I", priority=True),
             Binding("j", "move_down", "Down", show=False),
             Binding("k", "move_up", "Up", show=False),
             Binding("down", "move_down", "", show=False),
             Binding("up", "move_up", "", show=False),
             # Note: 'gg' is handled manually in on_key() method to require double-press
             Binding("G", "jump_bottom", "Bottom", show=False),
-            Binding("/", "focus_search", "Search", key_display="/"),
+            Binding("/", "focus_search", "Search", show=False),
+            Binding("ctrl+f", "focus_search", "Search", key_display="Ctrl+F", priority=True),
             Binding("escape", "clear_search", "Clear", show=False),
             Binding(":", "debug_console", "Debug", show=False),
-            Binding("?", "show_help", "Help", key_display="?"),
+            Binding("ctrl+h", "show_help", "Help", key_display="Ctrl+H", priority=True),
+            Binding("?", "show_help", "Help", show=False),
         ]
