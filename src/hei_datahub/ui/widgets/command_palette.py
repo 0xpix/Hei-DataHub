@@ -77,78 +77,22 @@ class CustomCommandPalette(ModalScreen[str]):
         """Load available commands from the active screen and app."""
         self.commands = []
 
-        # 1. Get the screen that is BEHIND this modal
-        target_screen = None
-        if len(self.app.screen_stack) >= 2:
-            target_screen = self.app.screen_stack[-2]
-        else:
-            # Fallback
-            target_screen = self.app.screen
-
-        found_bindings = {} # Label -> Action
-
-        # Helper to add commands
-        def add_command(name, action, description, key=None):
-            label = description
-            if key:
-                label = f"{description} ({key})"
-            # Prefer existing binding description if we already have it
-            # Also, check if this action is already added to avoid DuplicateID
-            if label not in found_bindings:
-                found_bindings[label] = action
-
-        # 1. Collect from screen bindings
-        if target_screen:
-            try:
-                # active_bindings returns dict[str, ActiveBinding]
-                for active_binding in target_screen.active_bindings.values():
-                    binding = active_binding.binding
-                    # Show all bindings with descriptions in the command palette
-                    if binding.description:
-                        add_command(binding.action, binding.action, binding.description, binding.key)
-            except Exception:
-                pass
-
-        # 2. Also collect from App-level bindings (for global shortcuts like theme, etc.)
-        try:
-            for binding in self.app.BINDINGS:
-                if hasattr(binding, 'description') and binding.description:
-                    add_command(binding.action, binding.action, binding.description, binding.key)
-        except Exception:
-            pass
-
-        # 3. Add hardcoded important commands that should always be available
-        always_available = [
-            ("Change Theme", "theme_palette", "ctrl+t"),
-            ("Open Command Palette", "commands", "ctrl+p"),
+        # Only show these essential commands in the palette
+        essential_commands = [
+            ("Add Dataset", "add_dataset", "Ctrl+N"),
+            ("Settings", "settings", "Ctrl+Shift+S"),
+            ("Check Updates", "check_updates", "Ctrl+U"),
+            ("Change Theme", "theme_palette", "Ctrl+T"),
+            ("About", "show_about", "Ctrl+I"),
+            ("Refresh", "refresh_data", "Ctrl+R"),
+            ("Exit", "quit", "Ctrl+Q"),
         ]
-        for desc, action, key in always_available:
-            label = f"{desc} ({key})"
-            if label not in found_bindings:
-                found_bindings[label] = action
 
-        for label, action in found_bindings.items():
+        for desc, action, key in essential_commands:
+            label = f"{desc} ({key})"
             self.commands.append((label, action))
 
-        # Sort commands alphabetically by label
-        self.commands.sort(key=lambda x: x[0])
-
-        self._update_list(self.commands, show_categories=True)
-
-    def _get_category(self, action: str) -> str:
-        """Infer category from action name."""
-        # Check if action is likely a system/app one
-        if action in ["quit", "bell", "toggle_dark"]:
-            return "System"
-
-        if "." in action:
-            category = action.split(".")[0]
-            if category == "screen":
-                 return "Screen"
-            return category.title()
-
-        # Try to guess based on source?
-        return "General"
+        self._update_list(self.commands, show_categories=False)
 
     def _update_list(self, commands, show_categories: bool = False) -> None:
         option_list = self.query_one(OptionList)
