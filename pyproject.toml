@@ -58,6 +58,7 @@ dev = [
 
 [project.scripts]
 hei-datahub = "hei_datahub.cli.main:main"
+hdh = "hei_datahub.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/0xpix/Hei-DataHub"
