@@ -65,8 +65,9 @@ class HomeScreen(Screen):
     def on_mount(self) -> None:
         """Set up the screen when mounted."""
         table = self.query_one("#results-table", DataTable)
-        table.add_columns("ID", "Name", "Description")
+        table.add_columns("Name", "ID", "Description")
         table.cursor_type = "row"
+        table.show_row_labels = False
         # Start with table focused, but don't refocus it during searches
         table.focus()
 
@@ -121,8 +122,8 @@ class HomeScreen(Screen):
                     snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
 
                 table.add_row(
-                    display_name,
                     ("☁️ " + display_name)[:40],
+                    result["id"],
                     snippet,
                     key=result["id"],
                 )
@@ -230,8 +231,8 @@ class HomeScreen(Screen):
                 display_name = result["name"]  # Use metadata name, not folder path
 
                 table.add_row(
-                    display_name,  # Show name in ID column
                     (name_prefix + display_name)[:40],  # Show name with cloud icon
+                    result["id"],
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
@@ -290,8 +291,8 @@ class HomeScreen(Screen):
                         description = description[:80] + "..." if len(description) > 80 else description
 
                         table.add_row(
-                            dataset_id,
                             name[:40],
+                            dataset_id,
                             description,
                             key=dataset_id,
                         )
@@ -302,8 +303,8 @@ class HomeScreen(Screen):
                     # If no metadata.yaml, show directory name only
                     logger.warning(f"Could not load metadata for {dataset_id}: {e}")
                     table.add_row(
-                        dataset_id,
                         f"📁 {dataset_id}"[:40],
+                        dataset_id,
                         "No metadata.yaml found",
                         key=dataset_id,
                     )
@@ -403,8 +404,8 @@ class HomeScreen(Screen):
                 display_name = result["name"]  # Use metadata name, not folder path
 
                 table.add_row(
-                    display_name,  # Show name in ID column
                     (name_prefix + display_name)[:40],  # Show name with cloud icon
+                    result["id"],
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
@@ -499,16 +500,16 @@ class HomeScreen(Screen):
                     description = description[:80] + "..." if len(description) > 80 else description
 
                     table.add_row(
-                        dataset_id,
                         name[:40],
+                        dataset_id,
                         description,
                         key=dataset_id,
                     )
                 else:
                     # Fallback for entries without metadata
                     table.add_row(
-                        dataset_id,
                         f"📁 {dataset_id}"[:40],
+                        dataset_id,
                         "No metadata.yaml",
                         key=dataset_id,
                     )
