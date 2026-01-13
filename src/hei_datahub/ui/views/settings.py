@@ -15,7 +15,6 @@ from textual.containers import Container, Horizontal, VerticalScroll
 from textual.screen import Screen
 from textual.widgets import (
     Button,
-    Footer,
     Header,
     Input,
     Label,
@@ -24,6 +23,7 @@ from textual.widgets import (
 from hei_datahub.cli.auth.credentials import get_auth_store
 from hei_datahub.infra.config_paths import get_config_path
 from hei_datahub.services.webdav_storage import WebDAVStorage
+from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 
 class SettingsScreen(Screen):
@@ -67,7 +67,9 @@ class SettingsScreen(Screen):
                 id="settings-container",
             ),
         )
-        yield Footer()
+        footer = ContextualFooter()
+        footer.set_context("settings")
+        yield footer
 
     def on_mount(self) -> None:
         """Load current settings from config."""
