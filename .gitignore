@@ -271,3 +271,5 @@ tests/.pytest_cache/
 tests/*.pyc
 /dev-site/
 DEV/
+
+config.toml
