@@ -12,21 +12,21 @@ class ThemePalette(ModalScreen[None]):
     CSS = """
     ThemePalette {
         align: center middle;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.5);
     }
 
     #theme-palette-container {
         width: 60;
         height: 20;
-        background: #1e1e2e;
-        border: wide #89b4fa;
+        background: $surface;
+        border: wide $accent;
         padding: 1;
     }
 
     #theme-input {
         border: none;
-        background: #313244;
-        color: #cdd6f4;
+        background: $surface;
+        color: $text;
         width: 100%;
         margin-bottom: 1;
         dock: top;
@@ -35,18 +35,18 @@ class ThemePalette(ModalScreen[None]):
     #theme-list {
         height: 1fr;
         border: none;
-        background: #1e1e2e;
-        color: #cdd6f4;
+        background: $surface;
+        color: $text;
         scrollbar-gutter: stable;
     }
 
     #theme-list > .option-list--option {
-        color: #cdd6f4;
+        color: $text;
     }
 
     #theme-list > .option-list--option-highlighted {
-        background: #45475a;
-        color: #f5e0dc;
+        background: $primary;
+        color: $text;
     }
 
     OptionList:focus {
