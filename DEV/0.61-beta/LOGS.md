@@ -1,15 +1,19 @@
-# 0.61-beta issues
+# 0.61-beta
 
 ## TO ADD
-- [ ] Windows support for the app
+- None
 
 ## TO CHANGE
-- None yet
+- [ ] Change the size of the fonts, based on the screen so it can fit and make it readable
 
 ## TO FIX
+- None
+
+## ADDED/CHANGED/FIXED
+- [x] Windows support for the app
+- [x] Change some of the fields for the ADD_DATASET feature
+
 - [x] Auth setup is only supported in linux
 - [x] The exe doesn't install the app, it just runs it
-
-## FIXED
 - Enabled Windows authentication support using Keyring and Credential Locker.
 - Added Inno Setup installer creation for Windows.
