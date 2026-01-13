@@ -118,7 +118,6 @@ def get_default_keybindings() -> dict[str, list[str]]:
         "focus_search": ["/", "ctrl+f"],
         "clear_search": ["escape"],
         "debug_console": [":"],
-        "show_help": ["ctrl+h", "?"],
     }
 
 
