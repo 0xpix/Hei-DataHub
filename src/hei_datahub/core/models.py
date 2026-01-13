@@ -38,6 +38,11 @@ class DatasetMetadata(BaseModel):
         max_length=200,
         description="Human-readable name",
     )
+    category: str = Field(
+        ...,
+        alias="category",
+        description="Dataset category (Climate, Land Cover, etc.)",
+    )
     description: str = Field(
         ..., alias="description", min_length=1, description="Detailed description"
     )
@@ -45,7 +50,13 @@ class DatasetMetadata(BaseModel):
         ...,
         alias="source",
         min_length=1,
-        description="URL or library snippet showing origin",
+        description="Human-readable origin",
+    )
+    access_method: str = Field(
+        ...,
+        alias="access_method",
+        min_length=1,
+        description="Machine-readable access identifier (GEE:..., PY:..., etc.)",
     )
     date_created: date = Field(
         ..., alias="date_created", description="Date when dataset was created"
@@ -58,6 +69,8 @@ class DatasetMetadata(BaseModel):
     )
 
     # Optional fields
+    reference: Optional[str] = Field(None, alias="reference", description="Formal citation or DOI")
+    tags: Optional[list[str]] = Field(None, alias="tags")
     file_format: Optional[str] = Field(None, alias="file_format")
     size: Optional[str] = Field(None, alias="size")
     data_types: Optional[list[str]] = Field(None, alias="data_types")
@@ -87,6 +100,17 @@ class DatasetMetadata(BaseModel):
         if not v[0].isalnum():
             raise ValueError("ID must start with an alphanumeric character")
         return v.lower()
+
+    @field_validator("access_method")
+    @classmethod
+    def validate_access_method(cls, v: str) -> str:
+        """Ensure Access Method starts with a valid prefix."""
+        valid_prefixes = ("GEE:", "PY:", "FILE:", "API:")
+        if not v.startswith(valid_prefixes):
+            raise ValueError(f"Access Method must start with one of: {', '.join(valid_prefixes)}")
+        if "\n" in v:
+            raise ValueError("Access Method must be single-line")
+        return v
 
     def to_dict(self) -> dict:
         """Convert to dictionary with aliases."""
