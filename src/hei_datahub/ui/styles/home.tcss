@@ -1,9 +1,90 @@
 /* Home Screen Styles for Hei-DataHub */
 
+.hidden {
+    display: none;
+}
+
+#main-container {
+    height: 100%;
+    width: 100%;
+    align: center top;
+    padding-top: 10;
+}
+
+#hero-section {
+    width: 60%;
+    height: auto;
+    background: $background;
+    border: none;
+    padding: 2;
+    align: center middle;
+    transition: margin-top 300ms;
+}
+
+#hero-section.compact {
+    margin-top: 0;
+    padding: 1;
+}
+
 #banner {
     text-align: center;
     padding: 1 0;
-    background: $panel;
+    margin-bottom: 3;
+    color: $accent;
+    text-style: bold;
+    width: 100%;
+    background: $background;
+    transition: height 300ms, margin-bottom 300ms;
+}
+
+#hero-section.compact #banner {
+    display: none;
+}
+
+#search-input {
+    width: 100%;
+    border: none;
+    background: $surface;
+    color: $text;
+    text-align: center;
+    height: 3;
+    padding: 1;
+}
+
+#search-input:focus {
+    border: tall $accent;
+    background: $surface;
+    text-style: bold;
+}
+
+#search-help {
+    text-align: center;
+    color: $text-muted;
+    margin-top: 1;
+    width: 100%;
+    transition: opacity 300ms;
+}
+
+#hero-section.compact #search-help {
+    display: none;
+}
+
+
+#search-help {
+    text-align: center;
+    color: $text-muted;
+    margin-top: 1;
+    width: 100%;
+}
+
+#results-section {
+    height: 1fr;
+    width: 100%;
+    padding: 1 2;
+}
+
+#results-section.hidden {
+    display: none;
 }
 
 #update-status {
@@ -13,6 +94,7 @@
     color: #1e40af;
     border-left: solid #2563eb;
     border-right: solid #2563eb;
+    margin-bottom: 1;
 }
 
 #update-status.hidden {
@@ -20,40 +102,10 @@
 }
 
 #mode-indicator {
-    text-align: center;
-    padding: 1 0;
-    background: $panel;
-}
-
-.title {
-    text-align: center;
-    text-style: bold;
-    padding: 1;
-    background: $primary;
-}
-
-#github-status {
     text-align: right;
     padding: 0 1;
-    background: $panel;
-}
-
-.pr-status {
-    margin-top: 2;
-    padding: 1;
-    text-align: center;
-    background: $panel;
-}
-
-#main-scroll {
-    height: 100%;
-    scrollbar-gutter: stable;
-}
-
-#search-container {
-    height: auto;
-    min-height: 100%;
-    padding: 1;
+    margin-bottom: 1;
+    color: $text-muted;
 }
 
 #filter-badges-container {
