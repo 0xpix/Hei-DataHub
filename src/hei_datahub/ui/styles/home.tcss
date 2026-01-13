@@ -111,10 +111,23 @@
 }
 
 #results-table {
-    height: auto;
-    min-height: 10;
-    max-height: 50;
+    height: 1fr;
     margin-top: 1;
+    border: none;
+    background: $surface;
+}
+
+#results-table > .datatable--header {
+    background: $surface;
+    color: $accent;
+    text-style: bold;
+    border-bottom: dashed $secondary;
+}
+
+#results-table > .datatable--cursor {
+    background: $primary 20%;
+    color: $text;
+    text-style: bold;
 }
 
 #details-container {
