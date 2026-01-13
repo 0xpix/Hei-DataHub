@@ -16,6 +16,7 @@ class ContextualFooter(Widget):
         dock: bottom;
         height: 1;
         background: $surface;
+        width: 100%;
     }
 
     ContextualFooter .footer-container {
@@ -23,6 +24,7 @@ class ContextualFooter(Widget):
         height: 1;
         background: $surface;
         align: center middle;
+        layout: horizontal;
     }
 
     ContextualFooter .footer-key {
@@ -30,15 +32,18 @@ class ContextualFooter(Widget):
         color: $text;
         padding: 0 1;
         text-style: bold;
+        width: auto;
     }
 
     ContextualFooter .footer-label {
         color: $text-muted;
         padding: 0 1;
+        width: auto;
     }
 
     ContextualFooter .footer-separator {
         color: $text-disabled;
+        width: auto;
     }
 
     ContextualFooter.hidden-footer {
@@ -51,27 +56,46 @@ class ContextualFooter(Widget):
 
     # Shortcut definitions for each context
     SHORTCUTS = {
-        "home": [],  # No shortcuts on home screen
-        "search": [],  # No shortcuts while typing in search
+        "home": [
+            ("Ctrl+N", "Add"),
+            ("Ctrl+P", "Commands"),
+            ("Ctrl+T", "Theme"),
+        ],
+        "search": [
+            ("Ctrl+N", "Add"),
+            ("Ctrl+P", "Commands"),
+        ],
         "results": [
             ("j/k", "Navigate"),
             ("gg", "Top"),
             ("G", "Bottom"),
             ("Enter", "Open"),
-            ("Esc", "Back"),
+            ("Ctrl+N", "Add"),
+            ("Esc", "Clear"),
         ],
         "details": [
-            ("d", "Delete"),
             ("e", "Edit"),
+            ("d", "Delete"),
+            ("y", "Copy URL"),
+            ("o", "Open URL"),
             ("Esc", "Back"),
         ],
         "edit": [
             ("Ctrl+S", "Save"),
+            ("Tab", "Next Field"),
+            ("Shift+Tab", "Prev Field"),
             ("Esc", "Cancel"),
         ],
         "add": [
             ("Ctrl+S", "Save"),
+            ("Tab", "Next Field"),
+            ("Shift+Tab", "Prev Field"),
             ("Esc", "Cancel"),
+        ],
+        "settings": [
+            ("Tab", "Next"),
+            ("Enter", "Select"),
+            ("Esc", "Back"),
         ],
     }
 
