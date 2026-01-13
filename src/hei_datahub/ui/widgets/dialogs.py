@@ -5,17 +5,17 @@ Moved from hei_datahub.ui.views.home
 """
 from textual.app import ComposeResult
 from textual.containers import Container, Vertical
-from textual.screen import Screen
+from textual.screen import ModalScreen
 from textual.widgets import Static
 
 
-class ConfirmCancelDialog(Screen):
+class ConfirmCancelDialog(ModalScreen[bool]):
     """Modal dialog to confirm canceling edits with unsaved changes."""
 
     CSS = """
-    #dialog-overlay {
+    ConfirmCancelDialog {
         align: center middle;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.5);
     }
 
     .dialog-box {
@@ -50,15 +50,12 @@ class ConfirmCancelDialog(Screen):
         self.dirty_count = dirty_count
 
     def compose(self) -> ComposeResult:
-        yield Container(
-            Vertical(
-                Static("[bold yellow]Discard Changes?[/bold yellow]", classes="dialog-title"),
-                Static(f"\nYou have {self.dirty_count} unsaved change(s) to [cyan]{self.dataset_id}[/cyan].\n", classes="dialog-text"),
-                Static("Press [bold]Y[/bold] to discard changes or [bold]N[/bold] to keep editing.", classes="dialog-text"),
-                id="confirm-dialog",
-                classes="dialog-box",
-            ),
-            id="dialog-overlay",
+        yield Vertical(
+            Static("[bold yellow]Discard Changes?[/bold yellow]", classes="dialog-title"),
+            Static(f"\nYou have {self.dirty_count} unsaved change(s) to [cyan]{self.dataset_id}[/cyan].\n", classes="dialog-text"),
+            Static("Press [bold]Y[/bold] to discard changes or [bold]N[/bold] to keep editing.", classes="dialog-text"),
+            id="confirm-dialog",
+            classes="dialog-box",
         )
 
     def action_confirm(self) -> None:
@@ -70,13 +67,13 @@ class ConfirmCancelDialog(Screen):
         self.dismiss(False)
 
 
-class ConfirmDeleteDialog(Screen):
+class ConfirmDeleteDialog(ModalScreen[bool]):
     """Modal dialog to confirm dataset deletion."""
 
     CSS = """
-    #dialog-overlay {
+    ConfirmDeleteDialog {
         align: center middle;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.5);
     }
 
     .dialog-box {
@@ -110,16 +107,13 @@ class ConfirmDeleteDialog(Screen):
         self.dataset_id = dataset_id
 
     def compose(self) -> ComposeResult:
-        yield Container(
-            Vertical(
-                Static("[bold red]Delete Dataset?[/bold red]", classes="dialog-title"),
-                Static(f"\nAre you sure you want to delete [cyan]{self.dataset_id}[/cyan]?\n", classes="dialog-text"),
-                Static("[bold red]This action cannot be undone![/bold red]", classes="dialog-text"),
-                Static("\nPress [bold]Y[/bold] to delete or [bold]N[/bold] to cancel.", classes="dialog-text"),
-                id="confirm-dialog",
-                classes="dialog-box",
-            ),
-            id="dialog-overlay",
+        yield Vertical(
+            Static("[bold red]Delete Dataset?[/bold red]", classes="dialog-title"),
+            Static(f"\nAre you sure you want to delete [cyan]{self.dataset_id}[/cyan]?\n", classes="dialog-text"),
+            Static("[bold red]This action cannot be undone![/bold red]", classes="dialog-text"),
+            Static("\nPress [bold]Y[/bold] to delete or [bold]N[/bold] to cancel.", classes="dialog-text"),
+            id="confirm-dialog",
+            classes="dialog-box",
         )
 
     def action_confirm(self) -> None:
@@ -128,4 +122,57 @@ class ConfirmDeleteDialog(Screen):
 
     def action_cancel(self) -> None:
         """User canceled - don't delete."""
+        self.dismiss(False)
+
+
+class ConfirmExitDialog(ModalScreen[bool]):
+    """Modal dialog to confirm exiting the application."""
+
+    CSS = """
+    ConfirmExitDialog {
+        align: center middle;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .dialog-box {
+        width: 50;
+        height: auto;
+        background: $surface;
+        border: thick $primary;
+        padding: 2;
+    }
+
+    .dialog-title {
+        text-align: center;
+        width: 100%;
+    }
+
+    .dialog-text {
+        text-align: center;
+        width: 100%;
+        padding: 1;
+    }
+    """
+
+    BINDINGS = [
+        ("y", "confirm", "Yes"),
+        ("n", "cancel", "No"),
+        ("escape", "cancel", "No"),
+    ]
+
+    def compose(self) -> ComposeResult:
+        yield Vertical(
+            Static("[bold yellow]Exit Application?[/bold yellow]", classes="dialog-title"),
+            Static("\nAre you sure you want to exit Hei-DataHub?\n", classes="dialog-text"),
+            Static("Press [bold]Y[/bold] to exit or [bold]N[/bold] to cancel.", classes="dialog-text"),
+            id="confirm-dialog",
+            classes="dialog-box",
+        )
+
+    def action_confirm(self) -> None:
+        """User confirmed - exit app."""
+        self.dismiss(True)
+
+    def action_cancel(self) -> None:
+        """User canceled - stay in app."""
         self.dismiss(False)
