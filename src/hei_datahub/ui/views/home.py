@@ -76,7 +76,7 @@ class HomeScreen(Screen):
     def on_mount(self) -> None:
         """Set up the screen when mounted."""
         table = self.query_one("#results-table", DataTable)
-        table.add_columns("Name", "ID", "Description")
+        table.add_columns("Name", "ID", "Format", "Source", "Description")
         table.cursor_type = "row"
         table.show_row_labels = False
 
@@ -136,6 +136,8 @@ class HomeScreen(Screen):
                 table.add_row(
                     ("☁️ " + display_name)[:40],
                     result["id"],
+                    result.get("metadata", {}).get("file_format", "N/A"),
+                    result.get("metadata", {}).get("source", "N/A"),
                     snippet,
                     key=result["id"],
                 )
@@ -305,6 +307,8 @@ class HomeScreen(Screen):
                         table.add_row(
                             name[:40],
                             dataset_id,
+                            metadata.get("file_format", "N/A"),
+                            metadata.get("source", "N/A"),
                             description,
                             key=dataset_id,
                         )
@@ -317,6 +321,8 @@ class HomeScreen(Screen):
                     table.add_row(
                         f"📁 {dataset_id}"[:40],
                         dataset_id,
+                        "N/A",
+                        "N/A",
                         "No metadata.yaml found",
                         key=dataset_id,
                     )
@@ -432,6 +438,8 @@ class HomeScreen(Screen):
                 table.add_row(
                     (name_prefix + display_name)[:40],  # Show name with cloud icon
                     result["id"],
+                    result.get("metadata", {}).get("file_format", "N/A"),
+                    result.get("metadata", {}).get("source", "N/A"),
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
