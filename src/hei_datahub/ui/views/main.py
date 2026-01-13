@@ -17,13 +17,74 @@ logger = logging.getLogger(__name__)
 class DataHubApp(App):
     """Main TUI application with Neovim-style keybindings."""
 
+    ENABLE_COMMAND_PALETTE = False
     CSS_PATH = "../styles/base.tcss"
+
+    BINDINGS = [
+        ("ctrl+p", "commands", "Open Command Palette"),
+        ("ctrl+t", "theme_palette", "Change Theme"),
+    ]
 
     # Track WebDAV/Heibox connection status
     heibox_connected = reactive(False)
 
+    def action_commands(self) -> None:
+        """Open the custom command palette."""
+        from hei_datahub.ui.widgets.command_palette import CustomCommandPalette
+
+        def on_command_selected(action: str | None) -> None:
+            if action:
+                # Schedule execution on the next tick to ensure screen stack and focus are settled
+                self.call_later(self._exec_command, action)
+
+        self.push_screen(CustomCommandPalette(), callback=on_command_selected)
+
+    def _exec_command(self, action: str) -> None:
+        """Execute command from palette."""
+        logger.debug(f"Executing palette command: {action}")
+
+        try:
+            # 1. PRIORITY: Check if the active Screen has a direct handler.
+            # This bypasses focused widgets (like DataTable) that might swallow the event.
+            if self.screen:
+                method_name = f"action_{action}"
+                if hasattr(self.screen, method_name):
+                    getattr(self.screen, method_name)()
+                    return
+
+            # 2. Fallback: Try focused widget
+            if self.focused:
+                if self.focused.run_action(action):
+                    return
+
+            # 3. Fallback: Try screen (via bubbling if not caught above)
+            if self.screen:
+                if self.screen.run_action(action):
+                    return
+
+            # 4. Try the app (global scope)
+            if self.run_action(action):
+                return
+        except Exception as e:
+            logger.exception(f"Error executing action '{action}'")
+            self.notify(f"Error executing '{action}': {e}", severity="error")
+            return
+
+        # If nothing handled it
+        logger.warning(f"Action '{action}' was not handled by any widget/screen/app")
+        self.notify(f"Command '{action}' not found or failed", severity="error")
+
+    def action_theme_palette(self) -> None:
+        """Open the theme selection palette."""
+        from hei_datahub.ui.widgets.theme_palette import ThemePalette
+        self.push_screen(ThemePalette())
+
     def on_mount(self) -> None:
         """Initialize the app."""
+        # Register custom themes first
+        from hei_datahub.ui.themes import register_custom_themes
+        register_custom_themes(self)
+
         # Initialize logging
         from hei_datahub import __version__
         from hei_datahub.app.runtime import log_startup, setup_logging
@@ -75,11 +136,21 @@ class DataHubApp(App):
         # Check WebDAV/Heibox connection status
         self.check_heibox_connection()
 
-        # Apply theme from config
-        theme_name = self.config.get("theme.name", "gruvbox")
-        self.theme = theme_name
+        # Apply theme from config (safely)
+        try:
+            # Load theme from config, defaulting to 'gruvbox' if missing
+            if self.config:
+                theme_name = self.config.get("theme.name") or "gruvbox"
+            else:
+                theme_name = "gruvbox"
 
-        # Push home screen (will automatically load from cloud or local based on config)
+            # Apply it
+            self.theme = theme_name
+            logger.info(f"Startup: Applied theme '{self.theme}' from config")
+
+        except Exception as e:
+            logger.error(f"Startup: Failed to apply theme '{theme_name}': {e}. Falling back to default.")
+            self.theme = "textual-dark"
         self.push_screen(HomeScreen())
 
         # Check for updates (async) - after screen is mounted
@@ -190,11 +261,9 @@ class DataHubApp(App):
         """Load and apply configuration settings."""
         try:
             self.config = get_config()
-            # Config is now available for use throughout the app
-            # Keybindings are already loaded when HomeScreen class is defined
-            # Settings like search debounce, auto_sync, etc. can be accessed via self.config.get()
-        except Exception:
-            # Config system optional - app works without it
+            logger.info("Configuration loaded successfully")
+        except Exception as e:
+            logger.error(f"Failed to load configuration: {e}")
             self.config = None
 
     def reload_configuration(self) -> None:
@@ -246,10 +315,6 @@ class DataHubApp(App):
             # Update the app's theme attribute (Textual built-in)
             self.theme = theme_name
 
-            # Reload the theme manager to pick up new theme
-            from hei_datahub.ui.theme import reload_theme
-            reload_theme()
-
             # Refresh all screens to apply new theme
             self.refresh()
 
@@ -257,7 +322,7 @@ class DataHubApp(App):
             for screen in self.screen_stack:
                 screen.refresh()
 
-            self.notify(f"Theme '{theme_name}' applied successfully!", timeout=3)
+            self.notify(f"Theme '{theme_name}' applied!", timeout=2)
 
         except Exception as e:
             self.notify(f"Failed to apply theme: {str(e)}", severity="error", timeout=5)
