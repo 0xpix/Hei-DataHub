@@ -56,18 +56,24 @@ class HomeScreen(Screen):
             Container(
                 Static(logo_text, id="banner"),
                 Static("", id="update-status", classes="hidden"),
-                Input(placeholder="Search datasets...", id="search-input"),
+                Container(
+                    Input(placeholder="Search datasets...", id="search-input"),
+                    id="search-container"
+                ),
                 Static("[bold]Ctrl+P[/bold] Commands", id="search-help"),
                 id="hero-section"
             ),
 
             # Results section (hidden until search or browse)
             Container(
-                Static("🔍 Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
-                Horizontal(id="filter-badges-container", classes="filter-badges"),
-                Label("All Datasets", id="results-label"),
-                DataTable(id="results-table", cursor_type="row"),
-                id="results-section",
+                Container(
+                    Static("🔍 Mode: [bold cyan]Normal[/bold cyan]", id="mode-indicator"),
+                    Horizontal(id="filter-badges-container", classes="filter-badges"),
+                    Label("All Datasets", id="results-label"),
+                    DataTable(id="results-table", cursor_type="row"),
+                    id="results-section",
+                ),
+                id="results-wrapper",
                 classes="hidden",
             ),
             id="main-container",
@@ -113,10 +119,10 @@ class HomeScreen(Screen):
             footer = self.query_one("#contextual-footer", ContextualFooter)
             search_input = self.query_one("#search-input", Input)
             table = self.query_one("#results-table", DataTable)
-            results_section = self.query_one("#results-section")
+            results_wrapper = self.query_one("#results-wrapper")
 
             # Check if results are visible
-            results_visible = "hidden" not in results_section.classes
+            results_visible = "hidden" not in results_wrapper.classes
 
             if table.has_focus and results_visible:
                 footer.set_context("results")
@@ -393,7 +399,7 @@ class HomeScreen(Screen):
 
     def _toggle_results_view(self, show: bool) -> None:
         """Toggle between splash screen and results view."""
-        results = self.query_one("#results-section")
+        results = self.query_one("#results-wrapper")
         hero = self.query_one("#hero-section")
 
         if show:
