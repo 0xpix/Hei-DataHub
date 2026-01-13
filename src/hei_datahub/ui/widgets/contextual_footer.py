@@ -99,6 +99,12 @@ class ContextualFooter(Widget):
             ("Enter", "Select"),
             ("Esc", "Back"),
         ],
+        "about": [
+            ("j/k", "Scroll"),
+            ("gg", "Top"),
+            ("G", "Bottom"),
+            ("Esc", "Back"),
+        ],
     }
 
     def compose(self) -> ComposeResult:
