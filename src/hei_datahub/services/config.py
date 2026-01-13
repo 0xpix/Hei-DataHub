@@ -284,8 +284,6 @@ class ConfigManager:
                         f.write(f"    {k}: {v}\n")
                 f.write("  stylesheets: []  # List of custom TCSS file paths\n")
                 f.write("  tokens: null     # Path to design tokens YAML (optional)\n")
-                f.write("  stylesheets: []  # List of custom TCSS file paths\n")
-                f.write("  tokens: null     # Path to design tokens YAML (optional)\n")
                 f.write("\n")
 
                 # Write keybindings section
