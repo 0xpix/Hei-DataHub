@@ -92,6 +92,14 @@ def format_logo(text: str, config) -> str:
     padding_top = logo_config.get("padding_top", 0)
     padding_bottom = logo_config.get("padding_bottom", 1)
 
+    # Normalize line widths to prevent alignment issues from trailing whitespace
+    # being stripped by editors/formatters
+    lines = text.rstrip("\n").splitlines()
+    if lines:
+        max_width = max(len(line) for line in lines)
+        lines = [line.ljust(max_width) for line in lines]
+        text = "\n".join(lines)
+
     # Add color markup - wrap entire block, not line by line
     # Add padding
     padding_top_lines = [""] * padding_top
