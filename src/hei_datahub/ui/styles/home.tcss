@@ -22,8 +22,10 @@
 }
 
 #hero-section.compact {
-    margin-top: 3;
+    margin-top: 5;
     padding: 1;
+    width: 100%;
+    align: center top;
 }
 
 #banner {
@@ -41,8 +43,18 @@
     display: none;
 }
 
-#search-input {
+#search-container {
     width: 100%;
+    height: auto;
+    align: center top;
+}
+
+#hero-section.compact #search-input {
+    width: 40%;
+}
+
+#search-input {
+    width: 60%;
     border: none;
     background: $surface;
     color: $text;
@@ -76,9 +88,15 @@
     width: 100%;
 }
 
-#results-section {
+#results-wrapper {
     height: 1fr;
-    width: 60%;
+    width: 100%;
+    align: center top;
+}
+
+#results-section {
+    height: 100%;
+    width: 40%;
     margin-top: 1;
 }
 
@@ -86,7 +104,7 @@
     width: 100%;
 }
 
-#results-section.hidden {
+#results-wrapper.hidden {
     display: none;
 }
 
