@@ -90,6 +90,13 @@ class HomeScreen(Screen):
         # Setup search autocomplete
         self._setup_search_autocomplete()
 
+    def on_screen_resume(self) -> None:
+        """Called when returning to this screen from a pushed screen."""
+        # Update footer context when coming back from dataset details, etc.
+        self._update_footer_context()
+        # Focus search input
+        self.query_one("#search-input").focus()
+
         # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
 
