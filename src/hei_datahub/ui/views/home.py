@@ -22,6 +22,7 @@ from textual.widgets import (
 
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.utils.keybindings import build_home_bindings
+from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ class HomeScreen(Screen):
                 Static(logo_text, id="banner"),
                 Static("", id="update-status", classes="hidden"),
                 Input(placeholder="Search datasets...", id="search-input"),
-                Static("Press [bold]?[/bold] for shortcuts", id="search-help"),
+                Static("[bold]Ctrl+P[/bold] Commands", id="search-help"),
                 id="hero-section"
             ),
 
@@ -71,7 +72,7 @@ class HomeScreen(Screen):
             ),
             id="main-container",
         )
-        yield Footer()
+        yield ContextualFooter(id="contextual-footer")
 
     def on_mount(self) -> None:
         """Set up the screen when mounted."""
@@ -83,6 +84,9 @@ class HomeScreen(Screen):
         # Focus search input on start
         self.query_one("#search-input").focus()
 
+        # Set initial footer context (home = no shortcuts)
+        self._update_footer_context()
+
         # Setup search autocomplete
         self._setup_search_autocomplete()
 
@@ -91,6 +95,30 @@ class HomeScreen(Screen):
 
         # Set up a very fast timer to reload when indexer finishes (100ms checks)
         self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
+
+    def on_descendant_focus(self, event) -> None:
+        """Update footer when focus changes."""
+        self._update_footer_context()
+
+    def _update_footer_context(self) -> None:
+        """Update the contextual footer based on current state."""
+        try:
+            footer = self.query_one("#contextual-footer", ContextualFooter)
+            search_input = self.query_one("#search-input", Input)
+            table = self.query_one("#results-table", DataTable)
+            results_section = self.query_one("#results-section")
+
+            # Check if results are visible
+            results_visible = "hidden" not in results_section.classes
+
+            if table.has_focus and results_visible:
+                footer.set_context("results")
+            elif search_input.has_focus and results_visible:
+                footer.set_context("results")  # Show results shortcuts while in search with results
+            else:
+                footer.set_context("home")  # No shortcuts on home
+        except Exception:
+            pass  # Footer not mounted yet
 
     def _check_indexer_and_reload(self) -> None:
         """Check if indexer is ready and add new datasets incrementally.
