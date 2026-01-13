@@ -165,11 +165,17 @@ AddDataScreen #probe-status {
 }
 
 AddDataScreen #error-message {
-    background: $error 10%;
-    border: round $error 30%;
     color: $error;
     margin-top: 1;
     margin-bottom: 2;
+    height: auto;
+    width: auto;
+}
+
+AddDataScreen #error-message.visible {
+    background: $error 10%;
+    border: round $error 30%;
+    padding: 1;
 }
 
 AddDataScreen #probe-status {
@@ -182,4 +188,16 @@ AddDataScreen .title {
     text-style: bold;
     padding: 1;
     margin: 1 0 2 0;
+}
+
+AddDataScreen #optional-container {
+    height: auto;
+}
+
+AddDataScreen #optional-container.hidden {
+    display: none;
+}
+
+.small-textarea {
+    height: 5;
 }
