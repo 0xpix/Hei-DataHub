@@ -10,6 +10,15 @@ Screen {
     layout: vertical;
 }
 
+/* Fix for Textual 0.47+ Input widget dim color issue
+   When applying dim effect, Textual needs a solid background color to blend with.
+   Default Inputs sometimes have transparent/default background which causes TypeError.
+*/
+Input {
+    background: $surface;
+    color: $text;
+}
+
 /* Global Header defaults */
 Header {
     dock: top;
