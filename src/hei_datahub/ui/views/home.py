@@ -747,32 +747,43 @@ class HomeScreen(Screen):
 
     @on(Input.Submitted, "#search-input")
     def on_search_submitted(self) -> None:
-        """Handle search submission - move focus to table."""
+        """Handle search submission - move focus to table only if there's a query and results."""
+        search_input = self.query_one("#search-input", Input)
         table = self.query_one("#results-table", DataTable)
-        if table.row_count > 0:
+
+        # Only move to table if:
+        # 1. There's an actual search query (not empty)
+        # 2. There are results to navigate
+        if search_input.value.strip() and table.row_count > 0:
+            # Set flag to prevent action_open_details from firing on same Enter press
+            self._search_just_submitted = True
+            # Move focus to table so user can navigate with j/k
             table.focus()
+            # Ensure cursor is at first row so it's visible
+            table.cursor_coordinate = (0, 0)
             self.search_mode = False
+        # Otherwise, do nothing - stay in search bar
 
     def action_clear_search(self) -> None:
         """Clear search or exit insert mode, or confirm exit if nothing to clear."""
         search_input = self.query_one("#search-input", Input)
+        table = self.query_one("#results-table", DataTable)
 
         if self.search_mode:
-            # Exit insert mode
-            table = self.query_one("#results-table", DataTable)
-            table.focus()
+            # Exit insert mode - focus search bar (not table)
+            search_input.focus()
             self.search_mode = False
         elif search_input.value:
-            # Clear search
+            # Clear search and refocus search bar
             search_input.value = ""
             self.load_all_datasets()
-        elif not search_input.has_focus:
-            # Nothing to clear and not in search input - show exit confirmation
+            search_input.focus()
+        elif table.has_focus:
+            # Table is focused with no search - show exit confirmation
             self._show_exit_confirmation()
         else:
-            # Focus table
-            table = self.query_one("#results-table", DataTable)
-            table.focus()
+            # Already on search bar with nothing to clear - show exit confirmation
+            self._show_exit_confirmation()
 
     def _show_exit_confirmation(self) -> None:
         """Show exit confirmation dialog."""
@@ -815,8 +826,23 @@ class HomeScreen(Screen):
 
     def action_open_details(self) -> None:
         """Open details for selected dataset or cloud file."""
+        # Prevent opening if Enter was just pressed in search bar
+        if getattr(self, '_search_just_submitted', False):
+            self._search_just_submitted = False
+            return
+
+        # Don't open if search input has focus (Enter in search bar shouldn't open)
+        search_input = self.query_one("#search-input", Input)
+        if search_input.has_focus:
+            return
+
         table = self.query_one("#results-table", DataTable)
-        if table.row_count > 0 and table.cursor_row < table.row_count:
+        # Only open if table has focus and has data
+        if not table.has_focus:
+            return
+        if table.row_count == 0:
+            return
+        if table.cursor_row < table.row_count:
             # Get the row key properly
             try:
                 row_key = table.get_row_at(table.cursor_row)[0]
