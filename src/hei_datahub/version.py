@@ -5,6 +5,7 @@ This module reads version data directly from version.yaml at runtime.
 For version updates, simply edit version.yaml - no sync step needed!
 """
 from pathlib import Path
+import sys
 
 import yaml
 
