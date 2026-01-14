@@ -1,0 +1,242 @@
+name: Update AUR Package
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag/version to publish to AUR'
+        required: true
+        type: string
+
+jobs:
+  update-aur:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Wait for release assets
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
+
+          echo "Waiting for AppImage to be available at:"
+          echo "$APPIMAGE_URL"
+
+          # Wait up to 10 minutes for the release asset
+          for i in {1..60}; do
+            if curl -sLI "$APPIMAGE_URL" | grep -q "200 OK\|HTTP/2 200"; then
+              echo "AppImage is available!"
+              exit 0
+            fi
+            echo "Attempt $i/60 - AppImage not yet available, waiting 10s..."
+            sleep 10
+          done
+
+          echo "ERROR: AppImage not available after 10 minutes"
+          exit 1
+
+      - name: Download AppImage and compute checksum
+        id: checksum
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
+
+          echo "Downloading AppImage..."
+          curl -L -o "HeiDataHub.AppImage" "$APPIMAGE_URL"
+
+          APPIMAGE_SHA256=$(sha256sum "HeiDataHub.AppImage" | cut -d' ' -f1)
+          echo "appimage_sha256=$APPIMAGE_SHA256" >> $GITHUB_OUTPUT
+          echo "AppImage SHA256: $APPIMAGE_SHA256"
+
+          # Download icon and compute checksum
+          curl -L -o "icon.png" "https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
+          ICON_SHA256=$(sha256sum "icon.png" | cut -d' ' -f1)
+          echo "icon_sha256=$ICON_SHA256" >> $GITHUB_OUTPUT
+          echo "Icon SHA256: $ICON_SHA256"
+
+      - name: Compute desktop file checksum
+        id: desktop_checksum
+        run: |
+          DESKTOP_SHA256=$(sha256sum "aur/hei-datahub.desktop" | cut -d' ' -f1)
+          echo "desktop_sha256=$DESKTOP_SHA256" >> $GITHUB_OUTPUT
+          echo "Desktop SHA256: $DESKTOP_SHA256"
+
+      - name: Generate updated PKGBUILD
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
+          DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
+          ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
+
+          cat > aur/PKGBUILD << EOF
+          # Maintainer: Hei-DataHub <noreply@example.com>
+          # AUR package for Hei-DataHub
+          # Installs the AppImage system-wide with desktop integration
+
+          pkgname=hei-datahub
+          pkgver=${VERSION}
+          pkgrel=1
+          pkgdesc="Lightweight local data hub with TUI for managing datasets"
+          arch=('x86_64')
+          url="https://github.com/0xpix/Hei-DataHub"
+          license=('MIT')
+          depends=('fuse2')
+          options=('!strip')
+          source=(
+              "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/\${pkgver}/HeiDataHub-\${pkgver}-x86_64.AppImage"
+              "hei-datahub.desktop"
+              "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
+          )
+          sha256sums=(
+              '${APPIMAGE_SHA256}'
+              '${DESKTOP_SHA256}'
+              '${ICON_SHA256}'
+          )
+
+          package() {
+              # Create directories
+              install -dm755 "\${pkgdir}/opt/\${pkgname}"
+              install -dm755 "\${pkgdir}/usr/bin"
+              install -dm755 "\${pkgdir}/usr/share/applications"
+              install -dm755 "\${pkgdir}/usr/share/icons/hicolor/256x256/apps"
+              install -dm755 "\${pkgdir}/usr/share/licenses/\${pkgname}"
+
+              # Install AppImage
+              install -Dm755 "HeiDataHub-\${pkgver}-x86_64.AppImage" "\${pkgdir}/opt/\${pkgname}/HeiDataHub.AppImage"
+
+              # Create wrapper script
+              cat > "\${pkgdir}/usr/bin/\${pkgname}" << 'WRAPPER'
+          #!/bin/bash
+          # Wrapper script for Hei-DataHub AppImage
+          exec /opt/hei-datahub/HeiDataHub.AppImage "\$@"
+          WRAPPER
+              chmod 755 "\${pkgdir}/usr/bin/\${pkgname}"
+
+              # Install desktop entry
+              install -Dm644 "hei-datahub.desktop" "\${pkgdir}/usr/share/applications/hei-datahub.desktop"
+
+              # Install icon
+              install -Dm644 "hei-datahub.png" "\${pkgdir}/usr/share/icons/hicolor/256x256/apps/hei-datahub.png"
+
+              # Install license (fetch from upstream)
+              curl -sL "https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/LICENSE" \\
+                  > "\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"
+          }
+          EOF
+
+          echo "Generated PKGBUILD:"
+          cat aur/PKGBUILD
+
+      - name: Generate .SRCINFO
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
+          DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
+          ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
+
+          cat > aur/.SRCINFO << EOF
+          pkgbase = hei-datahub
+          	pkgdesc = Lightweight local data hub with TUI for managing datasets
+          	pkgver = ${VERSION}
+          	pkgrel = 1
+          	url = https://github.com/0xpix/Hei-DataHub
+          	arch = x86_64
+          	license = MIT
+          	depends = fuse2
+          	options = !strip
+          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
+          	source = hei-datahub.desktop
+          	source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
+          	sha256sums = ${APPIMAGE_SHA256}
+          	sha256sums = ${DESKTOP_SHA256}
+          	sha256sums = ${ICON_SHA256}
+
+          pkgname = hei-datahub
+          EOF
+
+          echo "Generated .SRCINFO:"
+          cat aur/.SRCINFO
+
+      - name: Setup SSH for AUR
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+        run: |
+          if [[ -z "$AUR_SSH_KEY" ]]; then
+            echo "WARNING: AUR_SSH_KEY not set, skipping AUR push"
+            echo "To enable AUR publishing:"
+            echo "1. Generate SSH key: ssh-keygen -t ed25519 -f aur_key -N ''"
+            echo "2. Add public key to AUR account"
+            echo "3. Add private key as AUR_SSH_KEY secret in GitHub"
+            exit 0
+          fi
+
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_KEY" > ~/.ssh/aur_key
+          chmod 600 ~/.ssh/aur_key
+
+          cat >> ~/.ssh/config << EOF
+          Host aur.archlinux.org
+            IdentityFile ~/.ssh/aur_key
+            User aur
+            StrictHostKeyChecking no
+          EOF
+
+      - name: Clone AUR repo and push updates
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+        run: |
+          if [[ -z "$AUR_SSH_KEY" ]]; then
+            echo "Skipping AUR push (no SSH key configured)"
+            exit 0
+          fi
+
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Clone AUR repo
+          git clone ssh://aur@aur.archlinux.org/hei-datahub.git aur-repo || {
+            echo "AUR repo doesn't exist yet. Create it first at:"
+            echo "https://aur.archlinux.org/pkgbase/hei-datahub/submit/"
+            exit 1
+          }
+
+          # Copy updated files
+          cp aur/PKGBUILD aur-repo/
+          cp aur/.SRCINFO aur-repo/
+          cp aur/hei-datahub.desktop aur-repo/
+
+          # Commit and push
+          cd aur-repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Update to version ${VERSION}" || echo "No changes to commit"
+          git push origin master
+
+      - name: Summary
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "## AUR Package Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package:** hei-datahub" >> $GITHUB_STEP_SUMMARY
+          echo "- **AppImage SHA256:** ${{ steps.checksum.outputs.appimage_sha256 }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Install on Arch Linux" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo 'yay -S hei-datahub' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
