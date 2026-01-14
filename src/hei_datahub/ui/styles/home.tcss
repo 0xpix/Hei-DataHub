@@ -96,7 +96,7 @@
 
 #results-section {
     height: 100%;
-    width: 40%;
+    width: 60%;
     margin-top: 1;
 }
 
