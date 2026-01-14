@@ -82,7 +82,7 @@ class HomeScreen(Screen):
     def on_mount(self) -> None:
         """Set up the screen when mounted."""
         table = self.query_one("#results-table", DataTable)
-        table.add_columns("Name", "ID", "Format", "Source", "Description")
+        table.add_columns("ID", "Description", "Spatial", "Temporal", "Format", "Category")
         table.cursor_type = "row"
         table.show_row_labels = False
 
@@ -175,17 +175,18 @@ class HomeScreen(Screen):
                 snippet = result.get("snippet", "")
                 if not snippet or snippet.strip() == "":
                     description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:80] + "..." if len(description) > 80 else description
+                    snippet = description[:40] + "..." if len(description) > 40 else description
                 else:
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+                    snippet = snippet[:40] + "..." if len(snippet) > 40 else snippet
 
                 table.add_row(
-                    ("☁️ " + display_name)[:40],
                     result["id"],
-                    result.get("metadata", {}).get("file_format", "N/A"),
-                    result.get("metadata", {}).get("source", "N/A"),
                     snippet,
+                    (result.get("metadata", {}).get("spatial_coverage") or "N/A")[:20],
+                    (result.get("metadata", {}).get("temporal_coverage") or "N/A")[:20],
+                    result.get("metadata", {}).get("file_format") or "N/A",
+                    result.get("metadata", {}).get("category") or "N/A",
                     key=result["id"],
                 )
                 logger.info(f"Timer added dataset to table: {display_name}")
@@ -292,11 +293,12 @@ class HomeScreen(Screen):
                 display_name = result["name"]  # Use metadata name, not folder path
 
                 table.add_row(
-                    (name_prefix + display_name)[:40],  # Show name with cloud icon
                     result["id"],
-                    result.get("metadata", {}).get("file_format", "N/A"),
-                    result.get("metadata", {}).get("source", "N/A"),
                     snippet,
+                    (result.get("metadata", {}).get("spatial_coverage") or "N/A")[:20],
+                    (result.get("metadata", {}).get("temporal_coverage") or "N/A")[:20],
+                    result.get("metadata", {}).get("file_format") or "N/A",
+                    result.get("metadata", {}).get("category") or "N/A",
                     key=result["id"],  # Use folder path as internal key
                 )
 
@@ -351,7 +353,7 @@ class HomeScreen(Screen):
                         description = metadata.get('description', 'No description')
 
                         # Truncate for display
-                        description = description[:80] + "..." if len(description) > 80 else description
+                        description = description[:40] + "..." if len(description) > 40 else description
 
                         table.add_row(
                             name[:40],
@@ -474,22 +476,23 @@ class HomeScreen(Screen):
                 if not snippet or snippet.strip() == "":
                     # Use description from metadata if snippet is empty
                     description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:80] + "..." if len(description) > 80 else description
+                    snippet = description[:40] + "..." if len(description) > 40 else description
                 else:
                     # Clean snippet of HTML tags for display
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+                    snippet = snippet[:40] + "..." if len(snippet) > 40 else snippet
 
                 # All datasets are cloud now
                 name_prefix = "☁️ "
                 display_name = result["name"]  # Use metadata name, not folder path
 
                 table.add_row(
-                    (name_prefix + display_name)[:40],  # Show name with cloud icon
                     result["id"],
-                    result.get("metadata", {}).get("file_format", "N/A"),
-                    result.get("metadata", {}).get("source", "N/A"),
                     snippet,
+                    (result.get("metadata", {}).get("spatial_coverage") or "N/A")[:20],
+                    (result.get("metadata", {}).get("temporal_coverage") or "N/A")[:20],
+                    result.get("metadata", {}).get("file_format") or "N/A",
+                    result.get("metadata", {}).get("category") or "N/A",
                     key=result["id"],  # Use folder path as internal key
                 )
                 logger.info(f"Added to table: {display_name}")
@@ -580,7 +583,7 @@ class HomeScreen(Screen):
                 if metadata:
                     name = metadata.get('name', dataset_id)
                     description = metadata.get('description', 'No description')
-                    description = description[:80] + "..." if len(description) > 80 else description
+                    description = description[:40] + "..." if len(description) > 40 else description
 
                     table.add_row(
                         name[:40],
