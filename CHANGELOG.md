@@ -9,19 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.63.0-beta] - 2026-01-14 - Multi-Platform CI/CD
 
-**Full CI/CD Pipeline & Cross-Platform Distribution!** This release introduces automated builds and distribution for Windows, Linux, and macOS.
+**Full CI/CD Pipeline & Cross-Platform Distribution!** This release introduces automated builds and distribution for Windows and Linux, MacOS coming soon.
 
 ### Added
 
 - **GitHub Actions CI/CD Workflows**
   - `windows-build.yml` - Builds Windows `.exe` and NSIS installer
   - `linux-build.yml` - Builds Linux binary, `.deb` package, and `.AppImage`
-  - `macos-build.yml` - Builds macOS binary, `.app` bundle, `.zip`, and `.dmg`
   - `aur-publish.yml` - Automatic AUR package updates on new releases
 
 - **Build Scripts**
   - `scripts/build_linux.sh` - Linux build with PyInstaller, creates `.deb` and `.AppImage`
-  - `scripts/build_macos.sh` - macOS build with PyInstaller, creates `.app`, `.zip`, and `.dmg`
 
 - **AUR Package** - Hei-DataHub is now available on Arch Linux via AUR
   - Install with: `yay -S hei-datahub`
@@ -36,9 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Platform | Formats |
 |----------|---------|
-| Windows  | `.exe` (standalone), `.exe` (NSIS installer) |
+| Windows  | `.exe` (portable), `.exe` (NSIS installer) |
 | Linux    | Binary, `.deb`, `.AppImage` |
-| macOS    | Binary, `.app`, `.zip`, `.dmg` |
 | Arch     | AUR package (`hei-datahub`) |
 
 ---

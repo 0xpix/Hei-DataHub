@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.62.0-beta"
-codename: "Re-design"
-release_date: "2026-01-13"
-compatibility: "Hei-DataHub v0.62.x (beta)"
-notes: "Hotfix release - Authentication wizard fixes, desktop integration improvements, and removal of legacy code."
+version: "0.63.0-beta"
+codename: "Cross-Platform Polish"
+release_date: "2026-01-14"
+compatibility: "Hei-DataHub v0.63.x (beta)"
+notes: "This is a beta release featuring cross-platform enhancements and UI polish."
 
 # Additional metadata
 app_name: "Hei-DataHub"
