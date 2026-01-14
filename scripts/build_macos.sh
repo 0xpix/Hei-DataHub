@@ -340,8 +340,18 @@ mkdir -p "$APP_DIR/Contents/MacOS"
 mkdir -p "$APP_DIR/Contents/Resources"
 
 # Copy binary
+log_info "Copying binary from $DIST_DIR/hei-datahub to $APP_DIR/Contents/MacOS/hei-datahub"
 cp "$DIST_DIR/hei-datahub" "$APP_DIR/Contents/MacOS/hei-datahub"
 chmod +x "$APP_DIR/Contents/MacOS/hei-datahub"
+
+# Verify binary was copied
+if [[ -f "$APP_DIR/Contents/MacOS/hei-datahub" ]]; then
+    COPIED_SIZE=$(du -h "$APP_DIR/Contents/MacOS/hei-datahub" | cut -f1)
+    log_success "Binary copied successfully: $COPIED_SIZE"
+else
+    log_error "Failed to copy binary to app bundle!"
+    exit 1
+fi
 
 # Create launcher script that opens Terminal (TUI app needs terminal)
 # This MUST be created before Info.plist references it
@@ -415,10 +425,16 @@ fi
 
 log_success "Created .app bundle: ${APP_NAME}.app"
 
+# Debug: show app bundle contents before zipping
+log_info "App bundle contents:"
+ls -la "$APP_DIR/Contents/MacOS/"
+du -sh "$APP_DIR"
+
 # Create ZIP of the .app bundle
 ZIP_OUTPUT="$RELEASE_DIR/${OUTPUT_BASE}.zip"
 cd "$PACKAGING_DIR"
-zip -r "$ZIP_OUTPUT" "${APP_NAME}.app"
+# Use -y to store symlinks as symlinks, -r for recursive
+zip -ry "$ZIP_OUTPUT" "${APP_NAME}.app"
 cd "$PROJECT_ROOT"
 ZIP_SIZE=$(du -h "$ZIP_OUTPUT" | cut -f1)
 log_success "Created: ${OUTPUT_BASE}.zip ($ZIP_SIZE)"
