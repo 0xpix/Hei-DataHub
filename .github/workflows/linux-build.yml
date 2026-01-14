@@ -1,0 +1,125 @@
+name: Linux Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - release/*
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev fuse libfuse2
+
+      - name: Print environment info
+        run: |
+          echo "=== OS Information ==="
+          uname -a
+          cat /etc/os-release
+          echo ""
+          echo "=== Python Information ==="
+          python3 --version
+          uv --version
+          echo ""
+          echo "=== GitHub Context ==="
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref Name: ${{ github.ref_name }}"
+          echo "Ref Type: ${{ github.ref_type }}"
+          echo "SHA: ${{ github.sha }}"
+
+      - name: Make build script executable
+        run: chmod +x scripts/build_linux.sh
+
+      - name: Run Linux build script
+        run: ./scripts/build_linux.sh
+
+      - name: Debug - List output directories
+        if: always()
+        run: |
+          echo "=== Listing dist/ directory ==="
+          ls -la dist || echo "dist/ directory does not exist"
+          echo ""
+          echo "=== Listing release/ directory ==="
+          ls -la release || echo "release/ directory does not exist"
+          echo ""
+          echo "=== Listing build/ directory (top level) ==="
+          ls -la build 2>/dev/null | head -20 || echo "build/ directory does not exist"
+
+      - name: Verify build outputs
+        run: |
+          if [ ! -d "release" ] || [ -z "$(ls -A release 2>/dev/null)" ]; then
+            echo "ERROR: No build outputs found in release/"
+            exit 1
+          fi
+
+          # Check for .deb
+          if ! ls release/*.deb 1>/dev/null 2>&1; then
+            echo "ERROR: No .deb package found in release/"
+            exit 1
+          fi
+
+          # Check for .AppImage
+          if ! ls release/*.AppImage 1>/dev/null 2>&1; then
+            echo "ERROR: No .AppImage found in release/"
+            exit 1
+          fi
+
+          echo "Build outputs verified:"
+          ls -la release/
+
+      - name: Get artifact info
+        id: artifact
+        run: |
+          # Get the artifact filename
+          ARTIFACT_FILE=$(ls release/ | head -1)
+          echo "artifact_file=$ARTIFACT_FILE" >> $GITHUB_OUTPUT
+
+          # Get short SHA
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+          # Get ref name for artifact naming (sanitize for artifact name)
+          REF_NAME=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          echo "ref_name=$REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeiDataHub-linux-${{ steps.artifact.outputs.ref_name }}-${{ steps.artifact.outputs.short_sha }}
+          path: release/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload to GitHub Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
