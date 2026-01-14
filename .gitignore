@@ -8,6 +8,8 @@ __pycache__/
 # --- Build & Distribution ---
 build/
 dist/
+*.egg-info/
+.eggs/
 MANIFEST
 *.manifest
 *.spec
