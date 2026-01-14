@@ -339,14 +339,15 @@ APP_DIR="$PACKAGING_DIR/${APP_NAME}.app"
 mkdir -p "$APP_DIR/Contents/MacOS"
 mkdir -p "$APP_DIR/Contents/Resources"
 
-# Copy binary
-log_info "Copying binary from $DIST_DIR/hei-datahub to $APP_DIR/Contents/MacOS/hei-datahub"
-cp "$DIST_DIR/hei-datahub" "$APP_DIR/Contents/MacOS/hei-datahub"
-chmod +x "$APP_DIR/Contents/MacOS/hei-datahub"
+# Copy binary with a distinct name (macOS filesystem is case-insensitive!)
+# Using "hei-datahub-bin" to avoid collision with launcher script
+log_info "Copying binary from $DIST_DIR/hei-datahub to $APP_DIR/Contents/MacOS/hei-datahub-bin"
+cp "$DIST_DIR/hei-datahub" "$APP_DIR/Contents/MacOS/hei-datahub-bin"
+chmod +x "$APP_DIR/Contents/MacOS/hei-datahub-bin"
 
 # Verify binary was copied
-if [[ -f "$APP_DIR/Contents/MacOS/hei-datahub" ]]; then
-    COPIED_SIZE=$(du -h "$APP_DIR/Contents/MacOS/hei-datahub" | cut -f1)
+if [[ -f "$APP_DIR/Contents/MacOS/hei-datahub-bin" ]]; then
+    COPIED_SIZE=$(du -h "$APP_DIR/Contents/MacOS/hei-datahub-bin" | cut -f1)
     log_success "Binary copied successfully: $COPIED_SIZE"
 else
     log_error "Failed to copy binary to app bundle!"
@@ -354,12 +355,12 @@ else
 fi
 
 # Create launcher script that opens Terminal (TUI app needs terminal)
-# This MUST be created before Info.plist references it
+# This is the main executable referenced by Info.plist
 cat > "$APP_DIR/Contents/MacOS/Hei-DataHub" << 'LAUNCHER'
 #!/bin/bash
 # Hei-DataHub Launcher - Opens TUI app in Terminal
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BINARY="${DIR}/hei-datahub"
+BINARY="${DIR}/hei-datahub-bin"
 
 # Check if we're already in a terminal
 if [ -t 0 ]; then
