@@ -8,7 +8,7 @@ on:
       - main
       - release/*
     tags:
-      - 'v*'
+      - '*'
 
 permissions:
   contents: write
