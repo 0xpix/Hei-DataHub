@@ -4,15 +4,20 @@ on:
   pull_request:
     paths:
       - 'version.yaml'
+      - 'src/hei_datahub/version.yaml'
       - 'src/hei_datahub/version.py'
       - 'pyproject.toml'
-      - 'README.md'
+      - 'scripts/check_version_consistency.py'
+      - 'scripts/test_version.py'
   push:
     branches:
       - main
     paths:
       - 'version.yaml'
+      - 'src/hei_datahub/version.yaml'
       - 'src/hei_datahub/version.py'
+      - 'pyproject.toml'
+
 
 jobs:
   check-version-consistency:
@@ -28,7 +33,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyyaml
+          pip install --upgrade pip
+          pip install pyyaml tomli
+
+      - name: Debug paths
+        run: |
+          ls -R scripts
+          ls -R src/hei_datahub
+
 
       - name: Check version consistency
         run: |
