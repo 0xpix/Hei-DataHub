@@ -1,0 +1,148 @@
+name: Windows Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          choco install nsis -y
+          # Add NSIS to PATH
+          $nsisPath = "C:\Program Files (x86)\NSIS"
+          if (Test-Path $nsisPath) {
+            echo "$nsisPath" >> $env:GITHUB_PATH
+          }
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -e .
+
+      - name: Create config.yaml placeholder
+        shell: pwsh
+        run: |
+          # Create empty config.yaml if it doesn't exist (required by build script)
+          if (-not (Test-Path "config.yaml")) {
+            @"
+          # Placeholder config for build
+          "@  | Out-File -FilePath "config.yaml" -Encoding utf8
+          }
+
+      - name: Run Windows build script
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps1
+
+      - name: Debug - List output directories
+        shell: pwsh
+        if: always()
+        run: |
+          Write-Host "=== Listing dist/ directory ===" -ForegroundColor Cyan
+          if (Test-Path "dist") {
+            Get-ChildItem -Path "dist" -Recurse | Format-Table Name, Length, LastWriteTime
+          } else {
+            Write-Host "dist/ directory does not exist"
+          }
+
+          Write-Host "`n=== Listing release/ directory ===" -ForegroundColor Cyan
+          if (Test-Path "release") {
+            Get-ChildItem -Path "release" -Recurse | Format-Table Name, Length, LastWriteTime
+          } else {
+            Write-Host "release/ directory does not exist"
+          }
+
+          Write-Host "`n=== Listing build/ directory ===" -ForegroundColor Cyan
+          if (Test-Path "build") {
+            Get-ChildItem -Path "build" -Recurse -Depth 1 | Format-Table Name, Length, LastWriteTime
+          } else {
+            Write-Host "build/ directory does not exist"
+          }
+
+      - name: Verify build outputs
+        shell: pwsh
+        run: |
+          $distDir = "dist"
+          $exePath = Join-Path $distDir "hei-datahub.exe"
+          $setupPath = Join-Path $distDir "hei-datahub-setup.exe"
+
+          $hasOutputs = $false
+
+          if (Test-Path $exePath) {
+            Write-Host "Found: $exePath" -ForegroundColor Green
+            $hasOutputs = $true
+          }
+
+          if (Test-Path $setupPath) {
+            Write-Host "Found: $setupPath" -ForegroundColor Green
+            $hasOutputs = $true
+          }
+
+          if (-not $hasOutputs) {
+            Write-Host "ERROR: No build outputs found in dist/" -ForegroundColor Red
+            Write-Host "Expected: hei-datahub.exe and/or hei-datahub-setup.exe"
+            exit 1
+          }
+
+      - name: Get version info
+        id: version
+        shell: pwsh
+        run: |
+          # Extract version from version.yaml
+          $versionFile = "version.yaml"
+          if (Test-Path $versionFile) {
+            $content = Get-Content $versionFile -Raw
+            if ($content -match 'version:\s*[''"]?([0-9]+\.[0-9]+[^''"]*)[''"]?') {
+              $version = $matches[1]
+              Write-Host "Version: $version"
+              echo "version=$version" >> $env:GITHUB_OUTPUT
+            }
+          }
+
+          # Get short SHA
+          $shortSha = "${{ github.sha }}".Substring(0, 7)
+          echo "short_sha=$shortSha" >> $env:GITHUB_OUTPUT
+
+          # Determine ref name for artifact naming
+          $refName = "${{ github.ref_name }}" -replace '[^a-zA-Z0-9._-]', '-'
+          echo "ref_name=$refName" >> $env:GITHUB_OUTPUT
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeiDataHub-windows-${{ steps.version.outputs.ref_name }}-${{ steps.version.outputs.short_sha }}
+          path: |
+            dist/hei-datahub.exe
+            dist/hei-datahub-setup.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/hei-datahub.exe
+            dist/hei-datahub-setup.exe
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
