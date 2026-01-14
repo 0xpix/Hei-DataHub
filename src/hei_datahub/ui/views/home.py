@@ -99,11 +99,16 @@ class HomeScreen(Screen):
         """Called when returning to this screen from a pushed screen."""
         # Update footer context when coming back from dataset details, etc.
         self._update_footer_context()
-        # Focus search input
-        self.query_one("#search-input").focus()
 
         # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
+
+        # Focus results table if there are results, otherwise search bar
+        table = self.query_one("#results-table", DataTable)
+        if table.row_count > 0:
+            table.focus()
+        else:
+            self.query_one("#search-input").focus()
 
         # Set up a very fast timer to reload when indexer finishes (100ms checks)
         self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
@@ -289,6 +294,8 @@ class HomeScreen(Screen):
                 table.add_row(
                     (name_prefix + display_name)[:40],  # Show name with cloud icon
                     result["id"],
+                    result.get("metadata", {}).get("file_format", "N/A"),
+                    result.get("metadata", {}).get("source", "N/A"),
                     snippet,
                     key=result["id"],  # Use folder path as internal key
                 )
