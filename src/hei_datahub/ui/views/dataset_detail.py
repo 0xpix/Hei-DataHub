@@ -4,6 +4,7 @@ Cloud dataset details screen.
 import logging
 import os
 import tempfile
+import time
 
 import yaml
 from textual import work
@@ -15,6 +16,22 @@ from textual.widgets import (
     Label,
     Static,
 )
+
+# Simple in-memory cache for metadata to avoid refetching on every view
+# Key: dataset_id, Value: (metadata_dict, timestamp)
+_METADATA_CACHE = {}
+
+def clear_metadata_cache(dataset_id: str = None) -> None:
+    """Clear metadata cache for specific dataset or all."""
+    if dataset_id:
+        if dataset_id in _METADATA_CACHE:
+            del _METADATA_CACHE[dataset_id]
+    else:
+        _METADATA_CACHE.clear()
+
+def update_metadata_cache(dataset_id: str, metadata: dict) -> None:
+    """Update metadata cache with fresh data."""
+    _METADATA_CACHE[dataset_id] = (metadata, time.time())
 
 from hei_datahub.infra.index import delete_dataset
 from hei_datahub.services.index_service import get_index_service
@@ -63,12 +80,80 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
 
     def on_mount(self) -> None:
         """Load metadata when screen is mounted."""
-        self.load_metadata()
+        # 1. Start loading from cache/index immediately (fast)
+        self.load_metadata_from_index()
+
+        # 2. Check in-memory cache for full metadata
+        if self.dataset_id in _METADATA_CACHE:
+             cached_meta, timestamp = _METADATA_CACHE[self.dataset_id]
+             # Cache valid for 5 minutes
+             if time.time() - timestamp < 300:
+                 logger.info(f"Using cached cloud metadata for {self.dataset_id}")
+
+                 # Merge cached cloud data with current metadata (which might be from index)
+                 if self.metadata:
+                     self.metadata.update(cached_meta)
+                 else:
+                     self.metadata = cached_meta
+
+                 self._display_metadata(is_loading=False)
+                 return
+
+        # 3. If not in cache, fetch from cloud (slower)
+        self.load_metadata_from_cloud()
+
+    def load_metadata_from_index(self) -> None:
+        """Load metadata from index (fast)."""
+        try:
+            index_service = get_index_service()
+            # Search for this specific dataset in the index
+            results = index_service.search(query_text="", project_filter=None, limit=1000)
+
+            dataset_item = None
+            for item in results:
+                if item.get('path') == self.dataset_id:
+                    dataset_item = item
+                    break
+
+            if dataset_item:
+                logger.info(f"Loading metadata for '{self.dataset_id}' from index (fast)")
+
+                # Handle project list splitting
+                projects = []
+                if dataset_item.get('project'):
+                    # The index stores 'project' as a single string (possibly comma-separated)
+                    projects = [p.strip() for p in dataset_item.get('project').split(',')]
+
+                self.metadata = {
+                    'name': dataset_item.get('name', self.dataset_id),
+                    'description': dataset_item.get('description', ''),
+                    'tags': dataset_item.get('tags', '').split() if dataset_item.get('tags') else [],
+                    'format': dataset_item.get('format'),
+                    'file_format': dataset_item.get('format'),
+                    'source': dataset_item.get('source'),
+                    'size': dataset_item.get('size'),
+                    'category': dataset_item.get('category'),
+                    'spatial_coverage': dataset_item.get('spatial_coverage'),
+                    'temporal_coverage': dataset_item.get('temporal_coverage'),
+                    'access_method': dataset_item.get('access_method') or '',
+                    'storage_location': dataset_item.get('storage_location'),
+                    'reference': dataset_item.get('reference'),
+                    'spatial_resolution': dataset_item.get('spatial_resolution'),
+                    'temporal_resolution': dataset_item.get('temporal_resolution'),
+                    'used_in_projects': projects,
+                }
+
+                # Update UI immediately
+                self._display_metadata(is_loading=True)
+        except Exception as e:
+            logger.warning(f"Failed to load from index: {e}")
 
     @work(thread=True)
-    def load_metadata(self) -> None:
+    def load_metadata_from_cloud(self) -> None:
         """Load metadata from cloud storage (WebDAV) to show full source of truth."""
         try:
+            # We silently fetch in background without notifying user
+            # self.app.call_from_thread(self.app.notify, f"Fetching details for {self.dataset_id}...", timeout=2)
             logger.info("Downloading metadata from cloud to ensure full details")
 
             storage = get_storage_backend()
@@ -87,6 +172,9 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
                 if self.metadata.get('format') and not self.metadata.get('file_format'):
                     self.metadata['file_format'] = self.metadata['format']
 
+                # Update cache
+                _METADATA_CACHE[self.dataset_id] = (self.metadata, time.time())
+
                 # Update UI on main thread
                 self.app.call_from_thread(self._display_metadata)
 
@@ -94,16 +182,24 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
                 os.unlink(tmp_path)
 
         except Exception as e:
-            error_msg = f"Error loading metadata: {str(e)}"
-            self.app.call_from_thread(lambda: self.app.notify(error_msg, severity="error", timeout=5))
-            self.app.call_from_thread(lambda: self.query_one("#details-content", Static).update(f"[red]{error_msg}[/red]"))
+            # Only show error if we also failed to load from index (metadata is None)
+            if not self.metadata:
+                error_msg = f"Error loading metadata: {str(e)}"
+                self.app.call_from_thread(lambda: self.app.notify(error_msg, severity="error", timeout=5))
+                self.app.call_from_thread(lambda: self.query_one("#details-content", Static).update(f"[red]{error_msg}[/red]"))
+            else:
+                logger.warning(f"Failed to refresh metadata from cloud: {e}")
 
-    def _display_metadata(self) -> None:
+    def _display_metadata(self, is_loading: bool = False) -> None:
         """Display formatted metadata in the details view."""
         if not self.metadata:
             return
 
         content = []
+
+        if is_loading:
+             # Just a subtle indicator, no popup
+             content.append("[dim italic]Refreshing details...[/dim italic]\n")
 
         # Define field handlers for nicer display and ordering
         # Field Key -> (Display Name, Formatter Function)
