@@ -16,12 +16,51 @@ from textual.widgets import (
     Label,
     Static,
     TextArea,
+    Select,
 )
 
 from hei_datahub.ui.views.dataset_detail import CloudDatasetDetailsScreen
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 logger = logging.getLogger(__name__)
+
+
+def generate_tags(metadata: dict) -> list:
+    """Auto-generate tags from metadata fields."""
+    tags = set()
+
+    # Extract words from name
+    name = metadata.get('name', metadata.get('dataset_name', ''))
+    if name:
+        for word in name.lower().split():
+            if len(word) > 2 and word.isalnum():
+                tags.add(word)
+
+    # Add category as tag
+    category = metadata.get('category', '')
+    if category:
+        tags.add(category.lower().replace(' ', '-'))
+
+    # Extract from description (first few significant words)
+    description = metadata.get('description', '')
+    if description:
+        words = description.lower().split()[:20]
+        for word in words:
+            word = ''.join(c for c in word if c.isalnum())
+            if len(word) > 3 and word not in ('the', 'and', 'for', 'from', 'with', 'this', 'that'):
+                tags.add(word)
+
+    # Add format as tag
+    file_format = metadata.get('file_format', '')
+    if file_format:
+        tags.add(file_format.lower())
+
+    # Add spatial coverage
+    spatial = metadata.get('spatial_coverage', '')
+    if spatial:
+        tags.add(spatial.lower().replace(' ', '-'))
+
+    return sorted(list(tags))[:10]  # Limit to 10 tags
 
 
 class CloudEditDetailsScreen(Screen):
@@ -60,44 +99,82 @@ class CloudEditDetailsScreen(Screen):
             Container(
                 Static(id="edit-status", classes="edit-status"),
 
-                Label("Dataset Name:"),
+                # --- Core Dataset Info (Required) ---
+                Label("Dataset Name (required):"),
                 Input(value=self.metadata.get('dataset_name', self.metadata.get('name', '')), id="edit-name"),
                 Static(id="error-name", classes="field-error"),
 
-                Label("Description:"),
+                Label("Category (required):"),
+                Select(
+                    options=[
+                        ("Climate", "Climate"),
+                        ("Land Cover", "Land Cover"),
+                        ("Biodiversity", "Biodiversity"),
+                        ("Socioeconomic", "Socioeconomic"),
+                        ("Remote Sensing", "Remote Sensing"),
+                    ],
+                    value=self.metadata.get('category', Select.BLANK),
+                    id="edit-category"
+                ),
+                Static(id="error-category", classes="field-error"),
+
+                Label("Description (required):"),
                 TextArea(id="edit-description"),
                 Static(id="error-description", classes="field-error"),
 
-                Label("Source:"),
+                Label("Source (required):"),
                 Input(value=self.metadata.get('source', ''), id="edit-source"),
                 Static(id="error-source", classes="field-error"),
+
+                Label("Reference (citation/DOI):"),
+                TextArea(id="edit-reference", classes="small-textarea"),
+                Static(id="error-reference", classes="field-error"),
+
+                # --- Access & Format ---
+                Label("Access Method (required):"),
+                Input(value=self.metadata.get('access_method') or '', id="edit-access-method"),
+                Static(id="error-access-method", classes="field-error"),
+
+                Label("Format (required):"),
+                Input(value=str(self.metadata.get('file_format', '')), id="edit-format"),
+                Static(id="error-format", classes="field-error"),
 
                 Label("Storage Location:"),
                 Input(value=self.metadata.get('storage_location', ''), id="edit-storage"),
                 Static(id="error-storage", classes="field-error"),
 
-                Label("Date Created (YYYY-MM-DD):"),
-                Input(value=str(self.metadata.get('date_created', '')), id="edit-date"),
-                Static(id="error-date", classes="field-error"),
-
-                Label("File Format:"),
-                Input(value=str(self.metadata.get('file_format', '')), id="edit-format"),
-                Static(id="error-format", classes="field-error"),
-
+                # --- Additional Metadata ---
                 Label("Size:"),
                 Input(value=str(self.metadata.get('size', '')), id="edit-size"),
                 Static(id="error-size", classes="field-error"),
 
-                Label("Keywords (comma-separated):"),
-                Input(value=', '.join(self.metadata.get('keywords', [])) if isinstance(self.metadata.get('keywords'), list) else str(self.metadata.get('keywords', '')), id="edit-keywords"),
-                Static(id="error-keywords", classes="field-error"),
+                Label("Spatial Resolution:"),
+                Input(value=str(self.metadata.get('spatial_resolution', '')), id="edit-spatial-res"),
+                Static(id="error-spatial-res", classes="field-error"),
 
-                Label("License:"),
-                Input(value=str(self.metadata.get('license', '')), id="edit-license"),
-                Static(id="error-license", classes="field-error"),
+                Label("Spatial Coverage:"),
+                Input(value=str(self.metadata.get('spatial_coverage', '')), id="edit-spatial-cov"),
+                Static(id="error-spatial-cov", classes="field-error"),
+
+                Label("Temporal Resolution:"),
+                Input(value=str(self.metadata.get('temporal_resolution', '')), id="edit-temp-res"),
+                Static(id="error-temp-res", classes="field-error"),
+
+                Label("Temporal Coverage:"),
+                Input(value=str(self.metadata.get('temporal_coverage', '')), id="edit-temp-cov"),
+                Static(id="error-temp-cov", classes="field-error"),
+
+                Label("Related Projects (comma-separated):"),
+                Input(value=', '.join(self.metadata.get('used_in_projects', [])) if isinstance(self.metadata.get('used_in_projects'), list) else str(self.metadata.get('used_in_projects', '') or ''), id="edit-projects"),
+                Static(id="error-projects", classes="field-error"),
+
+                Label("Tags (auto-generated, comma-separated):"),
+                Input(value=', '.join(self.metadata.get('tags', [])) if isinstance(self.metadata.get('tags'), list) else str(self.metadata.get('tags', '')), id="edit-tags"),
+                Static(id="error-tags", classes="field-error"),
 
                 Horizontal(
                     Button("Save Dataset", id="save-btn", variant="primary"),
+                    Button("Regenerate Tags", id="regen-tags-btn", variant="default"),
                     Button("Cancel", id="cancel-btn", variant="default"),
                 ),
                 Label("", id="error-message"),
@@ -111,21 +188,32 @@ class CloudEditDetailsScreen(Screen):
 
     def on_mount(self) -> None:
         """Initialize field values after mounting."""
-        # Pre-populate previous values to prevent false dirty marking
+        # Pre-populate previous values (handle None values with 'or ""')
         self._previous_values = {
-            'name': self.metadata.get('dataset_name', self.metadata.get('name', '')),
-            'description': self.metadata.get('description', ''),
-            'source': self.metadata.get('source', ''),
-            'storage': self.metadata.get('storage_location', ''),
-            'date': str(self.metadata.get('date_created', '')),
-            'format': str(self.metadata.get('file_format', '')),
-            'size': str(self.metadata.get('size', '')),
-            'keywords': ', '.join(self.metadata.get('keywords', [])) if isinstance(self.metadata.get('keywords'), list) else str(self.metadata.get('keywords', '')),
-            'license': str(self.metadata.get('license', '')),
+            'name': self.metadata.get('dataset_name', self.metadata.get('name', '')) or '',
+            'category': self.metadata.get('category', '') or '',
+            'description': self.metadata.get('description', '') or '',
+            'source': self.metadata.get('source', '') or '',
+            'reference': self.metadata.get('reference', '') or '',
+            'access-method': self.metadata.get('access_method', '') or '',
+            'format': str(self.metadata.get('file_format', '') or ''),
+            'storage': self.metadata.get('storage_location', '') or '',
+            'size': str(self.metadata.get('size', '') or ''),
+            'spatial-res': str(self.metadata.get('spatial_resolution', '') or ''),
+            'spatial-cov': str(self.metadata.get('spatial_coverage', '') or ''),
+            'temp-res': str(self.metadata.get('temporal_resolution', '') or ''),
+            'temp-cov': str(self.metadata.get('temporal_coverage', '') or ''),
+            'projects': ', '.join(self.metadata.get('used_in_projects', []) or []) if isinstance(self.metadata.get('used_in_projects'), list) else str(self.metadata.get('used_in_projects', '') or ''),
+            'tags': ', '.join(self.metadata.get('tags', []) or []) if isinstance(self.metadata.get('tags'), list) else str(self.metadata.get('tags', '') or ''),
         }
 
+        # Set text areas (handle None values)
         desc_area = self.query_one("#edit-description", TextArea)
-        desc_area.text = self.metadata.get('description', '')
+        desc_area.text = self.metadata.get('description', '') or ''
+
+        ref_area = self.query_one("#edit-reference", TextArea)
+        ref_area.text = self.metadata.get('reference', '') or ''
+
         self.query_one("#edit-name", Input).focus()
         self._update_status()
 
@@ -138,6 +226,50 @@ class CloudEditDetailsScreen(Screen):
     def on_cancel_button_pressed(self) -> None:
         """Handle Cancel button click."""
         self.action_cancel_edits()
+
+    @on(Button.Pressed, "#regen-tags-btn")
+    def on_regen_tags_pressed(self) -> None:
+        """Regenerate tags from current metadata."""
+        # Update metadata from current form values
+        self._collect_form_data()
+
+        # Generate new tags
+        new_tags = generate_tags(self.metadata)
+        tags_str = ', '.join(new_tags)
+
+        # Update the tags input
+        self.query_one("#edit-tags", Input).value = tags_str
+        self.metadata['tags'] = new_tags
+        self._mark_dirty('tags')
+        self._update_status()
+        self.app.notify(f"Generated {len(new_tags)} tags", timeout=2)
+
+    def _collect_form_data(self) -> None:
+        """Collect all form data into metadata dict."""
+        self.metadata['name'] = self.query_one("#edit-name", Input).value.strip()
+        self.metadata['dataset_name'] = self.metadata['name']
+
+        category_val = self.query_one("#edit-category", Select).value
+        if category_val != Select.BLANK:
+            self.metadata['category'] = str(category_val)
+
+        self.metadata['description'] = self.query_one("#edit-description", TextArea).text.strip()
+        self.metadata['source'] = self.query_one("#edit-source", Input).value.strip()
+        self.metadata['reference'] = self.query_one("#edit-reference", TextArea).text.strip()
+        self.metadata['access_method'] = self.query_one("#edit-access-method", Input).value.strip()
+        self.metadata['file_format'] = self.query_one("#edit-format", Input).value.strip()
+        self.metadata['storage_location'] = self.query_one("#edit-storage", Input).value.strip()
+        self.metadata['size'] = self.query_one("#edit-size", Input).value.strip()
+        self.metadata['spatial_resolution'] = self.query_one("#edit-spatial-res", Input).value.strip()
+        self.metadata['spatial_coverage'] = self.query_one("#edit-spatial-cov", Input).value.strip()
+        self.metadata['temporal_resolution'] = self.query_one("#edit-temp-res", Input).value.strip()
+        self.metadata['temporal_coverage'] = self.query_one("#edit-temp-cov", Input).value.strip()
+
+        projects_str = self.query_one("#edit-projects", Input).value.strip()
+        self.metadata['used_in_projects'] = [p.strip() for p in projects_str.split(',') if p.strip()] if projects_str else []
+
+        tags_str = self.query_one("#edit-tags", Input).value.strip()
+        self.metadata['tags'] = [t.strip() for t in tags_str.split(',') if t.strip()] if tags_str else []
 
     @on(Input.Changed)
     def on_input_changed(self, event: Input.Changed) -> None:
@@ -197,21 +329,27 @@ class CloudEditDetailsScreen(Screen):
     def _update_metadata_from_field(self, field_name: str, value: str) -> None:
         """Update metadata dict from field value."""
         field_map = {
-            'name': 'name',  # Cloud uses 'name' not 'dataset_name'
+            'name': 'name',
+            'category': 'category',
             'description': 'description',
             'source': 'source',
-            'storage': 'storage_location',
-            'date': 'date_created',
+            'reference': 'reference',
+            'access-method': 'access_method',
             'format': 'file_format',
+            'storage': 'storage_location',
             'size': 'size',
-            'keywords': 'keywords',
-            'license': 'license',
+            'spatial-res': 'spatial_resolution',
+            'spatial-cov': 'spatial_coverage',
+            'temp-res': 'temporal_resolution',
+            'temp-cov': 'temporal_coverage',
+            'projects': 'used_in_projects',
+            'tags': 'tags',
         }
 
         meta_field = field_map.get(field_name, field_name)
 
         # Handle list fields
-        if field_name in ('keywords',):
+        if field_name == 'tags' or field_name == 'projects':
             if value.strip():
                 self.metadata[meta_field] = [v.strip() for v in value.split(',') if v.strip()]
             else:
@@ -231,21 +369,29 @@ class CloudEditDetailsScreen(Screen):
         """Get current field value from metadata."""
         field_map = {
             'name': 'name',
+            'category': 'category',
             'description': 'description',
             'source': 'source',
-            'storage': 'storage_location',
-            'date': 'date_created',
+            'reference': 'reference',
+            'access-method': 'access_method',
             'format': 'file_format',
+            'storage': 'storage_location',
             'size': 'size',
-            'keywords': 'keywords',
-            'license': 'license',
+            'spatial-res': 'spatial_resolution',
+            'spatial-cov': 'spatial_coverage',
+            'temp-res': 'temporal_resolution',
+            'temp-cov': 'temporal_coverage',
+            'projects': 'used_in_projects',
+            'tags': 'tags',
         }
 
         meta_field = field_map.get(field_name, field_name)
         value = self.metadata.get(meta_field, '')
 
         # Handle list fields
-        if field_name == 'keywords' and isinstance(value, list):
+        if field_name == 'tags' and isinstance(value, list):
+            return ', '.join(value)
+        if field_name == 'projects' and isinstance(value, list):
             return ', '.join(value)
 
         return str(value) if value else ''
@@ -286,6 +432,9 @@ class CloudEditDetailsScreen(Screen):
 
     def action_save_edits(self) -> None:
         """Save changes to cloud storage (Ctrl+S)."""
+        # Collect all form data first
+        self._collect_form_data()
+
         # Basic validation
         if not self.metadata.get('name') and not self.metadata.get('dataset_name'):
             self.app.notify("Dataset name is required", severity="error", timeout=3)
@@ -293,6 +442,18 @@ class CloudEditDetailsScreen(Screen):
 
         if not self.metadata.get('description'):
             self.app.notify("Description is required", severity="error", timeout=3)
+            return
+
+        if not self.metadata.get('source'):
+            self.app.notify("Source is required", severity="error", timeout=3)
+            return
+
+        if not self.metadata.get('access_method'):
+            self.app.notify("Access Method is required", severity="error", timeout=3)
+            return
+
+        if not self.metadata.get('file_format'):
+            self.app.notify("Format is required", severity="error", timeout=3)
             return
 
         # Save to cloud
@@ -376,8 +537,10 @@ class CloudEditDetailsScreen(Screen):
                     # Extract fields
                     name = self.metadata.get('dataset_name') or self.metadata.get('name', new_folder_path)
                     description = self.metadata.get('description', '')
-                    keywords = self.metadata.get('keywords', [])
-                    tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
+                    tags_list = self.metadata.get('tags', [])
+                    tags = " ".join(tags_list) if isinstance(tags_list, list) else str(tags_list)
+                    used_in_projects = self.metadata.get('used_in_projects', [])
+                    project = ", ".join(used_in_projects) if used_in_projects else None
 
                     logger.info(f"Updating index for '{new_folder_path}': name='{name}', description='{description[:50]}...'")
 
@@ -390,11 +553,20 @@ class CloudEditDetailsScreen(Screen):
                     index_service.upsert_item(
                         path=new_folder_path,  # Use new folder path
                         name=name,
-                        project=None,
+                        project=project,
                         tags=tags,
                         description=description,
                         format=self.metadata.get('file_format'),
                         source=self.metadata.get('source'),
+                        category=self.metadata.get('category'),
+                        spatial_coverage=self.metadata.get('spatial_coverage'),
+                        temporal_coverage=self.metadata.get('temporal_coverage'),
+                        access_method=self.metadata.get('access_method'),
+                        storage_location=self.metadata.get('storage_location'),
+                        reference=self.metadata.get('reference'),
+                        spatial_resolution=self.metadata.get('spatial_resolution'),
+                        temporal_resolution=self.metadata.get('temporal_resolution'),
+                        size=self.metadata.get('size'),
                         is_remote=True,
                     )
                     logger.info(f"✓ Search index updated successfully for '{new_folder_path}'")
