@@ -15,7 +15,7 @@
 # Hei-DataHub
 
 ![Version](https://img.shields.io/badge/Version-0.62.0--beta-blue.svg)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Version Consistency Check](https://github.com/0xpix/Hei-DataHub/actions/workflows/version-sync.yml/badge.svg)](https://github.com/0xpix/Hei-DataHub/actions/workflows/version-sync.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 > Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key cloud sync via WebDAV.
