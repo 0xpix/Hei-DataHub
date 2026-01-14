@@ -10,6 +10,14 @@ build/
 dist/
 *.egg-info/
 .eggs/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+share/python-wheels/
+lib/
+lib64/
 MANIFEST
 *.manifest
 *.spec
