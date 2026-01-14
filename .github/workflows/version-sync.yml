@@ -1,6 +1,7 @@
 name: Version Consistency Check
 
 on:
+  workflow_dispatch:  # Allow manual triggering
   pull_request:
     paths:
       - 'version.yaml'
@@ -9,6 +10,7 @@ on:
       - 'pyproject.toml'
       - 'scripts/check_version_consistency.py'
       - 'scripts/test_version.py'
+      - '.github/workflows/version-sync.yml'
   push:
     branches:
       - main
@@ -17,6 +19,7 @@ on:
       - 'src/hei_datahub/version.yaml'
       - 'src/hei_datahub/version.py'
       - 'pyproject.toml'
+      - '.github/workflows/version-sync.yml'
 
 
 jobs:
