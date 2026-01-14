@@ -56,7 +56,9 @@ jobs:
         run: chmod +x scripts/build_linux.sh
 
       - name: Run Linux build script
-        run: ./scripts/build_linux.sh
+        run: |
+          source .venv/bin/activate
+          ./scripts/build_linux.sh
 
       - name: Debug - List output directories
         if: always()
