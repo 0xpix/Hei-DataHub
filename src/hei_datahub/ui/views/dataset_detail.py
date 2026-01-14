@@ -67,40 +67,9 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
 
     @work(thread=True)
     def load_metadata(self) -> None:
-        """Load metadata from index (fast) or cloud storage (fallback)."""
+        """Load metadata from cloud storage (WebDAV) to show full source of truth."""
         try:
-            # First try to get metadata from the index (much faster)
-            index_service = get_index_service()
-
-            # Search for this specific dataset in the index
-            results = index_service.search(query_text="", project_filter=None, limit=1000)
-
-            # Find the dataset by path
-            dataset_item = None
-            for item in results:
-                if item.get('path') == self.dataset_id:
-                    dataset_item = item
-                    break
-
-            if dataset_item:
-                # Build metadata from index data (no network call!)
-                logger.info(f"Loading metadata for '{self.dataset_id}' from index (fast)")
-                self.metadata = {
-                    'name': dataset_item.get('name', self.dataset_id),
-                    'description': dataset_item.get('description', ''),
-                    'tags': dataset_item.get('tags', '').split() if dataset_item.get('tags') else [],
-                    'format': dataset_item.get('format'),
-                    'source': dataset_item.get('source'),
-                    'size': dataset_item.get('size'),
-                    # Note: Some fields might not be in index, but that's OK for preview
-                }
-
-                # Update UI on main thread
-                self.app.call_from_thread(self._display_metadata)
-                return
-
-            # Fallback: If not in index, download from cloud (slower)
-            logger.info("Dataset not in index, downloading metadata from cloud")
+            logger.info("Downloading metadata from cloud to ensure full details")
 
             storage = get_storage_backend()
             metadata_path = f"{self.dataset_id}/metadata.yaml"
@@ -113,6 +82,10 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
             try:
                 with open(tmp_path, encoding='utf-8') as f:
                     self.metadata = yaml.safe_load(f)
+
+                # Ensure 'file_format' alias is present if 'format' exists (for compatibility)
+                if self.metadata.get('format') and not self.metadata.get('file_format'):
+                    self.metadata['file_format'] = self.metadata['format']
 
                 # Update UI on main thread
                 self.app.call_from_thread(self._display_metadata)
@@ -132,40 +105,71 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
 
         content = []
 
-        # Format metadata nicely
-        if 'name' in self.metadata:
-            content.append(f"[bold cyan]Name:[/bold cyan] {self.metadata['name']}")
+        # Define field handlers for nicer display and ordering
+        # Field Key -> (Display Name, Formatter Function)
+        field_config = {
+            'name': ('Name', lambda x: x),
+            'dataset_name': ('Name', lambda x: x), # Alias
+            'id': ('ID', lambda x: x),
+            'category': ('Category', lambda x: x),
+            'description': ('Description', lambda x: x),
+            'source': ('Source', lambda x: x),
+            'reference': ('Reference', lambda x: x),
+            'access_method': ('Access Method', lambda x: x),
+            'file_format': ('Format', lambda x: x),
+            'format': ('Format', lambda x: x), # Alias
+            'storage_location': ('Storage Location', lambda x: x),
+            'size': ('Size', lambda x: x),
+            'spatial_resolution': ('Spatial Resolution', lambda x: x),
+            'spatial_coverage': ('Spatial Coverage', lambda x: x),
+            'temporal_resolution': ('Temporal Resolution', lambda x: x),
+            'temporal_coverage': ('Temporal Coverage', lambda x: f"{x.get('start', 'N/A')} to {x.get('end', 'N/A')}" if isinstance(x, dict) else x),
+            'tags': ('Tags', lambda x: ', '.join(x) if isinstance(x, list) else x),
+            'license': ('License', lambda x: x),
+            'keywords': ('Keywords', lambda x: ', '.join(x) if isinstance(x, list) else x),
+            'used_in_projects': ('Used in Projects', lambda x: ', '.join(x) if isinstance(x, list) else str(x)),
+            'date_created': ('Date Created', lambda x: x),
+        }
 
-        if 'description' in self.metadata:
-            content.append(f"\n[bold cyan]Description:[/bold cyan]\n{self.metadata['description']}")
+        # Track processed keys to handle dynamic/unknown fields
+        processed_keys = set()
 
-        if 'source' in self.metadata:
-            content.append(f"\n[bold cyan]Source:[/bold cyan] {self.metadata['source']}")
+        # 1. Display known fields in preferred order
+        preferred_order = [
+            'name', 'category', 'description', 'source', 'access_method',
+            'file_format', 'reference', 'dataset_id', 'id'
+        ]
 
-        if 'license' in self.metadata:
-            content.append(f"\n[bold cyan]License:[/bold cyan] {self.metadata['license']}")
+        for key in preferred_order:
+            val = self.metadata.get(key)
+            if val and key not in processed_keys:
+                display_name, formatter = field_config.get(key, (key.title(), str))
+                formatted_val = formatter(val)
+                content.append(f"\n[bold cyan]{display_name}:[/bold cyan] {formatted_val}")
+                processed_keys.add(key)
 
-        if 'temporal_coverage' in self.metadata:
-            tc = self.metadata['temporal_coverage']
-            if isinstance(tc, dict):
-                start = tc.get('start', 'N/A')
-                end = tc.get('end', 'N/A')
-                content.append(f"\n[bold cyan]Temporal Coverage:[/bold cyan] {start} to {end}")
+                # Handle aliases (e.g. if we processed 'name', mark 'dataset_name' as processed too)
+                if key == 'name': processed_keys.add('dataset_name')
+                if key == 'dataset_name': processed_keys.add('name')
+                if key == 'file_format': processed_keys.add('format')
+                if key == 'format': processed_keys.add('file_format')
 
-        if 'spatial_coverage' in self.metadata:
-            content.append(f"\n[bold cyan]Spatial Coverage:[/bold cyan] {self.metadata['spatial_coverage']}")
+        # 2. Display remaining known fields
+        for key, val in self.metadata.items():
+            if key in field_config and key not in processed_keys and val:
+                display_name, formatter = field_config.get(key, (key.title(), str))
+                formatted_val = formatter(val)
+                content.append(f"\n[bold cyan]{display_name}:[/bold cyan] {formatted_val}")
+                processed_keys.add(key)
 
-        if 'keywords' in self.metadata:
-            keywords = ', '.join(self.metadata['keywords']) if isinstance(self.metadata['keywords'], list) else self.metadata['keywords']
-            content.append(f"\n[bold cyan]Keywords:[/bold cyan] {keywords}")
-
-        # Show raw YAML at the end
-        import yaml
-        content.append("\n\n[bold cyan]Raw Metadata:[/bold cyan]")
-        content.append(f"[dim]{yaml.dump(self.metadata, default_flow_style=False)}[/dim]")
+        # 3. Display any other unknown fields (to ensure user sees EVERYTHING)
+        for key, val in self.metadata.items():
+            if key not in processed_keys and val and key not in ('id',): # Skip internal ID if redundant
+                content.append(f"\n[bold cyan]{key.replace('_', ' ').title()}:[/bold cyan] {val}")
+                processed_keys.add(key)
 
         details_widget = self.query_one("#details-content", Static)
-        details_widget.update("\n".join(content))
+        details_widget.update("\n".join(content).strip())
 
     # action_back, action_copy_source, action_open_url are inherited from mixins
 
