@@ -8,50 +8,20 @@ __pycache__/
 # --- Build & Distribution ---
 build/
 dist/
-*.egg-info/
-.eggs/
-eggs/
-parts/
-var/
-sdist/
-wheels/
-share/python-wheels/
-lib/
-lib64/
 MANIFEST
 *.manifest
 *.spec
+*.in
 
 # --- Environments ---
-.env
 .venv
-env/
-venv/
-ENV/
 
 # --- Tools & QA ---
-.mypy_cache/
 .ruff_cache/
 .pytest_cache/
-.tox/
-.nox/
-.coverage
-.coverage.*
-htmlcov/
-coverage.xml
-
-# --- Documentation ---
-site/
-docs/_build/
 
 # --- IDEs & Editors ---
 .vscode/
-.idea/
-.spyderproject
-.spyproject
-.ropeproject
-.cursorignore
-.cursorindexingignore
 
 # --- Project Specific ---
 # Internal development notes & logs
@@ -71,5 +41,4 @@ config.yaml
 .hei-datahub/
 
 # --- Tests ---
-# User requested to exclude tests from repository
 tests/
