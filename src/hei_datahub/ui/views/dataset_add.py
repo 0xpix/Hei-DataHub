@@ -34,6 +34,44 @@ from .home import HomeScreen
 logger = logging.getLogger(__name__)
 
 
+def generate_tags(metadata: dict) -> list:
+    """Auto-generate tags from metadata fields."""
+    tags = set()
+
+    # Extract words from name
+    name = metadata.get('name', metadata.get('dataset_name', ''))
+    if name:
+        for word in name.lower().split():
+            if len(word) > 2 and word.isalnum():
+                tags.add(word)
+
+    # Add category as tag
+    category = metadata.get('category', '')
+    if category:
+        tags.add(category.lower().replace(' ', '-'))
+
+    # Extract from description (first few significant words)
+    description = metadata.get('description', '')
+    if description:
+        words = description.lower().split()[:20]
+        for word in words:
+            word = ''.join(c for c in word if c.isalnum())
+            if len(word) > 3 and word not in ('the', 'and', 'for', 'from', 'with', 'this', 'that'):
+                tags.add(word)
+
+    # Add format as tag
+    file_format = metadata.get('file_format', '')
+    if file_format:
+        tags.add(file_format.lower())
+
+    # Add spatial coverage
+    spatial = metadata.get('spatial_coverage', '')
+    if spatial:
+        tags.add(spatial.lower().replace(' ', '-'))
+
+    return sorted(list(tags))[:10]  # Limit to 10 tags
+
+
 class AddDataScreen(Screen):
     """Screen to add a new dataset with scrolling support and Neovim keys."""
 
@@ -284,8 +322,13 @@ class AddDataScreen(Screen):
             metadata["temporal_coverage"] = temp_cov
         if used_in_projects:
             metadata["used_in_projects"] = used_in_projects
+
+        # Auto-generate tags if none provided
         if tags:
             metadata["tags"] = tags
+        else:
+            metadata["tags"] = generate_tags(metadata)
+            logger.info(f"Auto-generated tags: {metadata['tags']}")
 
         # Validate and save
         try:
@@ -362,10 +405,10 @@ class AddDataScreen(Screen):
                     # Extract fields
                     name = metadata.get('dataset_name', dataset_id)
                     description = metadata.get('description', '')
-                    keywords = metadata.get('keywords', [])
-                    tags = " ".join(keywords) if isinstance(keywords, list) else str(keywords)
+                    tags_list = metadata.get('tags', [])
+                    tags = " ".join(tags_list) if isinstance(tags_list, list) else str(tags_list)
                     used_in_projects = metadata.get('used_in_projects', [])
-                    project = used_in_projects[0] if used_in_projects else None
+                    project = ", ".join(used_in_projects) if used_in_projects else None
 
                     index_service.upsert_item(
                         path=dataset_id,
@@ -375,6 +418,15 @@ class AddDataScreen(Screen):
                         description=description,
                         format=metadata.get('file_format'),
                         source=metadata.get('source'),
+                        category=metadata.get('category'),
+                        spatial_coverage=metadata.get('spatial_coverage'),
+                        temporal_coverage=metadata.get('temporal_coverage'),
+                        access_method=metadata.get('access_method'),
+                        storage_location=metadata.get('storage_location'),
+                        reference=metadata.get('reference'),
+                        spatial_resolution=metadata.get('spatial_resolution'),
+                        temporal_resolution=metadata.get('temporal_resolution'),
+                        size=metadata.get('size'),
                         is_remote=True,  # This is a cloud dataset
                     )
                 except Exception as idx_err:
