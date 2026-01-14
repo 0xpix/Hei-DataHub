@@ -139,6 +139,25 @@
         "type": "string"
       }
     },
+    "access_method": {
+      "type": "string",
+      "description": "How to access the dataset (e.g., API, download, database connection)"
+    },
+    "category": {
+      "type": "string",
+      "description": "Primary category or classification of the dataset"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Auto-generated keywords and tags for searchability",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reference": {
+      "type": "string",
+      "description": "Reference information or identifier for the dataset"
+    },
     "extras": {
       "type": "object",
       "description": "Free-form object for custom fields",
