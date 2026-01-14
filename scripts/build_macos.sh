@@ -24,7 +24,7 @@ BUILD_DIR="$PROJECT_ROOT/build"
 PACKAGING_DIR="$PROJECT_ROOT/packaging"
 
 # Package metadata
-APP_NAME="HeiDataHub"
+APP_NAME="Hei-DataHub"
 BUNDLE_ID="com.heidatahub.app"
 DESCRIPTION="Lightweight local data hub with TUI for managing datasets"
 
@@ -234,13 +234,51 @@ if [[ -d "$PROJECT_ROOT/src/hei_datahub/infra/sql" ]]; then
     DATA_ARGS+=(--add-data "src/hei_datahub/infra/sql${SEP}hei_datahub/infra/sql")
 fi
 
-# Find icon
+# Find icon - convert .ico to .icns if needed
 ICON_ARG=""
-if [[ -f "$PROJECT_ROOT/assets/icons/hei-datahub.icns" ]]; then
-    ICON_ARG="--icon=$PROJECT_ROOT/assets/icons/hei-datahub.icns"
-elif [[ -f "$PROJECT_ROOT/assets/icons/hei-datahub.ico" ]]; then
-    # ico works on macOS too
-    ICON_ARG="--icon=$PROJECT_ROOT/assets/icons/hei-datahub.ico"
+ICNS_PATH="$PROJECT_ROOT/assets/icons/hei-datahub.icns"
+ICO_PATH="$PROJECT_ROOT/assets/icons/hei-datahub.ico"
+
+if [[ -f "$ICNS_PATH" ]]; then
+    ICON_ARG="--icon=$ICNS_PATH"
+    log_success "Found .icns icon"
+elif [[ -f "$ICO_PATH" ]]; then
+    # Convert .ico to .icns using sips and iconutil (macOS built-in)
+    log_info "Converting .ico to .icns..."
+    ICONSET_DIR="$PROJECT_ROOT/assets/icons/hei-datahub.iconset"
+    mkdir -p "$ICONSET_DIR"
+
+    # Extract icon from .ico and create iconset
+    # sips can convert ico to png
+    sips -s format png "$ICO_PATH" --out "$ICONSET_DIR/icon_512x512.png" 2>/dev/null || true
+
+    if [[ -f "$ICONSET_DIR/icon_512x512.png" ]]; then
+        # Create required sizes
+        sips -z 16 16 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_16x16.png" 2>/dev/null || true
+        sips -z 32 32 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_16x16@2x.png" 2>/dev/null || true
+        sips -z 32 32 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_32x32.png" 2>/dev/null || true
+        sips -z 64 64 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_32x32@2x.png" 2>/dev/null || true
+        sips -z 128 128 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_128x128.png" 2>/dev/null || true
+        sips -z 256 256 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_128x128@2x.png" 2>/dev/null || true
+        sips -z 256 256 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_256x256.png" 2>/dev/null || true
+        sips -z 512 512 "$ICONSET_DIR/icon_512x512.png" --out "$ICONSET_DIR/icon_256x256@2x.png" 2>/dev/null || true
+        cp "$ICONSET_DIR/icon_512x512.png" "$ICONSET_DIR/icon_512x512@2x.png" 2>/dev/null || true
+
+        # Convert iconset to icns
+        iconutil -c icns "$ICONSET_DIR" -o "$ICNS_PATH" 2>/dev/null && {
+            ICON_ARG="--icon=$ICNS_PATH"
+            log_success "Converted .ico to .icns"
+        } || {
+            log_warn "iconutil failed, using .ico directly"
+            ICON_ARG="--icon=$ICO_PATH"
+        }
+
+        # Cleanup iconset
+        rm -rf "$ICONSET_DIR"
+    else
+        log_warn "Failed to convert icon, using .ico directly"
+        ICON_ARG="--icon=$ICO_PATH"
+    fi
 fi
 
 # PyInstaller arguments for macOS
@@ -305,7 +343,31 @@ mkdir -p "$APP_DIR/Contents/Resources"
 cp "$DIST_DIR/hei-datahub" "$APP_DIR/Contents/MacOS/hei-datahub"
 chmod +x "$APP_DIR/Contents/MacOS/hei-datahub"
 
-# Create Info.plist
+# Create launcher script that opens Terminal (TUI app needs terminal)
+# This MUST be created before Info.plist references it
+cat > "$APP_DIR/Contents/MacOS/Hei-DataHub" << 'LAUNCHER'
+#!/bin/bash
+# Hei-DataHub Launcher - Opens TUI app in Terminal
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BINARY="${DIR}/hei-datahub"
+
+# Check if we're already in a terminal
+if [ -t 0 ]; then
+    # Already in terminal, just run
+    exec "$BINARY" "$@"
+else
+    # Not in terminal, open Terminal.app and run
+    osascript <<EOF
+tell application "Terminal"
+    activate
+    do script "\"${BINARY}\"; exit"
+end tell
+EOF
+fi
+LAUNCHER
+chmod +x "$APP_DIR/Contents/MacOS/Hei-DataHub"
+
+# Create Info.plist - executable points to our launcher
 cat > "$APP_DIR/Contents/Info.plist" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -322,7 +384,7 @@ cat > "$APP_DIR/Contents/Info.plist" << EOF
     <key>CFBundleShortVersionString</key>
     <string>${VERSION}</string>
     <key>CFBundleExecutable</key>
-    <string>hei-datahub</string>
+    <string>Hei-DataHub</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>LSMinimumSystemVersion</key>
@@ -331,23 +393,24 @@ cat > "$APP_DIR/Contents/Info.plist" << EOF
     <true/>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.developer-tools</string>
+    <key>CFBundleIconFile</key>
+    <string>icon</string>
+    <key>LSBackgroundOnly</key>
+    <false/>
 </dict>
 </plist>
 EOF
 
-# Create launcher script that opens Terminal (TUI app needs terminal)
-cat > "$APP_DIR/Contents/MacOS/launcher.sh" << 'EOF'
-#!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-osascript -e "tell application \"Terminal\" to do script \"'${DIR}/hei-datahub'; exit\""
-EOF
-chmod +x "$APP_DIR/Contents/MacOS/launcher.sh"
-
-# Copy icon if available
-if [[ -f "$PROJECT_ROOT/assets/icons/hei-datahub.icns" ]]; then
-    cp "$PROJECT_ROOT/assets/icons/hei-datahub.icns" "$APP_DIR/Contents/Resources/icon.icns"
-    # Update Info.plist to reference icon
-    sed -i '' 's|</dict>|    <key>CFBundleIconFile</key>\n    <string>icon</string>\n</dict>|' "$APP_DIR/Contents/Info.plist" 2>/dev/null || true
+# Copy icon to Resources
+if [[ -f "$ICNS_PATH" ]]; then
+    cp "$ICNS_PATH" "$APP_DIR/Contents/Resources/icon.icns"
+    log_success "Added app icon"
+elif [[ -f "$ICO_PATH" ]]; then
+    # Try to use the ico as fallback
+    cp "$ICO_PATH" "$APP_DIR/Contents/Resources/icon.icns"
+    log_warn "Using .ico as icon (may not display correctly)"
+else
+    log_warn "No icon found"
 fi
 
 log_success "Created .app bundle: ${APP_NAME}.app"
