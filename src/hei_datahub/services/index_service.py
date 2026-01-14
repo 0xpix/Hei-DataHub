@@ -58,10 +58,52 @@ class IndexService:
                     description TEXT,
                     format TEXT,
                     source TEXT,
+                    category TEXT,
+                    spatial_coverage TEXT,
+                    temporal_coverage TEXT,
+                    access_method TEXT,
+                    storage_location TEXT,
+                    reference TEXT,
+                    spatial_resolution TEXT,
+                    temporal_resolution TEXT,
                     created_at INTEGER,
                     updated_at INTEGER DEFAULT (strftime('%s', 'now'))
                 )
             """)
+
+            # Add new columns if they don't exist (migration for existing databases)
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN category TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN spatial_coverage TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN temporal_coverage TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN access_method TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN storage_location TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN reference TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN spatial_resolution TEXT")
+            except Exception:
+                pass  # Column already exists
+            try:
+                conn.execute("ALTER TABLE items ADD COLUMN temporal_resolution TEXT")
+            except Exception:
+                pass  # Column already exists
 
             # Create FTS5 virtual table (content-full for trigger support)
             conn.execute("""
@@ -209,7 +251,15 @@ class IndexService:
                         items.description,
                         items.format,
                         items.source,
-                        items.tags
+                        items.tags,
+                        items.category,
+                        items.spatial_coverage,
+                        items.temporal_coverage,
+                        items.access_method,
+                        items.storage_location,
+                        items.reference,
+                        items.spatial_resolution,
+                        items.temporal_resolution
                     FROM items
                     JOIN items_fts ON items.id = items_fts.rowid
                     WHERE items_fts MATCH ?
@@ -247,7 +297,10 @@ class IndexService:
                 sql = """
                     SELECT
                         id, name, path, project, size, mtime, is_remote,
-                        description, format, source, tags
+                        description, format, source, tags, category,
+                        spatial_coverage, temporal_coverage,
+                        access_method, storage_location, reference,
+                        spatial_resolution, temporal_resolution
                     FROM items
                 """
 
@@ -274,6 +327,14 @@ class IndexService:
                     "format": row["format"],
                     "source": row["source"],
                     "tags": row["tags"],
+                    "category": row["category"],
+                    "spatial_coverage": row["spatial_coverage"],
+                    "temporal_coverage": row["temporal_coverage"],
+                    "access_method": row["access_method"],
+                    "storage_location": row["storage_location"],
+                    "reference": row["reference"],
+                    "spatial_resolution": row["spatial_resolution"],
+                    "temporal_resolution": row["temporal_resolution"],
                 })
 
             # Cache the full result set (before pagination)
@@ -299,6 +360,14 @@ class IndexService:
         description: Optional[str] = None,
         format: Optional[str] = None,
         source: Optional[str] = None,
+        category: Optional[str] = None,
+        spatial_coverage: Optional[str] = None,
+        temporal_coverage: Optional[str] = None,
+        access_method: Optional[str] = None,
+        storage_location: Optional[str] = None,
+        reference: Optional[str] = None,
+        spatial_resolution: Optional[str] = None,
+        temporal_resolution: Optional[str] = None,
     ) -> None:
         """
         Insert or update an item in the index.
@@ -315,15 +384,24 @@ class IndexService:
             description: Item description
             format: File format
             source: Data source
+            category: Dataset category
+            spatial_coverage: Spatial coverage info
+            temporal_coverage: Temporal coverage info
+            access_method: How to access the data
+            storage_location: Where data is stored
+            reference: Reference/citation
+            spatial_resolution: Spatial resolution
+            temporal_resolution: Temporal resolution
         """
         conn = self.get_connection()
         try:
             conn.execute("""
                 INSERT INTO items (
                     path, name, project, tags, size, mtime, etag, is_remote,
-                    description, format, source
+                    description, format, source, category, spatial_coverage, temporal_coverage,
+                    access_method, storage_location, reference, spatial_resolution, temporal_resolution
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(path) DO UPDATE SET
                     name = excluded.name,
                     project = excluded.project,
@@ -335,9 +413,18 @@ class IndexService:
                     description = excluded.description,
                     format = excluded.format,
                     source = excluded.source,
+                    category = excluded.category,
+                    spatial_coverage = excluded.spatial_coverage,
+                    temporal_coverage = excluded.temporal_coverage,
+                    access_method = excluded.access_method,
+                    storage_location = excluded.storage_location,
+                    reference = excluded.reference,
+                    spatial_resolution = excluded.spatial_resolution,
+                    temporal_resolution = excluded.temporal_resolution,
                     updated_at = strftime('%s', 'now')
             """, (path, name, project, tags, size, mtime, etag, int(is_remote),
-                  description, format, source))
+                  description, format, source, category, spatial_coverage, temporal_coverage,
+                  access_method, storage_location, reference, spatial_resolution, temporal_resolution))
             conn.commit()
 
             # Invalidate cache
@@ -366,9 +453,10 @@ class IndexService:
                 conn.execute("""
                     INSERT INTO items (
                         path, name, project, tags, size, mtime, etag, is_remote,
-                        description, format, source
+                        description, format, source, category, spatial_coverage, temporal_coverage,
+                        access_method, storage_location, reference, spatial_resolution, temporal_resolution
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(path) DO UPDATE SET
                         name = excluded.name,
                         project = excluded.project,
@@ -380,6 +468,14 @@ class IndexService:
                         description = excluded.description,
                         format = excluded.format,
                         source = excluded.source,
+                        category = excluded.category,
+                        spatial_coverage = excluded.spatial_coverage,
+                        temporal_coverage = excluded.temporal_coverage,
+                        access_method = excluded.access_method,
+                        storage_location = excluded.storage_location,
+                        reference = excluded.reference,
+                        spatial_resolution = excluded.spatial_resolution,
+                        temporal_resolution = excluded.temporal_resolution,
                         updated_at = strftime('%s', 'now')
                 """, (
                     item.get("path"),
@@ -393,6 +489,14 @@ class IndexService:
                     item.get("description"),
                     item.get("format"),
                     item.get("source"),
+                    item.get("category"),
+                    item.get("spatial_coverage"),
+                    item.get("temporal_coverage"),
+                    item.get("access_method"),
+                    item.get("storage_location"),
+                    item.get("reference"),
+                    item.get("spatial_resolution"),
+                    item.get("temporal_resolution"),
                 ))
                 count += 1
 
