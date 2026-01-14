@@ -8,6 +8,8 @@ __pycache__/
 # --- Build & Distribution ---
 build/
 dist/
+release/
+packaging/
 *.egg-info/
 .eggs/
 MANIFEST
@@ -21,6 +23,7 @@ MANIFEST
 # --- Tools & QA ---
 .ruff_cache/
 .pytest_cache/
+.cache/
 
 # --- IDEs & Editors ---
 .vscode/
@@ -44,3 +47,6 @@ config.yaml
 
 # --- Tests ---
 tests/
+
+# --- AUR ---
+hei-datahub/
