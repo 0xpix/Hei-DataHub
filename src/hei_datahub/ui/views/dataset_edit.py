@@ -19,7 +19,7 @@ from textual.widgets import (
     Select,
 )
 
-from hei_datahub.ui.views.dataset_detail import CloudDatasetDetailsScreen
+from hei_datahub.ui.views.dataset_detail import CloudDatasetDetailsScreen, clear_metadata_cache, update_metadata_cache
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 
 logger = logging.getLogger(__name__)
@@ -456,12 +456,16 @@ class CloudEditDetailsScreen(Screen):
             self.app.notify("Format is required", severity="error", timeout=3)
             return
 
+        # Notify user immediately that save process started
+        self.app.notify("Saving changes...", timeout=2)
+
         # Save to cloud
         self.save_to_cloud()
 
     @work(thread=True)
     def save_to_cloud(self) -> None:
         """Save dataset to cloud storage (WebDAV)."""
+        tmp_path = None
         try:
             import os
             import tempfile
@@ -469,8 +473,6 @@ class CloudEditDetailsScreen(Screen):
             import yaml
 
             from hei_datahub.services.storage_manager import get_storage_backend
-
-            self.app.call_from_thread(self.app.notify, "Uploading changes to cloud...", timeout=2)
 
             storage = get_storage_backend()
 
@@ -493,34 +495,16 @@ class CloudEditDetailsScreen(Screen):
                 tmp_path = tmp.name
                 logger.debug(f"Created temp file: {tmp_path}")
 
+
             try:
-                # Check if name changed - rename the folder on HeiBox to match
-                new_name = self.metadata.get('dataset_name') or self.metadata.get('name')
-                old_folder_path = self.dataset_id
+                # We do NOT rename the folder when the dataset name changes
+                # The folder name (ID) is permanent to preserve links and avoid conflicts
+                # new_name = self.metadata.get('dataset_name') or self.metadata.get('name')
 
-                # Folder rename: if name changed, rename folder to match the new name
-                if new_name and new_name != old_folder_path:
-                    logger.info(f"Name changed to '{new_name}' - renaming folder from '{old_folder_path}'")
+                # Always use the original dataset_id as the folder path
+                new_folder_path = self.dataset_id
 
-                    try:
-                        # Rename the folder on HeiBox
-                        storage.move(old_folder_path, new_name)
-                        logger.info(f"✓ Renamed folder from '{old_folder_path}' to '{new_name}'")
-                        new_folder_path = new_name
-                    except Exception as rename_err:
-                        logger.error(f"Failed to rename folder: {rename_err}")
-                        self.app.call_from_thread(
-                            self.app.notify,
-                            f"Warning: Folder rename failed: {str(rename_err)}. Updating metadata only.",
-                            severity="warning",
-                            timeout=5
-                        )
-                        # Continue with upload to old folder if rename failed
-                        new_folder_path = old_folder_path
-                else:
-                    new_folder_path = old_folder_path
-
-                # Upload metadata.yaml to the (possibly renamed) folder
+                # Upload metadata.yaml to the folder
                 remote_path = f"{new_folder_path}/metadata.yaml"
                 logger.info(f"Uploading to: {remote_path}")
 
@@ -543,12 +527,6 @@ class CloudEditDetailsScreen(Screen):
                     project = ", ".join(used_in_projects) if used_in_projects else None
 
                     logger.info(f"Updating index for '{new_folder_path}': name='{name}', description='{description[:50]}...'")
-
-                    # If folder was renamed, delete the old index entry first
-                    if new_folder_path != old_folder_path:
-                        logger.info(f"Folder renamed: deleting old index entry for '{old_folder_path}'")
-                        index_service.delete_item(old_folder_path)
-                        logger.info(f"✓ Deleted old index entry for '{old_folder_path}'")
 
                     index_service.upsert_item(
                         path=new_folder_path,  # Use new folder path
@@ -596,9 +574,15 @@ class CloudEditDetailsScreen(Screen):
 
                     for screen in self.app.screen_stack:
                         if isinstance(screen, CloudDatasetDetailsScreen) and screen.dataset_id == self.dataset_id:
-                            # Reload metadata from cloud
-                            logger.info(f"Refreshing CloudDatasetDetailsScreen for {self.dataset_id}")
-                            screen.load_metadata()
+                            # Directly update metadata from what we just saved (no fetch needed)
+                            logger.info(f"Refreshing CloudDatasetDetailsScreen for {self.dataset_id} with saved data")
+
+                            # Update global cache
+                            update_metadata_cache(self.dataset_id, yaml_metadata)
+
+                            # Update screen directly
+                            screen.metadata = yaml_metadata
+                            screen._display_metadata()
                             break
 
                     # Also refresh the HomeScreen table to show updated name (force cache clear)
@@ -617,8 +601,9 @@ class CloudEditDetailsScreen(Screen):
 
             finally:
                 # Cleanup temp file
-                os.unlink(tmp_path)
-                logger.debug(f"Cleaned up temp file: {tmp_path}")
+                if tmp_path and os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+                    logger.debug(f"Cleaned up temp file: {tmp_path}")
 
         except Exception as e:
             logger.error(f"Error uploading to cloud: {e}", exc_info=True)
