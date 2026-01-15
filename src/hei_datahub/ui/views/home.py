@@ -82,7 +82,7 @@ class HomeScreen(Screen):
     def on_mount(self) -> None:
         """Set up the screen when mounted."""
         table = self.query_one("#results-table", DataTable)
-        table.add_columns("ID", "Description", "Spatial", "Temporal", "Format", "Category")
+        table.add_columns("Category", "Name", "Description", "Spatial Info", "Temporal Info", "Format")
         table.cursor_type = "row"
         table.show_row_labels = False
 
@@ -97,18 +97,22 @@ class HomeScreen(Screen):
 
     def on_screen_resume(self) -> None:
         """Called when returning to this screen from a pushed screen."""
-        # Update footer context when coming back from dataset details, etc.
-        self._update_footer_context()
-
         # Load immediately - show what we have even if indexer not ready
         self.load_all_datasets()
 
-        # Focus results table if there are results, otherwise search bar
+        # Focus results table if there are results AND it is visible, otherwise search bar
         table = self.query_one("#results-table", DataTable)
-        if table.row_count > 0:
+        results_wrapper = self.query_one("#results-wrapper")
+        is_visible = "hidden" not in results_wrapper.classes
+
+        if table.row_count > 0 and is_visible:
             table.focus()
         else:
             self.query_one("#search-input").focus()
+
+        # Update footer context AFTER setting focus
+        # Use call_later to ensure focus state is propagated
+        self.call_later(self._update_footer_context)
 
         # Set up a very fast timer to reload when indexer finishes (100ms checks)
         self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
@@ -180,13 +184,22 @@ class HomeScreen(Screen):
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
                     snippet = snippet[:40] + "..." if len(snippet) > 40 else snippet
 
+                meta = result.get("metadata", {})
+                s_cov = meta.get("spatial_coverage") or "N/A"
+                s_res = meta.get("spatial_resolution")
+                s_info = f"{s_cov} ({s_res})" if s_res else s_cov
+
+                t_cov = meta.get("temporal_coverage") or "N/A"
+                t_res = meta.get("temporal_resolution")
+                t_info = f"{t_cov} ({t_res})" if t_res else t_cov
+
                 table.add_row(
-                    result["id"],
+                    meta.get("category") or "N/A",
+                    display_name[:40],
                     snippet,
-                    (result.get("metadata", {}).get("spatial_coverage") or "N/A")[:20],
-                    (result.get("metadata", {}).get("temporal_coverage") or "N/A")[:20],
-                    result.get("metadata", {}).get("file_format") or "N/A",
-                    result.get("metadata", {}).get("category") or "N/A",
+                    s_info[:40],
+                    t_info[:40],
+                    meta.get("file_format") or "N/A",
                     key=result["id"],
                 )
                 logger.info(f"Timer added dataset to table: {display_name}")
@@ -292,13 +305,22 @@ class HomeScreen(Screen):
                 name_prefix = "☁️ "
                 display_name = result["name"]  # Use metadata name, not folder path
 
+                meta = result.get("metadata", {})
+                s_cov = meta.get("spatial_coverage") or "N/A"
+                s_res = meta.get("spatial_resolution")
+                s_info = f"{s_cov} ({s_res})" if s_res else s_cov
+
+                t_cov = meta.get("temporal_coverage") or "N/A"
+                t_res = meta.get("temporal_resolution")
+                t_info = f"{t_cov} ({t_res})" if t_res else t_cov
+
                 table.add_row(
-                    result["id"],
+                    meta.get("category") or "N/A",
+                    display_name[:40],
                     snippet,
-                    (result.get("metadata", {}).get("spatial_coverage") or "N/A")[:20],
-                    (result.get("metadata", {}).get("temporal_coverage") or "N/A")[:20],
-                    result.get("metadata", {}).get("file_format") or "N/A",
-                    result.get("metadata", {}).get("category") or "N/A",
+                    s_info[:40],
+                    t_info[:40],
+                    meta.get("file_format") or "N/A",
                     key=result["id"],  # Use folder path as internal key
                 )
 
@@ -355,12 +377,21 @@ class HomeScreen(Screen):
                         # Truncate for display
                         description = description[:40] + "..." if len(description) > 40 else description
 
+                        s_cov = metadata.get("spatial_coverage") or "N/A"
+                        s_res = metadata.get("spatial_resolution")
+                        s_info = f"{s_cov} ({s_res})" if s_res else s_cov
+
+                        t_cov = metadata.get("temporal_coverage") or "N/A"
+                        t_res = metadata.get("temporal_resolution")
+                        t_info = f"{t_cov} ({t_res})" if t_res else t_cov
+
                         table.add_row(
+                            metadata.get("category", "N/A"),
                             name[:40],
-                            dataset_id,
-                            metadata.get("file_format", "N/A"),
-                            metadata.get("source", "N/A"),
                             description,
+                            s_info[:40],
+                            t_info[:40],
+                            metadata.get("file_format", "N/A"),
                             key=dataset_id,
                         )
                     finally:
@@ -370,11 +401,12 @@ class HomeScreen(Screen):
                     # If no metadata.yaml, show directory name only
                     logger.warning(f"Could not load metadata for {dataset_id}: {e}")
                     table.add_row(
+                        "N/A",
                         f"📁 {dataset_id}"[:40],
-                        dataset_id,
-                        "N/A",
-                        "N/A",
                         "No metadata.yaml found",
+                        "N/A",
+                        "N/A",
+                        "N/A",
                         key=dataset_id,
                     )
 
@@ -426,6 +458,9 @@ class HomeScreen(Screen):
         # Determine visibility based on query
         has_query = bool(query.strip())
         self._toggle_results_view(has_query)
+
+        # Update footer context as visibility/results changed
+        self._update_footer_context()
 
         # If query is empty or very short, we effectively clear results (hide view)
         if not has_query:
@@ -486,13 +521,22 @@ class HomeScreen(Screen):
                 name_prefix = "☁️ "
                 display_name = result["name"]  # Use metadata name, not folder path
 
+                meta = result.get("metadata", {})
+                s_cov = meta.get("spatial_coverage") or "N/A"
+                s_res = meta.get("spatial_resolution")
+                s_info = f"{s_cov} ({s_res})" if s_res else s_cov
+
+                t_cov = meta.get("temporal_coverage") or "N/A"
+                t_res = meta.get("temporal_resolution")
+                t_info = f"{t_cov} ({t_res})" if t_res else t_cov
+
                 table.add_row(
-                    result["id"],
+                    meta.get("category") or "N/A",
+                    display_name[:40],
                     snippet,
-                    (result.get("metadata", {}).get("spatial_coverage") or "N/A")[:20],
-                    (result.get("metadata", {}).get("temporal_coverage") or "N/A")[:20],
-                    result.get("metadata", {}).get("file_format") or "N/A",
-                    result.get("metadata", {}).get("category") or "N/A",
+                    s_info[:40],
+                    t_info[:40],
+                    meta.get("file_format") or "N/A",
                     key=result["id"],  # Use folder path as internal key
                 )
                 logger.info(f"Added to table: {display_name}")
@@ -585,18 +629,32 @@ class HomeScreen(Screen):
                     description = metadata.get('description', 'No description')
                     description = description[:40] + "..." if len(description) > 40 else description
 
+                    s_cov = metadata.get("spatial_coverage") or "N/A"
+                    s_res = metadata.get("spatial_resolution")
+                    s_info = f"{s_cov} ({s_res})" if s_res else s_cov
+
+                    t_cov = metadata.get("temporal_coverage") or "N/A"
+                    t_res = metadata.get("temporal_resolution")
+                    t_info = f"{t_cov} ({t_res})" if t_res else t_cov
+
                     table.add_row(
+                        metadata.get("category", "N/A"),
                         name[:40],
-                        dataset_id,
                         description,
+                        s_info[:40],
+                        t_info[:40],
+                        metadata.get("file_format", "N/A"),
                         key=dataset_id,
                     )
                 else:
                     # Fallback for entries without metadata
                     table.add_row(
+                        "N/A",
                         f"📁 {dataset_id}"[:40],
-                        dataset_id,
                         "No metadata.yaml",
+                        "N/A",
+                        "N/A",
+                        "N/A",
                         key=dataset_id,
                     )
 
