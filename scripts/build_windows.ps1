@@ -108,8 +108,16 @@ $NsisScript = Join-Path $InstallerDir "hei_datahub.nsi"
 Clear-Host
 Write-Banner "HEI-DATAHUB WINDOWS BUILD" -Color Cyan
 
+# Extract version from version.yaml
+$VersionLine = Get-Content -Path "version.yaml" | Select-String "version:"
+$AppVersion = $VersionLine.ToString().Split(":")[1].Trim().Trim('"').Trim("'")
+$PortableName = "hei-datahub-v$AppVersion-portable.exe"
+$SetupName = "hei-datahub-v$AppVersion-setup.exe"
+
 Write-Host "  Project: " -NoNewline -ForegroundColor Gray
 Write-Host "Hei-DataHub" -ForegroundColor White
+Write-Host "  Version: " -NoNewline -ForegroundColor Gray
+Write-Host $AppVersion -ForegroundColor Green
 Write-Host "  Time:    " -NoNewline -ForegroundColor Gray
 Write-Host (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -ForegroundColor White
 Write-Host ""
@@ -244,9 +252,13 @@ python -m PyInstaller $PyInstallerArgs $EntryPoint 2>&1 | Out-Null
 
 $ExePath = Join-Path $DistDir "hei-datahub.exe"
 if (Test-Path $ExePath) {
-    $exeSize = (Get-Item $ExePath).Length
+    # Create portable version with versioned name
+    $PortablePath = Join-Path $DistDir $PortableName
+    Copy-Item -Path $ExePath -Destination $PortablePath -Force
+
+    $exeSize = (Get-Item $PortablePath).Length
     Complete-Progress -Status "Executable built successfully"
-    Write-Success "hei-datahub.exe ($(Format-FileSize $exeSize))"
+    Write-Success "$PortableName ($(Format-FileSize $exeSize))"
 } else {
     Complete-Progress -Status "Failed"
     Write-Failure "PyInstaller build failed"
@@ -280,22 +292,27 @@ if (Test-Path $IconPath) {
     Write-Host "  Run 'make generate-icon' first" -ForegroundColor Yellow
 }
 
-Update-Progress -Percent 30 -Status "Compiling NSIS script..."
+Update-Progress -Percent 30 -Status "Compiling NSIS script (v$AppVersion)..."
 
 # Run NSIS from Windows temp directory
 Push-Location $WinTempDir
-$nsisOutput = makensis /V2 "hei_datahub.nsi" 2>&1
+# Pass version and output filename to NSIS
+$nsisOutput = makensis /DVERSION=$AppVersion /X"OutFile $SetupName" /V2 "hei_datahub.nsi" 2>&1
 $nsisExitCode = $LASTEXITCODE
 Pop-Location
 
 if ($nsisExitCode -eq 0) {
-    # Copy installer back to dist
-    $SetupPath = Join-Path $WinTempDir "hei-datahub-setup.exe"
-    if (Test-Path $SetupPath) {
-        Copy-Item -Path $SetupPath -Destination $DistDir -Force
-        $setupSize = (Get-Item (Join-Path $DistDir "hei-datahub-setup.exe")).Length
+    # Copy installer back to dist (NSIS creates it in WinTempDir because OutFile was relative or simple name)
+    $SetupCmdPath = Join-Path $WinTempDir $SetupName
+    if (Test-Path $SetupCmdPath) {
+        Copy-Item -Path $SetupCmdPath -Destination $DistDir -Force
+        $setupSize = (Get-Item (Join-Path $DistDir $SetupName)).Length
         Complete-Progress -Status "Installer built successfully"
-        Write-Success "hei-datahub-setup.exe ($(Format-FileSize $setupSize))"
+        Write-Success "$SetupName ($(Format-FileSize $setupSize))"
+    } else {
+        # Fallback check if OutFile was ignored or different behavior
+        Complete-Progress -Status "Failed"
+        Write-Failure "Installer output not found at expected path: $SetupCmdPath"
     }
 } else {
     Complete-Progress -Status "Failed"
@@ -316,16 +333,16 @@ Write-Host "  +-----------------------------------------------------------------
 Write-Host "  |                        OUTPUT FILES                              |" -ForegroundColor DarkGray
 Write-Host "  +-------------------------------------------------------------------+" -ForegroundColor DarkGray
 
-$exeFile = Join-Path $DistDir "hei-datahub.exe"
-$setupFile = Join-Path $DistDir "hei-datahub-setup.exe"
+$portableFile = Join-Path $DistDir $PortableName
+$setupFile = Join-Path $DistDir $SetupName
 
-if (Test-Path $exeFile) {
-    $size = Format-FileSize (Get-Item $exeFile).Length
-    Write-Host "  |  [EXE]   hei-datahub.exe                  $($size.PadRight(12))|" -ForegroundColor White
+if (Test-Path $portableFile) {
+    $size = Format-FileSize (Get-Item $portableFile).Length
+    Write-Host "  |  [EXE]   $PortableName          $($size.PadRight(12))|" -ForegroundColor White
 }
 if (Test-Path $setupFile) {
     $size = Format-FileSize (Get-Item $setupFile).Length
-    Write-Host "  |  [SETUP] hei-datahub-setup.exe            $($size.PadRight(12))|" -ForegroundColor White
+    Write-Host "  |  [SETUP] $SetupName             $($size.PadRight(12))|" -ForegroundColor White
 }
 
 Write-Host "  +-------------------------------------------------------------------+" -ForegroundColor DarkGray
