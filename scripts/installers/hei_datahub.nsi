@@ -6,8 +6,6 @@ InstallDir "$PROGRAMFILES64\Hei-DataHub"
 InstallDirRegKey HKCU "Software\Hei-DataHub" ""
 RequestExecutionLevel admin
 
-!define VERSION "0.61-beta"
-
 !define MUI_ABORTWARNING
 !define MUI_ICON "hei-datahub.ico"
 !define MUI_UNICON "hei-datahub.ico"
