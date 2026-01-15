@@ -6,6 +6,7 @@ import logging
 from textual import work
 from textual.app import App
 from textual.binding import Binding
+from textual.events import Resize
 from textual.reactive import reactive
 
 from hei_datahub.infra.db import ensure_database
@@ -28,6 +29,14 @@ class DataHubApp(App):
 
     # Track WebDAV/Heibox connection status
     heibox_connected = reactive(False)
+
+    def on_resize(self, event: Resize) -> None:
+        """Adjust layout based on window size."""
+        # TODO: Implement responsive layout changes for future versions for now let's make it 10 (width) x 35 (height) (170 was for my laptop)
+        if event.size.width < 160 or event.size.height < 35:
+            self.add_class("compact-layout")
+        else:
+            self.remove_class("compact-layout")
 
     def action_commands(self) -> None:
         """Open the custom command palette."""
@@ -82,6 +91,11 @@ class DataHubApp(App):
 
     def on_mount(self) -> None:
         """Initialize the app."""
+        # Check initial size for compact mode
+        if self.app.size.width < 120 or self.app.size.height < 35:
+            self.add_class("compact-layout")
+            logger.info("Enabled automatic compact layout")
+
         # Register custom themes first
         from hei_datahub.ui.themes import register_custom_themes
         register_custom_themes(self)
