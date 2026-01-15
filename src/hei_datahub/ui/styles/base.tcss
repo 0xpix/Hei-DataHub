@@ -1,4 +1,89 @@
 /* ============================================================================
+   RESPONSIVE LAYOUT STYLES
+   Automatic compact mode for smaller screens (< 120 width or < 35 height)
+   ============================================================================ */
+
+.compact-layout {
+    /* Base font size adjustment isn't possible in terminal, but we can reduce spacing */
+}
+
+.compact-layout #hero-section {
+    margin-top: 10 !important;
+    padding: 1 !important;
+}
+
+.compact-layout #banner {
+    margin-bottom: 1 !important;
+    padding: 0 !important;
+}
+
+.compact-layout DataTable {
+    height: 1fr;
+}
+
+.compact-layout #details-container,
+.compact-layout #edit-form-container,
+.compact-layout #form-container {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 1;
+    border: none;
+}
+
+.compact-layout #details-container .title {
+    margin-bottom: 0;
+}
+
+/* Compact Footer */
+.compact-layout ContextualFooter {
+    height: 1;
+}
+
+.compact-layout ContextualFooter .footer-key {
+    padding: 0 1;
+}
+
+.compact-layout ContextualFooter .footer-label {
+    padding: 0;
+    margin-right: 1;
+}
+
+/* Compact Forms (Edit/Add) */
+.compact-layout Input,
+.compact-layout TextArea,
+.compact-layout Select {
+    margin-bottom: 0 !important;
+    height: 3 !important;
+    min-height: 1 !important;
+    padding: 0 1;
+    border: none;
+}
+
+.compact-layout Label {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.compact-layout Button {
+    height: 1 !important;
+    min-height: 1 !important;
+    padding: 0 1 !important;
+    border: none !important;
+}
+
+/* Compact Details */
+.compact-layout #details-content {
+    padding: 0;
+}
+
+/* Compact Table - Tight rows */
+.compact-layout DataTable {
+    height: 1fr;
+    margin: 0;
+    border: none;
+}
+/* ============================================================================
    GLOBAL BASE STYLES - Hei-DataHub
    Only truly global, screen-agnostic rules
    ============================================================================ */
