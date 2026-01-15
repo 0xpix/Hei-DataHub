@@ -91,10 +91,7 @@ class AddDataScreen(Screen):
                 Label("Dataset Name (required):"),
                 Input(placeholder="e.g., Global Weather Stations 2024", id="input-name"),
 
-                Label("ID (required):"),
-                Input(placeholder="Unique slug (leave empty to auto-generate)", id="input-id"),
-
-                Label("Category (required):"),
+                Label("Category:"),
                 Select(
                     options=[
                         ("Administrative Boundaries", "Administrative Boundaries"),
@@ -234,7 +231,7 @@ class AddDataScreen(Screen):
 
         # Gather form data
         name = self.query_one("#input-name", Input).value.strip()
-        dataset_id = self.query_one("#input-id", Input).value.strip()
+        # ID is auto-generated
         category_val = self.query_one("#input-category", Select).value
         description = self.query_one("#input-description", TextArea).text.strip()
         source = self.query_one("#input-source", Input).value.strip()
@@ -257,10 +254,11 @@ class AddDataScreen(Screen):
             self.show_error("[red]Error: Dataset Name is required[/red]", "#input-name")
             return
 
+        # Category is optional now
         if category_val == Select.BLANK:
-            self.show_error("[red]Error: Category is required[/red]", "#input-category")
-            return
-        category = str(category_val)
+            category = "Not specified"
+        else:
+            category = str(category_val)
 
         if not description:
             self.show_error("[red]Error: Description is required[/red]", "#input-description")
@@ -282,9 +280,8 @@ class AddDataScreen(Screen):
              self.show_error("[red]Error: Format & Structure is required[/red]", "#input-format")
              return
 
-        # Generate ID if not provided
-        if not dataset_id:
-            dataset_id = generate_unique_id(name)
+        # Always generate ID from name
+        dataset_id = generate_unique_id(name)
 
         # Parse lists
         used_in_projects = [p.strip() for p in projects_str.split(',') if p.strip()] if projects_str else None
@@ -299,30 +296,18 @@ class AddDataScreen(Screen):
             "source": source,
             "access_method": access_method,
             "file_format": file_format,
-            "storage_location": storage if storage else "N/A",
+            "storage_location": storage if storage else "Not specified",
             "date_created": date.today().isoformat(),
         }
 
-        # If storage is empty, pass empty string? Pydantic min_length=1.
-        # I'll modify model logic or prompt logic.
-        # If user says Optional, I should allow empty.
-        # I'll define storage_location as "N/A" if empty to satisfy model, or update model to Optional.
-        # Model update is safer for "Optional" semantics.
-        # But required field list in Model has storage_location.
-        # Let's set it to "N/A" or "Not specified" if empty and allow user to save.
+        # Apply "Not specified" default to empty optional fields
+        metadata["reference"] = reference if reference else "Not specified"
+        metadata["size"] = size if size else "Not specified"
+        metadata["spatial_resolution"] = spatial_res if spatial_res else "Not specified"
+        metadata["spatial_coverage"] = spatial_cov if spatial_cov else "Not specified"
+        metadata["temporal_resolution"] = temp_res if temp_res else "Not specified"
+        metadata["temporal_coverage"] = temp_cov if temp_cov else "Not specified"
 
-        if reference:
-            metadata["reference"] = reference
-        if size:
-            metadata["size"] = size
-        if spatial_res:
-            metadata["spatial_resolution"] = spatial_res
-        if spatial_cov:
-            metadata["spatial_coverage"] = spatial_cov
-        if temp_res:
-             metadata["temporal_resolution"] = temp_res
-        if temp_cov:
-            metadata["temporal_coverage"] = temp_cov
         if used_in_projects:
             metadata["used_in_projects"] = used_in_projects
 
