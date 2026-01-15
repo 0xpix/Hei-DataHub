@@ -11,9 +11,13 @@ CloudEditDetailsScreen {
 
 CloudEditDetailsScreen #edit-scroll {
     height: 1fr;
-    overflow-y: auto;
-    scrollbar-size: 0 0;
+    overflow-y: scroll;
     align: center top;
+    scrollbar-gutter: stable;
+    scrollbar-background: $surface;
+    scrollbar-color: $primary;
+    scrollbar-color-hover: $accent;
+    scrollbar-color-active: $accent;
 }
 
 CloudEditDetailsScreen #edit-form-container {
