@@ -105,7 +105,7 @@ def get_default_keybindings() -> dict[str, list[str]]:
     """Get default keybindings configuration."""
     return {
         "add_dataset": ["ctrl+n"],
-        "settings": ["ctrl+shift+s"],
+        "settings": ["ctrl+shift+s", "ctrl+comma"],
         "open_details": ["o", "enter"],
         "check_updates": ["ctrl+u"],
         "refresh_data": ["ctrl+r"],
@@ -127,7 +127,7 @@ class UserConfig(BaseModel):
 
     This represents the full user config file structure.
     """
-    config_version: int = Field(default=2)
+    config_version: int = Field(default=3)
     theme: ThemeConfig = Field(default_factory=ThemeConfig)
     ui: UIConfig = Field(default_factory=UIConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
@@ -165,8 +165,8 @@ class ConfigManager:
                 config = UserConfig(**data)
 
                 # Save migrated config if version changed
-                if data.get("config_version", 1) < 2:
-                    logger.info("Migrating config to version 2")
+                if data.get("config_version", 1) < 3:
+                    logger.info("Migrating config to version 3")
                     self._save_user_config(config)
 
                 return config
@@ -182,7 +182,7 @@ class ConfigManager:
             return config
 
     def _migrate_config(self, data: dict[str, Any]) -> dict[str, Any]:
-        """Migrate config from v1 to v2 non-destructively."""
+        """Migrate config from v1 to v2/v3 non-destructively."""
         current_version = data.get("config_version", 1)
 
         if current_version < 2:
@@ -233,9 +233,24 @@ class ConfigManager:
                     "max_retries": 3,
                 }
 
-            # Update version
-            data["config_version"] = 2
-            logger.info("Migrated config from v1 to v2")
+            # Update version if it was v1
+            if current_version < 2:
+                data["config_version"] = 2
+                logger.info("Migrated config from v1 to v2")
+
+        if current_version < 3:
+             # Add compatible keybindings for Windows
+             if "keybindings" in data:
+                 kb = data["keybindings"]
+                 if "settings" in kb:
+                      if "ctrl+comma" not in kb["settings"]:
+                           kb["settings"].append("ctrl+comma")
+                 else:
+                      # If settings missing, use defaults
+                      kb["settings"] = ["ctrl+shift+s", "ctrl+comma"]
+
+             data["config_version"] = 3
+             logger.info("Migrated config from v2 to v3")
 
         return data
 
