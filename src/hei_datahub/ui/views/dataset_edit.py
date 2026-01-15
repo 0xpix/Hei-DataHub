@@ -107,11 +107,14 @@ class CloudEditDetailsScreen(Screen):
                 Label("Category (required):"),
                 Select(
                     options=[
-                        ("Climate", "Climate"),
-                        ("Land Cover", "Land Cover"),
+                        ("Administrative Boundaries", "Administrative Boundaries"),
                         ("Biodiversity", "Biodiversity"),
-                        ("Socioeconomic", "Socioeconomic"),
-                        ("Remote Sensing", "Remote Sensing"),
+                        ("Climate & Weather", "Climate & Weather"),
+                        ("Extreme Events", "Extreme Events"),
+                        ("Geographic Reference", "Geographic Reference"),
+                        ("Land & Ecosystems", "Land & Ecosystems"),
+                        ("Land Cover", "Land Cover"),
+                        ("Socio-Economic", "Socio-Economic"),
                     ],
                     value=self.metadata.get('category', Select.BLANK),
                     id="edit-category"
