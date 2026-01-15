@@ -97,8 +97,17 @@ class HomeScreen(Screen):
 
     def on_screen_resume(self) -> None:
         """Called when returning to this screen from a pushed screen."""
-        # Load immediately - show what we have even if indexer not ready
-        self.load_all_datasets()
+        search_input = self.query_one("#search-input", Input)
+        query = search_input.value
+
+        if query and query.strip():
+             # We have a search query, restore search results
+             self.perform_search(query)
+        else:
+             # Load immediately - show what we have even if indexer not ready
+             self.load_all_datasets()
+             # Set up a very fast timer to reload when indexer finishes (100ms checks)
+             self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
         # Focus results table if there are results AND it is visible, otherwise search bar
         table = self.query_one("#results-table", DataTable)
@@ -113,9 +122,6 @@ class HomeScreen(Screen):
         # Update footer context AFTER setting focus
         # Use call_later to ensure focus state is propagated
         self.call_later(self._update_footer_context)
-
-        # Set up a very fast timer to reload when indexer finishes (100ms checks)
-        self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
     def on_descendant_focus(self, event) -> None:
         """Update footer when focus changes."""
@@ -884,6 +890,12 @@ class HomeScreen(Screen):
             search_input.focus()
             self.search_mode = False
             self._update_footer_context()
+        elif table.has_focus:
+            # Return focus to search input (without clearing)
+            search_input.focus()
+            # Move cursor to end
+            search_input.cursor_position = len(search_input.value)
+            self._update_footer_context()
         elif search_input.value:
             # Clear search and refocus search bar
             search_input.value = ""
@@ -891,7 +903,7 @@ class HomeScreen(Screen):
             search_input.focus()
             self._update_footer_context()  # Update footer to home context
         elif table.has_focus:
-            # Table is focused with no search - show exit confirmation
+            # Table is focused with no search (shouldn't happen with new logic but safe fallback)
             self._show_exit_confirmation()
         else:
             # Already on search bar with nothing to clear - show exit confirmation
