@@ -126,7 +126,7 @@ class AddDataScreen(Screen):
                 # --- Access / Location (Optional per list, validated if URL) ---
                 Label("Access / Location (URL/Path):"),
                 Input(placeholder="https://... or /data/...", id="input-storage"),
-                Label("", id="url-validation-msg", classes="warning"),
+                Label("", id="url-validation-msg", classes="warning hidden"),
 
                 # --- Additional Metadata (Collapsible) ---
                 Button("Show/Hide Additional Metadata", id="toggle-optional-btn", variant="default", classes="w-full"),
@@ -191,12 +191,16 @@ class AddDataScreen(Screen):
                 result = urllib.parse.urlparse(value)
                 if all([result.scheme, result.netloc]):
                     msg_label.update("") # Valid format
+                    msg_label.add_class("hidden")
                 else:
                     msg_label.update("⚠️ Invalid URL format")
+                    msg_label.remove_class("hidden")
             except ValueError:
                 msg_label.update("⚠️ Invalid URL")
+                msg_label.remove_class("hidden")
         else:
             msg_label.update("")
+            msg_label.add_class("hidden")
 
     @on(Button.Pressed, "#save-btn")
     def on_save_button(self) -> None:
