@@ -97,6 +97,24 @@ class HomeScreen(Screen):
 
     def on_screen_resume(self) -> None:
         """Called when returning to this screen from a pushed screen."""
+        table = self.query_one("#results-table", DataTable)
+
+        # 1. PRIORITY: Check if we explicitly saved an ID (e.g. before opening details)
+        saved_focused_id = getattr(self, "_last_focused_dataset_id", None)
+
+        # 2. FALLBACK: Save current selection ID from table if no explicit save
+        if not saved_focused_id and table.row_count > 0 and table.cursor_row is not None:
+            try:
+                # Try to get the key from current cursor safely
+                cell_key = table.coordinate_to_cell_key(table.cursor_coordinate)
+                row_key = cell_key.row_key
+                saved_focused_id = row_key.value if hasattr(row_key, 'value') else str(row_key)
+            except Exception:
+                pass
+
+        # Clear the explicit save so it doesn't persist forever
+        self._last_focused_dataset_id = None
+
         search_input = self.query_one("#search-input", Input)
         query = search_input.value
 
@@ -110,12 +128,21 @@ class HomeScreen(Screen):
              self.set_interval(0.1, self._check_indexer_and_reload, name="indexer_check")
 
         # Focus results table if there are results AND it is visible, otherwise search bar
-        table = self.query_one("#results-table", DataTable)
         results_wrapper = self.query_one("#results-wrapper")
         is_visible = "hidden" not in results_wrapper.classes
 
         if table.row_count > 0 and is_visible:
             table.focus()
+
+            # Try to restore selection to saved row
+            if saved_focused_id:
+                try:
+                    new_index = table.get_row_index(saved_focused_id)
+                    if new_index is not None:
+                        table.cursor_coordinate = (new_index, 0)
+                except Exception:
+                    # Row ID might not exist anymore or error finding it
+                    pass
         else:
             self.query_one("#search-input").focus()
 
@@ -185,10 +212,10 @@ class HomeScreen(Screen):
                 snippet = result.get("snippet", "")
                 if not snippet or snippet.strip() == "":
                     description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:40] + "..." if len(description) > 40 else description
+                    snippet = description[:30] + "..." if len(description) > 30 else description
                 else:
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:40] + "..." if len(snippet) > 40 else snippet
+                    snippet = snippet[:30] + "..." if len(snippet) > 30 else snippet
 
                 meta = result.get("metadata", {})
                 s_cov = meta.get("spatial_coverage") or "N/A"
@@ -201,7 +228,7 @@ class HomeScreen(Screen):
 
                 table.add_row(
                     meta.get("category") or "N/A",
-                    display_name[:40],
+                    display_name[:25],
                     snippet,
                     s_info[:40],
                     t_info[:40],
@@ -301,11 +328,11 @@ class HomeScreen(Screen):
                 if not snippet or snippet.strip() == "":
                     # Use description from metadata if snippet is empty
                     description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:80] + "..." if len(description) > 80 else description
+                    snippet = description[:30] + "..." if len(description) > 30 else description
                 else:
                     # Clean snippet of HTML tags for display
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:80] + "..." if len(snippet) > 80 else snippet
+                    snippet = snippet[:30] + "..." if len(snippet) > 30 else snippet
 
                 # All datasets are cloud now, but keep the indicator
                 name_prefix = "☁️ "
@@ -322,7 +349,7 @@ class HomeScreen(Screen):
 
                 table.add_row(
                     meta.get("category") or "N/A",
-                    display_name[:40],
+                    display_name[:25],
                     snippet,
                     s_info[:40],
                     t_info[:40],
@@ -517,11 +544,11 @@ class HomeScreen(Screen):
                 if not snippet or snippet.strip() == "":
                     # Use description from metadata if snippet is empty
                     description = result.get("metadata", {}).get("description", "No description")
-                    snippet = description[:40] + "..." if len(description) > 40 else description
+                    snippet = description[:30] + "..." if len(description) > 30 else description
                 else:
                     # Clean snippet of HTML tags for display
                     snippet = snippet.replace("<b>", "").replace("</b>", "")
-                    snippet = snippet[:40] + "..." if len(snippet) > 40 else snippet
+                    snippet = snippet[:30] + "..." if len(snippet) > 30 else snippet
 
                 # All datasets are cloud now
                 name_prefix = "☁️ "
@@ -538,7 +565,7 @@ class HomeScreen(Screen):
 
                 table.add_row(
                     meta.get("category") or "N/A",
-                    display_name[:40],
+                    display_name[:25],
                     snippet,
                     s_info[:40],
                     t_info[:40],
@@ -966,14 +993,24 @@ class HomeScreen(Screen):
             return
         if table.row_count == 0:
             return
-        if table.cursor_row < table.row_count:
-            # Get the row key properly
+
+        if table.cursor_row is not None and table.cursor_row < table.row_count:
             try:
-                row_key = table.get_row_at(table.cursor_row)[0]
-                if row_key:
+                # Get the true RowKey from the cursor position (handles sorting correctly)
+                # coordinate_to_cell_key returns a CellKey, which has a row_key attribute
+                cell_key = table.coordinate_to_cell_key(table.cursor_coordinate)
+                row_key = cell_key.row_key
+                row_key_value = row_key.value if hasattr(row_key, 'value') else str(row_key)
+
+                # Save specifically for restoring after back navigation
+                self._last_focused_dataset_id = row_key_value
+
+                if row_key_value:
                     # ALWAYS open cloud dataset details (cloud-only workflow)
-                    self._open_cloud_file_preview(str(row_key))
+                    self._open_cloud_file_preview(str(row_key_value))
             except Exception as e:
+                # Fallback: try legacy method just in case or log error
+                logger.error(f"Error getting row key: {e}")
                 self.app.notify(f"Error opening details: {str(e)}", severity="error", timeout=3)
 
     def _open_cloud_file_preview(self, filename: str) -> None:
@@ -995,6 +1032,9 @@ class HomeScreen(Screen):
             # Get the row key which is the folder path (result["id"])
             # NOT the first column which is the display name
             row_key = event.row_key.value if hasattr(event.row_key, 'value') else str(event.row_key)
+
+            # Save specifically for restoring after back navigation
+            self._last_focused_dataset_id = row_key
 
             # ALWAYS use cloud mode (cloud-only workflow)
             self._open_cloud_file_preview(row_key)
