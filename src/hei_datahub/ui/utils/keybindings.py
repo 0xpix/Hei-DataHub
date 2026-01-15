@@ -130,6 +130,7 @@ def build_home_bindings() -> list[Binding]:
         return [
             Binding("ctrl+n", "add_dataset", "Add Dataset", key_display="Ctrl+N", priority=True),
             Binding("ctrl+shift+s", "settings", "Settings", key_display="Ctrl+Shift+S", priority=True),
+            Binding("ctrl+comma", "settings", "Settings", show=False, priority=True),
             Binding("o", "open_details", "Open", show=False),
             Binding("enter", "open_details", "View Details", show=False),
             Binding("ctrl+u", "check_updates", "Check Updates", key_display="Ctrl+U", priority=True),
