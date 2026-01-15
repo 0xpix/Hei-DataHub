@@ -296,23 +296,26 @@ Update-Progress -Percent 30 -Status "Compiling NSIS script (v$AppVersion)..."
 
 # Run NSIS from Windows temp directory
 Push-Location $WinTempDir
-# Pass version and output filename to NSIS
-$nsisOutput = makensis /DVERSION=$AppVersion /X"OutFile $SetupName" /V2 "hei_datahub.nsi" 2>&1
+# Pass version to NSIS
+$nsisOutput = makensis /DVERSION=$AppVersion /V2 "hei_datahub.nsi" 2>&1
 $nsisExitCode = $LASTEXITCODE
 Pop-Location
 
 if ($nsisExitCode -eq 0) {
-    # Copy installer back to dist (NSIS creates it in WinTempDir because OutFile was relative or simple name)
-    $SetupCmdPath = Join-Path $WinTempDir $SetupName
-    if (Test-Path $SetupCmdPath) {
-        Copy-Item -Path $SetupCmdPath -Destination $DistDir -Force
-        $setupSize = (Get-Item (Join-Path $DistDir $SetupName)).Length
+    # Generate path for expected output (defined in NSI) and target (versioned)
+    $DefaultSetupName = "hei-datahub-setup.exe"
+    $DefaultSetupPath = Join-Path $WinTempDir $DefaultSetupName
+    $TargetSetupPath = Join-Path $DistDir $SetupName
+
+    if (Test-Path $DefaultSetupPath) {
+        Copy-Item -Path $DefaultSetupPath -Destination $TargetSetupPath -Force
+        $setupSize = (Get-Item $TargetSetupPath).Length
         Complete-Progress -Status "Installer built successfully"
         Write-Success "$SetupName ($(Format-FileSize $setupSize))"
     } else {
-        # Fallback check if OutFile was ignored or different behavior
+        # Fallback check if OutFile was somehow different
         Complete-Progress -Status "Failed"
-        Write-Failure "Installer output not found at expected path: $SetupCmdPath"
+        Write-Failure "Installer output not found at: $DefaultSetupPath"
     }
 } else {
     Complete-Progress -Status "Failed"
