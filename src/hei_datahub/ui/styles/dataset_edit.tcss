@@ -9,14 +9,15 @@ CloudEditDetailsScreen {
     layout: vertical;
 }
 
-CloudEditDetailsScreen #add-data-scroll {
+CloudEditDetailsScreen #edit-scroll {
     height: 1fr;
     overflow-y: auto;
-    scrollbar-size: 1 1;
+    scrollbar-size: 0 0;
+    align: center top;
 }
 
 CloudEditDetailsScreen #edit-form-container {
-    max-width: 100;
+    max-width: 120;
     width: 100%;
     height: auto;
     padding: 3;
