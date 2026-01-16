@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.64.0-beta] - 2026-01-16 - macOS Support & UI Refinements
+
+**macOS Support & UX Improvements!** This release adds official macOS support via Homebrew and significantly improves the UI responsiveness and navigation.
+
+### Added
+
+- **macOS Support**
+  - Official Homebrew Tap available (`brew tap 0xpix/homebrew-tap`)
+  - Native `arm64` and `x86_64` builds
+- **Responsive Layout** - Improved rendering on smaller terminal screens
+- **Enhanced Copying**
+  - Minimalistic copy buttons added to dataset details fields
+  - **VIM-like Yanking**: Press multiple keys to copy specific fields in details view
+  - Dynamic footer showing available yank shortcuts
+- **Issue Reporting** - Dedicated shortcut to report issues directly
+
+### Changed
+
+- **Dataset Management**
+  - ID is now auto-generated from the title (manual entry removed)
+  - Category field is now optional
+  - Empty fields display as "Not specified" instead of blank
+- **UI Layout**
+  - Improved column layout in the dataset table
+
+### Fixed
+
+- **Navigation & Shortcuts**
+  - Fixed `o` shortcut in details view (now opens Access/Location link correctly)
+  - Fixed `Esc` navigation flow (Search -> Home)
+  - Fixed `Ctrl+T` (Theme) focus issues interfering with search bar
+  - Fixed Windows-specific `Shift+Ctrl+S` shortcut issue
+- **State Management**
+  - Fixed data updates not reflecting immediately (save/delete no longer requires restart)
+  - Fixed search results being cleared when navigating back from details
+  - Fixed focus loss when returning to the list view
+- **UI Glitches**
+  - Fixed centering layout for "Edit Dataset" form
+  - Removed graphical artifact in "Add Dataset" form
+
+---
+
 ## [0.63.0-beta] - 2026-01-14 - Multi-Platform CI/CD
 
 **Full CI/CD Pipeline & Cross-Platform Distribution!** This release introduces automated builds and distribution for Windows and Linux, MacOS coming soon.
