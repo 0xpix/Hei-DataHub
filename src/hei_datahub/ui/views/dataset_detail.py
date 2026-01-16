@@ -6,12 +6,14 @@ import os
 import tempfile
 import time
 
+import pyperclip
 import yaml
-from textual import work
+from textual import on, work, events
 from textual.app import ComposeResult
-from textual.containers import VerticalScroll
+from textual.containers import VerticalScroll, Horizontal
 from textual.screen import Screen
 from textual.widgets import (
+    Button,
     Header,
     Label,
     Static,
@@ -42,6 +44,28 @@ from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 logger = logging.getLogger(__name__)
 
 
+class MetadataField(Horizontal):
+    """A row displaying a metadata field with a copy button."""
+    def __init__(self, label: str, value: str, raw_value: str = None) -> None:
+        super().__init__()
+        self.label_text = label
+        self.value_text = value
+        self.raw_value = raw_value if raw_value is not None else value
+
+    def compose(self) -> ComposeResult:
+        # Minimalistic copy icon
+        yield Label(" ", classes="copy-btn")
+        yield Label(f"[bold cyan]{self.label_text}:[/bold cyan] {self.value_text}", classes="field-text")
+
+    @on(events.Click, ".copy-btn")
+    def copy_to_clipboard(self) -> None:
+        try:
+             pyperclip.copy(str(self.raw_value))
+             self.app.notify(f"Copied {self.label_text}", timeout=2)
+        except Exception as e:
+             self.app.notify(f"Failed to copy: {e}", severity="error")
+
+
 class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
     """Screen to view cloud dataset details (from metadata.yaml)."""
 
@@ -70,23 +94,12 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         if url and (url.startswith('http://') or url.startswith('https://')):
             return url
 
-        # Fallback to Access Method
-        url = self.metadata.get('access_method')
-        if url and (url.startswith('http://') or url.startswith('https://')):
-            return url
-
-        # Fallback to Source
-        url = self.metadata.get('source')
-        if url and (url.startswith('http://') or url.startswith('https://')):
-            return url
-
         return self.metadata.get('storage_location')
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield VerticalScroll(
             Label(f"󱤟 Dataset: {self.dataset_id}", classes="title"),
-            Static(id="details-content"),
             id="details-container",
         )
         footer = ContextualFooter()
@@ -210,11 +223,16 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         if not self.metadata:
             return
 
-        content = []
+        container = self.query_one("#details-container", VerticalScroll)
+
+        # Clear existing fields (keep the title which is the first child)
+        for child in container.query(MetadataField):
+            child.remove()
+        for child in container.query(".loading-msg"):
+            child.remove()
 
         if is_loading:
-             # Just a subtle indicator, no popup
-             content.append("[dim italic]Refreshing details...[/dim italic]\n")
+             container.mount(Label("Refreshing details...", classes="loading-msg"))
 
         # Define field handlers for nicer display and ordering
         # Field Key -> (Display Name, Formatter Function)
@@ -245,6 +263,17 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         # Track processed keys to handle dynamic/unknown fields
         processed_keys = set()
 
+        def mount_field(key, val):
+            display_name, formatter = field_config.get(key, (key.replace('_', ' ').title(), str))
+            formatted_val = formatter(val)
+
+            # For copying, ensure we have a string
+            raw_val = val
+            if isinstance(val, (dict, list)):
+                raw_val = str(val)
+
+            container.mount(MetadataField(display_name, formatted_val, raw_value=raw_val))
+
         # 1. Display known fields in preferred order
         preferred_order = [
             'name', 'category', 'description', 'source', 'access_method',
@@ -254,9 +283,7 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         for key in preferred_order:
             val = self.metadata.get(key)
             if val and key not in processed_keys:
-                display_name, formatter = field_config.get(key, (key.title(), str))
-                formatted_val = formatter(val)
-                content.append(f"\n[bold cyan]{display_name}:[/bold cyan] {formatted_val}")
+                mount_field(key, val)
                 processed_keys.add(key)
 
                 # Handle aliases (e.g. if we processed 'name', mark 'dataset_name' as processed too)
@@ -268,19 +295,14 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         # 2. Display remaining known fields
         for key, val in self.metadata.items():
             if key in field_config and key not in processed_keys and val:
-                display_name, formatter = field_config.get(key, (key.title(), str))
-                formatted_val = formatter(val)
-                content.append(f"\n[bold cyan]{display_name}:[/bold cyan] {formatted_val}")
+                mount_field(key, val)
                 processed_keys.add(key)
 
         # 3. Display any other unknown fields (to ensure user sees EVERYTHING)
         for key, val in self.metadata.items():
             if key not in processed_keys and val and key not in ('id',): # Skip internal ID if redundant
-                content.append(f"\n[bold cyan]{key.replace('_', ' ').title()}:[/bold cyan] {val}")
+                mount_field(key, val)
                 processed_keys.add(key)
-
-        details_widget = self.query_one("#details-content", Static)
-        details_widget.update("\n".join(content).strip())
 
     # action_back, action_copy_source, action_open_url are inherited from mixins
 
