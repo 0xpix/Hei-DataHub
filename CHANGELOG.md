@@ -16,21 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **macOS Support**
   - Official Homebrew Tap available (`brew tap 0xpix/homebrew-tap`)
   - Native `arm64` and `x86_64` builds
-- **Responsive Layout** - Improved rendering on smaller terminal screens
-- **Enhanced Copying**
-  - Minimalistic copy buttons added to dataset details fields
-  - **VIM-like Yanking**: Press multiple keys to copy specific fields in details view
-  - Dynamic footer showing available yank shortcuts
-- **Issue Reporting** - Dedicated shortcut to report issues directly
+- Improved rendering on smaller terminal screens
+- Minimalistic copy buttons added to dataset details fields
+- **VIM-like Yanking**: Press multiple keys to copy specific fields in details view
+- Dynamic footer showing available yank shortcuts
+- Dedicated shortcut to report issues directly
 
 ### Changed
 
-- **Dataset Management**
-  - ID is now auto-generated from the title (manual entry removed)
-  - Category field is now optional
-  - Empty fields display as "Not specified" instead of blank
-- **UI Layout**
-  - Improved column layout in the dataset table
+- ID is now auto-generated from the title (manual entry removed)
+- Category field is now optional
+- Empty fields display as "Not specified" instead of blank
+- Improved column layout in the dataset table
 
 ### Fixed
 
@@ -43,9 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed data updates not reflecting immediately (save/delete no longer requires restart)
   - Fixed search results being cleared when navigating back from details
   - Fixed focus loss when returning to the list view
-- **UI Glitches**
-  - Fixed centering layout for "Edit Dataset" form
-  - Removed graphical artifact in "Add Dataset" form
 
 ---
 
