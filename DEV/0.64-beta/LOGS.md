@@ -1,7 +1,7 @@
 # 0.64-beta
 
 ## TO ADD
-- [ ] Add support for MacOS
+- [ ] Add support for MacOS - Probably will stick to uv install for beta and then will do the homebrew install later
 - [ ] Add shortcut to naviguate to the left/right h/l
 
 ## TO CHANGE
@@ -10,8 +10,8 @@
 ## TO FIX
 
 - [ ] Data won't appear after setting up auth, it will apear just after launching the app again
+- [ ] FIx the shortcut `o` in the dataset detail page where it tries to open the source instead of the link from Acess/Location
 - [!] Fix the scroll, it feels weird and not smooth - (wasn't fixed, it added the scrollbar back)
-- [!] Fix the issue when on Windows I press `Shift+Ctrl+S` the setting doesn't appear
 
 ## ADDED/CHANGED/FIXED
 
@@ -20,6 +20,7 @@
 - [x] If the Any of the fields were left empty, just put "Not specified"
 - [x] Make the category not required
 
+- [x] Fix the issue when on Windows I press `Shift+Ctrl+S` the setting doesn't appear
 - [x] The dataset is not changing when i saved/delete until i re-launch the app
 - [x] There is a weird box or rectangle above the show/hide additional metadata in add dataset
 - [x] Fix the layout of the edit dataset, it's not centered
