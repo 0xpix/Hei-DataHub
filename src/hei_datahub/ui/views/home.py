@@ -56,7 +56,6 @@ class HomeScreen(Screen):
         # Load logo from config
         logo_text = get_logo_widget_text(get_config())
 
-        yield Header()
         yield Container(
             # Top "Hero" section with centered logo and search
             Container(
