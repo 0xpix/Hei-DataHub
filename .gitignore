@@ -49,7 +49,3 @@ tests/
 
 # --- AUR ---
 hei-datahub/
-
-# --- macOS (for now) ---
-.github/workflows/macos-build.yml
-scripts/build_macos.sh
