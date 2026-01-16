@@ -10,8 +10,8 @@ import pyperclip
 import yaml
 from textual import on, work, events
 from textual.app import ComposeResult
-from textual.containers import VerticalScroll, Horizontal
-from textual.screen import Screen
+from textual.containers import VerticalScroll, Horizontal, Container
+from textual.screen import Screen, ModalScreen
 from textual.widgets import (
     Button,
     Header,
@@ -66,6 +66,42 @@ class MetadataField(Horizontal):
              self.app.notify(f"Failed to copy: {e}", severity="error")
 
 
+class YankFooter(Static):
+    """Footer for Yank Mode cheat sheet."""
+
+    DEFAULT_CSS = """
+    YankFooter {
+        dock: bottom;
+        width: 100%;
+        height: 2;
+        background: $surface;
+        color: $text;
+        border-top: wide $accent;
+        padding: 0 1;
+        display: none;
+        text-align: center;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        # Mappings for display
+        items = [
+            ("n", "name"), ("c", "cat"), ("d", "desc"), ("s", "src"),
+            ("a", "access"), ("f", "fmt"), ("r", "ref"), ("l", "loc"),
+            ("t", "time"), ("p", "space"), ("y", "all")
+        ]
+
+        text_parts = ["[bold reverse magenta] YANK [/]"]
+
+        parts = []
+        for k, label in items:
+            parts.append(f"[bold]{k}[/]:[dim]{label}[/]")
+        parts.append("[bold]Esc[/]:[dim]cancel[/]")
+
+        text_parts.append("  ".join(parts))
+
+        yield Label("  ".join(text_parts), markup=True)
+
 class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
     """Screen to view cloud dataset details (from metadata.yaml)."""
 
@@ -82,6 +118,26 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         super().__init__()
         self.dataset_id = dataset_id
         self.metadata = None
+        self._yank_mode = False
+        self._yank_auto_cancel_timer = None
+
+        self.field_map = {
+            'n': ('name', 'Name'),
+            'c': ('category', 'Category'),
+            'd': ('description', 'Description'),
+            's': ('source', 'Source'),
+            'a': ('access_method', 'Access Method'),
+            'f': ('file_format', 'Format'),
+            'r': ('reference', 'Reference'),
+            'l': ('storage_location', 'Storage Location'),
+            'e': ('date_created', 'Date Created'),
+            'z': ('size', 'Size'),
+            'p': ('spatial_coverage', 'Spatial Coverage'),
+            't': ('temporal_coverage', 'Temporal Coverage'),
+            'u': ('used_in_projects', 'Used in Projects'),
+            'g': ('tags', 'Tags'),
+            'y': ('__ALL__', 'All Fields'),
+        }
 
     @property
     def source_url(self) -> str:
@@ -105,6 +161,8 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         footer = ContextualFooter()
         footer.set_context("details")
         yield footer
+        # Add YankFooter but keep it hidden via CSS until toggled
+        yield YankFooter()
 
     def on_mount(self) -> None:
         """Load metadata when screen is mounted."""
@@ -129,6 +187,97 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
 
         # 3. If not in cache, fetch from cloud (slower)
         self.load_metadata_from_cloud()
+
+    def on_key(self, event: events.Key) -> None:
+        """Handle key presses for yank mode."""
+        # Yank Mode Logic
+        if self._yank_mode:
+            # Stop timer on any key press
+            if self._yank_auto_cancel_timer:
+                self._yank_auto_cancel_timer.stop()
+
+            if event.key == "escape":
+                self._exit_yank_mode()
+                event.stop()
+                return
+
+            key = event.key
+            if len(key) == 1:
+                key = key.lower()
+
+            if key in self.field_map:
+                self._perform_yank(key)
+                event.stop()
+            else:
+                self.app.notify("Yank cancelled", severity="warning")
+                self._exit_yank_mode()
+                event.stop()
+            return
+
+        # Normal Mode Logic
+        if event.key == "y":
+             # Only enter yank mode if metadata is available
+             if self.metadata:
+                 self._enter_yank_mode()
+                 event.stop()
+
+    def _enter_yank_mode(self) -> None:
+        """Activate operator-pending yank mode."""
+        self._yank_mode = True
+        self.query_one(ContextualFooter).styles.display = "none"
+        self.query_one(YankFooter).styles.display = "block"
+
+        # Auto-cancel after 10 seconds
+        self._yank_auto_cancel_timer = self.set_timer(10.0, self._exit_yank_mode)
+
+    def _exit_yank_mode(self) -> None:
+        """Deactivate yank mode."""
+        self._yank_mode = False
+        if self._yank_auto_cancel_timer:
+            self._yank_auto_cancel_timer.stop()
+
+        # Switch footers back
+        try:
+            self.query_one(YankFooter).styles.display = "none"
+            self.query_one(ContextualFooter).styles.display = "block"
+        except Exception:
+            # In case widget is unmounted
+            pass
+
+    def _perform_yank(self, key_char: str) -> None:
+        field_key, display_name = self.field_map[key_char]
+
+        if field_key == '__ALL__':
+            # YAML dump all
+            try:
+                # Clean up metadata for YAML dump (remove internal keys if any?)
+                # We dump the whole metadata dict
+                content = yaml.dump(self.metadata, sort_keys=False, allow_unicode=True)
+                pyperclip.copy(content)
+                self.app.notify("✓ Yanked All Fields (YAML)")
+            except Exception as e:
+                self.app.notify(f"Yank failed: {e}", severity="error")
+        else:
+            # Specific field
+            # Check if key exists in metadata or try aliases
+            val = self.metadata.get(field_key)
+
+            # Fallback for 'format' if 'file_format' used in map but mostly stored as 'format'
+            if val is None and field_key == 'file_format':
+                 val = self.metadata.get('format')
+
+            if val is not None:
+                try:
+                    pyperclip.copy(str(val))
+                    self.app.notify(f"✓ Yanked {display_name}")
+                except Exception as e:
+                    self.app.notify(f"Yank failed: {e}", severity="error")
+            else:
+                self.app.notify(f"Field '{display_name}' is empty", severity="warning")
+
+        self._exit_yank_mode()
+
+
 
     def load_metadata_from_index(self) -> None:
         """Load metadata from index (fast)."""
