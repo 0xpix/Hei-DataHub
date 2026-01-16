@@ -93,7 +93,6 @@ class CloudEditDetailsScreen(Screen):
         self._field_errors = {}
 
     def compose(self) -> ComposeResult:
-        yield Header()
         yield VerticalScroll(
             Label(f"󱘫 Editing Dataset: {self.dataset_id}", classes="title"),
             Container(
