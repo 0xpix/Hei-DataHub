@@ -119,7 +119,6 @@ class UpdateScreen(Screen):
         """Start update check when mounted."""
         log = self.query_one("#update-log", Log)
         log.write_line(f"Platform: {self._platform}")
-        
         if self.auto_start:
             self.run_update()
 
@@ -149,7 +148,6 @@ class UpdateScreen(Screen):
     def run_update(self) -> None:
         """Run the update process in background."""
         self._updating = True
-        
         self._log("Starting update check...")
         self._update_ui("Checking for updates...", 5)
 
@@ -165,7 +163,7 @@ class UpdateScreen(Screen):
         # Check for updates
         self._update_ui("Connecting to GitHub...", 10)
         self._log("Fetching latest release info...")
-        
+
         try:
             update_info = check_for_updates(force=True)
         except Exception as e:
@@ -216,7 +214,7 @@ class UpdateScreen(Screen):
         self._log("Or if using pip:")
         self._log("  pip install --upgrade hei-datahub")
         self._log("─" * 40)
-        
+
         self._show_result_linux(latest_version)
 
     def _handle_windows_update(self, update_info: dict) -> None:
@@ -242,15 +240,15 @@ class UpdateScreen(Screen):
         latest = update_info.get("latest_version", "?")
         self._log("Fetching download URL...")
         win_info = get_download_url()
-        
+
         if not win_info or "error" in win_info:
             error_msg = win_info.get("error", "Unknown error") if win_info else "Failed to get download info"
             self._show_error(error_msg)
             return
-        
+
         download_url = win_info.get("download_url")
         file_size = win_info.get("file_size", 0)
-        
+
         if not download_url:
             self._show_error("No download URL in release")
             return
@@ -284,10 +282,10 @@ class UpdateScreen(Screen):
         self._log("✓ Installer started!")
         self._log("Closing app in 2 seconds...")
         self._update_ui("Update ready!", 100)
-        
+
         self._updating = False
         self._success = True
-        
+
         # Update button and schedule exit
         def finish():
             try:
@@ -296,13 +294,13 @@ class UpdateScreen(Screen):
             except Exception:
                 pass
             self.set_timer(2.0, self._do_exit)
-        
+
         self.app.call_from_thread(finish)
 
     def _show_no_update(self, current_version: str) -> None:
         """Show 'no update available' message."""
         self._updating = False
-        
+
         def update():
             try:
                 self.query_one("#update-status", Static).update("✅ Up to date!")
@@ -313,13 +311,13 @@ class UpdateScreen(Screen):
                 btn.variant = "success"
             except Exception:
                 pass
-        
+
         self.app.call_from_thread(update)
 
     def _show_result_linux(self, latest_version: str) -> None:
         """Show result for Linux with update instructions."""
         self._updating = False
-        
+
         def update():
             try:
                 self.query_one("#update-status", Static).update(f"🐧 Update to v{latest_version}")
@@ -330,13 +328,13 @@ class UpdateScreen(Screen):
                 btn.variant = "primary"
             except Exception:
                 pass
-        
+
         self.app.call_from_thread(update)
 
     def _show_dev_mode(self) -> None:
         """Show result for dev mode (running from source)."""
         self._updating = False
-        
+
         def update():
             try:
                 self.query_one("#update-status", Static).update("📁 Development Mode")
@@ -346,14 +344,14 @@ class UpdateScreen(Screen):
                 btn.label = "Close"
             except Exception:
                 pass
-        
+
         self.app.call_from_thread(update)
 
     def _show_error(self, message: str) -> None:
         """Show error message."""
         self._updating = False
         self._log(f"✗ {message}")
-        
+
         def update():
             try:
                 self.query_one("#update-status", Static).update("❌ Update Failed")
@@ -364,7 +362,7 @@ class UpdateScreen(Screen):
                 btn.variant = "error"
             except Exception:
                 pass
-        
+            
         self.app.call_from_thread(update)
 
     def _do_exit(self) -> None:
