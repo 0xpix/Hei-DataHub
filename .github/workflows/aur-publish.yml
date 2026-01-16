@@ -158,35 +158,35 @@ jobs:
           cat aur/PKGBUILD
 
       - name: Generate .SRCINFO
-            ruTAG="${{ steps.version.outputs.tag }}"
-            VERSION="${{ steps.version.outputs.clean_version }}"
-            APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
-            DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
-            ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
+          APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
+          DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
+          ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
 
-            cat > aur/.SRCINFO << EOF
-            pkgbase = hei-datahub
-                pkgdesc = Lightweight local data hub with TUI for managing datasets
-                pkgver = ${VERSION}
-                pkgrel = 1
-                url = https://github.com/0xpix/Hei-DataHub
-                arch = x86_64
-                license = MIT
-                depends = fuse2
-                options = !strip
-                source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG
-                source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
-                source = hei-datahub.desktop
-                source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
-                sha256sums = ${APPIMAGE_SHA256}
-                sha256sums = ${DESKTOP_SHA256}
-                sha256sums = ${ICON_SHA256}
+          cat > aur/.SRCINFO << EOF
+          pkgbase = hei-datahub
+          	pkgdesc = Lightweight local data hub with TUI for managing datasets
+          	pkgver = ${VERSION}
+          	pkgrel = 1
+          	url = https://github.com/0xpix/Hei-DataHub
+          	arch = x86_64
+          	license = MIT
+          	depends = fuse2
+          	options = !strip
+          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
+          	source = hei-datahub.desktop
+          	source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
+          	sha256sums = ${APPIMAGE_SHA256}
+          	sha256sums = ${DESKTOP_SHA256}
+          	sha256sums = ${ICON_SHA256}
 
-            pkgname = hei-datahub
-            EOF
+          pkgname = hei-datahub
+          EOF
 
-            echo "Generated .SRCINFO:"
-            cat aur/.SRCINFO
+          echo "Generated .SRCINFO:"
+          cat aur/.SRCINFO
 
       - name: Setup SSH for AUR
         env:
