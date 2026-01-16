@@ -41,8 +41,6 @@ class AboutScreen(Screen):
         # Load logo from config
         get_logo_widget_text(get_config())
 
-        yield Header()
-
         with ScrollableContainer(id="about-container"):
             # Main card container
             with Container(id="about-card"):
