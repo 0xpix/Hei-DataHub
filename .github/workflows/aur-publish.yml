@@ -14,7 +14,16 @@ on:
 jobs:
   update-aur:
     runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
     steps:
+      - name: Install git and basic tools
+        run: |
+          pacman -Sy --noconfirm git openssh curl
+
+          # Fix "dubious ownership" error in container
+          git config --global --add safe.directory '*'
+
       - name: Checkout main repo
         uses: actions/checkout@v4
 
@@ -112,7 +121,7 @@ jobs:
           license=('MIT')
           depends=('fuse2')
           options=('!strip')
-          source=(VERSION
+          source=(
               "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-\${pkgver}-x86_64.AppImage"
               "hei-datahub.desktop"
               "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
@@ -159,34 +168,27 @@ jobs:
 
       - name: Generate .SRCINFO
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          VERSION="${{ steps.version.outputs.clean_version }}"
-          APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
-          DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
-          ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
+          cd aur
+          # makepkg requires that we are not root/permission fix
+          # But for --printsrcinfo, we can just run it.
+          # However, makepkg checks ownership.
 
-          cat > aur/.SRCINFO << EOF
-          pkgbase = hei-datahub
-          	pkgdesc = Lightweight local data hub with TUI for managing datasets
-          	pkgver = ${VERSION}
-          	pkgrel = 1
-          	url = https://github.com/0xpix/Hei-DataHub
-          	arch = x86_64
-          	license = MIT
-          	depends = fuse2
-          	options = !strip
-          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
-          	source = hei-datahub.desktop
-          	source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
-          	sha256sums = ${APPIMAGE_SHA256}
-          	sha256sums = ${DESKTOP_SHA256}
-          	sha256sums = ${ICON_SHA256}
+          # Generate .SRCINFO using makepkg
+          # We need to ensure the copied files are here
+          # (PKGBUILD and hei-datahub.desktop are already in aur/)
 
-          pkgname = hei-datahub
-          EOF
+          echo "Generating .SRCINFO..."
+          # Since we are root in container, makepkg complains. Allow running as root for this.
+          # Or create a user. Creating a user is safer and standard for makepkg.
+
+          chmod 777 . # PKGBUILD must be readable
+          useradd builder
+          chown -R builder .
+
+          su builder -c "makepkg --printsrcinfo" > .SRCINFO
 
           echo "Generated .SRCINFO:"
-          cat aur/.SRCINFO
+          cat .SRCINFO
 
       - name: Setup SSH for AUR
         env:
