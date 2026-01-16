@@ -69,12 +69,12 @@ def get_action_display_map_home() -> dict[str, tuple]:
     """Get action display map for home screen."""
     return {
         "add_dataset": ("Add Dataset", "Ctrl+N", True),
-        "settings": ("Settings", "Ctrl+Shift+S", True),
+        "settings": ("Settings", "Ctrl+S", True),
         "open_details": ("Open", "o", False),
         "check_updates": ("Check Updates", "Ctrl+U", True),
         "refresh_data": ("Refresh", "Ctrl+R", True),
         "quit": ("Quit", "Ctrl+Q", True),
-        "show_about": ("About", "Ctrl+I", True),
+        "show_about": ("About", "F1", True),
         "move_down": ("Down", "j", False),
         "move_up": ("Up", "k", False),
         "jump_top": ("Top", "g g", False),
@@ -129,8 +129,7 @@ def build_home_bindings() -> list[Binding]:
         # priority=True ensures modifier bindings work even when Input widget is focused
         return [
             Binding("ctrl+n", "add_dataset", "Add Dataset", key_display="Ctrl+N", priority=True),
-            Binding("ctrl+shift+s", "settings", "Settings", key_display="Ctrl+Shift+S", priority=True),
-            Binding("ctrl+comma", "settings", "Settings", show=False, priority=True),
+            Binding("ctrl+s", "settings", "Settings", key_display="Ctrl+S", priority=True),
             Binding("o", "open_details", "Open", show=False),
             Binding("enter", "open_details", "View Details", show=False),
             Binding("ctrl+u", "check_updates", "Check Updates", key_display="Ctrl+U", priority=True),
