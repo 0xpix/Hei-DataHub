@@ -2,6 +2,7 @@
 
 ## TO ADD
 - [ ] Add support for MacOS - Probably will stick to uv install for beta and then will do the homebrew install later
+- [ ] Add a responsive layout for smaller screens
 - [ ] Add shortcut to naviguate to the left/right h/l
 
 ## TO CHANGE
