@@ -26,7 +26,7 @@ def update_formula(path, version, arm_sha, intel_sha):
 
     # URL templates - Ensure these match the actual release asset names
     # As defined in build_macos.sh: hei-datahub-${VERSION}-macos-${ARCH}.tar.gz
-    base_url = f"https://github.com/0xpix/hei-datahub/releases/download/v{version}"
+    base_url = f"https://github.com/0xpix/Hei-DataHub/releases/download/{version}"
     arm_url = f"{base_url}/hei-datahub-{version}-macos-arm64.tar.gz"
     intel_url = f"{base_url}/hei-datahub-{version}-macos-x86_64.tar.gz"
 
