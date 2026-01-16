@@ -65,41 +65,38 @@ CloudDatasetDetailsScreen #details-container .title {
    CONTENT CARD - Bordered Container
    ============================================================================ */
 
-CloudDatasetDetailsScreen #details-content {
+/* Replaced legacy #details-content with actual MetadataField styles */
+
+MetadataField {
+    layout: horizontal;
+    height: auto;
     width: 100%;
-    min-height: 20;
-    padding: 3;
-    margin: 0;
-    background: $panel;
-    border: round $primary 30%;
+    margin-bottom: 1;
+    padding: 0;
+}
+
+MetadataField .copy-btn {
+    width: 3;
+    min-width: 3;
+    color: $text-muted;
+    content-align: center top;
+}
+
+MetadataField .copy-btn:hover {
+    color: $accent;
+    text-style: bold;
+}
+
+MetadataField .field-text {
+    width: 1fr;
+    height: auto;
+    color: $text;
 }
 
 /* ============================================================================
    TYPOGRAPHY - Metadata Fields
    ============================================================================ */
 
-/* All text inside details content */
-CloudDatasetDetailsScreen #details-content Static {
-    color: $text;
-    padding: 0;
-}
-
-/* Field labels - cyan bold */
-CloudDatasetDetailsScreen #details-content Static .field-label {
-    color: $text;
-    text-style: bold;
-}
-
-/* Field values - normal text */
-CloudDatasetDetailsScreen #details-content Static .field-value {
-    color: $text;
-}
-
-/* Section dividers */
-CloudDatasetDetailsScreen #details-content Static .divider {
-    border-bottom: solid $primary 30%;
-    margin: 2 0;
-}
 
 /* ============================================================================
    LOADING STATE
