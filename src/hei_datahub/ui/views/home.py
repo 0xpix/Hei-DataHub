@@ -23,6 +23,9 @@ from textual.widgets import (
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.utils.keybindings import build_home_bindings
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
+import webbrowser
+import urllib.parse
+from textual import events
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +34,10 @@ class HomeScreen(Screen):
     """Main screen with search functionality and Neovim-style navigation."""
 
     # Load bindings from config file
-    BINDINGS = build_home_bindings() + [Binding("U", "check_updates", "Update", key_display="U", show=True)]
+    BINDINGS = build_home_bindings() + [
+        Binding("U", "check_updates", "Update", key_display="U", show=True),
+        Binding("ctrl+i", "report_issue", "Report Issue", show=False),
+    ]
 
     # Load CSS from styles directory
     ENABLE_COMMAND_PALETTE = True
@@ -276,6 +282,12 @@ class HomeScreen(Screen):
                     logger.debug(f"Tracked usage: {term.field}:{term.value}")
         except Exception as e:
             logger.debug(f"Failed to track search usage: {e}")
+
+    def action_report_issue(self) -> None:
+        """Open the issue reporting page."""
+        url = "https://github.com/0xpix/Hei-DataHub/issues/new?labels=bug&template=bug_report.md"
+        self.notify("Opening GitHub issue page...")
+        webbrowser.open(url)
 
     def load_all_datasets(self, force_refresh: bool = False) -> None:
         """Load and display all available datasets from index (CLOUD ONLY)."""
