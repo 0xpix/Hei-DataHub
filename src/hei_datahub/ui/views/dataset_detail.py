@@ -42,7 +42,7 @@ from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 logger = logging.getLogger(__name__)
 
 
-class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActionsMixin, Screen):
+class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
     """Screen to view cloud dataset details (from metadata.yaml)."""
 
     CSS_PATH = "../styles/dataset_detail.tcss"
@@ -50,7 +50,6 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
     BINDINGS = [
         ("escape", "back", "Back"),
         ("e", "edit_cloud_dataset", "Edit"),
-        ("y", "copy_source", "Copy Source"),
         ("o", "open_url", "Open URL"),
         ("d", "delete_dataset", "Delete"),
     ]
@@ -62,10 +61,26 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, ClipboardActio
 
     @property
     def source_url(self) -> str:
-        """Get source URL for mixins (used by UrlActionsMixin and ClipboardActionsMixin)."""
-        if self.metadata and 'source' in self.metadata:
-            return self.metadata['source']
-        return None
+        """Get source URL for mixins (used by UrlActionsMixin)."""
+        if not self.metadata:
+            return None
+
+        # Check Access/Location (storage_location) first
+        url = self.metadata.get('storage_location')
+        if url and (url.startswith('http://') or url.startswith('https://')):
+            return url
+
+        # Fallback to Access Method
+        url = self.metadata.get('access_method')
+        if url and (url.startswith('http://') or url.startswith('https://')):
+            return url
+            
+        # Fallback to Source
+        url = self.metadata.get('source')
+        if url and (url.startswith('http://') or url.startswith('https://')):
+            return url
+
+        return self.metadata.get('storage_location')
 
     def compose(self) -> ComposeResult:
         yield Header()
