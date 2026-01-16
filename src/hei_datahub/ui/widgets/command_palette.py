@@ -30,6 +30,7 @@ class CustomCommandPalette(ModalScreen[str]):
         background: $surface;
         color: $text;
         width: 100%;
+        height: 1;
         margin-bottom: 1;
         dock: top;
     }
@@ -84,16 +85,25 @@ class CustomCommandPalette(ModalScreen[str]):
             ("Refresh", "refresh_data", "Ctrl+R", "Data"),
             # Navigation
             ("Settings", "settings", "Ctrl+Shift+S", "Navigation"),
-            ("Check Updates", "check_updates", "Ctrl+U", "Navigation"),
-            ("About", "show_about", "Ctrl+I", "Navigation"),
+            ("About", "show_about", "F1", "Navigation"),
             # Appearance
             ("Change Theme", "theme_palette", "Ctrl+T", "Appearance"),
             # System
+            ("Report Issue", "report_issue", "Ctrl+I", "System"),
+            ("Check Updates", "check_updates", "Ctrl+U", "System"),
             ("Exit", "quit", "Ctrl+Q", "System"),
         ]
 
         for desc, action, key, category in categorized_commands:
-            label = f"{desc} ({key})"
+            # Align key to the right (assuming width ~50 chars available)
+            # Container width 60 - borders/padding ~6-8 chars -> ~52 chars
+            # We add 2 chars indent in update_list, so target ~48-50 chars here
+            key_str = f"{key}"
+            target_width = 48
+            spaces = target_width - len(desc) - len(key_str)
+            if spaces < 1: spaces = 1
+
+            label = f"{desc}{' ' * spaces}{key_str}"
             self.commands.append((label, action, category))
 
         self._update_list(self.commands, show_categories=True)
