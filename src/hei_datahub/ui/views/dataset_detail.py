@@ -74,7 +74,7 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         url = self.metadata.get('access_method')
         if url and (url.startswith('http://') or url.startswith('https://')):
             return url
-            
+
         # Fallback to Source
         url = self.metadata.get('source')
         if url and (url.startswith('http://') or url.startswith('https://')):
