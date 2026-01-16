@@ -12,6 +12,7 @@ from textual import on, work, events
 from textual.app import ComposeResult
 from textual.containers import VerticalScroll, Horizontal, Container
 from textual.screen import Screen, ModalScreen
+from textual.binding import Binding
 from textual.widgets import (
     Button,
     Header,
@@ -73,7 +74,8 @@ class YankFooter(Static):
     YankFooter {
         dock: bottom;
         width: 100%;
-        height: 2;
+        height: auto;
+        min-height: 1;
         background: $surface;
         color: $text;
         border-top: wide $accent;
@@ -95,8 +97,8 @@ class YankFooter(Static):
 
         parts = []
         for k, label in items:
-            parts.append(f"[bold]{k}[/]:[dim]{label}[/]")
-        parts.append("[bold]Esc[/]:[dim]cancel[/]")
+            parts.append(f"[bold]{k}[/]:{label}")
+        parts.append("[bold]Esc[/]:cancel")
 
         text_parts.append("  ".join(parts))
 
@@ -112,7 +114,17 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         ("e", "edit_cloud_dataset", "Edit"),
         ("o", "open_url", "Open URL"),
         ("d", "delete_dataset", "Delete"),
+        Binding("j", "scroll_down", "Scroll Down", show=False),
+        Binding("k", "scroll_up", "Scroll Up", show=False),
     ]
+
+    def action_scroll_down(self) -> None:
+        """Scroll down (vim style)."""
+        self.query_one("#details-container", VerticalScroll).scroll_down()
+
+    def action_scroll_up(self) -> None:
+        """Scroll up (vim style)."""
+        self.query_one("#details-container", VerticalScroll).scroll_up()
 
     def __init__(self, dataset_id: str):
         super().__init__()
@@ -153,7 +165,6 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
         return self.metadata.get('storage_location')
 
     def compose(self) -> ComposeResult:
-        yield Header()
         yield VerticalScroll(
             Label(f"󱤟 Dataset: {self.dataset_id}", classes="title"),
             id="details-container",
