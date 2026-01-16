@@ -1,7 +1,6 @@
 # 0.64-beta
 
 ## TO ADD
-- [ ] Add support for MacOS - Probably will stick to uv install for beta and then will do the homebrew install later
 - [ ] Add shortcut to naviguate to the left/right h/l
 
 ## TO CHANGE
@@ -12,6 +11,7 @@
 - [!] Fix the scroll, it feels weird and not smooth - (wasn't fixed, it added the scrollbar back)
 
 ## ADDED/CHANGED/FIXED
+- [x] Add support for MacOS - Added the howmebrew-tap for now (will do the homebrew later)
 - [x] Add a responsive layout for smaller screens
 - [x] Add a copy minimalistic btn for non-technical people, for example at the start of each field in the dataset details
 - [x] Add a feature where when you are in dataset details, you can press multiple keys to copy different fields, for example ctrl+c r e f (VIM like)
