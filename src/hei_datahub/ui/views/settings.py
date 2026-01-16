@@ -38,7 +38,6 @@ class SettingsScreen(Screen):
     ]
 
     def compose(self) -> ComposeResult:
-        yield Header()
         yield VerticalScroll(
             Label("☁️ WebDAV (HeiBox) Settings  |  [italic]Configure cloud storage credentials[/italic]", classes="title"),
             Label(""),
