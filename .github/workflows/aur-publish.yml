@@ -208,7 +208,7 @@ jobs:
 
             # Verify packaging (checks integrity of existing files)
             echo 'Validating PKGBUILD...'
-            su builduser -c 'makepkg -o'
+            su builduser -c 'makepkg -od'
           "
 
           echo "Generated .SRCINFO:"
