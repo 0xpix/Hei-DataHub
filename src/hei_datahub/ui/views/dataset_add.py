@@ -83,7 +83,6 @@ class AddDataScreen(Screen):
     ]
 
     def compose(self) -> ComposeResult:
-        yield Header()
         yield VerticalScroll(
             Label("󰆺 Add New Dataset", classes="title"),
             Container(
