@@ -1,20 +1,12 @@
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-main.png" alt="Logo Main" width="200"/>
+  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo round" width="400"/>
 </p>
 
-<p align="center">
-  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo round" width="200"/>
-  <img src="assets/png/Hei-datahub-logo-H.png" alt="Logo H" width="200"/>
-</p>
-
-<p align="center">
-  <img src="assets/png/Hei-datahub-logo-inline.png" alt="Logo inline" width="400"/>
-</p>
 
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/Version-0.63.0--beta-blue.svg)
+![Version](https://img.shields.io/badge/Version-0.64.0--beta-blue.svg)
 [![Version Consistency Check](https://github.com/0xpix/Hei-DataHub/actions/workflows/version-sync.yml/badge.svg)](https://github.com/0xpix/Hei-DataHub/actions/workflows/version-sync.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
