@@ -40,8 +40,9 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
-          # URL pattern: .../download/<TAG>/HeiDataHub-<CLEAN_VERSION>-x86_64.AppImage
-          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-${VERSION}-x86_64.AppImage"
+          # URL pattern: .../download/<VERSION>/HeiDataHub-<VERSION>-x86_64.AppImage
+          # Using clean VERSION for the tag part of URL as requested, assuming release slug matches version
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
 
           echo "Waiting for AppImage to be available at:"
           echo "$APPIMAGE_URL"
@@ -64,7 +65,8 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
-          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-${VERSION}-x86_64.AppImage"
+          # Using VERSION in URL to match the expected link format
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
 
           echo "Downloading AppImage..."
           curl -L -o "HeiDataHub.AppImage" "$APPIMAGE_URL"
@@ -110,7 +112,7 @@ jobs:
           license=('MIT')
           depends=('fuse2')
           options=('!strip')
-          source=(
+          source=(VERSION
               "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-\${pkgver}-x86_64.AppImage"
               "hei-datahub.desktop"
               "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
@@ -156,46 +158,53 @@ jobs:
           cat aur/PKGBUILD
 
       - name: Generate .SRCINFO
-        ruTAG="${{ steps.version.outputs.tag }}"
-          VERSION="${{ steps.version.outputs.clean_version }}"
-          APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
-          DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
-          ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
+            ruTAG="${{ steps.version.outputs.tag }}"
+            VERSION="${{ steps.version.outputs.clean_version }}"
+            APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
+            DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
+            ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
 
-          cat > aur/.SRCINFO << EOF
-          pkgbase = hei-datahub
-          	pkgdesc = Lightweight local data hub with TUI for managing datasets
-          	pkgver = ${VERSION}
-          	pkgrel = 1
-          	url = https://github.com/0xpix/Hei-DataHub
-          	arch = x86_64
-          	license = MIT
-          	depends = fuse2
-          	options = !strip
-          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG
-          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
-          	source = hei-datahub.desktop
-          	source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
-          	sha256sums = ${APPIMAGE_SHA256}
-          	sha256sums = ${DESKTOP_SHA256}
-          	sha256sums = ${ICON_SHA256}
+            cat > aur/.SRCINFO << EOF
+            pkgbase = hei-datahub
+                pkgdesc = Lightweight local data hub with TUI for managing datasets
+                pkgver = ${VERSION}
+                pkgrel = 1
+                url = https://github.com/0xpix/Hei-DataHub
+                arch = x86_64
+                license = MIT
+                depends = fuse2
+                options = !strip
+                source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG
+                source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
+                source = hei-datahub.desktop
+                source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
+                sha256sums = ${APPIMAGE_SHA256}
+                sha256sums = ${DESKTOP_SHA256}
+                sha256sums = ${ICON_SHA256}
 
-          pkgname = hei-datahub
-          EOF
+            pkgname = hei-datahub
+            EOF
 
-          echo "Generated .SRCINFO:"
-          cat aur/.SRCINFO
+            echo "Generated .SRCINFO:"
+            cat aur/.SRCINFO
 
       - name: Setup SSH for AUR
         env:
           AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
         run: |
           if [[ -z "$AUR_SSH_KEY" ]]; then
-            echo "WARNING: AUR_SSH_KEY not set, skipping AUR push"
+            echo "::error::AUR_SSH_KEY secret is not set!"
             echo "To enable AUR publishing:"
             echo "1. Generate SSH key: ssh-keygen -t ed25519 -f aur_key -N ''"
-            echo "2. Add public key to AUR account"
-            echo "3. Add private key as AUR_SSH_KEY secret in GitHub"
+            echo "2. Add public key (aur_key.pub) to your AUR account at https://aur.archlinux.org/account"
+            echo "3. Add private key (aur_key) as 'AUR_SSH_KEY' repository secret in GitHub"
+
+            # Fail the job if this is a tag push (release)
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              exit 1
+            fi
+
+            echo "WARNING: Skipping AUR push (workflow_dispatch without key). PKGBUILD generated but not pushed."
             exit 0
           fi
 
@@ -203,6 +212,7 @@ jobs:
           echo "$AUR_SSH_KEY" > ~/.ssh/aur_key
           chmod 600 ~/.ssh/aur_key
 
+          # Disable StrictHostKeyChecking to avoid interactive prompts
           cat >> ~/.ssh/config << EOF
           Host aur.archlinux.org
             IdentityFile ~/.ssh/aur_key
@@ -242,12 +252,12 @@ jobs:
           git push origin master
 
       - name: Summary
-        ruTAG="${{ steps.version.outputs.tag }}"
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
           echo "## AUR Package Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${VERSION} (Tag: ${TAG})
-          echo "- **Version:** ${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${VERSION} (Tag: ${TAG})" >> $GITHUB_STEP_SUMMARY
           echo "- **Package:** hei-datahub" >> $GITHUB_STEP_SUMMARY
           echo "- **AppImage SHA256:** ${{ steps.checksum.outputs.appimage_sha256 }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
