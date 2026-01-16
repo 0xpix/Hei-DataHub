@@ -58,13 +58,17 @@ class ContextualFooter(Widget):
     SHORTCUTS = {
         "home": [
             ("Ctrl+N", "Add"),
-            ("Ctrl+P", "Commands"),
             ("Ctrl+S", "Settings"),
+            ("Ctrl+I", "Report Issue"),
+            ("Ctrl+P", "Commands"),
+            ("F1", "About"),
         ],
         "search": [
             ("Ctrl+N", "Add"),
             ("Ctrl+S", "Settings"),
+            ("Ctrl+I", "Report Issue"),
             ("Ctrl+P", "Commands"),
+            ("F1", "About"),
         ],
         "results": [
             ("j/k", "Navigate"),
