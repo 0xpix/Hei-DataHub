@@ -2,8 +2,6 @@
 
 ## TO ADD
 - [ ] Add support for MacOS - Probably will stick to uv install for beta and then will do the homebrew install later
-- [ ] Add a feature where when you are in dataset details, you can press multiple keys to copy different fields, for example ctrl+c r e f (VIM like)
-- [ ] Add a dynamic footer for the Yank shortcut in the dataset details
 - [ ] Add shortcut to naviguate to the left/right h/l
 
 ## TO CHANGE
@@ -14,8 +12,9 @@
 - [!] Fix the scroll, it feels weird and not smooth - (wasn't fixed, it added the scrollbar back)
 
 ## ADDED/CHANGED/FIXED
-
 - [x] Add a copy minimalistic btn for non-technical people, for example at the start of each field in the dataset details
+- [x] Add a feature where when you are in dataset details, you can press multiple keys to copy different fields, for example ctrl+c r e f (VIM like)
+- [x] Add a dynamic footer for the Yank shortcut in the dataset details
 
 - [x] Change the layout of the columns in the dataset table
 - [x] Remove the generate ID field, just generate it automatically based on the title
