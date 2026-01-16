@@ -25,6 +25,7 @@ class DataHubApp(App):
     BINDINGS = [
         Binding("ctrl+p", "commands", "Open Command Palette", priority=True),
         Binding("ctrl+t", "theme_palette", "Change Theme", priority=True),
+        Binding("ctrl+s", "settings", "Settings", priority=True),
     ]
 
     # Track WebDAV/Heibox connection status
@@ -88,6 +89,15 @@ class DataHubApp(App):
         """Open the theme selection palette."""
         from hei_datahub.ui.widgets.theme_palette import ThemePalette
         self.push_screen(ThemePalette())
+
+    def action_settings(self) -> None:
+        """Open settings menu (Global)."""
+        self.notify("Opening Settings...", timeout=1)
+        try:
+            from hei_datahub.ui.utils.settings_router import open_settings_screen
+            open_settings_screen(self)
+        except Exception as e:
+            self.notify(f"Error opening settings: {e}", severity="error")
 
     def on_mount(self) -> None:
         """Initialize the app."""
