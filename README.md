@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="assets/png/Hei-datahub-logo-round.png" alt="Logo round" width="400"/>
+  <img src="assets/png/Hei-datahub-logo-H.png" alt="Logo round" width="400"/>
 </p>
 
 
