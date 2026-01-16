@@ -34,7 +34,7 @@ class DataHubApp(App):
     def on_resize(self, event: Resize) -> None:
         """Adjust layout based on window size."""
         # TODO: Implement responsive layout changes for future versions for now let's make it 10 (width) x 35 (height) (170 was for my laptop)
-        if event.size.width < 160 or event.size.height < 35:
+        if event.size.width < 170 or event.size.height < 35:
             self.add_class("compact-layout")
         else:
             self.remove_class("compact-layout")
