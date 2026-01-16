@@ -72,6 +72,8 @@ jobs:
       - name: Compute desktop file checksum
         id: desktop_checksum
         run: |
+          mkdir -p aur
+          cp assets/linux/hei-datahub.desktop aur/hei-datahub.desktop
           DESKTOP_SHA256=$(sha256sum "aur/hei-datahub.desktop" | cut -d' ' -f1)
           echo "desktop_sha256=$DESKTOP_SHA256" >> $GITHUB_OUTPUT
           echo "Desktop SHA256: $DESKTOP_SHA256"
