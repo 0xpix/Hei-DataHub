@@ -22,17 +22,26 @@ jobs:
         id: version
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            VERSION="${{ github.event.inputs.tag }}"
+            TAG="${{ github.event.inputs.tag }}"
           else
-            VERSION="${{ github.ref_name }}"
+            TAG="${{ github.ref_name }}"
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
+
+          # Strip leading 'v' for package version and filename
+          CLEAN_VERSION="${TAG#v}"
+
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "clean_version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+
+          echo "Tag: $TAG"
+          echo "Clean Version: $CLEAN_VERSION"
 
       - name: Wait for release assets
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
+          TAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
+          # URL pattern: .../download/<TAG>/HeiDataHub-<CLEAN_VERSION>-x86_64.AppImage
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-${VERSION}-x86_64.AppImage"
 
           echo "Waiting for AppImage to be available at:"
           echo "$APPIMAGE_URL"
@@ -53,8 +62,9 @@ jobs:
       - name: Download AppImage and compute checksum
         id: checksum
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
+          TAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-${VERSION}-x86_64.AppImage"
 
           echo "Downloading AppImage..."
           curl -L -o "HeiDataHub.AppImage" "$APPIMAGE_URL"
@@ -80,7 +90,8 @@ jobs:
 
       - name: Generate updated PKGBUILD
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
+          TAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
           APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
           DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
           ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
@@ -100,7 +111,7 @@ jobs:
           depends=('fuse2')
           options=('!strip')
           source=(
-              "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/\${pkgver}/HeiDataHub-\${pkgver}-x86_64.AppImage"
+              "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-\${pkgver}-x86_64.AppImage"
               "hei-datahub.desktop"
               "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
           )
@@ -145,8 +156,8 @@ jobs:
           cat aur/PKGBUILD
 
       - name: Generate .SRCINFO
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
+        ruTAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
           APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
           DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
           ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
@@ -161,6 +172,7 @@ jobs:
           	license = MIT
           	depends = fuse2
           	options = !strip
+          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG
           	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
           	source = hei-datahub.desktop
           	source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
@@ -230,10 +242,11 @@ jobs:
           git push origin master
 
       - name: Summary
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
+        ruTAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
           echo "## AUR Package Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${VERSION} (Tag: ${TAG})
           echo "- **Version:** ${VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "- **Package:** hei-datahub" >> $GITHUB_STEP_SUMMARY
           echo "- **AppImage SHA256:** ${{ steps.checksum.outputs.appimage_sha256 }}" >> $GITHUB_STEP_SUMMARY
