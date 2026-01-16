@@ -135,7 +135,7 @@ def build_home_bindings() -> list[Binding]:
             Binding("ctrl+u", "check_updates", "Check Updates", key_display="Ctrl+U", priority=True),
             Binding("ctrl+r", "refresh_data", "Refresh", key_display="Ctrl+R", priority=True),
             Binding("ctrl+q", "quit", "Quit", key_display="Ctrl+Q", priority=True),
-            Binding("ctrl+i", "show_about", "About", key_display="Ctrl+I", priority=True),
+            Binding("f1", "show_about", "About", key_display="F1", priority=True),
             Binding("j", "move_down", "Down", show=False),
             Binding("k", "move_up", "Up", show=False),
             Binding("down", "move_down", "", show=False),
