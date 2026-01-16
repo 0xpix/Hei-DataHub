@@ -105,12 +105,12 @@ def get_default_keybindings() -> dict[str, list[str]]:
     """Get default keybindings configuration."""
     return {
         "add_dataset": ["ctrl+n"],
-        "settings": ["ctrl+shift+s", "ctrl+comma"],
+        "settings": ["ctrl+s"],
         "open_details": ["o", "enter"],
         "check_updates": ["ctrl+u"],
         "refresh_data": ["ctrl+r"],
         "quit": ["ctrl+q"],
-        "show_about": ["ctrl+i"],
+        "show_about": ["f1"],
         "move_down": ["j", "down"],
         "move_up": ["k", "up"],
         "jump_top": ["g"],
@@ -127,7 +127,7 @@ class UserConfig(BaseModel):
 
     This represents the full user config file structure.
     """
-    config_version: int = Field(default=3)
+    config_version: int = Field(default=4)
     theme: ThemeConfig = Field(default_factory=ThemeConfig)
     ui: UIConfig = Field(default_factory=UIConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
@@ -251,6 +251,29 @@ class ConfigManager:
 
              data["config_version"] = 3
              logger.info("Migrated config from v2 to v3")
+
+        if current_version < 4:
+            # Add F1 for help/about as robust fallback
+            if "keybindings" in data:
+                kb = data["keybindings"]
+                if "show_about" in kb:
+                    for key in ["f1", "ctrl+shift+i"]:
+                         if key not in kb["show_about"]:
+                             kb["show_about"].append(key)
+                else:
+                    kb["show_about"] = ["f1"]
+
+            data["config_version"] = 4
+
+        if current_version < 4:
+            # Clean up settings keybindings to only use ctrl+s
+            if "keybindings" in data:
+                kb = data["keybindings"]
+                if "settings" in kb:
+                    # Enforce only ctrl+s
+                    kb["settings"] = ["ctrl+s"]
+
+            data["config_version"] = 4
 
         return data
 
