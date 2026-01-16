@@ -30,8 +30,16 @@ jobs:
           # Strip leading 'v' for package version and filename
           CLEAN_VERSION="${TAG#v}"
 
+          # Determine if tag has 'v' prefix for URL construction in PKGBUILD
+          if [[ "$TAG" == v* ]]; then
+            TAG_PREFIX="v"
+          else
+            TAG_PREFIX=""
+          fi
+
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "clean_version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+          echo "tag_prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT
 
           echo "Tag: $TAG"
           echo "Clean Version: $CLEAN_VERSION"
@@ -81,6 +89,12 @@ jobs:
           echo "icon_sha256=$ICON_SHA256" >> $GITHUB_OUTPUT
           echo "Icon SHA256: $ICON_SHA256"
 
+          # Download license and compute checksum
+          curl -L -o "LICENSE" "https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/LICENSE"
+          LICENSE_SHA256=$(sha256sum "LICENSE" | cut -d' ' -f1)
+          echo "license_sha256=$LICENSE_SHA256" >> $GITHUB_OUTPUT
+          echo "License SHA256: $LICENSE_SHA256"
+
       - name: Compute desktop file checksum
         id: desktop_checksum
         run: |
@@ -94,9 +108,11 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
+          TAG_PREFIX="${{ steps.version.outputs.tag_prefix }}"
           APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
           DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
           ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
+          LICENSE_SHA256="${{ steps.checksum.outputs.license_sha256 }}"
 
           cat > aur/PKGBUILD << EOF
           # Maintainer: Hei-DataHub <noreply@example.com>
@@ -112,15 +128,17 @@ jobs:
           license=('MIT')
           depends=('fuse2')
           options=('!strip')
-          source=(VERSION
-              "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG}/HeiDataHub-\${pkgver}-x86_64.AppImage"
+          source=(
+              "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG_PREFIX}\${pkgver}/HeiDataHub-\${pkgver}-x86_64.AppImage"
               "hei-datahub.desktop"
               "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
+              "LICENSE::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/LICENSE"
           )
           sha256sums=(
               '${APPIMAGE_SHA256}'
               '${DESKTOP_SHA256}'
               '${ICON_SHA256}'
+              '${LICENSE_SHA256}'
           )
 
           package() {
@@ -148,45 +166,68 @@ jobs:
               # Install icon
               install -Dm644 "hei-datahub.png" "\${pkgdir}/usr/share/icons/hicolor/256x256/apps/hei-datahub.png"
 
-              # Install license (fetch from upstream)
-              curl -sL "https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/LICENSE" \\
-                  > "\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"
+              # Install license
+              install -Dm644 "\${srcdir}/LICENSE" "\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"
           }
           EOF
 
           echo "Generated PKGBUILD:"
           cat aur/PKGBUILD
 
-      - name: Generate .SRCINFO
+      - name: Validate PKGBUILD and generate .SRCINFO
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
-          APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
-          DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
-          ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
 
-          cat > aur/.SRCINFO << EOF
-          pkgbase = hei-datahub
-          	pkgdesc = Lightweight local data hub with TUI for managing datasets
-          	pkgver = ${VERSION}
-          	pkgrel = 1
-          	url = https://github.com/0xpix/Hei-DataHub
-          	arch = x86_64
-          	license = MIT
-          	depends = fuse2
-          	options = !strip
-          	source = HeiDataHub-${VERSION}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage
-          	source = hei-datahub.desktop
-          	source = hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png
-          	sha256sums = ${APPIMAGE_SHA256}
-          	sha256sums = ${DESKTOP_SHA256}
-          	sha256sums = ${ICON_SHA256}
+          # Check for bare tokens (e.g. source=VERSION)
+          if grep -q "source=.*VERSION" aur/PKGBUILD; then
+             echo "::error::PKGBUILD contains invalid 'VERSION' in source array!"
+             exit 1
+          fi
 
-          pkgname = hei-datahub
-          EOF
+          # Prepare files for validation (to avoid re-downloading)
+          # We place the downloaded assets where makepkg expects them so makepkg -o verifies them
+          cp "HeiDataHub.AppImage" "aur/HeiDataHub-${VERSION}-x86_64.AppImage"
+          cp "icon.png" "aur/hei-datahub.png"
+          cp "LICENSE" "aur/LICENSE"
+
+          # Prepare directory for docker ownership
+          chmod 777 aur
+          chmod 666 aur/*
+
+          # Use a docker container to run makepkg
+          echo "Running makepkg in container..."
+          docker run --rm -v "$PWD/aur:/pkg" -w /pkg archlinux:base-devel /bin/bash -c "
+            # Create a build user (makepkg cannot run as root)
+            useradd builduser -m
+            chown -R builduser /pkg
+
+            # Generate .SRCINFO
+            echo 'Generating .SRCINFO...'
+            su builduser -c 'makepkg --printsrcinfo > .SRCINFO'
+
+            # Verify packaging (checks integrity of existing files)
+            echo 'Validating PKGBUILD...'
+            su builduser -c 'makepkg -o'
+          "
 
           echo "Generated .SRCINFO:"
           cat aur/.SRCINFO
+
+          # Ensure .SRCINFO exists and not empty
+          if [[ ! -s aur/.SRCINFO ]]; then
+             echo "::error::.SRCINFO was not generated or empty!"
+             exit 1
+          fi
+
+      - name: Upload packaging artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aur-package-files
+          path: |
+            aur/PKGBUILD
+            aur/.SRCINFO
 
       - name: Setup SSH for AUR
         env:
@@ -229,7 +270,7 @@ jobs:
             exit 0
           fi
 
-          VERSION="${{ steps.version.outputs.version }}"
+          VERSION="${{ steps.version.outputs.clean_version }}"
 
           # Clone AUR repo
           git clone ssh://aur@aur.archlinux.org/hei-datahub.git aur-repo || {
