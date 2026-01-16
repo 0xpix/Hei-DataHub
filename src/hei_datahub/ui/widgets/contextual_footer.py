@@ -78,6 +78,7 @@ class ContextualFooter(Widget):
             ("e", "Edit"),
             ("d", "Delete"),
             ("o", "Open URL"),
+            ("y", "Yank fields"),
             ("Esc", "Back"),
         ],
         "edit": [
