@@ -31,7 +31,6 @@ MANIFEST
 # --- Project Specific ---
 # Internal development notes & logs
 devs/
-DEV/
 logs/
 
 # SQLite Databases
@@ -54,4 +53,3 @@ hei-datahub/
 # --- macOS (for now) ---
 .github/workflows/macos-build.yml
 scripts/build_macos.sh
-
