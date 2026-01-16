@@ -7,82 +7,94 @@
     /* Base font size adjustment isn't possible in terminal, but we can reduce spacing */
 }
 
+/* 1. Hero / Header adjustments */
+/* Keep hero section closer to standard, but slightly reduced padding */
 .compact-layout #hero-section {
-    margin-top: 10 !important;
     padding: 1 !important;
+    /* margin-top: inherit; (Use standard margin) */
 }
 
+/* Ensure banner is visible but maybe smaller margins if defined elsewhere */
 .compact-layout #banner {
+    /* Removed display: block !important to allow home.tcss to hide it during search */
     margin-bottom: 1 !important;
-    padding: 0 !important;
 }
 
-.compact-layout DataTable {
-    height: 1fr;
+.compact-layout Header {
+    height: 1 !important;
+    min-height: 1 !important;
+    dock: top;
 }
 
-.compact-layout #details-container,
+/* 2. Containers & Margins */
+/* Details container (ScrollView) */
+.compact-layout #details-container {
+    max-width: 95% !important;
+    width: 70% !important;
+    height: 90% !important;
+    margin: 1 0 !important;
+    border: round $primary 30% !important;
+    align: center middle;
+    padding: 0 1 !important;
+}
+
+/* Form containers (Content inside ScrollView) */
 .compact-layout #edit-form-container,
 .compact-layout #form-container {
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 1;
-    border: none;
+    max-width: 95% !important;
+    width: 70% !important;
+    height: auto !important; /* Allow growing for scrolling */
+    margin: 0 0 !important;
+    border: round $primary 30% !important;
+    align: center middle;
+    padding: 0 1 !important;
 }
 
-.compact-layout #details-container .title {
-    margin-bottom: 0;
+.compact-layout #results-section {
+    width: 80% !important;
+    border: none !important;
 }
 
-/* Compact Footer */
+.compact-layout #main-container > Container {
+    align: center middle;
+}
+
+/* 3. Table Density */
+.compact-layout DataTable {
+    height: 1fr;
+    margin-top: 1 !important;
+    border: none !important;
+}
+/* Reduce table cell padding if possible or rely on tighter rows */
+
+/* 4. Form inputs - tighter spacing */
+.compact-layout #form-container Input,
+.compact-layout #edit-form-container Input,
+.compact-layout #settings-container Input,
+.compact-layout TextArea {
+    margin-bottom: 1 !important; /* Slight breathing room but less than normal */
+    height: 3 !important; /* Standard height but ensure no bloat */
+}
+
+.compact-layout Select {
+    margin-bottom: 1 !important;
+    height: auto !important;
+}
+
+.compact-layout Label {
+    margin-top: 1 !important;
+    margin-bottom: 0 !important;
+}
+
+/* 5. Footer - minimal */
 .compact-layout ContextualFooter {
     height: 1;
 }
 
-.compact-layout ContextualFooter .footer-key {
-    padding: 0 1;
-}
-
-.compact-layout ContextualFooter .footer-label {
-    padding: 0;
-    margin-right: 1;
-}
-
-/* Compact Forms (Edit/Add) */
-.compact-layout Input,
-.compact-layout TextArea,
-.compact-layout Select {
-    margin-bottom: 0 !important;
-    height: 3 !important;
-    min-height: 1 !important;
-    padding: 0 1;
-    border: none;
-}
-
-.compact-layout Label {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-.compact-layout Button {
-    height: 1 !important;
-    min-height: 1 !important;
-    padding: 0 1 !important;
-    border: none !important;
-}
-
-/* Compact Details */
-.compact-layout #details-content {
-    padding: 0;
-}
-
-/* Compact Table - Tight rows */
-.compact-layout DataTable {
-    height: 1fr;
-    margin: 0;
-    border: none;
-}
+/* 6. Search Bar positioning in compact mode - REMOVED to keep "as is" */
+/*.compact-layout #search-container {
+    margin-bottom: 1 !important;
+}*/
 /* ============================================================================
    GLOBAL BASE STYLES - Hei-DataHub
    Only truly global, screen-agnostic rules
