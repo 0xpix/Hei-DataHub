@@ -15,6 +15,7 @@
 - [x] Add a copy minimalistic btn for non-technical people, for example at the start of each field in the dataset details
 - [x] Add a feature where when you are in dataset details, you can press multiple keys to copy different fields, for example ctrl+c r e f (VIM like)
 - [x] Add a dynamic footer for the Yank shortcut in the dataset details
+- [x] Add a report shortcut for people to report issues
 
 - [x] Change the layout of the columns in the dataset table
 - [x] Remove the generate ID field, just generate it automatically based on the title
