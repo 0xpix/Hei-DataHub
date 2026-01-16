@@ -113,6 +113,7 @@ class SettingsWizard(Screen):
                 ),
                 Input(
                     placeholder="your-username",
+                    password=True,
                     id="step3-username",
                     classes="wizard-input"
                 ),

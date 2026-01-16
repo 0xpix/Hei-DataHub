@@ -47,7 +47,7 @@ class SettingsScreen(Screen):
                 Label("Library Name:"),
                 Input(placeholder="e.g., heidata", id="input-library"),
                 Label("Username:"),
-                Input(placeholder="your-username", id="input-username"),
+                Input(placeholder="your-username", password=True, id="input-username"),
                 Label("Password/Token:"),
                 Input(placeholder="your-WebDAV-password", password=True, id="input-token"),
                 Label("[dim]Note: Credentials are stored securely in system keyring[/dim]"),
