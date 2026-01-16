@@ -318,7 +318,7 @@ wheels = [
 
 [[package]]
 name = "hei-datahub"
-version = "0.61.0b0"
+version = "0.64.0b0"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
