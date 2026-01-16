@@ -2,6 +2,8 @@
 
 ## TO ADD
 - [ ] Add support for MacOS - Probably will stick to uv install for beta and then will do the homebrew install later
+- [ ] Add a feature where when you are in dataset details, you can press multiple keys to copy different fields, for example ctrl+c r e f
+- [ ] Add a copy btn for non-technical people, for example at the start of each field
 - [ ] Add shortcut to naviguate to the left/right h/l
 
 ## TO CHANGE
@@ -10,11 +12,11 @@
 ## TO FIX
 
 - [ ] Data won't appear after setting up auth, it will apear just after launching the app again
-- [ ] FIx the shortcut `o` in the dataset detail page where it tries to open the source instead of the link from Acess/Location
 - [!] Fix the scroll, it feels weird and not smooth - (wasn't fixed, it added the scrollbar back)
 
 ## ADDED/CHANGED/FIXED
 
+- [x] Fix the shortcut `o` in the dataset detail page where it tries to open the source instead of the link from Acess/Location and remove copy url
 - [x] Change the layout of the columns in the dataset table
 - [x] Remove the generate ID field, just generate it automatically based on the title
 - [x] If the Any of the fields were left empty, just put "Not specified"
