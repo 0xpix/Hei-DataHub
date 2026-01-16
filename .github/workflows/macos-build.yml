@@ -18,8 +18,10 @@ jobs:
         include:
           - arch: arm64
             os: macos-14
+            python-arch: 'arm64'
           - arch: x86_64
-            os: macos-13
+            os: macos-14
+            python-arch: 'x64'
 
     steps:
       - name: Checkout code
@@ -29,6 +31,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          architecture: ${{ matrix.python-arch }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -60,3 +63,83 @@ jobs:
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-tap:
+    name: Update Homebrew Tap
+    needs: build-macos
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Main Repo (for script)
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: Download Artifacts (ARM64)
+        uses: actions/download-artifact@v4
+        with:
+          name: checksums-macos-arm64
+          path: artifacts/arm
+
+      - name: Download Artifacts (Intel)
+        uses: actions/download-artifact@v4
+        with:
+          name: checksums-macos-x86_64
+          path: artifacts/intel
+
+      - name: Read Checksums
+        id: shas
+        run: |
+          # Read the first field (SHA) from the checksum file
+          # Pattern: <sha>  <filename>
+          ARM_SHA=$(cat artifacts/arm/sha256-macos-arm64.txt | awk '{print $1}')
+          INTEL_SHA=$(cat artifacts/intel/sha256-macos-x86_64.txt | awk '{print $1}')
+          
+          echo "ARM_SHA=$ARM_SHA" >> $GITHUB_OUTPUT
+          echo "INTEL_SHA=$INTEL_SHA" >> $GITHUB_OUTPUT
+          echo "Extracted SHAs - ARM: $ARM_SHA, Intel: $INTEL_SHA"
+
+      - name: Create GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.TAP_BOT_APP_ID }}
+          private-key: ${{ secrets.TAP_BOT_PRIVATE_KEY }}
+          owner: 0xpix
+          repositories: homebrew-tap
+
+      - name: Checkout Tap Repo
+        uses: actions/checkout@v4
+        with:
+          repository: 0xpix/homebrew-tap
+          token: ${{ steps.app-token.outputs.token }}
+          path: tap
+
+      - name: Extract Version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Update Formula
+        run: |
+          python3 main/scripts/update_homebrew_formula.py \
+            tap/Formula/hei-datahub.rb \
+            ${{ steps.get_version.outputs.VERSION }} \
+            ${{ steps.shas.outputs.ARM_SHA }} \
+            ${{ steps.shas.outputs.INTEL_SHA }}
+
+      - name: Commit and Push
+        run: |
+          cd tap
+          git config user.name "hei-datahub-tap-bot"
+          git config user.email "tap-bot@users.noreply.github.com"
+          
+          # Check for changes
+          if [[ -n $(git status -s) ]]; then
+            git add Formula/hei-datahub.rb
+            git commit -m "hei-datahub ${{ steps.get_version.outputs.VERSION }}"
+            git push
+            echo "Successfully pushed update to homebrew-tap"
+          else
+            echo "No changes detected (formula might already be up to date)"
+          fi
