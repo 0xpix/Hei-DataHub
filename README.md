@@ -23,6 +23,8 @@
 
 **Hei-DataHub** is a terminal-based inventory and dataset management tool designed to be fast, minimal, and "zen." It helps you organize and search through your datasets without leaving your keyboard.
 
+> **P.S.** Works with any university that uses **SeafDAV** technology.
+
 ## 📦 Installation
 Visit the website to download your 
 
