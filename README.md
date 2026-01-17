@@ -4,47 +4,103 @@
 </p>
 
 
+<div align="center">
+
 # Hei-DataHub
 
-![Version](https://img.shields.io/badge/Version-0.64.0--beta-blue.svg)
-[![Version Consistency Check](https://github.com/0xpix/Hei-DataHub/actions/workflows/version-sync.yml/badge.svg)](https://github.com/0xpix/Hei-DataHub/actions/workflows/version-sync.yml)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+**A calm inventory experience in your terminal.**
 
-> Local-first TUI to catalog datasets with YAML + SQLite, fast full-text search, and one-key cloud sync via WebDAV.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Release](https://img.shields.io/github/v/release/0xpix/Hei-DataHub)](https://github.com/0xpix/Hei-DataHub/releases)
+
+[Website](https://hei-datahub.app) • [Documentation](https://hei-datahub.app/docs) • [Report Bug](https://github.com/0xpix/Hei-DataHub/issues)
+
+</div>
 
 ---
 
-## 🚀 Install
+## ✨ Overview
 
-**Linux (UV recommended):**
+**Hei-DataHub** is a terminal-based inventory and dataset management tool designed to be fast, minimal, and "zen." It helps you organize and search through your datasets without leaving your keyboard.
+
+## 📦 Installation
+Visit the website to download your 
+
+### macOS
+Install via our Homebrew tap:
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+brew install 0xpix/tap/hei-datahub
+```
+
+### Linux (Arch Linux)
+Available in the AUR:
+```bash
+yay -S hei-datahub
+```
+
+### Windows & Linux (Universal via `uv`)
+If you have [`uv`](https://docs.astral.sh/uv/) installed:
+```bash
 uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
-hei-datahub # or hdh
 ```
 
-**Windows:**
-Download `hei-datahub-setup.exe` from [Releases](https://github.com/0xpix/Hei-DataHub/releases).
+### Manual Installation
+Download the latest binaries from the [Download Page](https://hei-datahub.app/download).
 
----
+## ⚡ Quick Start
 
-## ⚡ Features
+1.  **Launch the application:**
+    ```bash
+    hei-datahub
+    ```
 
-- **Secure** — Credentials stored in system keyring
-- **Cloud sync** — Direct upload to Heibox/Seafile via WebDAV
-- **Fast search** — <80ms full-text search with SQLite FTS5
-- **Keyboard-first** — Vim-style navigation, no mouse needed
+2.  **Add your first dataset:**
+    Press `a` (or your configured binding) to open the "Add Dataset" modal.
 
----
+3.  **Search:**
+    Press `/` to enter search mode.
 
-## 🛠️ Development
+## ⚙️ Configuration
 
-```bash
-git clone git@github.com:0xpix/Hei-DataHub.git
-cd Hei-DataHub
-uv sync --dev && source .venv/bin/activate
-hei-datahub # hdh
+Hei-DataHub looks for a configuration file in your standard config directory:
+
+- **Linux:** `~/.config/hei-datahub/config.toml`
+- **macOS:** `~/Library/Application Support/hei-datahub/config.toml`
+- **Windows:** `%APPDATA%\hei-datahub\config.toml`
+
+Example configuration:
+```toml
+[general]
+theme = "dark"
+editor = "nvim"
+
+[paths]
+data_root = "~/Datasets"
 ```
+
+Configuration docs coming soon ...
+
+## ⌨️ Keybindings
+
+| Key | Action |
+| :--- | :--- |
+| `j` / `k` | Navigate list down/up |
+| `/` | Search |
+| `Enter` | View details |
+| `Ctrl+A` | Add new dataset |
+| `Ctrl+E` | Edit selected dataset |
+| `Ctrl+P` | Show help menu |
+| `esc/Ctrl+Q` | Quit |
+
+## 🤝 Contributing
+
+Contributions are welcome! Please look at the [issues](https://github.com/0xpix/Hei-DataHub/issues) to see how you can help.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ---
 
