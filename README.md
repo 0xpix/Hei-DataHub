@@ -44,7 +44,7 @@ If you have [`uv`](https://docs.astral.sh/uv/) installed:
 uv tool install "git+ssh://git@github.com/0xpix/Hei-DataHub.git@main"
 ```
 
-### Manual Installation
+### Manual Installation (Recommended for Windows)
 Download the latest binaries from the [Download Page](https://hei-datahub.app/download).
 
 ## ⚡ Quick Start
