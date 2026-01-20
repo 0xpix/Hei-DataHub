@@ -39,8 +39,8 @@ def run_clear(force: bool = False, clear_all: bool = False) -> int:
     Returns:
         Exit code (0 = success)
     """
-    if platform.system() not in ["Linux", "Windows"]:
-        print(f"❌ Error: auth clear is only supported on Linux and Windows (current: {platform.system()}).", file=sys.stderr)
+    if platform.system() not in ["Linux", "Windows", "Darwin"]:
+        print(f"❌ Error: auth clear is only supported on Linux, Windows, and macOS (current: {platform.system()}).", file=sys.stderr)
         return 2
 
     from hei_datahub.infra.config_paths import get_config_path
