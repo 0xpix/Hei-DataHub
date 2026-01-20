@@ -45,14 +45,14 @@ class AuthStore(ABC):
 
 
 class KeyringAuthStore(AuthStore):
-    """Linux/Windows keyring-based credential storage (Secret Service/Credential Locker)."""
+    """Cross-platform keyring-based credential storage (Secret Service/Credential Locker/macOS Keychain)."""
 
     SERVICE_NAME = "hei-datahub"
 
     def __init__(self):
         """Initialize keyring store."""
-        if platform.system() not in ["Linux", "Windows"]:
-            raise RuntimeError(f"KeyringAuthStore is only supported on Linux and Windows (current: {platform.system()})")
+        if platform.system() not in ["Linux", "Windows", "Darwin"]:
+            raise RuntimeError(f"KeyringAuthStore is only supported on Linux, Windows, and macOS (current: {platform.system()})")
 
         try:
             import keyring
@@ -171,8 +171,8 @@ def get_auth_store(prefer_keyring: bool = True) -> AuthStore:
     Returns:
         AuthStore instance
     """
-    if platform.system() not in ["Linux", "Windows"]:
-        raise RuntimeError(f"Only Linux and Windows are supported for auth setup (current: {platform.system()})")
+    if platform.system() not in ["Linux", "Windows", "Darwin"]:
+        raise RuntimeError(f"Only Linux, Windows, and macOS are supported for auth setup (current: {platform.system()})")
 
     if prefer_keyring:
         try:
