@@ -61,8 +61,8 @@ def run_setup_wizard(
         Exit code: 0 success, 1 validation/abort, 2 usage error
     """
     # Platform check
-    if platform.system() not in ["Linux", "Windows"]:
-        print(f"❌ Error: auth setup is only supported on Linux and Windows (current: {platform.system()}).", file=sys.stderr)
+    if platform.system() not in ["Linux", "Windows", "Darwin"]:
+        print(f"❌ Error: auth setup is only supported on Linux, Windows, and macOS (current: {platform.system()}).", file=sys.stderr)
         return 2
 
     print("🔐 Hei-DataHub WebDAV Authentication Setup\n")
