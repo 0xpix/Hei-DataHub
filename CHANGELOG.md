@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.64.1-beta] - 2026-01-20 - macOS Auth Hotfix
+
+**Hotfix:** Enables settings and authentication on macOS.
+
+### Fixed
+
+- **macOS Authentication Support**
+  - Fixed settings wizard not working on macOS (was showing "only supported on Windows and Linux")
+  - Added Darwin (macOS) to supported platforms for `auth setup`, `auth clear`, and `auth doctor` commands
+  - macOS now uses the native Keychain for secure credential storage
+
+---
+
 ## [0.64.0-beta] - 2026-01-16 - macOS Support & UI Refinements
 
 **macOS Support & UX Improvements!** This release adds official macOS support via Homebrew and significantly improves the UI responsiveness and navigation.
