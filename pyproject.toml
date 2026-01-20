@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hei-datahub"
-version = "0.64.0-beta"
+version = "0.64.1-beta"
 description = "Hei-DataHub — lightweight local data hub with TUI for managing datasets"
 readme = "README.md"
 requires-python = ">=3.10"
