@@ -1,9 +1,9 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.64.0-beta"
+version: "0.64.1-beta"
 codename: "macOS & Polish"
-release_date: "2026-01-16"
+release_date: "2026-01-20"
 compatibility: "Hei-DataHub v0.64.x (beta)"
 notes: "This is a beta release featuring cross-platform enhancements and UI polish."
 
