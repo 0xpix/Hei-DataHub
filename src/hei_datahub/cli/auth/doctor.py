@@ -707,8 +707,8 @@ def run_doctor(output_json: bool = False, skip_write: bool = False, timeout: int
     Returns:
         Exit code (0 = success)
     """
-    if platform.system() not in ["Linux", "Windows"]:
-        print(f"❌ Error: auth doctor is only supported on Linux and Windows (current: {platform.system()}).", file=sys.stderr)
+    if platform.system() not in ["Linux", "Windows", "Darwin"]:
+        print(f"❌ Error: auth doctor is only supported on Linux, Windows, and macOS (current: {platform.system()}).", file=sys.stderr)
         return 2
 
     doctor = AuthDoctor(output_json=output_json, skip_write=skip_write, timeout=timeout)
