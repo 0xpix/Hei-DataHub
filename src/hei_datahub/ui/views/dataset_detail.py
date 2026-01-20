@@ -5,6 +5,7 @@ import logging
 import os
 import tempfile
 import time
+from datetime import datetime
 
 import pyperclip
 import yaml
@@ -494,19 +495,27 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
             # Delete the entire dataset folder
             folder_path = self.dataset_id
             try:
-                # List and delete all files in the dataset folder
-                items = storage.listdir(folder_path)
-                for item in items:
-                    file_path = f"{folder_path}/{item.name}"
-                    storage.delete(file_path)
-                    logger.debug(f"Deleted file: {file_path}")
+                # Version control/Backup: Move to _DELETED_DATASETS instead of permanent deletion
+                # This ensures data can be restored from Heibox if needed.
+                backup_root = "_DELETED_DATASETS"
+                if not storage.exists(backup_root):
+                    storage.mkdir(backup_root)
 
-                # Delete the folder itself
-                storage.delete(folder_path)
-                logger.info(f"Deleted dataset folder from cloud: {folder_path}")
+                # Append timestamp to avoid collisions
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                backup_path = f"{backup_root}/{folder_path}_{timestamp}"
+
+                # Move instead of delete
+                storage.move(folder_path, backup_path)
+                logger.info(f"Moved dataset folder to backup: {backup_path}")
+
+                self.app.call_from_thread(
+                    lambda: self.app.notify(f"Dataset moved to {backup_path}", timeout=5)
+                )
+
             except Exception as e:
-                logger.warning(f"Error deleting from cloud: {e}")
-                # Continue with local deletion even if cloud deletion fails
+                logger.warning(f"Error moving to backup (cloud): {e}")
+                # Continue with local deletion even if cloud deletion/move fails
 
             # Delete from local SQLite index (datasets_store and datasets_fts)
             try:
