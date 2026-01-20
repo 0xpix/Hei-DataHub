@@ -150,10 +150,9 @@ sudo dnf install python3-keyring python3-secretstorage libsecret gnome-keyring
 
 ## Platform Support
 
-**Supported:** Linux only
-**Not supported:** macOS, Windows
+**Supported:** Linux, Windows, macOS
 
-The module explicitly checks for Linux and raises `RuntimeError` on other platforms.
+All major platforms are supported. On macOS, credentials are stored in the macOS Keychain. On Linux, GNOME Keyring or KDE Wallet is used. On Windows, the Windows Credential Locker is used.
 
 ## Error Handling
 
