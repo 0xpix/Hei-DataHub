@@ -113,8 +113,10 @@ log_info "Project root: $PROJECT_ROOT"
 log_info "Build time: $(date '+%Y-%m-%d %H:%M:%S')"
 
 VERSION=$(get_version)
+# Replace -beta with b for filename consistency to match macOS/Windows builds
+FILE_VERSION=${VERSION/-beta/b}
 DEB_VERSION=$(get_deb_version "$VERSION")
-log_info "Version: $VERSION (deb: $DEB_VERSION)"
+log_info "Version: $VERSION (File: $FILE_VERSION, Deb: $DEB_VERSION)"
 
 # Determine architecture
 ARCH=$(uname -m)
@@ -404,7 +406,7 @@ fi  # End CAN_BUILD_DEB check
 banner "STEP 6/6: Building .AppImage"
 
 APPDIR="$PACKAGING_DIR/AppDir"
-APPIMAGE_OUTPUT="HeiDataHub-${VERSION}-x86_64.AppImage"
+APPIMAGE_OUTPUT="heidatahub-${FILE_VERSION}-x86_64.AppImage"
 
 log_info "Creating AppDir structure..."
 
