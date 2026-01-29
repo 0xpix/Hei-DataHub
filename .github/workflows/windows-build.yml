@@ -84,13 +84,13 @@ jobs:
           $distDir = "dist"
 
           # Check for versioned executables checks
-          $exeFiles = Get-ChildItem -Path $distDir -Filter "hei-datahub-v*.exe"
+          $exeFiles = Get-ChildItem -Path $distDir -Filter "hei-datahub-*.exe"
 
           if ($exeFiles.Count -gt 0) {
             Write-Host "Found $($exeFiles.Count) output files:" -ForegroundColor Green
             $exeFiles | ForEach-Object { Write-Host " - $($_.Name)" }
           } else {
-            Write-Host "ERROR: No output files found matching 'hei-datahub-v*.exe' in dist/" -ForegroundColor Red
+            Write-Host "ERROR: No output files found matching 'hei-datahub-*.exe' in dist/" -ForegroundColor Red
             Get-ChildItem -Path $distDir | Select-Object Name
             exit 1
           }
@@ -123,7 +123,7 @@ jobs:
         with:
           name: HeiDataHub-windows-${{ steps.version.outputs.ref_name }}-${{ steps.version.outputs.short_sha }}
           path: |
-            dist/hei-datahub-v*.exe
+            dist/hei-datahub-*.exe
           if-no-files-found: error
           retention-days: 7
 
@@ -132,7 +132,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/hei-datahub-v*.exe
+            dist/hei-datahub-*.exe
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
