@@ -111,8 +111,10 @@ Write-Banner "HEI-DATAHUB WINDOWS BUILD" -Color Cyan
 # Extract version from version.yaml
 $VersionLine = Get-Content -Path "version.yaml" | Select-String "version:"
 $AppVersion = $VersionLine.ToString().Split(":")[1].Trim().Trim('"').Trim("'")
-$PortableName = "hei-datahub-v$AppVersion-portable.exe"
-$SetupName = "hei-datahub-v$AppVersion-setup.exe"
+# Replace -beta with b for filename consistency (e.g. 0.64.0-beta -> 0.64.0b)
+$BuildVersion = $AppVersion.Replace("-beta", "b")
+$PortableName = "hei-datahub-$BuildVersion-portable.exe"
+$SetupName = "hei-datahub-$BuildVersion-setup.exe"
 
 Write-Host "  Project: " -NoNewline -ForegroundColor Gray
 Write-Host "Hei-DataHub" -ForegroundColor White
