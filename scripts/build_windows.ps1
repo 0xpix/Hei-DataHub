@@ -108,9 +108,23 @@ $NsisScript = Join-Path $InstallerDir "hei_datahub.nsi"
 Clear-Host
 Write-Banner "HEI-DATAHUB WINDOWS BUILD" -Color Cyan
 
-# Extract version from version.yaml
-$VersionLine = Get-Content -Path "version.yaml" | Select-String "version:"
-$AppVersion = $VersionLine.ToString().Split(":")[1].Trim().Trim('"').Trim("'")
+# Try to get version from git first (matching Linux build behavior)
+$AppVersion = $null
+if (Get-Command git -ErrorAction SilentlyContinue) {
+    try {
+        $GitTag = git describe --tags --exact-match 2>$null
+        if ($LASTEXITCODE -eq 0 -and $GitTag) {
+            $AppVersion = $GitTag.Trim().TrimStart("v")
+        }
+    } catch {}
+}
+
+# Fallback to version.yaml if git tag not found
+if (-not $AppVersion) {
+    $VersionLine = Get-Content -Path "version.yaml" | Select-String "version:"
+    $AppVersion = $VersionLine.ToString().Split(":")[1].Trim().Trim('"').Trim("'")
+}
+
 # Replace -beta with b for filename consistency (e.g. 0.64.0-beta -> 0.64.0b)
 $BuildVersion = $AppVersion.Replace("-beta", "b")
 $PortableName = "hei-datahub-$BuildVersion-portable.exe"
