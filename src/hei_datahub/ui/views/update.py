@@ -95,7 +95,13 @@ class UpdateScreen(Screen):
         self.auto_start = auto_start
         self._updating = False
         self._success = False
-        self._platform = "windows" if sys.platform == "win32" else "linux"
+        # Detect platform
+        if sys.platform == "win32":
+            self._platform = "windows"
+        elif sys.platform == "darwin":
+            self._platform = "macos"
+        else:
+            self._platform = "linux"
 
     def compose(self) -> ComposeResult:
         yield Container(
@@ -208,37 +214,167 @@ class UpdateScreen(Screen):
         self._log(f"New version available: v{latest_version}")
         self._update_ui(f"Update available: v{latest_version}", 25)
 
-        # Platform-specific handling
-        if self._platform == "linux":
-            self._handle_linux_update(latest_version)
-        else:
+        # Use installation method detection for correct update instructions
+        from hei_datahub.infra.install_method import get_install_info, InstallMethod
+
+        install_info = get_install_info()
+
+        # Handle Windows EXE separately (auto-update)
+        if install_info.method == InstallMethod.WINDOWS_EXE:
             self._handle_windows_update(update_info)
+            return
 
-    def _handle_linux_update(self, latest_version: str) -> None:
-        """Handle update on Linux - show instructions."""
-        self._update_ui("Update instructions", 100)
+        # All other installation methods: show instructions
+        self._handle_manual_update(latest_version, install_info)
+
+    def _handle_manual_update(self, latest_version: str, install_info) -> None:
+        """Handle update for non-auto-update installations - run update command."""
+        import subprocess
+        import shlex
+        from hei_datahub.infra.install_method import InstallMethod
+
+        # Determine the update command(s) to run
+        commands = []
+        method_name = ""
+
+        if install_info.method == InstallMethod.AUR:
+            method_name = "AUR (Arch Linux)"
+            # Use yay for AUR updates
+            commands = [["yay", "-Syu", "--noconfirm", "hei-datahub"]]
+        elif install_info.method == InstallMethod.HOMEBREW:
+            method_name = "Homebrew"
+            # brew update first, then upgrade
+            commands = [
+                ["brew", "update"],
+                ["brew", "upgrade", "hei-datahub"]
+            ]
+        elif install_info.method == InstallMethod.UV_TOOL:
+            method_name = "uv tool"
+            commands = [["uv", "tool", "upgrade", "hei-datahub"]]
+        elif install_info.method == InstallMethod.PIP:
+            method_name = "pip"
+            commands = [["pip", "install", "--upgrade", "hei-datahub"]]
+        elif install_info.method == InstallMethod.DEV:
+            method_name = "Development"
+            # For dev mode, just show instructions (can't auto-update source)
+            self._update_ui("Development mode", 100)
+            self._log("")
+            self._log("─" * 40)
+            self._log("🔧 Running from source (dev mode)", "info")
+            self._log("")
+            self._log("To update, run in the repo:")
+            self._log("  git pull origin main")
+            self._log("  uv sync")
+            self._log("─" * 40)
+            self._show_result_manual(latest_version, install_info)
+            return
+        else:
+            # Unknown method - show instructions
+            self._update_ui("Update instructions", 100)
+            self._log("")
+            self._log("─" * 40)
+            self._log("📦 To update:", "info")
+            self._log("")
+            self._log(install_info.update_instructions)
+            self._log("─" * 40)
+            self._show_result_manual(latest_version, install_info)
+            return
+
+        # Run the update command(s)
         self._log("")
         self._log("─" * 40)
-        self._log("📦 To update on Linux, run:", "info")
+        self._log(f"📦 Updating via {method_name}...", "info")
         self._log("")
-        self._log("  uv tool upgrade hei-datahub")
-        self._log("")
-        self._log("Or if using pip:")
-        self._log("  pip install --upgrade hei-datahub")
+
+        total_commands = len(commands)
+        success = True
+
+        for i, cmd in enumerate(commands):
+            cmd_str = " ".join(cmd)
+            self._log(f"$ {cmd_str}")
+
+            # Update progress
+            base_progress = 30
+            progress_per_cmd = 60 // total_commands
+            current_progress = base_progress + (i * progress_per_cmd)
+            self._update_ui(f"Running: {cmd[0]}...", current_progress)
+
+            try:
+                # Run command and capture output in real-time
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+
+                # Read output line by line
+                for line in iter(process.stdout.readline, ''):
+                    line = line.rstrip()
+                    if line:
+                        self._log(f"  {line}")
+
+                process.wait()
+
+                if process.returncode != 0:
+                    self._log(f"✗ Command failed with exit code {process.returncode}")
+                    success = False
+                    break
+                else:
+                    self._log(f"✓ {cmd[0]} completed")
+
+            except FileNotFoundError:
+                self._log(f"✗ Command not found: {cmd[0]}")
+                success = False
+                break
+            except Exception as e:
+                self._log(f"✗ Error: {e}")
+                success = False
+                break
+
+            self._log("")
+
         self._log("─" * 40)
 
-        self._show_result_linux(latest_version)
+        if success:
+            self._update_ui("Update complete!", 100)
+            self._log("")
+            self._log("✓ Update completed successfully!")
+            self._log("")
+            self._log("Restart the app to use the new version.")
+            self._show_update_success(latest_version)
+        else:
+            self._update_ui("Update failed", 100)
+            self._log("")
+            self._log("✗ Update failed. Try running manually:")
+            self._log(f"  {install_info.update_command}")
+            self._show_result_manual(latest_version, install_info)
+
+    def _show_update_success(self, latest_version: str) -> None:
+        """Show update success message."""
+        self._updating = False
+
+        def update():
+            try:
+                self.query_one("#update-status", Static).update(f"✅ Updated to v{latest_version}")
+                self.query_one("#update-progress", ProgressBar).update(progress=100)
+                self.query_one("#update-percent", Static).update("100%")
+                btn = self.query_one("#cancel-btn", Button)
+                btn.label = "Restart"
+                btn.variant = "success"
+            except Exception:
+                pass
+
+        self.app.call_from_thread(update)
 
     def _handle_windows_update(self, update_info: dict) -> None:
         """Handle update on Windows - download and install."""
         # Check if frozen (PyInstaller)
         if not getattr(sys, 'frozen', False):
-            self._log("Running from source code")
-            self._log("Auto-update only works with installed .exe")
-            self._log("")
-            self._log("To update from source:")
-            self._log("  git pull origin main")
-            self._show_dev_mode()
+            from hei_datahub.infra.install_method import get_install_info
+            install_info = get_install_info()
+            self._handle_manual_update(update_info.get("latest_version", "?"), install_info)
             return
 
         # Import Windows updater
@@ -326,13 +462,25 @@ class UpdateScreen(Screen):
 
         self.app.call_from_thread(update)
 
-    def _show_result_linux(self, latest_version: str) -> None:
-        """Show result for Linux with update instructions."""
+    def _show_result_manual(self, latest_version: str, install_info) -> None:
+        """Show result for manual update installations (AUR, Homebrew, pip, etc.)."""
+        from hei_datahub.infra.install_method import InstallMethod
+
         self._updating = False
+
+        # Determine icon based on install method
+        method_icons = {
+            InstallMethod.AUR: "🐧",
+            InstallMethod.HOMEBREW: "🍺",
+            InstallMethod.UV_TOOL: "📦",
+            InstallMethod.PIP: "🐍",
+            InstallMethod.DEV: "🔧",
+        }
+        icon = method_icons.get(install_info.method, "📦")
 
         def update():
             try:
-                self.query_one("#update-status", Static).update(f"🐧 Update to v{latest_version}")
+                self.query_one("#update-status", Static).update(f"{icon} Update to v{latest_version}")
                 self.query_one("#update-progress", ProgressBar).update(progress=100)
                 self.query_one("#update-percent", Static).update("100%")
                 btn = self.query_one("#cancel-btn", Button)
