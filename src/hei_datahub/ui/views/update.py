@@ -268,6 +268,21 @@ class UpdateScreen(Screen):
             self._log("─" * 40)
             self._show_result_manual(latest_version, install_info)
             return
+        elif install_info.method == InstallMethod.APPIMAGE:
+            # Generic AppImage - show download instructions
+            self._update_ui("AppImage", 100)
+            self._log("")
+            self._log("─" * 40)
+            self._log("📦 Running from AppImage", "info")
+            self._log("")
+            self._log("To update, download the latest AppImage from:")
+            self._log("  https://github.com/0xpix/Hei-DataHub/releases")
+            self._log("")
+            self._log("Or install via AUR for automatic updates:")
+            self._log("  yay -S hei-datahub")
+            self._log("─" * 40)
+            self._show_result_manual(latest_version, install_info)
+            return
         else:
             # Unknown method - show instructions
             self._update_ui("Update instructions", 100)
@@ -475,6 +490,7 @@ class UpdateScreen(Screen):
             InstallMethod.UV_TOOL: "📦",
             InstallMethod.PIP: "🐍",
             InstallMethod.DEV: "🔧",
+            InstallMethod.APPIMAGE: "📦",
         }
         icon = method_icons.get(install_info.method, "📦")
 
