@@ -31,6 +31,10 @@ class DataHubApp(App):
     # Track WebDAV/Heibox connection status
     heibox_connected = reactive(False)
 
+    # Track update availability (set by silent update check)
+    update_available = reactive(False)
+    latest_version = reactive("")
+
     def on_resize(self, event: Resize) -> None:
         """Adjust layout based on window size."""
         # TODO: Implement responsive layout changes for future versions for now let's make it 10 (width) x 35 (height) (170 was for my laptop)
@@ -267,17 +271,56 @@ class DataHubApp(App):
             pass
 
     @work(exclusive=True, thread=True)
-    async def check_for_updates_async(self) -> None:
-        """Check for updates asynchronously (background)."""
-        from hei_datahub.services.update_check import check_for_updates, format_update_message
+    def check_for_updates_async(self) -> None:
+        """
+        Perform silent update check on app launch (non-blocking).
 
-        update_info = check_for_updates(force=False)
-        if update_info and update_info.get("has_update"):
-            message = format_update_message(update_info)
-            self.notify(message, severity="information", timeout=10)
+        Uses the new update_service with proper version comparison
+        supporting tags like 0.64.11b.
+        """
+        try:
+            from hei_datahub.services.update_service import check_for_updates_silent
+
+            logger.info("Starting silent update check on launch...")
+            result = check_for_updates_silent()
+
+            if result is None:
+                logger.debug("Update check skipped (throttled or failed)")
+                return
+
+            if result.error:
+                logger.warning(f"Update check error: {result.error}")
+                return
+
+            # Update reactive state for UI components
+            if result.has_update:
+                logger.info(f"Update available: {result.latest_version} (current: {result.current_version})")
+                self.update_available = True
+                self.latest_version = result.latest_version
+
+                # Notify home screen to update badge
+                self._update_home_screen_badge()
+            else:
+                logger.info(f"App is up to date: {result.current_version}")
+                self.update_available = False
+                self.latest_version = result.latest_version
+
+        except Exception as e:
+            logger.error(f"Silent update check failed: {e}", exc_info=True)
+            # Fail silently - no UI impact
+
+    def _update_home_screen_badge(self) -> None:
+        """Notify home screen to show update badge."""
+        try:
+            for screen in self.screen_stack:
+                if isinstance(screen, HomeScreen):
+                    if hasattr(screen, 'show_update_badge'):
+                        screen.show_update_badge(self.latest_version)
+        except Exception as e:
+            logger.debug(f"Could not update home screen badge: {e}")
 
     @work(exclusive=True, thread=True)
-    async def startup_pull_check(self) -> None:
+    def startup_pull_check(self) -> None:
         """Check if we should prompt for pull on startup - DISABLED (cloud-only via WebDAV)."""
         # No longer needed - using WebDAV sync instead of Git pull
         pass
