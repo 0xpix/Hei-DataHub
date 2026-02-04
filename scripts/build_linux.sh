@@ -406,7 +406,7 @@ fi  # End CAN_BUILD_DEB check
 banner "STEP 6/6: Building .AppImage"
 
 APPDIR="$PACKAGING_DIR/AppDir"
-APPIMAGE_OUTPUT="heidatahub-${FILE_VERSION}-x86_64.AppImage"
+APPIMAGE_OUTPUT="HeiDataHub-${FILE_VERSION}-x86_64.AppImage"
 
 log_info "Creating AppDir structure..."
 
