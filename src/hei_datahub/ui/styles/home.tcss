@@ -59,7 +59,8 @@
     border: round $success;
     color: $text;
     width: auto;
-    height: 1;
+    height: auto;
+    min-height: 1;
 }
 
 #hero-section.compact #update-badge {
