@@ -13,7 +13,6 @@ Usage:
 """
 import logging
 import os
-import shutil
 import subprocess
 import sys
 from typing import Optional
@@ -56,8 +55,10 @@ class UrlActionsMixin:
         which can cause 'undefined symbol: rl_print_keybinding' errors
         on some Linux installations.
 
-        Uses start_new_session=True on Linux to properly detach the browser
-        process, which is required when running as a packaged binary.
+        For packaged binaries (PyInstaller), we need to:
+        1. Use shell=True to get proper PATH resolution
+        2. Ensure proper environment inheritance
+        3. Detach from the parent process completely
         """
         try:
             if sys.platform == "darwin":
@@ -75,46 +76,33 @@ class UrlActionsMixin:
                     stderr=subprocess.DEVNULL
                 )
             else:
-                # Linux - try xdg-open first with proper session detachment
-                # start_new_session=True is critical for packaged binaries
-                browsers = ["xdg-open", "gio", "gnome-open", "kde-open", "firefox", "chromium", "google-chrome"]
-                opened = False
+                # Linux - use shell=True for proper PATH resolution in packaged binaries
+                # Build a clean environment with essential variables
+                clean_env = {
+                    "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
+                    "HOME": os.environ.get("HOME", ""),
+                    "DISPLAY": os.environ.get("DISPLAY", ":0"),
+                    "WAYLAND_DISPLAY": os.environ.get("WAYLAND_DISPLAY", ""),
+                    "XDG_RUNTIME_DIR": os.environ.get("XDG_RUNTIME_DIR", ""),
+                    "DBUS_SESSION_BUS_ADDRESS": os.environ.get("DBUS_SESSION_BUS_ADDRESS", ""),
+                    "XDG_CURRENT_DESKTOP": os.environ.get("XDG_CURRENT_DESKTOP", ""),
+                    "DESKTOP_SESSION": os.environ.get("DESKTOP_SESSION", ""),
+                }
+                # Remove empty values
+                clean_env = {k: v for k, v in clean_env.items() if v}
 
-                for browser in browsers:
-                    if browser in ["xdg-open", "gio", "gnome-open", "kde-open"]:
-                        # These are openers, not browsers - just pass URL
-                        cmd = [browser, url] if browser != "gio" else ["gio", "open", url]
-                    else:
-                        # Direct browser - pass URL
-                        cmd = [browser, url]
-
-                    if shutil.which(cmd[0]):
-                        try:
-                            proc = subprocess.Popen(
-                                cmd,
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL,
-                                start_new_session=True,
-                                env={**os.environ, "DISPLAY": os.environ.get("DISPLAY", ":0")}
-                            )
-                            # Give it a moment to fail fast if it will
-                            try:
-                                proc.wait(timeout=0.5)
-                                if proc.returncode == 0:
-                                    opened = True
-                                    break
-                                # Non-zero return, try next browser
-                            except subprocess.TimeoutExpired:
-                                # Still running = good, browser is opening
-                                opened = True
-                                break
-                        except Exception as e:
-                            logger.debug(f"Browser {browser} failed: {e}")
-                            continue
-
-                if not opened:
-                    raise RuntimeError("No suitable browser found")
+                # Use shell=True with xdg-open for proper resolution
+                subprocess.Popen(
+                    f'xdg-open "{url}"',
+                    shell=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    stdin=subprocess.DEVNULL,
+                    start_new_session=True,
+                    env=clean_env,
+                    cwd=os.environ.get("HOME", "/tmp")
+                )
+                # Don't wait - xdg-open spawns a browser and exits
 
         except Exception as e:
             raise RuntimeError(f"Could not open browser: {e}")
