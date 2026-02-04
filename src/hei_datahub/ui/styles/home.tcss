@@ -55,7 +55,7 @@
 #update-badge-text {
     text-align: center;
     padding: 0 2;
-    background: $surface;
+    background: $background;
     border: round $success;
     color: $text;
     width: auto;
