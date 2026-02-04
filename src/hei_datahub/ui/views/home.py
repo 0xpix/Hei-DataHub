@@ -23,7 +23,8 @@ from textual.widgets import (
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.utils.keybindings import build_home_bindings
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
-import webbrowser
+import subprocess
+import sys
 import urllib.parse
 from textual import events
 
@@ -50,6 +51,9 @@ class HomeScreen(Screen):
     _g_pressed: bool = False
     _g_timer: Optional[Timer] = None
 
+    # Track if update badge is shown
+    _update_badge_shown: bool = False
+
     def compose(self) -> ComposeResult:
         from hei_datahub.ui.assets.loader import get_logo_widget_text
 
@@ -60,7 +64,15 @@ class HomeScreen(Screen):
             # Top "Hero" section with centered logo and search
             Container(
                 Static(logo_text, id="banner"),
-                Static("", id="update-status", classes="hidden"),
+                # Update badge container - hidden by default, shown when update available
+                Container(
+                    Static(
+                        "🆕 [bold green]Update available[/bold green]  •  [dim]Press Ctrl+U to update[/dim]",
+                        id="update-badge-text"
+                    ),
+                    id="update-badge",
+                    classes="hidden"
+                ),
                 Container(
                     Input(placeholder="Search datasets...", id="search-input"),
                     id="search-container"
@@ -99,6 +111,61 @@ class HomeScreen(Screen):
 
         # Setup search autocomplete
         self._setup_search_autocomplete()
+
+        # Check for cached update state and show badge if update available
+        self._check_cached_update_state()
+
+    def _check_cached_update_state(self) -> None:
+        """Check cached update state and show badge if update available."""
+        try:
+            from hei_datahub.services.update_service import get_cached_update_state
+
+            cached = get_cached_update_state()
+            if cached and cached.has_update:
+                self.show_update_badge(cached.latest_version)
+                logger.debug(f"Showing cached update badge: {cached.latest_version}")
+        except Exception as e:
+            logger.debug(f"Could not check cached update state: {e}")
+
+    def show_update_badge(self, latest_version: str) -> None:
+        """
+        Show the update available badge in the UI.
+
+        Called by the app after silent update check completes.
+
+        Args:
+            latest_version: The latest available version string
+        """
+        if self._update_badge_shown:
+            return  # Already showing
+
+        try:
+            badge = self.query_one("#update-badge")
+            badge_text = self.query_one("#update-badge-text", Static)
+
+            # Update badge text with version info
+            badge_text.update(
+                f"🆕 [bold green]Update available: v{latest_version}[/bold green]  •  "
+                f"[dim]Press [bold]Ctrl+U[/bold] to update[/dim]"
+            )
+
+            # Show the badge with animation
+            badge.remove_class("hidden")
+            self._update_badge_shown = True
+
+            logger.info(f"Update badge shown for version {latest_version}")
+
+        except Exception as e:
+            logger.debug(f"Could not show update badge: {e}")
+
+    def hide_update_badge(self) -> None:
+        """Hide the update badge (e.g., after user triggers update)."""
+        try:
+            badge = self.query_one("#update-badge")
+            badge.add_class("hidden")
+            self._update_badge_shown = False
+        except Exception:
+            pass
 
     def on_screen_resume(self) -> None:
         """Called when returning to this screen from a pushed screen."""
@@ -286,7 +353,30 @@ class HomeScreen(Screen):
         """Open the issue reporting page."""
         url = "https://github.com/0xpix/Hei-DataHub/issues/new?labels=bug&template=bug_report.md"
         self.notify("Opening GitHub issue page...")
-        webbrowser.open(url)
+        self._open_url(url)
+
+    def _open_url(self, url: str) -> None:
+        """
+        Open a URL in the default browser using subprocess.
+
+        Avoids using webbrowser module which can cause readline symbol
+        conflicts on some Linux installations.
+        """
+        try:
+            if sys.platform == "darwin":
+                subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            elif sys.platform == "win32":
+                subprocess.Popen(["start", url], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            else:
+                # Linux - try xdg-open first, then common alternatives
+                subprocess.Popen(["xdg-open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as e:
+            logger.error(f"Failed to open URL: {e}")
+            self.notify(f"Could not open browser: {e}", severity="error")
+
+    def action_theme_palette(self) -> None:
+        """Open theme palette (passthrough to app)."""
+        self.app.action_theme_palette()
 
     def load_all_datasets(self, force_refresh: bool = False) -> None:
         """Load and display all available datasets from index (CLOUD ONLY)."""
@@ -1067,9 +1157,39 @@ class HomeScreen(Screen):
         self.app.pull_updates()
 
     def action_check_updates(self) -> None:
-        """Check for app updates and show update screen (Shift+U key)."""
+        """
+        Check for app updates and show update screen (Ctrl+U).
+
+        Uses the new update_service to force a fresh check, then opens
+        the update screen if an update is available, or shows a toast
+        if already up to date.
+        """
+        from hei_datahub.services.update_service import trigger_update
         from hei_datahub.ui.views.update import UpdateScreen
-        self.app.push_screen(UpdateScreen(auto_start=True))
+
+        # Hide the update badge when user triggers update
+        self.hide_update_badge()
+
+        # Force a fresh check
+        logger.info("User triggered update check (Ctrl+U)")
+        result = trigger_update()
+
+        if result.error:
+            self.notify(f"Update check failed: {result.error}", severity="error", timeout=5)
+            return
+
+        if result.has_update:
+            # Update available - show update screen
+            logger.info(f"Update available: {result.latest_version}")
+            self.app.push_screen(UpdateScreen(auto_start=True))
+        else:
+            # Already up to date - show toast
+            self.notify(
+                f"✓ You're up to date! (v{result.current_version})",
+                severity="information",
+                timeout=3
+            )
+            logger.info(f"Already up to date: {result.current_version}")
 
 
     def action_refresh_data(self) -> None:
