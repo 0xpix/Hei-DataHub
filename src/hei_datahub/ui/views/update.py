@@ -151,32 +151,44 @@ class UpdateScreen(Screen):
         self._log("Starting update check...")
         self._update_ui("Checking for updates...", 5)
 
-        # Import version check
+        # Import version check - use new update_service with proper version comparison
         try:
             from hei_datahub import __version__
-            from hei_datahub.services.update_check import check_for_updates
+            from hei_datahub.services.update_service import (
+                trigger_update,
+                is_newer_version,
+            )
             self._log(f"Current version: v{__version__}")
         except ImportError as e:
             self._show_error(f"Import error: {e}")
             return
 
-        # Check for updates
+        # Check for updates using new service with proper version comparison
         self._update_ui("Connecting to GitHub...", 10)
         self._log("Fetching latest release info...")
 
         try:
-            update_info = check_for_updates(force=True)
+            result = trigger_update()
         except Exception as e:
             self._show_error(f"Failed to check: {e}")
             return
 
-        if update_info is None:
+        if result is None:
             self._show_error("Could not connect to update server")
             return
 
-        if "error" in update_info:
-            self._show_error(update_info["error"])
+        if result.error:
+            self._show_error(result.error)
             return
+
+        # Build update_info dict for compatibility with existing code
+        update_info = {
+            "has_update": result.has_update,
+            "current_version": result.current_version,
+            "latest_version": result.latest_version,
+            "release_url": result.release_url,
+            "release_notes": result.release_notes,
+        }
 
         # Check if update is available
         has_update = update_info.get("has_update", False)
@@ -362,7 +374,7 @@ class UpdateScreen(Screen):
                 btn.variant = "error"
             except Exception:
                 pass
-            
+
         self.app.call_from_thread(update)
 
     def _do_exit(self) -> None:
