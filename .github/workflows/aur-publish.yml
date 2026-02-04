@@ -30,6 +30,10 @@ jobs:
           # Strip leading 'v' for package version and filename
           CLEAN_VERSION="${TAG#v}"
 
+          # Sanitize version for pkgver (AUR doesn't allow hyphens)
+          # Replace hyphens with underscores
+          PKGVER="${CLEAN_VERSION//-/_}"
+
           # Determine if tag has 'v' prefix for URL construction in PKGBUILD
           if [[ "$TAG" == v* ]]; then
             TAG_PREFIX="v"
@@ -39,10 +43,12 @@ jobs:
 
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "clean_version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+          echo "pkgver=$PKGVER" >> $GITHUB_OUTPUT
           echo "tag_prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT
 
           echo "Tag: $TAG"
           echo "Clean Version: $CLEAN_VERSION"
+          echo "Package Version (pkgver): $PKGVER"
 
       - name: Wait for release assets
         run: |
@@ -108,19 +114,21 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
+          PKGVER="${{ steps.version.outputs.pkgver }}"
           TAG_PREFIX="${{ steps.version.outputs.tag_prefix }}"
           APPIMAGE_SHA256="${{ steps.checksum.outputs.appimage_sha256 }}"
           DESKTOP_SHA256="${{ steps.desktop_checksum.outputs.desktop_sha256 }}"
           ICON_SHA256="${{ steps.checksum.outputs.icon_sha256 }}"
           LICENSE_SHA256="${{ steps.checksum.outputs.license_sha256 }}"
 
+          # Note: pkgver uses sanitized version (no hyphens), but download URLs use original VERSION
           cat > aur/PKGBUILD << EOF
           # Maintainer: Hei-DataHub <noreply@example.com>
           # AUR package for Hei-DataHub
           # Installs the AppImage system-wide with desktop integration
 
           pkgname=hei-datahub
-          pkgver=${VERSION}
+          pkgver=${PKGVER}
           pkgrel=1
           pkgdesc="Lightweight local data hub with TUI for managing datasets"
           arch=('x86_64')
@@ -128,8 +136,9 @@ jobs:
           license=('MIT')
           depends=('fuse2')
           options=('!strip')
+          _realver=${VERSION}
           source=(
-              "HeiDataHub-\${pkgver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG_PREFIX}\${pkgver}/HeiDataHub-\${pkgver}-x86_64.AppImage"
+              "HeiDataHub-\${_realver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG_PREFIX}\${_realver}/HeiDataHub-\${_realver}-x86_64.AppImage"
               "hei-datahub.desktop"
               "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
               "LICENSE::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/LICENSE"
@@ -150,7 +159,7 @@ jobs:
               install -dm755 "\${pkgdir}/usr/share/licenses/\${pkgname}"
 
               # Install AppImage
-              install -Dm755 "HeiDataHub-\${pkgver}-x86_64.AppImage" "\${pkgdir}/opt/\${pkgname}/HeiDataHub.AppImage"
+              install -Dm755 "HeiDataHub-\${_realver}-x86_64.AppImage" "\${pkgdir}/opt/\${pkgname}/HeiDataHub.AppImage"
 
               # Create wrapper script
               cat > "\${pkgdir}/usr/bin/\${pkgname}" << 'WRAPPER'
@@ -179,14 +188,15 @@ jobs:
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
 
-          # Check for bare tokens (e.g. source=VERSION)
-          if grep -q "source=.*VERSION" aur/PKGBUILD; then
+          # Check for bare tokens (e.g. source=VERSION) - but allow _realver which is intentional
+          if grep -q "source=.*[^_]VERSION" aur/PKGBUILD; then
              echo "::error::PKGBUILD contains invalid 'VERSION' in source array!"
              exit 1
           fi
 
           # Prepare files for validation (to avoid re-downloading)
           # We place the downloaded assets where makepkg expects them so makepkg -o verifies them
+          # Note: Using VERSION (original) since _realver in PKGBUILD references the original version
           cp "HeiDataHub.AppImage" "aur/HeiDataHub-${VERSION}-x86_64.AppImage"
           cp "icon.png" "aur/hei-datahub.png"
           cp "LICENSE" "aur/LICENSE"
