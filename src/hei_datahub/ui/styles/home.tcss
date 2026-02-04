@@ -64,7 +64,7 @@
 }
 
 #hero-section.compact #update-badge {
-    margin-bottom: 0;
+    display: none;
 }
 
 #search-container {
