@@ -12,7 +12,8 @@ Usage:
         ...
 """
 import logging
-import webbrowser
+import subprocess
+import sys
 from typing import Optional
 
 import pyperclip
@@ -45,12 +46,31 @@ class UrlActionsMixin:
         """Override this to provide the URL to open."""
         raise NotImplementedError("UrlActionsMixin requires source_url property")
 
+    def _open_url_subprocess(self, url: str) -> None:
+        """
+        Open a URL using subprocess to avoid readline conflicts.
+
+        Uses platform-specific commands instead of webbrowser module
+        which can cause 'undefined symbol: rl_print_keybinding' errors
+        on some Linux installations.
+        """
+        try:
+            if sys.platform == "darwin":
+                subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            elif sys.platform == "win32":
+                subprocess.Popen(["start", url], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            else:
+                # Linux - use xdg-open
+                subprocess.Popen(["xdg-open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as e:
+            raise RuntimeError(f"Could not open browser: {e}")
+
     def action_open_url(self) -> None:
         """Open source URL in browser if it's a URL (o key)."""
         url = self.source_url
         if url and (url.startswith('http://') or url.startswith('https://')):
             try:
-                webbrowser.open(url)
+                self._open_url_subprocess(url)
                 self.app.notify("Opening URL in browser...", timeout=2)
             except Exception as e:
                 self.app.notify(f"Failed to open URL: {str(e)}", severity="error", timeout=3)
