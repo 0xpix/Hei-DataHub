@@ -65,16 +65,16 @@ class HomeScreen(Screen):
             Container(
                 Static(logo_text, id="banner"),
                 Container(
+                    Input(placeholder="Search datasets...", id="search-input"),
+                    id="search-container"
+                ),
+                Container(
                     Static(
                         "🆕 [green]Update available[/green] • [dim]Ctrl+U[/dim]",
                         id="update-badge-text"
                     ),
                     id="update-badge",
-                    classes="hidden"
-                ),
-                Container(
-                    Input(placeholder="Search datasets...", id="search-input"),
-                    id="search-container"
+                    classes=""
                 ),
                 id="hero-section"
             ),
