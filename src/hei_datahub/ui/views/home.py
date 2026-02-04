@@ -23,6 +23,7 @@ from textual.widgets import (
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.utils.keybindings import build_home_bindings
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
+from hei_datahub.ui.widgets.update_overlay import UpdateOverlay
 import subprocess
 import sys
 import urllib.parse
@@ -93,6 +94,7 @@ class HomeScreen(Screen):
             ),
             id="main-container",
         )
+        yield UpdateOverlay(id="update-overlay", on_restart=self._restart_app)
         yield ContextualFooter(id="contextual-footer")
 
     def on_mount(self) -> None:
@@ -1200,38 +1202,50 @@ class HomeScreen(Screen):
 
     def action_check_updates(self) -> None:
         """
-        Check for app updates and show update screen (Ctrl+U).
+        Check for app updates and run update in-place (Ctrl+U).
 
-        Uses the new update_service to force a fresh check, then opens
-        the update screen if an update is available, or shows a toast
-        if already up to date.
+        Shows an overlay on the home screen with progress bar while
+        the update runs in the background. After completion, prompts
+        to restart the app.
         """
-        from hei_datahub.services.update_service import trigger_update
-        from hei_datahub.ui.views.update import UpdateScreen
-
         # Hide the update badge when user triggers update
         self.hide_update_badge()
 
-        # Force a fresh check
         logger.info("User triggered update check (Ctrl+U)")
-        result = trigger_update()
 
-        if result.error:
-            self.notify(f"Update check failed: {result.error}", severity="error", timeout=5)
-            return
+        # Show the update overlay and start the update
+        try:
+            overlay = self.query_one("#update-overlay", UpdateOverlay)
+            overlay.show()
+        except Exception as e:
+            logger.error(f"Failed to show update overlay: {e}")
+            self.notify(f"Update failed: {e}", severity="error", timeout=5)
 
-        if result.has_update:
-            # Update available - show update screen
-            logger.info(f"Update available: {result.latest_version}")
-            self.app.push_screen(UpdateScreen(auto_start=True))
+    def _restart_app(self) -> None:
+        """Restart the application after update."""
+        import os
+        import sys
+
+        logger.info("Restarting application after update...")
+
+        # Get the executable path
+        if getattr(sys, 'frozen', False):
+            # Running as compiled binary
+            executable = sys.executable
+            args = sys.argv[:]
         else:
-            # Already up to date - show toast
-            self.notify(
-                f"✓ You're up to date! (v{result.current_version})",
-                severity="information",
-                timeout=3
-            )
-            logger.info(f"Already up to date: {result.current_version}")
+            # Running from Python
+            executable = sys.executable
+            args = [sys.executable] + sys.argv[:]
+
+        # Exit and restart
+        self.app.exit()
+
+        # Use os.execv to replace current process with new one
+        try:
+            os.execv(executable, args)
+        except Exception as e:
+            logger.error(f"Failed to restart: {e}")
 
 
     def action_refresh_data(self) -> None:
