@@ -64,10 +64,9 @@ class HomeScreen(Screen):
             # Top "Hero" section with centered logo and search
             Container(
                 Static(logo_text, id="banner"),
-                # Update badge container - hidden by default, shown when update available
                 Container(
                     Static(
-                        "🆕 [bold green]Update available[/bold green]  •  [dim]Press Ctrl+U to update[/dim]",
+                        "🆕 [green]Update available[/green] • [dim]Ctrl+U[/dim]",
                         id="update-badge-text"
                     ),
                     id="update-badge",
@@ -143,10 +142,9 @@ class HomeScreen(Screen):
             badge = self.query_one("#update-badge")
             badge_text = self.query_one("#update-badge-text", Static)
 
-            # Update badge text with version info
+            # Update badge text with version info (compact)
             badge_text.update(
-                f"🆕 [bold green]Update available: v{latest_version}[/bold green]  •  "
-                f"[dim]Press [bold]Ctrl+U[/bold] to update[/dim]"
+                f"🆕 [green]v{latest_version} available[/green] • [dim]Ctrl+U[/dim]"
             )
 
             # Show the badge with animation
