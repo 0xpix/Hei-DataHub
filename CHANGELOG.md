@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.64.14-beta] - 2026-02-04 - Silent Updates
+## [0.65.15-beta] - 2026-02-04 - Silent Updates
 
 **Silent Update Check & Bug Fixes!** This release adds automatic background update checking on app launch with a visual badge notification.
 
