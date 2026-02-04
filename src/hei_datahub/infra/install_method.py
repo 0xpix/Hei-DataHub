@@ -26,6 +26,7 @@ class InstallMethod(Enum):
     UV_TOOL = "uv"           # uv tool install
     PIP = "pip"              # pip install
     DEV = "dev"              # Development mode (running from source)
+    APPIMAGE = "appimage"    # AppImage (generic Linux)
     UNKNOWN = "unknown"      # Unknown installation method
 
 
@@ -43,8 +44,18 @@ def _is_frozen() -> bool:
     return getattr(sys, 'frozen', False)
 
 
+def _is_appimage() -> bool:
+    """Check if running from an AppImage."""
+    # AppImages set APPIMAGE and APPDIR environment variables
+    return bool(os.environ.get("APPIMAGE") or os.environ.get("APPDIR"))
+
+
 def _is_dev_mode() -> bool:
     """Check if running from repository (development mode)."""
+    # Don't check dev mode if we're in an AppImage
+    if _is_appimage():
+        return False
+
     package_path = Path(__file__).resolve()
     try:
         potential_repo = package_path.parent.parent.parent.parent
@@ -63,13 +74,14 @@ def _check_pacman_installed() -> bool:
         return False
 
     try:
-        # Check if pacman exists
-        if not shutil.which("pacman"):
+        # Check if pacman exists (use full path as fallback)
+        pacman_path = shutil.which("pacman") or "/usr/bin/pacman"
+        if not Path(pacman_path).exists():
             return False
 
         # Check if hei-datahub is installed via pacman
         result = subprocess.run(
-            ["pacman", "-Qq", "hei-datahub"],
+            [pacman_path, "-Qq", "hei-datahub"],
             capture_output=True,
             text=True,
             timeout=5
@@ -137,7 +149,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 2. Check for development mode
+    # 2. Check for development mode (before AppImage check)
     if _is_dev_mode():
         return InstallInfo(
             method=InstallMethod.DEV,
@@ -150,7 +162,36 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 3. Check for AUR (pacman) on Linux
+    # 3. Check for AppImage on Linux - then determine how it was installed
+    if _is_appimage():
+        # AppImage running - check if installed via AUR/pacman
+        if _check_pacman_installed():
+            return InstallInfo(
+                method=InstallMethod.AUR,
+                update_command="yay -Syu hei-datahub",
+                update_instructions=(
+                    "Installed via AUR package.\n\n"
+                    "To update, run:\n"
+                    "  yay -Syu hei-datahub\n\n"
+                    "Or with your preferred AUR helper:\n"
+                    "  paru -Syu hei-datahub"
+                )
+            )
+        else:
+            # Generic AppImage (downloaded manually)
+            return InstallInfo(
+                method=InstallMethod.APPIMAGE,
+                update_command="",
+                update_instructions=(
+                    "Running from AppImage.\n\n"
+                    "To update, download the latest AppImage from:\n"
+                    "  https://github.com/0xpix/Hei-DataHub/releases\n\n"
+                    "Or install via AUR for automatic updates:\n"
+                    "  yay -S hei-datahub"
+                )
+            )
+
+    # 4. Check for AUR (pacman) on Linux (non-AppImage)
     if _check_pacman_installed():
         return InstallInfo(
             method=InstallMethod.AUR,
@@ -164,7 +205,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 4. Check for Homebrew on macOS
+    # 5. Check for Homebrew on macOS
     if _check_homebrew_installed():
         return InstallInfo(
             method=InstallMethod.HOMEBREW,
@@ -177,7 +218,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 5. Check for UV tool installation
+    # 6. Check for UV tool installation
     if _check_uv_installed():
         return InstallInfo(
             method=InstallMethod.UV_TOOL,
@@ -189,7 +230,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 6. Check if in site-packages (pip install)
+    # 7. Check if in site-packages (pip install)
     package_path = Path(__file__).resolve()
     if "site-packages" in str(package_path):
         return InstallInfo(
@@ -202,7 +243,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 7. Unknown installation method
+    # 8. Unknown installation method
     return InstallInfo(
         method=InstallMethod.UNKNOWN,
         update_command="",
