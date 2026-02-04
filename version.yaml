@@ -1,10 +1,10 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.65.15-beta"
-codename: "Silent Updates"
+version: "0.64.17-beta"
+codename: "Smart Updates"
 release_date: "2026-02-04"
-compatibility: "Hei-DataHub v0.65.x (beta)"
+compatibility: "Hei-DataHub v0.64.x (beta)"
 notes: "Silent update check on launch, improved version comparison, and bug fixes."
 
 # Additional metadata
