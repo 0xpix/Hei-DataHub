@@ -6,8 +6,12 @@ Features:
 - Version comparison supporting tags like "0.64.11b" (with optional suffix)
 - Caching/throttling to avoid excessive API calls (6-12 hours)
 - UI state management for showing update badge
+
+Debug:
+    Set HEI_DEBUG_UPDATER=1 to enable verbose update logging.
 """
 import logging
+import os
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -20,10 +24,31 @@ from hei_datahub.services.state import get_state_manager
 
 logger = logging.getLogger(__name__)
 
+# Debug mode: set HEI_DEBUG_UPDATER=1 for verbose logging
+_DEBUG = os.environ.get("HEI_DEBUG_UPDATER", "").strip() in ("1", "true", "yes")
+
+
+def _debug(msg: str) -> None:
+    """Log a debug message; use WARNING level if HEI_DEBUG_UPDATER is set."""
+    if _DEBUG:
+        logger.warning(f"[DEBUG-UPDATER] {msg}")
+    else:
+        logger.debug(msg)
+
+
 # Cache settings
 UPDATE_CHECK_INTERVAL_HOURS = 8  # Check every 8 hours (within 6-12 range)
-UPDATE_CHECK_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+
+# GitHub API endpoints
+_RELEASES_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
+UPDATE_CHECK_URL = f"{_RELEASES_URL}/latest"
 TAGS_URL = f"https://api.github.com/repos/{GITHUB_REPO}/tags"
+
+# Standard headers for GitHub API
+_GITHUB_HEADERS = {
+    "Accept": "application/vnd.github+json",
+    "User-Agent": f"Hei-DataHub/{__version__}",
+}
 
 # Pre-release suffix ordering (higher = newer)
 # 'a' (alpha) < 'b' (beta) < 'rc' < stable (no suffix)
@@ -274,8 +299,10 @@ def fetch_latest_tag(force: bool = False) -> Optional[str]:
     """
     Fetch the latest release tag from GitHub.
 
-    Uses the releases/latest endpoint for official releases.
-    Falls back to tags if no releases.
+    Strategy:
+    1. Try /releases (list) — pick highest version (handles pre-releases).
+    2. Fall back to /releases/latest.
+    3. Fall back to /tags.
 
     Args:
         force: Bypass cache and fetch fresh
@@ -285,6 +312,8 @@ def fetch_latest_tag(force: bool = False) -> Optional[str]:
     """
     state = get_state_manager()
 
+    _debug(f"fetch_latest_tag called (force={force}), current __version__={__version__}")
+
     # Check cache first (unless forced)
     if not force:
         cached_tag = state.get_preference("last_known_latest_tag")
@@ -293,45 +322,139 @@ def fetch_latest_tag(force: bool = False) -> Optional[str]:
         if cached_tag and last_check:
             age = datetime.now() - last_check
             if age < timedelta(hours=UPDATE_CHECK_INTERVAL_HOURS):
-                logger.debug(f"Using cached tag: {cached_tag} (age: {age})")
+                _debug(f"Using cached tag: {cached_tag} (age: {age})")
                 return cached_tag
 
+    # --- Strategy 1: /releases list (best — handles pre-releases) ---
+    tag = _fetch_latest_from_releases_list(state)
+    if tag:
+        return tag
+
+    # --- Strategy 2: /releases/latest (only returns non-prerelease) ---
     try:
-        # Try releases/latest first (official releases)
+        _debug(f"Trying /releases/latest: {UPDATE_CHECK_URL}")
         response = requests.get(
             UPDATE_CHECK_URL,
-            timeout=5,
-            headers={"Accept": "application/vnd.github.v3+json"}
+            timeout=10,
+            headers=_GITHUB_HEADERS,
         )
+        _debug(f"/releases/latest status={response.status_code}")
 
         if response.status_code == 200:
             data = response.json()
             tag = data.get("tag_name", "").lstrip('v')
 
             if tag:
-                # Cache the result
                 state.set_preference("last_known_latest_tag", tag)
                 state.set_last_update_check()
-                logger.info(f"Fetched latest release tag: {tag}")
+                _debug(f"Got latest release tag: {tag}")
                 return tag
 
-        # If no releases, try tags endpoint
-        if response.status_code == 404:
-            logger.debug("No releases found, trying tags endpoint...")
-            return _fetch_latest_from_tags(state)
+        if response.status_code == 403:
+            _handle_rate_limit(response)
 
     except requests.exceptions.Timeout:
-        logger.warning("Timeout fetching latest version")
+        logger.warning("Timeout fetching /releases/latest")
     except requests.exceptions.ConnectionError:
         logger.warning("No internet connection for update check")
     except Exception as e:
-        logger.error(f"Error fetching latest version: {e}")
+        logger.error(f"Error fetching /releases/latest: {e}")
+
+    # --- Strategy 3: /tags ---
+    tag = _fetch_latest_from_tags(state)
+    if tag:
+        return tag
 
     # Return cached value on error (if available)
     cached = state.get_preference("last_known_latest_tag")
     if cached:
-        logger.debug(f"Returning cached tag on error: {cached}")
+        _debug(f"Returning cached tag on error: {cached}")
     return cached
+
+
+def _fetch_latest_from_releases_list(state) -> Optional[str]:
+    """
+    Fetch the highest version from the full releases list.
+
+    This handles repos that only have pre-releases (no 'latest').
+    Filters out drafts but includes pre-releases.
+    """
+    try:
+        _debug(f"Trying /releases list: {_RELEASES_URL}")
+        response = requests.get(
+            _RELEASES_URL,
+            timeout=10,
+            headers=_GITHUB_HEADERS,
+            params={"per_page": 30},
+        )
+        _debug(f"/releases list status={response.status_code}")
+
+        if response.status_code == 403:
+            _handle_rate_limit(response)
+            return None
+
+        if response.status_code != 200:
+            return None
+
+        releases = response.json()
+        if not releases:
+            _debug("No releases found in list")
+            return None
+
+        # Collect non-draft tags
+        tag_names: list[str] = []
+        for rel in releases:
+            if rel.get("draft", False):
+                continue
+            tag = rel.get("tag_name", "").lstrip('v').strip()
+            if tag:
+                tag_names.append(tag)
+
+        if not tag_names:
+            _debug("All releases are drafts or have no tags")
+            return None
+
+        # Sort using our version comparison and pick the highest
+        tag_names.sort(
+            key=lambda t: (
+                parse_tag_version(t).segments,
+                parse_tag_version(t).get_suffix_order(),
+                parse_tag_version(t).suffix_num or 0,
+            )
+        )
+        latest = tag_names[-1]
+
+        state.set_preference("last_known_latest_tag", latest)
+        state.set_last_update_check()
+        _debug(f"Highest version from releases list: {latest}")
+        return latest
+
+    except requests.exceptions.Timeout:
+        logger.warning("Timeout fetching /releases list")
+    except requests.exceptions.ConnectionError:
+        logger.warning("No internet connection for /releases list")
+    except Exception as e:
+        logger.error(f"Error fetching /releases list: {e}")
+
+    return None
+
+
+def _handle_rate_limit(response) -> None:
+    """Log a helpful message when GitHub API rate-limits us."""
+    remaining = response.headers.get("X-RateLimit-Remaining", "?")
+    reset_ts = response.headers.get("X-RateLimit-Reset", "")
+    reset_str = ""
+    if reset_ts:
+        try:
+            reset_dt = datetime.fromtimestamp(int(reset_ts))
+            reset_str = f" (resets at {reset_dt:%H:%M:%S})"
+        except Exception:
+            pass
+    logger.warning(
+        f"GitHub API rate limited. Remaining: {remaining}{reset_str}. "
+        f"Update check skipped."
+    )
+    _debug(f"Rate limit headers: {dict(response.headers)}")
 
 
 def _fetch_latest_from_tags(state) -> Optional[str]:
@@ -341,17 +464,25 @@ def _fetch_latest_from_tags(state) -> Optional[str]:
     Finds the highest version tag using our comparison logic.
     """
     try:
+        _debug(f"Trying /tags: {TAGS_URL}")
         response = requests.get(
             TAGS_URL,
-            timeout=5,
-            headers={"Accept": "application/vnd.github.v3+json"}
+            timeout=10,
+            headers=_GITHUB_HEADERS,
+            params={"per_page": 50},
         )
+        _debug(f"/tags status={response.status_code}")
+
+        if response.status_code == 403:
+            _handle_rate_limit(response)
+            return None
 
         if response.status_code != 200:
             return None
 
         tags = response.json()
         if not tags:
+            _debug("No tags found")
             return None
 
         # Find the highest version tag
@@ -361,18 +492,28 @@ def _fetch_latest_from_tags(state) -> Optional[str]:
             return None
 
         # Sort using our version comparison
-        tag_names.sort(key=lambda t: (parse_tag_version(t).segments, parse_tag_version(t).get_suffix_order()))
+        tag_names.sort(
+            key=lambda t: (
+                parse_tag_version(t).segments,
+                parse_tag_version(t).get_suffix_order(),
+                parse_tag_version(t).suffix_num or 0,
+            )
+        )
         latest = tag_names[-1]
 
         # Cache result
         state.set_preference("last_known_latest_tag", latest)
         state.set_last_update_check()
-        logger.info(f"Fetched latest tag from tags list: {latest}")
+        _debug(f"Highest version from tags: {latest}")
         return latest
 
+    except requests.exceptions.Timeout:
+        logger.warning("Timeout fetching /tags")
+    except requests.exceptions.ConnectionError:
+        logger.warning("No internet for /tags")
     except Exception as e:
         logger.error(f"Error fetching tags: {e}")
-        return None
+    return None
 
 
 def check_for_updates_silent() -> Optional[UpdateCheckResult]:
@@ -408,11 +549,12 @@ def check_for_updates_silent() -> Optional[UpdateCheckResult]:
             return None
 
     # Perform fresh check
-    logger.info("Performing silent update check...")
+    _debug("Performing silent update check…")
 
     latest_tag = fetch_latest_tag(force=True)
 
     if not latest_tag:
+        _debug("Could not fetch latest version from any source")
         return UpdateCheckResult(
             has_update=False,
             current_version=__version__,
@@ -422,6 +564,14 @@ def check_for_updates_silent() -> Optional[UpdateCheckResult]:
 
     # Compare versions
     has_update = is_newer_version(latest_tag, __version__)
+
+    _debug(
+        f"Version comparison: current={__version__} "
+        f"(parsed={parse_tag_version(__version__)}), "
+        f"latest={latest_tag} "
+        f"(parsed={parse_tag_version(latest_tag)}), "
+        f"has_update={has_update}"
+    )
 
     # Cache the result
     state.set_preference("last_known_update_available", has_update)
@@ -481,7 +631,16 @@ def trigger_update() -> UpdateCheckResult:
     Returns:
         UpdateCheckResult with fresh data
     """
-    logger.info("Triggering update check (user-initiated)...")
+    _debug("Triggering update check (user-initiated)…")
+    _debug(f"Current __version__ = {__version__}")
+
+    # Import and log install method for debugging
+    try:
+        from hei_datahub.infra.install_method import get_install_info
+        info = get_install_info()
+        _debug(f"Install method: {info.method.value}, command: {info.update_command}")
+    except Exception as e:
+        _debug(f"Could not detect install method: {e}")
 
     # Force fresh check
     clear_update_cache()
