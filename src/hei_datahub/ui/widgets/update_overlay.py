@@ -9,10 +9,10 @@ import subprocess
 import sys
 from typing import Callable, Optional
 
-from textual import work
+from textual import on, work
 from textual.app import ComposeResult
 from textual.containers import Center, Container
-from textual.widgets import Button, ProgressBar, Static
+from textual.widgets import Button, Input, ProgressBar, Static
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +101,21 @@ class UpdateOverlay(Container):
     #update-restart-btn {
         min-width: 16;
     }
+
+    #update-overlay-password-container {
+        width: 100%;
+        height: auto;
+        margin-top: 1;
+        display: none;
+    }
+
+    #update-overlay-password-container.visible {
+        display: block;
+    }
+
+    #update-overlay-password {
+        width: 100%;
+    }
     """
 
     def __init__(
@@ -114,6 +129,10 @@ class UpdateOverlay(Container):
         self._on_restart = on_restart
         self._updating = False
         self._finished = False
+        # Pending sudo update state
+        self._pending_sudo_cmd: Optional[list[str]] = None
+        self._pending_sudo_version: Optional[str] = None
+        self._pending_sudo_info = None
 
     def compose(self) -> ComposeResult:
         yield Container(
@@ -121,6 +140,14 @@ class UpdateOverlay(Container):
             Static("Checking for updates…", id="update-overlay-status"),
             ProgressBar(id="update-overlay-progress", total=100, show_eta=False, show_percentage=True),
             Static("", id="update-overlay-message"),
+            Container(
+                Input(
+                    placeholder="Password",
+                    password=True,
+                    id="update-overlay-password",
+                ),
+                id="update-overlay-password-container",
+            ),
             Center(
                 Button("Restart", id="update-restart-btn", variant="success"),
                 id="update-overlay-button-container"
@@ -133,6 +160,10 @@ class UpdateOverlay(Container):
         self.add_class("visible")
         self._finished = False
         self.query_one("#update-overlay-button-container").remove_class("visible")
+        self.query_one("#update-overlay-password-container").remove_class("visible")
+        self._pending_sudo_cmd = None
+        self._pending_sudo_version = None
+        self._pending_sudo_info = None
         self.start_update()
 
     def hide(self) -> None:
@@ -211,10 +242,14 @@ class UpdateOverlay(Container):
             self._show_manual_instructions(latest_version, install_info)
             return
 
-        # Methods that need sudo / interactive prompts cannot run
-        # inside the TUI — show the command for the user to run.
-        if install_info.method in (InstallMethod.AUR, InstallMethod.HOMEBREW):
-            self._show_manual_instructions(latest_version, install_info)
+        # AUR needs sudo — prompt for password inside the overlay
+        if install_info.method == InstallMethod.AUR:
+            self._prompt_sudo_update(latest_version, install_info)
+            return
+
+        # Homebrew doesn't need sudo — run directly
+        if install_info.method == InstallMethod.HOMEBREW:
+            self._run_auto_update(latest_version, install_info)
             return
 
         # Auto-update for non-interactive tools (uv, pipx, pip)
@@ -238,6 +273,9 @@ class UpdateOverlay(Container):
         elif install_info.method == InstallMethod.PIP:
             method_name = "pip"
             commands = [[sys.executable, "-m", "pip", "install", "--upgrade", "hei-datahub"]]
+        elif install_info.method == InstallMethod.HOMEBREW:
+            method_name = "brew"
+            commands = [["brew", "upgrade", "hei-datahub"]]
         else:
             self._show_manual_instructions(latest_version, install_info)
             return
@@ -307,6 +345,106 @@ class UpdateOverlay(Container):
                 msg += f"\n{short_err}"
             msg += f"\nTry: {install_info.update_command}"
             self._show_error(msg)
+
+    def _prompt_sudo_update(self, latest_version: str, install_info) -> None:
+        """Show a password prompt so the user can authorize a sudo update."""
+        self._pending_sudo_version = latest_version
+        self._pending_sudo_info = install_info
+
+        # Build the command that will run under sudo
+        cmd = install_info.update_command  # e.g. "yay -Syu hei-datahub"
+        self._pending_sudo_cmd = cmd.split() if cmd else ["yay", "-Syu", "--noconfirm", "hei-datahub"]
+
+        def show_prompt():
+            self.query_one("#update-overlay-title", Static).update(
+                f"v{latest_version} — Password Required"
+            )
+            self._update_progress("Enter your password to update", 20)
+            pwd_container = self.query_one("#update-overlay-password-container")
+            pwd_container.add_class("visible")
+            pwd_input = self.query_one("#update-overlay-password", Input)
+            pwd_input.value = ""
+            pwd_input.focus()
+
+        self.app.call_from_thread(show_prompt)
+
+    @on(Input.Submitted, "#update-overlay-password")
+    def _on_password_submitted(self, event: Input.Submitted) -> None:
+        """Handle password submission — run the sudo update."""
+        password = event.value
+        event.input.value = ""
+
+        # Hide the password field immediately
+        self.query_one("#update-overlay-password-container").remove_class("visible")
+
+        if not password:
+            self._update_progress("Password cannot be empty", 20)
+            return
+
+        if self._pending_sudo_cmd and self._pending_sudo_version:
+            self._run_sudo_update(
+                password,
+                self._pending_sudo_cmd,
+                self._pending_sudo_version,
+                self._pending_sudo_info,
+            )
+
+    @work(exclusive=True, thread=True)
+    def _run_sudo_update(
+        self, password: str, cmd: list[str], latest_version: str, install_info
+    ) -> None:
+        """Run an update command via sudo, piping the password to stdin."""
+        self._updating = True
+        _debug = os.environ.get("HEI_DEBUG_UPDATER", "").strip() in ("1", "true", "yes")
+
+        method_name = cmd[0]  # e.g. "yay" or "paru"
+        # Wrap in sudo -S so password is read from stdin.
+        # --noconfirm avoids interactive prompts from pacman/yay.
+        sudo_cmd = ["sudo", "-S"] + cmd
+        if "--noconfirm" not in sudo_cmd:
+            sudo_cmd.insert(2, "--noconfirm") if method_name in ("yay", "paru", "pacman") else None
+
+        self._set_progress(f"Updating via {method_name}…", 30)
+        logger.info(f"Sudo update: {' '.join(sudo_cmd)}")
+
+        try:
+            process = subprocess.Popen(
+                sudo_cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                env={**os.environ},
+            )
+            stdout, stderr = process.communicate(
+                input=password + "\n", timeout=300
+            )
+
+            if _debug:
+                logger.warning(f"[DEBUG-UPDATER] stdout: {stdout[:300]}")
+                logger.warning(f"[DEBUG-UPDATER] stderr: {stderr[:300]}")
+
+            if process.returncode == 0:
+                self._show_success(latest_version)
+            else:
+                # Check for wrong-password errors
+                lower_err = (stderr + stdout).lower()
+                if "incorrect password" in lower_err or "sorry" in lower_err:
+                    self._show_error("Incorrect password")
+                else:
+                    short_err = stderr.strip().split("\n")[-1][:80] if stderr.strip() else ""
+                    msg = f"Update via {method_name} failed."
+                    if short_err:
+                        msg += f"\n{short_err}"
+                    self._show_error(msg)
+
+        except subprocess.TimeoutExpired:
+            self._show_error(f"Update timed out ({method_name})")
+        except FileNotFoundError:
+            self._show_error(f"Command not found: {sudo_cmd[0]}")
+        except Exception as e:
+            logger.error(f"Sudo update error: {e}")
+            self._show_error(str(e))
 
     def _handle_windows_update(self, result) -> None:
         """Handle Windows executable update."""
