@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.64.20-beta] - 2026-02-09 - Hotfix
+
+**Hotfix:** Fixes Ctrl+I browser opening, update detection order, and redesigns the update overlay.
+
+### Fixed
+
+- Ctrl+I (Report Issue) now reliably opens GitHub Issues in the default browser
+- Update detection order — UV and pipx installs are now correctly detected before AUR/Homebrew
+- AUR updates now run inside the TUI with a minimalistic password prompt
+- Update badge only appears when a new update is genuinely available
+
+---
+
 ## [0.65.15-beta] - 2026-02-04 - Silent Updates
 
 **Silent Update Check & Bug Fixes!** This release adds automatic background update checking on app launch with a visual badge notification.
