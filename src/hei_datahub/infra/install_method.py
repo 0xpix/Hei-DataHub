@@ -5,9 +5,10 @@ Detects how the application was installed to provide correct update instructions
 - AUR (yay/pacman) on Arch Linux
 - Homebrew on macOS
 - Windows EXE installer
-- UV tool / pip
+- UV tool / pipx / pip
 - Development mode (running from source)
 """
+import logging
 import os
 import shutil
 import subprocess
@@ -17,6 +18,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+logger = logging.getLogger(__name__)
+
+# Debug mode: HEI_DEBUG_UPDATER=1 for verbose detection logging
+_DEBUG = os.environ.get("HEI_DEBUG_UPDATER", "").strip() in ("1", "true", "yes")
+
 
 class InstallMethod(Enum):
     """Detected installation method."""
@@ -24,6 +30,7 @@ class InstallMethod(Enum):
     HOMEBREW = "homebrew"    # macOS Homebrew
     WINDOWS_EXE = "windows"  # Windows installer (.exe)
     UV_TOOL = "uv"           # uv tool install
+    PIPX = "pipx"            # pipx install
     PIP = "pip"              # pip install
     DEV = "dev"              # Development mode (running from source)
     APPIMAGE = "appimage"    # AppImage (generic Linux)
@@ -131,9 +138,60 @@ def _check_uv_installed() -> bool:
         return False
 
 
+def _check_pipx_installed() -> bool:
+    """Check if package is installed via pipx."""
+    try:
+        package_path = Path(__file__).resolve()
+
+        # pipx installs to $PIPX_HOME/venvs or ~/.local/pipx/venvs (older)
+        # or ~/.local/share/pipx/venvs (newer)
+        pipx_home = os.environ.get("PIPX_HOME", "")
+        if pipx_home and "pipx" in str(package_path) and pipx_home in str(package_path):
+            return True
+
+        # Check common pipx venv paths
+        pipx_dirs = [
+            Path.home() / ".local" / "pipx" / "venvs",
+            Path.home() / ".local" / "share" / "pipx" / "venvs",
+        ]
+        for pipx_dir in pipx_dirs:
+            if str(pipx_dir) in str(package_path):
+                return True
+
+        # Also check if pipx is available and lists our package
+        if shutil.which("pipx"):
+            result = subprocess.run(
+                ["pipx", "list", "--short"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode == 0 and "hei-datahub" in result.stdout.lower():
+                return True
+
+        return False
+    except Exception:
+        return False
+
+
 def detect_install_method() -> InstallInfo:
     """
     Detect how Hei-DataHub was installed and return update instructions.
+
+    Detection priority is based on specificity:
+    1. Frozen exe (PyInstaller) — definitive, from sys.frozen
+    2. Dev mode — definitive, from file path in repo
+    3. AppImage — definitive, from $APPIMAGE env var
+    4. UV tool — definitive, from file path in uv/tools/
+    5. pipx — definitive, from file path in pipx/venvs/
+    6. AUR (pacman) — system package manager check
+    7. Homebrew — system package manager check
+    8. pip (site-packages) — broad fallback
+    9. Unknown
+
+    Path-based checks (4-5) come BEFORE package-manager checks (6-7)
+    because the file path is proof of how the *running* code was
+    installed, whereas pacman/brew may list an old/parallel install.
 
     Returns:
         InstallInfo with method, update command, and instructions
@@ -191,7 +249,31 @@ def detect_install_method() -> InstallInfo:
                 )
             )
 
-    # 4. Check for AUR (pacman) on Linux (non-AppImage)
+    # 4. Check for UV tool installation (path-based — definitive)
+    if _check_uv_installed():
+        return InstallInfo(
+            method=InstallMethod.UV_TOOL,
+            update_command="uv tool upgrade hei-datahub",
+            update_instructions=(
+                "Installed via uv tool.\n\n"
+                "To update, run:\n"
+                "  uv tool upgrade hei-datahub"
+            )
+        )
+
+    # 5. Check for pipx installation (path-based — definitive)
+    if _check_pipx_installed():
+        return InstallInfo(
+            method=InstallMethod.PIPX,
+            update_command="pipx upgrade hei-datahub",
+            update_instructions=(
+                "Installed via pipx.\n\n"
+                "To update, run:\n"
+                "  pipx upgrade hei-datahub"
+            )
+        )
+
+    # 6. Check for AUR (pacman) on Linux (non-AppImage)
     if _check_pacman_installed():
         return InstallInfo(
             method=InstallMethod.AUR,
@@ -205,7 +287,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 5. Check for Homebrew on macOS
+    # 7. Check for Homebrew on macOS
     if _check_homebrew_installed():
         return InstallInfo(
             method=InstallMethod.HOMEBREW,
@@ -218,32 +300,20 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 6. Check for UV tool installation
-    if _check_uv_installed():
-        return InstallInfo(
-            method=InstallMethod.UV_TOOL,
-            update_command="uv tool upgrade hei-datahub",
-            update_instructions=(
-                "Installed via uv tool.\n\n"
-                "To update, run:\n"
-                "  uv tool upgrade hei-datahub"
-            )
-        )
-
-    # 7. Check if in site-packages (pip install)
+    # 8. Check if in site-packages (pip install)
     package_path = Path(__file__).resolve()
     if "site-packages" in str(package_path):
         return InstallInfo(
             method=InstallMethod.PIP,
-            update_command="pip install --upgrade hei-datahub",
+            update_command=f"{sys.executable} -m pip install --upgrade hei-datahub",
             update_instructions=(
                 "Installed via pip.\n\n"
                 "To update, run:\n"
-                "  pip install --upgrade hei-datahub"
+                f"  {sys.executable} -m pip install --upgrade hei-datahub"
             )
         )
 
-    # 8. Unknown installation method
+    # 9. Unknown installation method
     return InstallInfo(
         method=InstallMethod.UNKNOWN,
         update_command="",
@@ -267,4 +337,13 @@ def get_install_info() -> InstallInfo:
     global _cached_install_info
     if _cached_install_info is None:
         _cached_install_info = detect_install_method()
+        _pkg_path = Path(__file__).resolve()
+        msg = (
+            f"Detected install method: {_cached_install_info.method.value} "
+            f"(package path: {_pkg_path})"
+        )
+        if _DEBUG:
+            logger.warning(f"[DEBUG-UPDATER] {msg}")
+        else:
+            logger.info(msg)
     return _cached_install_info
