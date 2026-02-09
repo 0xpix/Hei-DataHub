@@ -11,8 +11,8 @@ from typing import Callable, Optional
 
 from textual import work
 from textual.app import ComposeResult
-from textual.containers import Center, Container, Vertical
-from textual.widgets import Button, Label, ProgressBar, Static
+from textual.containers import Center, Container
+from textual.widgets import Button, ProgressBar, Static
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class UpdateOverlay(Container):
         position: absolute;
         width: 100%;
         height: 100%;
-        background: $surface 85%;
+        background: $surface 80%;
         align: center middle;
         layer: overlay;
     }
@@ -40,32 +40,33 @@ class UpdateOverlay(Container):
     }
 
     #update-overlay-box {
-        width: 60;
+        width: 50;
         height: auto;
-        max-height: 20;
-        padding: 1 2;
+        max-height: 14;
+        padding: 1 3;
         background: $surface;
-        border: thick $primary;
-        align: center middle;
+        border: round $primary 50%;
     }
 
     #update-overlay-title {
+        width: 100%;
         text-align: center;
         text-style: bold;
         color: $text;
-        margin-bottom: 1;
     }
 
     #update-overlay-status {
+        width: 100%;
         text-align: center;
         color: $text-muted;
+        margin-top: 1;
         height: 1;
     }
 
     #update-overlay-progress-container {
-        height: 3;
-        margin: 1 0;
-        align: center middle;
+        width: 100%;
+        height: 1;
+        margin: 1 0 0 0;
     }
 
     #update-overlay-progress {
@@ -73,22 +74,24 @@ class UpdateOverlay(Container):
     }
 
     #update-overlay-percent {
-        text-align: center;
-        color: $success;
-        text-style: bold;
+        display: none;
     }
 
     #update-overlay-message {
+        width: 100%;
         text-align: center;
         color: $text-muted;
         margin-top: 1;
-        height: 2;
+        height: auto;
+        max-height: 2;
     }
 
     #update-overlay-button-container {
+        width: 100%;
         margin-top: 1;
         align: center middle;
         display: none;
+        height: auto;
     }
 
     #update-overlay-button-container.visible {
@@ -114,16 +117,12 @@ class UpdateOverlay(Container):
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Static("🔄 Updating Hei-DataHub", id="update-overlay-title"),
-            Static("Checking for updates...", id="update-overlay-status"),
-            Vertical(
-                ProgressBar(id="update-overlay-progress", total=100, show_eta=False),
-                id="update-overlay-progress-container"
-            ),
-            Static("0%", id="update-overlay-percent"),
+            Static("Updating…", id="update-overlay-title"),
+            Static("Checking for updates…", id="update-overlay-status"),
+            ProgressBar(id="update-overlay-progress", total=100, show_eta=False, show_percentage=True),
             Static("", id="update-overlay-message"),
             Center(
-                Button("Restart App", id="update-restart-btn", variant="success"),
+                Button("Restart", id="update-restart-btn", variant="success"),
                 id="update-overlay-button-container"
             ),
             id="update-overlay-box"
@@ -145,9 +144,10 @@ class UpdateOverlay(Container):
         try:
             self.query_one("#update-overlay-status", Static).update(status)
             self.query_one("#update-overlay-progress", ProgressBar).update(progress=percent)
-            self.query_one("#update-overlay-percent", Static).update(f"{percent}%")
             if message:
                 self.query_one("#update-overlay-message", Static).update(message)
+            else:
+                self.query_one("#update-overlay-message", Static).update("")
         except Exception as e:
             logger.debug(f"Failed to update progress UI: {e}")
 
@@ -193,6 +193,10 @@ class UpdateOverlay(Container):
 
         # Get install method
         install_info = get_install_info()
+        logger.info(
+            f"Update available: {result.current_version} → {latest_version}, "
+            f"install method: {install_info.method.value}"
+        )
 
         # Handle different installation methods
         if install_info.method == InstallMethod.DEV:
@@ -207,66 +211,84 @@ class UpdateOverlay(Container):
             self._show_manual_instructions(latest_version, install_info)
             return
 
-        # Auto-update for AUR, Homebrew, pip, uv
+        # Methods that need sudo / interactive prompts cannot run
+        # inside the TUI — show the command for the user to run.
+        if install_info.method in (InstallMethod.AUR, InstallMethod.HOMEBREW):
+            self._show_manual_instructions(latest_version, install_info)
+            return
+
+        # Auto-update for non-interactive tools (uv, pipx, pip)
         self._run_auto_update(latest_version, install_info)
 
     def _run_auto_update(self, latest_version: str, install_info) -> None:
         """Run automatic update for package managers."""
         from hei_datahub.infra.install_method import InstallMethod
 
-        commands = []
+        _debug = os.environ.get("HEI_DEBUG_UPDATER", "").strip() in ("1", "true", "yes")
+
+        commands: list[list[str]] = []
         method_name = ""
 
-        if install_info.method == InstallMethod.AUR:
-            method_name = "yay"
-            commands = [["yay", "-Syu", "--noconfirm", "hei-datahub"]]
-        elif install_info.method == InstallMethod.HOMEBREW:
-            method_name = "Homebrew"
-            commands = [
-                ["brew", "update"],
-                ["brew", "upgrade", "hei-datahub"]
-            ]
-        elif install_info.method == InstallMethod.UV_TOOL:
+        if install_info.method == InstallMethod.UV_TOOL:
             method_name = "uv"
             commands = [["uv", "tool", "upgrade", "hei-datahub"]]
+        elif install_info.method == InstallMethod.PIPX:
+            method_name = "pipx"
+            commands = [["pipx", "upgrade", "hei-datahub"]]
         elif install_info.method == InstallMethod.PIP:
             method_name = "pip"
-            commands = [["pip", "install", "--upgrade", "hei-datahub"]]
+            commands = [[sys.executable, "-m", "pip", "install", "--upgrade", "hei-datahub"]]
         else:
             self._show_manual_instructions(latest_version, install_info)
             return
 
-        self._set_progress(f"Updating via {method_name}...", 30)
+        self._set_progress(f"Updating via {method_name}…", 30)
+        logger.info(f"Auto-update via {method_name}: {commands}")
 
         total_commands = len(commands)
         success = True
+        last_stderr = ""
 
         for i, cmd in enumerate(commands):
             # Update progress
             base_progress = 30
             progress_per_cmd = 60 // total_commands
             current_progress = base_progress + (i * progress_per_cmd)
-            self._set_progress(f"Running: {' '.join(cmd[:2])}...", current_progress)
+            self._set_progress(f"Running: {' '.join(cmd[:3])}…", current_progress)
 
             try:
                 # Run command
                 process = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
+                    stderr=subprocess.PIPE,
                     text=True,
                     bufsize=1,
                     env={**os.environ}
                 )
 
-                # Wait for completion
-                process.wait()
+                stdout, stderr = process.communicate(timeout=120)
 
                 if process.returncode != 0:
-                    logger.error(f"Command failed: {' '.join(cmd)} (exit code {process.returncode})")
+                    last_stderr = stderr or stdout or ""
+                    logger.error(
+                        f"Command failed: {' '.join(cmd)} "
+                        f"(exit code {process.returncode})\n"
+                        f"stdout: {stdout}\nstderr: {stderr}"
+                    )
+                    if _debug:
+                        logger.warning(f"[DEBUG-UPDATER] stdout: {stdout}")
+                        logger.warning(f"[DEBUG-UPDATER] stderr: {stderr}")
                     success = False
                     break
+                else:
+                    if _debug:
+                        logger.warning(f"[DEBUG-UPDATER] {' '.join(cmd)} succeeded: {stdout[:200]}")
 
+            except subprocess.TimeoutExpired:
+                logger.error(f"Command timed out: {' '.join(cmd)}")
+                self._show_error(f"Update timed out running: {' '.join(cmd[:3])}")
+                return
             except FileNotFoundError:
                 logger.error(f"Command not found: {cmd[0]}")
                 self._show_error(f"Command not found: {cmd[0]}")
@@ -279,7 +301,12 @@ class UpdateOverlay(Container):
         if success:
             self._show_success(latest_version)
         else:
-            self._show_error("Update failed. Try running manually.")
+            short_err = last_stderr.strip().split('\n')[-1][:80] if last_stderr.strip() else ""
+            msg = f"Update via {method_name} failed."
+            if short_err:
+                msg += f"\n{short_err}"
+            msg += f"\nTry: {install_info.update_command}"
+            self._show_error(msg)
 
     def _handle_windows_update(self, result) -> None:
         """Handle Windows executable update."""
@@ -343,9 +370,16 @@ class UpdateOverlay(Container):
         self._updating = False
         self._finished = True
 
+        # Clear update cache so the badge won't reappear after restart
+        try:
+            from hei_datahub.services.update_service import clear_update_cache
+            clear_update_cache()
+        except Exception:
+            pass
+
         def update_ui():
-            self._update_progress(f"✅ Updated to v{latest_version}!", 100, "Restart to use the new version")
-            self.query_one("#update-overlay-title", Static).update("✅ Update Complete")
+            self.query_one("#update-overlay-title", Static).update("Update Complete")
+            self._update_progress(f"Updated to v{latest_version}", 100, "Restart to apply")
             self.query_one("#update-overlay-button-container").add_class("visible")
 
         self.app.call_from_thread(update_ui)
@@ -358,10 +392,16 @@ class UpdateOverlay(Container):
         self._updating = False
         self._finished = True
 
+        # Clear stale cache
+        try:
+            from hei_datahub.services.update_service import clear_update_cache
+            clear_update_cache()
+        except Exception:
+            pass
+
         def update_ui():
-            self.query_one("#update-overlay-title", Static).update("✅ Up to Date")
-            self._update_progress(f"You're running v{current_version}", 100, "")
-            # Auto-hide after 2 seconds
+            self.query_one("#update-overlay-title", Static).update("Up to Date")
+            self._update_progress(f"v{current_version} is the latest", 100)
             self.set_timer(2.0, self.hide)
 
         self.app.call_from_thread(update_ui)
@@ -372,21 +412,45 @@ class UpdateOverlay(Container):
         self._finished = True
 
         def update_ui():
-            self.query_one("#update-overlay-title", Static).update("🔧 Development Mode")
-            self._update_progress("Running from source", 100, "Run: git pull && uv sync")
+            self.query_one("#update-overlay-title", Static).update("Development Mode")
+            self._update_progress("Running from source", 100, "git pull && uv sync")
             self.set_timer(3.0, self.hide)
 
         self.app.call_from_thread(update_ui)
 
     def _show_manual_instructions(self, latest_version: str, install_info) -> None:
-        """Show manual update instructions."""
+        """Show manual update instructions and copy command to clipboard."""
         self._updating = False
         self._finished = True
 
+        cmd = install_info.update_command
+
+        # Try to copy the command to clipboard
+        copied = False
+        if cmd:
+            try:
+                from hei_datahub.ui.utils.external import copy_to_clipboard
+                copied = copy_to_clipboard(cmd)
+            except Exception:
+                pass
+
         def update_ui():
-            self.query_one("#update-overlay-title", Static).update(f"📦 v{latest_version} Available")
-            self._update_progress("Manual update required", 100, install_info.update_command)
-            self.set_timer(5.0, self.hide)
+            self.query_one("#update-overlay-title", Static).update(
+                f"v{latest_version} Available"
+            )
+            if cmd:
+                hint = " (copied)" if copied else ""
+                self._update_progress(
+                    f"Run in terminal{hint}:",
+                    100,
+                    cmd,
+                )
+            else:
+                self._update_progress(
+                    install_info.update_instructions.split('\n')[0],
+                    100,
+                )
+            self.set_timer(8.0, self.hide)
 
         self.app.call_from_thread(update_ui)
 
@@ -396,8 +460,8 @@ class UpdateOverlay(Container):
         self._finished = True
 
         def update_ui():
-            self.query_one("#update-overlay-title", Static).update("❌ Update Failed")
-            self._update_progress(message, 0, "")
+            self.query_one("#update-overlay-title", Static).update("Update Failed")
+            self._update_progress(message, 0)
             self.set_timer(4.0, self.hide)
 
         self.app.call_from_thread(update_ui)
