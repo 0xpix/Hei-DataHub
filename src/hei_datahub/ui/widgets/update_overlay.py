@@ -239,7 +239,7 @@ class UpdateOverlay(Container):
             return
 
         if install_info.method == InstallMethod.APPIMAGE:
-            self._show_manual_instructions(latest_version, install_info)
+            self._handle_appimage_update(latest_version)
             return
 
         # AUR needs sudo — prompt for password inside the overlay
@@ -445,6 +445,133 @@ class UpdateOverlay(Container):
         except Exception as e:
             logger.error(f"Sudo update error: {e}")
             self._show_error(str(e))
+
+    def _handle_appimage_update(self, latest_version: str) -> None:
+        """Download the new AppImage from GitHub and replace the current one."""
+        import tempfile
+        import requests
+        from pathlib import Path
+        from hei_datahub.version import GITHUB_REPO
+
+        _debug = os.environ.get("HEI_DEBUG_UPDATER", "").strip() in ("1", "true", "yes")
+
+        appimage_path = os.environ.get("APPIMAGE")
+        if not appimage_path:
+            self._show_error("Cannot determine AppImage path")
+            return
+
+        appimage_file = Path(appimage_path)
+        if not appimage_file.exists():
+            self._show_error(f"AppImage not found: {appimage_path}")
+            return
+
+        # Find the AppImage download URL from GitHub releases
+        self._set_progress("Fetching release info…", 25)
+        asset_pattern = "AppImage"
+
+        try:
+            api_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
+            headers = {
+                "Accept": "application/vnd.github+json",
+                "User-Agent": f"Hei-DataHub/{latest_version}",
+            }
+            resp = requests.get(api_url, headers=headers, timeout=15)
+            resp.raise_for_status()
+            releases = resp.json()
+        except Exception as e:
+            self._show_error(f"Failed to fetch releases: {e}")
+            return
+
+        # Find the release matching latest_version
+        download_url = None
+        file_size = 0
+        for release in releases:
+            tag = release.get("tag_name", "")
+            if tag == latest_version or tag.lstrip("v") == latest_version:
+                for asset in release.get("assets", []):
+                    name = asset.get("name", "")
+                    if asset_pattern in name and "x86_64" in name:
+                        download_url = asset.get("browser_download_url")
+                        file_size = asset.get("size", 0)
+                        break
+                break
+
+        if not download_url:
+            logger.warning(f"No AppImage asset found for {latest_version}")
+            from hei_datahub.infra.install_method import get_install_info
+            self._show_manual_instructions(latest_version, get_install_info())
+            return
+
+        # Download to a temporary file
+        self._set_progress("Downloading AppImage…", 30)
+        mb_total = file_size / (1024 * 1024) if file_size else 0
+
+        try:
+            dl_resp = requests.get(download_url, stream=True, timeout=300)
+            dl_resp.raise_for_status()
+            total = int(dl_resp.headers.get("content-length", 0)) or file_size
+
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".AppImage")
+            downloaded = 0
+            with os.fdopen(tmp_fd, "wb") as f:
+                for chunk in dl_resp.iter_content(chunk_size=65536):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        if total > 0:
+                            pct = 30 + int(60 * downloaded / total)
+                            mb_done = downloaded / (1024 * 1024)
+                            self._set_progress(
+                                f"Downloading: {mb_done:.1f}/{mb_total:.1f} MB",
+                                min(pct, 90),
+                            )
+        except Exception as e:
+            self._show_error(f"Download failed: {e}")
+            return
+
+        # Replace the old AppImage with the new one
+        self._set_progress("Installing…", 92)
+        tmp_file = Path(tmp_path)
+
+        try:
+            # Make the new file executable
+            os.chmod(tmp_path, 0o755)
+
+            # Back up current AppImage (just rename, same dir)
+            backup_path = appimage_file.with_suffix(".AppImage.bak")
+            try:
+                if backup_path.exists():
+                    backup_path.unlink()
+                appimage_file.rename(backup_path)
+            except PermissionError:
+                # May need sudo to replace system-installed AppImage
+                self._show_error(
+                    f"Permission denied replacing {appimage_path}\n"
+                    "Try running with sudo or move the AppImage."
+                )
+                tmp_file.unlink(missing_ok=True)
+                return
+
+            # Move new AppImage into place
+            import shutil
+            shutil.move(str(tmp_file), str(appimage_file))
+
+            if _debug:
+                logger.warning(f"[DEBUG-UPDATER] Replaced {appimage_path}")
+
+            # Clean up backup
+            backup_path.unlink(missing_ok=True)
+
+        except Exception as e:
+            logger.error(f"Failed to replace AppImage: {e}")
+            # Try to restore backup
+            if backup_path.exists() and not appimage_file.exists():
+                backup_path.rename(appimage_file)
+            tmp_file.unlink(missing_ok=True)
+            self._show_error(f"Install failed: {e}")
+            return
+
+        self._show_success(latest_version)
 
     def _handle_windows_update(self, result) -> None:
         """Handle Windows executable update."""
