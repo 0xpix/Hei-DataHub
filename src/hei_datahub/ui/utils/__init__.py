@@ -1,1 +1,1 @@
-"""UI utilities for keybindings and actions."""
+"""UI utilities for keybindings, actions, and external helpers."""
