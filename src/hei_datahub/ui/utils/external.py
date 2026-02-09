@@ -63,29 +63,53 @@ def _try_macos_open(url: str) -> bool:
 
 
 def _try_linux_xdg_open(url: str) -> bool:
-    """Linux: use xdg-open with a proper environment."""
+    """Linux: use xdg-open, fully detached from the current terminal.
+
+    Inside a Textual TUI the terminal is in raw / alternate-screen mode,
+    which can prevent xdg-open from working correctly. We solve this by
+    double-forking so the child process has no connection to the current
+    TTY at all.
+    """
     xdg = shutil.which("xdg-open")
     if not xdg:
         _debug("xdg-open not found in PATH")
         return False
 
-    # Inherit the full environment — stripping variables breaks desktop integration
     env = os.environ.copy()
 
     try:
-        proc = subprocess.Popen(
-            [xdg, url],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            stdin=subprocess.DEVNULL,
-            start_new_session=True,
-            env=env,
-        )
-        # xdg-open may fork and exit quickly; we just need to confirm it launched
-        _debug(f"xdg-open launched with pid {proc.pid}")
-        return True
+        # Double-fork: the intermediate child exits immediately, so the
+        # grandchild is re-parented to init/systemd and has no controlling
+        # terminal from Textual.
+        pid = os.fork()
+        if pid == 0:
+            # --- First child ---
+            try:
+                os.setsid()  # new session, no controlling terminal
+                # Second fork so the session leader exits and the
+                # grandchild can never accidentally acquire a TTY.
+                pid2 = os.fork()
+                if pid2 == 0:
+                    # --- Grandchild: exec xdg-open ---
+                    # Close inherited fds from Textual
+                    devnull = os.open(os.devnull, os.O_RDWR)
+                    os.dup2(devnull, 0)
+                    os.dup2(devnull, 1)
+                    os.dup2(devnull, 2)
+                    if devnull > 2:
+                        os.close(devnull)
+                    os.execve(xdg, [xdg, url], env)
+                else:
+                    os._exit(0)  # first child exits
+            except Exception:
+                os._exit(1)
+        else:
+            # --- Parent (Textual process) ---
+            os.waitpid(pid, 0)  # reap the first child (instant)
+            _debug(f"xdg-open double-forked (first child pid={pid})")
+            return True
     except Exception as e:
-        _debug(f"xdg-open exception: {e}")
+        _debug(f"xdg-open double-fork exception: {e}")
         return False
 
 
