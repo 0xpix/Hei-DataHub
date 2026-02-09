@@ -12,9 +12,6 @@ Usage:
         ...
 """
 import logging
-import os
-import subprocess
-import sys
 from typing import Optional
 
 import pyperclip
@@ -49,63 +46,15 @@ class UrlActionsMixin:
 
     def _open_url_subprocess(self, url: str) -> None:
         """
-        Open a URL using subprocess to avoid readline conflicts.
+        Open a URL using the cross-platform external URL opener.
 
-        Uses platform-specific commands instead of webbrowser module
-        which can cause 'undefined symbol: rl_print_keybinding' errors
-        on some Linux installations.
-
-        For packaged binaries (PyInstaller), we need to:
-        1. Use shell=True to get proper PATH resolution
-        2. Ensure proper environment inheritance
-        3. Detach from the parent process completely
+        Delegates to the shared open_external_url utility which handles
+        platform differences and packaged-binary edge cases.
         """
-        try:
-            if sys.platform == "darwin":
-                subprocess.Popen(
-                    ["open", url],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    start_new_session=True
-                )
-            elif sys.platform == "win32":
-                subprocess.Popen(
-                    ["start", url],
-                    shell=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-                )
-            else:
-                # Linux - use shell=True for proper PATH resolution in packaged binaries
-                # Build a clean environment with essential variables
-                clean_env = {
-                    "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
-                    "HOME": os.environ.get("HOME", ""),
-                    "DISPLAY": os.environ.get("DISPLAY", ":0"),
-                    "WAYLAND_DISPLAY": os.environ.get("WAYLAND_DISPLAY", ""),
-                    "XDG_RUNTIME_DIR": os.environ.get("XDG_RUNTIME_DIR", ""),
-                    "DBUS_SESSION_BUS_ADDRESS": os.environ.get("DBUS_SESSION_BUS_ADDRESS", ""),
-                    "XDG_CURRENT_DESKTOP": os.environ.get("XDG_CURRENT_DESKTOP", ""),
-                    "DESKTOP_SESSION": os.environ.get("DESKTOP_SESSION", ""),
-                }
-                # Remove empty values
-                clean_env = {k: v for k, v in clean_env.items() if v}
+        from hei_datahub.ui.utils.external import open_external_url
 
-                # Use shell=True with xdg-open for proper resolution
-                subprocess.Popen(
-                    f'xdg-open "{url}"',
-                    shell=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    stdin=subprocess.DEVNULL,
-                    start_new_session=True,
-                    env=clean_env,
-                    cwd=os.environ.get("HOME", "/tmp")
-                )
-                # Don't wait - xdg-open spawns a browser and exits
-
-        except Exception as e:
-            raise RuntimeError(f"Could not open browser: {e}")
+        if not open_external_url(url):
+            raise RuntimeError(f"Could not open browser for: {url}")
 
     def action_open_url(self) -> None:
         """Open source URL in browser if it's a URL (o key)."""
@@ -113,9 +62,23 @@ class UrlActionsMixin:
         if url and (url.startswith('http://') or url.startswith('https://')):
             try:
                 self._open_url_subprocess(url)
-                self.app.notify("Opening URL in browser...", timeout=2)
+                self.app.notify("Opening URL in browser…", timeout=2)
             except Exception as e:
-                self.app.notify(f"Failed to open URL: {str(e)}", severity="error", timeout=3)
+                # Fallback: try clipboard
+                from hei_datahub.ui.utils.external import copy_to_clipboard
+
+                if copy_to_clipboard(url):
+                    self.app.notify(
+                        "Could not open browser. URL copied to clipboard.",
+                        severity="warning",
+                        timeout=5,
+                    )
+                else:
+                    self.app.notify(
+                        f"Failed to open URL: {e}",
+                        severity="error",
+                        timeout=5,
+                    )
         else:
             self.app.notify("Source is not a URL", severity="warning", timeout=2)
 
