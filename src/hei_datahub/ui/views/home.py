@@ -24,9 +24,7 @@ from hei_datahub.services.config import get_config
 from hei_datahub.ui.utils.keybindings import build_home_bindings
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 from hei_datahub.ui.widgets.update_overlay import UpdateOverlay
-import subprocess
 import sys
-import urllib.parse
 from textual import events
 
 logger = logging.getLogger(__name__)
@@ -75,7 +73,7 @@ class HomeScreen(Screen):
                         id="update-badge-text"
                     ),
                     id="update-badge",
-                    classes=""
+                    classes="hidden"
                 ),
                 id="hero-section"
             ),
@@ -117,14 +115,32 @@ class HomeScreen(Screen):
         self._check_cached_update_state()
 
     def _check_cached_update_state(self) -> None:
-        """Check cached update state and show badge if update available."""
+        """Check cached update state and show badge only if the cached
+        latest version is genuinely newer than the *running* version."""
         try:
-            from hei_datahub.services.update_service import get_cached_update_state
+            from hei_datahub.services.update_service import (
+                get_cached_update_state,
+                is_newer_version,
+                clear_update_cache,
+            )
 
             cached = get_cached_update_state()
-            if cached and cached.has_update:
-                self.show_update_badge(cached.latest_version)
-                logger.debug(f"Showing cached update badge: {cached.latest_version}")
+            if not cached or not cached.has_update:
+                return
+
+            # Re-verify: the cached tag must still be newer than the
+            # version we are actually running (guards against stale
+            # cache left over from a previous release).
+            if not is_newer_version(cached.latest_version, cached.current_version):
+                logger.debug(
+                    f"Stale update cache: cached latest={cached.latest_version} "
+                    f"<= current={cached.current_version}; clearing"
+                )
+                clear_update_cache()
+                return
+
+            self.show_update_badge(cached.latest_version)
+            logger.debug(f"Showing cached update badge: {cached.latest_version}")
         except Exception as e:
             logger.debug(f"Could not check cached update state: {e}")
 
@@ -350,73 +366,51 @@ class HomeScreen(Screen):
             logger.debug(f"Failed to track search usage: {e}")
 
     def action_report_issue(self) -> None:
-        """Open the issue reporting page."""
-        url = "https://github.com/0xpix/Hei-DataHub/issues/new?labels=bug&template=bug_report.md"
-        self.notify("Opening GitHub issue page...")
-        self._open_url(url)
+        """Open the issue reporting page in the default browser."""
+        from hei_datahub.version import ISSUES_URL
+        from hei_datahub.ui.utils.external import open_external_url, copy_to_clipboard
 
-    def _open_url(self, url: str) -> None:
-        """
-        Open a URL in the default browser using subprocess.
+        url = f"{ISSUES_URL}/new?labels=bug&template=bug_report.md"
+        self.notify("Opening GitHub issue page…")
 
-        Avoids using webbrowser module which can cause readline symbol
-        conflicts on some Linux installations.
-
-        For packaged binaries (PyInstaller), we need to:
-        1. Use shell=True to get proper PATH resolution
-        2. Ensure proper environment inheritance
-        3. Detach from the parent process completely
-        """
-        import os
-
-        try:
-            if sys.platform == "darwin":
-                subprocess.Popen(
-                    ["open", url],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    start_new_session=True
-                )
-            elif sys.platform == "win32":
-                subprocess.Popen(
-                    ["start", url],
-                    shell=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
+        if open_external_url(url):
+            logger.info(f"Opened issue URL: {url}")
+        else:
+            # Browser failed — copy URL to clipboard and show it
+            copied = copy_to_clipboard(url)
+            if copied:
+                self.notify(
+                    "Could not open browser. URL copied to clipboard.",
+                    severity="warning",
+                    timeout=8,
                 )
             else:
-                # Linux - use shell=True for proper PATH resolution in packaged binaries
-                # Build a clean environment with essential variables
-                clean_env = {
-                    "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
-                    "HOME": os.environ.get("HOME", ""),
-                    "DISPLAY": os.environ.get("DISPLAY", ":0"),
-                    "WAYLAND_DISPLAY": os.environ.get("WAYLAND_DISPLAY", ""),
-                    "XDG_RUNTIME_DIR": os.environ.get("XDG_RUNTIME_DIR", ""),
-                    "DBUS_SESSION_BUS_ADDRESS": os.environ.get("DBUS_SESSION_BUS_ADDRESS", ""),
-                    "XDG_CURRENT_DESKTOP": os.environ.get("XDG_CURRENT_DESKTOP", ""),
-                    "DESKTOP_SESSION": os.environ.get("DESKTOP_SESSION", ""),
-                }
-                # Remove empty values
-                clean_env = {k: v for k, v in clean_env.items() if v}
-
-                # Use shell=True with xdg-open for proper resolution
-                # The shell will handle PATH lookup correctly
-                proc = subprocess.Popen(
-                    f'xdg-open "{url}"',
-                    shell=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    stdin=subprocess.DEVNULL,
-                    start_new_session=True,
-                    env=clean_env,
-                    cwd=os.environ.get("HOME", "/tmp")
+                self.notify(
+                    f"Could not open browser. Go to:\n{url}",
+                    severity="error",
+                    timeout=12,
                 )
-                # Don't wait - xdg-open spawns a browser and exits
+            logger.warning(f"Failed to open URL in browser: {url}")
 
-        except Exception as e:
-            logger.error(f"Failed to open URL: {e}")
-            self.notify(f"Could not open browser: {e}", severity="error")
+    def _open_url(self, url: str) -> None:
+        """Open a URL in the default browser (cross-platform)."""
+        from hei_datahub.ui.utils.external import open_external_url, copy_to_clipboard
+
+        if not open_external_url(url):
+            copied = copy_to_clipboard(url)
+            if copied:
+                self.notify(
+                    "Could not open browser. URL copied to clipboard.",
+                    severity="warning",
+                    timeout=8,
+                )
+            else:
+                self.notify(
+                    f"Could not open browser. Go to:\n{url}",
+                    severity="error",
+                    timeout=12,
+                )
+            logger.warning(f"Failed to open URL: {url}")
 
     def action_theme_palette(self) -> None:
         """Open theme palette (passthrough to app)."""
