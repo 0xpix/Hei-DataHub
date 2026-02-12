@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.64.24-beta"
-codename: "Update Hotfix"
+version: "0.64.25-beta"
+codename: "Badge Hotfix"
 release_date: "2026-02-12"
 compatibility: "Hei-DataHub v0.64.x (beta)"
-notes: "Hotfix: F2 report issue shortcut, update detection, cross-platform URL opener, update overlay redesign."
+notes: "Hotfix: Update badge now always detected on launch by bypassing throttle cache."
 
 # Additional metadata
 app_name: "Hei-DataHub"
