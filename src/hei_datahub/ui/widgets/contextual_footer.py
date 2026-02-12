@@ -64,14 +64,17 @@ class ContextualFooter(Widget):
             ("F1", "About"),
         ],
         "search": [
-            ("Ctrl+N", "Add"),
-            ("Ctrl+S", "Settings"),
-            ("F2", "Report Issue"),
-            ("Ctrl+P", "Commands"),
             ("F1", "About"),
+            ("F2", "Report Issue"),
+            ("F3", "Tags"),
+            ("Ctrl+S", "Settings"),
+            ("Ctrl+N", "Add"),
+            ("Ctrl+P", "Commands"),
+
         ],
         "results": [
-            ("j/k", "Navigate"),
+            ("j/k", "Up/Down"),
+            ("h/l", "Left/Right"),
             ("gg", "Top"),
             ("G", "Bottom"),
             ("Enter", "Open"),
@@ -103,9 +106,7 @@ class ContextualFooter(Widget):
             ("Esc", "Back"),
         ],
         "about": [
-            ("j/k", "Scroll"),
-            ("gg", "Top"),
-            ("G", "Bottom"),
+            ("o", "Open links"),
             ("Esc", "Back"),
         ],
     }
