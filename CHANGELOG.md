@@ -7,20 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.64.20-beta] - 2026-02-09 - Hotfix
+## [0.64.24-beta] - 2026-02-12 - Hotfix
 
-**Hotfix:** Fixes Ctrl+I browser opening, update detection order, and redesigns the update overlay.
+**Hotfix:** Fixes Report Issue shortcut, update detection order, cross-platform URL opening, and redesigns the update overlay.
+
+### Changed
+
+- Update UI with improved user feedback during updates
+- Update service with improved logging and error handling
+- Installation method detection with improved logging
 
 ### Fixed
 
-- Ctrl+I (Report Issue) now reliably opens GitHub Issues in the default browser
+- Report Issue shortcut changed from `Ctrl+I` to `F2` (`Ctrl+I` is aliased to Tab in terminals and never fired)
 - Update detection order — UV and pipx installs are now correctly detected before AUR/Homebrew
-- AUR updates now run inside the TUI with a minimalistic password prompt
 - Update badge only appears when a new update is genuinely available
+- `xdg-open` on Linux no longer causes TTY issues (double-forking fix)
+- URL opening refactored to shared cross-platform utility with browser fallback
+
+**PS: The app hasn't been extensivly tested in Windows/MacOS**
 
 ---
 
-## [0.65.15-beta] - 2026-02-04 - Silent Updates
+## [0.64.15-beta] - 2026-02-04 - Silent Updates
 
 **Silent Update Check & Bug Fixes!** This release adds automatic background update checking on app launch with a visual badge notification.
 
@@ -29,7 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed the update badge not showing up
   - Fixed "Change Theme" command not working from command palette (`Ctrl+P`)
   - Fixed `undefined symbol: rl_print_keybinding` error when using Ctrl+I on AUR-installed package
-
 
 ---
 
