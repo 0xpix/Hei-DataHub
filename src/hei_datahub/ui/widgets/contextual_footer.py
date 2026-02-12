@@ -59,14 +59,14 @@ class ContextualFooter(Widget):
         "home": [
             ("Ctrl+N", "Add"),
             ("Ctrl+S", "Settings"),
-            ("Ctrl+I", "Report Issue"),
+            ("F2", "Report Issue"),
             ("Ctrl+P", "Commands"),
             ("F1", "About"),
         ],
         "search": [
             ("Ctrl+N", "Add"),
             ("Ctrl+S", "Settings"),
-            ("Ctrl+I", "Report Issue"),
+            ("F2", "Report Issue"),
             ("Ctrl+P", "Commands"),
             ("F1", "About"),
         ],
