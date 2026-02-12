@@ -171,7 +171,13 @@ class IndexService:
         project_filter: Optional[str] = None,
         source_filter: Optional[str] = None,
         format_filter: Optional[str] = None,
-        tag_filter: Optional[str] = None,
+        category_filter: Optional[str] = None,
+        method_filter: Optional[str] = None,
+        size_filter: Optional[str] = None,
+        sr_filter: Optional[str] = None,
+        sc_filter: Optional[str] = None,
+        tr_filter: Optional[str] = None,
+        tc_filter: Optional[str] = None,
         limit: int = INDEX_MAX_RESULTS,
         offset: int = 0
     ) -> list[dict[str, Any]]:
@@ -183,7 +189,13 @@ class IndexService:
             project_filter: Optional project prefix filter
             source_filter: Optional source filter
             format_filter: Optional format filter
-            tag_filter: Optional tag filter
+            category_filter: Optional category filter
+            method_filter: Optional access method filter
+            size_filter: Optional size filter
+            sr_filter: Optional spatial resolution filter
+            sc_filter: Optional spatial coverage filter
+            tr_filter: Optional temporal resolution filter
+            tc_filter: Optional temporal coverage filter
             limit: Maximum results to return
             offset: Offset for pagination
 
@@ -191,7 +203,9 @@ class IndexService:
             List of matching items with metadata
         """
         # Check cache first
-        cache_key = (query_text, project_filter, source_filter, format_filter, tag_filter)
+        cache_key = (query_text, project_filter, source_filter, format_filter,
+                     category_filter, method_filter, size_filter,
+                     sr_filter, sc_filter, tr_filter, tc_filter)
         if cache_key in self._query_cache:
             timestamp = self._cache_timestamps.get(cache_key, 0)
             if time.time() - timestamp < self._cache_timeout:
@@ -235,9 +249,33 @@ class IndexService:
                     where_clauses.append("items.format LIKE ?")
                     params.append(f"%{format_filter}%")
 
-                if tag_filter:
-                    where_clauses.append("items.tags LIKE ?")
-                    params.append(f"%{tag_filter}%")
+                if category_filter:
+                    where_clauses.append("items.category LIKE ?")
+                    params.append(f"%{category_filter}%")
+
+                if method_filter:
+                    where_clauses.append("items.access_method LIKE ?")
+                    params.append(f"%{method_filter}%")
+
+                if size_filter:
+                    where_clauses.append("items.size LIKE ?")
+                    params.append(f"%{size_filter}%")
+
+                if sr_filter:
+                    where_clauses.append("items.spatial_resolution LIKE ?")
+                    params.append(f"%{sr_filter}%")
+
+                if sc_filter:
+                    where_clauses.append("items.spatial_coverage LIKE ?")
+                    params.append(f"%{sc_filter}%")
+
+                if tr_filter:
+                    where_clauses.append("items.temporal_resolution LIKE ?")
+                    params.append(f"%{tr_filter}%")
+
+                if tc_filter:
+                    where_clauses.append("items.temporal_coverage LIKE ?")
+                    params.append(f"%{tc_filter}%")
 
                 sql = """
                     SELECT
@@ -290,9 +328,33 @@ class IndexService:
                     where_clauses.append("items.format LIKE ?")
                     params.append(f"%{format_filter}%")
 
-                if tag_filter:
-                    where_clauses.append("items.tags LIKE ?")
-                    params.append(f"%{tag_filter}%")
+                if category_filter:
+                    where_clauses.append("items.category LIKE ?")
+                    params.append(f"%{category_filter}%")
+
+                if method_filter:
+                    where_clauses.append("items.access_method LIKE ?")
+                    params.append(f"%{method_filter}%")
+
+                if size_filter:
+                    where_clauses.append("items.size LIKE ?")
+                    params.append(f"%{size_filter}%")
+
+                if sr_filter:
+                    where_clauses.append("items.spatial_resolution LIKE ?")
+                    params.append(f"%{sr_filter}%")
+
+                if sc_filter:
+                    where_clauses.append("items.spatial_coverage LIKE ?")
+                    params.append(f"%{sc_filter}%")
+
+                if tr_filter:
+                    where_clauses.append("items.temporal_resolution LIKE ?")
+                    params.append(f"%{tr_filter}%")
+
+                if tc_filter:
+                    where_clauses.append("items.temporal_coverage LIKE ?")
+                    params.append(f"%{tc_filter}%")
 
                 sql = """
                     SELECT
