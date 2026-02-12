@@ -52,7 +52,10 @@ class SmartSearchSuggester(Suggester):
             if len(parts) == 2:
                 field = parts[0].lower()
                 partial_value = parts[1]
-                supported_fields = {"source", "project", "tag", "owner", "size", "format", "type"}
+                supported_fields = {
+                    "project", "source", "category", "method",
+                    "format", "size", "sr", "sc", "tr", "tc",
+                }
                 if field in supported_fields:
                     # Typing field value
                     return (field, partial_value, False)
@@ -69,7 +72,10 @@ class SmartSearchSuggester(Suggester):
 
             # If typing field name, suggest field names
             if is_typing_field:
-                field_names = ["source:", "project:", "tag:", "owner:", "size:", "format:", "type:"]
+                field_names = [
+                    "all", "project:", "source:", "category:", "method:",
+                    "format:", "size:", "sr:", "sc:", "tr:", "tc:",
+                ]
                 partial_lower = partial_value.lower()
 
                 # Find matching field names
