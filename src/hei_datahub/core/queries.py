@@ -60,20 +60,24 @@ class QueryParser:
     Parse structured search queries.
 
     Supported fields:
-    - source: Source URL/library
-    - format: File format
-    - type: Data type
-    - tag: Tags
-    - date_created: Creation date
+    - project: Related projects
+    - source: Source
+    - category: Category
+    - method: Access method
+    - format: Format & structure
     - size: Dataset size
-    - name: Dataset name
-    - id: Dataset ID
-    - project: Used in projects
+    - sr: Spatial resolution
+    - sc: Spatial coverage
+    - tr: Temporal resolution
+    - tc: Temporal coverage
+
+    Special keywords:
+    - all: Show all datasets (no colon needed)
     """
 
     SUPPORTED_FIELDS = {
-        "source", "format", "type", "tag", "tags",
-        "date_created", "date", "size", "name", "id", "project"
+        "project", "source", "category", "method",
+        "format", "size", "sr", "sc", "tr", "tc",
     }
 
     # Pattern to match various field query formats:
@@ -253,6 +257,6 @@ def suggest_operator_completions(field: str) -> list[str]:
     Returns:
         List of valid operators
     """
-    if field in ("date_created", "date", "size"):
+    if field == "size":
         return [":", ">", "<", ">=", "<="]
     return [":"]
