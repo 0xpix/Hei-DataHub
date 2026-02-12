@@ -89,7 +89,7 @@ class CustomCommandPalette(ModalScreen[str]):
             # Appearance
             ("Change Theme", "theme_palette", "Ctrl+T", "Appearance"),
             # System
-            ("Report Issue", "report_issue", "Ctrl+I", "System"),
+            ("Report Issue", "report_issue", "F2", "System"),
             ("Check Updates", "check_updates", "Ctrl+U", "System"),
             ("Exit", "quit", "Ctrl+Q", "System"),
         ]
