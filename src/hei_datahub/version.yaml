@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.64.23-beta"
+version: "0.64.24-beta"
 codename: "Update Hotfix"
 release_date: "2026-02-12"
 compatibility: "Hei-DataHub v0.64.x (beta)"
-notes: "Hotfix: Ctrl+I browser opening, update detection, install method priority, minimalistic update overlay."
+notes: "Hotfix: F2 report issue shortcut, update detection, cross-platform URL opener, update overlay redesign."
 
 # Additional metadata
 app_name: "Hei-DataHub"
