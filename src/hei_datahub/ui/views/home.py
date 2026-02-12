@@ -36,7 +36,7 @@ class HomeScreen(Screen):
     # Load bindings from config file
     BINDINGS = build_home_bindings() + [
         Binding("U", "check_updates", "Update", key_display="U", show=True),
-        Binding("ctrl+i", "report_issue", "Report Issue", show=False),
+        Binding("f2", "report_issue", "Report Issue", show=False, priority=True),
     ]
 
     # Load CSS from styles directory
