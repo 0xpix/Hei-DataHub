@@ -212,6 +212,8 @@
     margin-top: 1;
     border: none;
     background: $background;
+    scrollbar-size: 1 1;
+    scrollbar-gutter: stable;
 }
 
 #results-table > .datatable--header {
