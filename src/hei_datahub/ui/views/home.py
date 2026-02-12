@@ -851,19 +851,18 @@ class HomeScreen(Screen):
                 field = term.field.lower()
                 search_value = term.value.lower()
 
-                # Map common field names
+                # Map field names to metadata keys
                 field_map = {
-                    'name': 'name',
-                    'description': 'description',
-                    'desc': 'description',
-                    'source': 'source',
-                    'license': 'license',
-                    'keyword': 'keywords',
-                    'keywords': 'keywords',
                     'project': 'used_in_projects',
-                    'projects': 'used_in_projects',
-                    'temporal': 'temporal_coverage',
-                    'spatial': 'spatial_coverage',
+                    'source': 'source',
+                    'category': 'category',
+                    'method': 'access_method',
+                    'format': 'file_format',
+                    'size': 'size',
+                    'sr': 'spatial_resolution',
+                    'sc': 'spatial_coverage',
+                    'tr': 'temporal_resolution',
+                    'tc': 'temporal_coverage',
                 }
 
                 metadata_field = field_map.get(field, field)
@@ -983,6 +982,13 @@ class HomeScreen(Screen):
         search_input = self.query_one("#search-input", Input)
 
         if search_input.has_focus:
+            # F3 shows the tags help overlay
+            if event.key == "f3":
+                self.action_show_tags_help()
+                event.prevent_default()
+                event.stop()
+                return
+
             # Tab accepts autocomplete and prevents navigation to table
             if event.key == "tab":
                 # Manually accept the suggestion by moving cursor to end
@@ -996,6 +1002,22 @@ class HomeScreen(Screen):
                 event.prevent_default()
                 event.stop()
         else:
+            # Handle h/l for horizontal scroll in the data table
+            if event.key == "h":
+                table = self.query_one("#results-table", DataTable)
+                if table.has_focus:
+                    table.scroll_left(animate=False)
+                    event.prevent_default()
+                    event.stop()
+                    return
+            elif event.key == "l":
+                table = self.query_one("#results-table", DataTable)
+                if table.has_focus:
+                    table.scroll_right(animate=False)
+                    event.prevent_default()
+                    event.stop()
+                    return
+
             # Handle 'gg' sequence for jump to top
             if event.key == "g":
                 if self._g_pressed:
@@ -1184,6 +1206,11 @@ class HomeScreen(Screen):
         """Show help overlay with keybindings (? key)."""
         from hei_datahub.ui.widgets.help import HelpScreen
         self.app.push_screen(HelpScreen())
+
+    def action_show_tags_help(self) -> None:
+        """Show search tags help overlay."""
+        from hei_datahub.ui.widgets.tags_help import TagsHelpScreen
+        self.app.push_screen(TagsHelpScreen())
 
     def action_settings(self) -> None:
         """Open settings menu (S key)."""
