@@ -3,15 +3,49 @@ About screen showing project information, logo, and story.
 
 Redesigned with a minimalistic, retro-inspired aesthetic for terminal elegance.
 """
+import webbrowser
+
+from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, ScrollableContainer, Vertical
 from textual.screen import Screen
-from textual.widgets import Header, Static
+from textual.widgets import Header, Label, Static
 
 from hei_datahub.services.config import get_config
 from hei_datahub.ui.assets.loader import get_logo_widget_text
 from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
+
+
+GITHUB_URL = "https://github.com/0xpix/Hei-DataHub"
+DOCS_URL = "https://docs.hei-datahub.app"
+
+
+class OpenFooter(Static):
+    """Footer shown during open-link mode."""
+
+    DEFAULT_CSS = """
+    OpenFooter {
+        dock: bottom;
+        width: 100%;
+        height: 2;
+        background: $surface;
+        color: $text;
+        border-top: wide $accent;
+        padding: 0 1;
+        display: none;
+        text-align: center;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        yield Label(
+            "[bold reverse #60a5fa] OPEN [/]  "
+            "[bold]g[/]:GitHub  "
+            "[bold]d[/]:Docs  "
+            "[bold]Esc[/]:cancel",
+            markup=True,
+        )
 
 
 class AboutScreen(Screen):
@@ -33,6 +67,8 @@ class AboutScreen(Screen):
         """Initialize the screen."""
         super().__init__(*args, **kwargs)
         self._g_pressed = False
+        self._open_mode = False
+        self._open_auto_cancel_timer = None
 
     def compose(self) -> ComposeResult:
         """Compose the about screen layout."""
@@ -42,56 +78,110 @@ class AboutScreen(Screen):
         get_logo_widget_text(get_config())
 
         with ScrollableContainer(id="about-container"):
-            # Main card container
             with Container(id="about-card"):
-                # Logo and version header
-                # yield Static(logo_text, id="logo")
-                yield Static(f"Hei-datahub - v{__version__}", id="version-badge")
 
-                # Separator
-                yield Static("─" * 70, id="header-separator", classes="separator")
+                yield Static(f"Hei-DataHub  v{__version__}", id="version-badge")
+                yield Static("─" * 60, classes="separator")
 
-                # Tagline
+                # Origin
+                yield Static("[b #d4a574]The Origin[/b #d4a574]", classes="section-title")
                 yield Static(
-                    "A cloud-first TUI for data cataloging and research collaboration.",
-                    id="tagline"
+                    "Hei-DataHub started with a simple frustration: dataset tracking "
+                    "had turned into a mess of Excel files, broken links, and tools "
+                    "that slowed research down instead of supporting it.\n\n"
+                    "Finding the right dataset often means interrupting colleagues, "
+                    "digging through old emails, or searching across scattered folders. "
+                    "The data exists—but never where or when you need it.\n\n"
+                    "Hei-DataHub brings everything into one place. A fast, local inventory "
+                    "that lets you find the right dataset in a split second—without "
+                    "messages, meetings, or context switching.",
+                    classes="section-content"
                 )
 
-                # Separator
-                yield Static("─" * 70, id="features-separator", classes="separator")
+                yield Static("─" * 60, classes="separator")
 
-                # Compact content sections
-                with Vertical(id="content-section"):
+                # Philosophy - compact pillars
+                yield Static("[b #d4a574]Philosophy[/b #d4a574]", classes="section-title")
 
-                    yield Static("[b #d4a574]Story[/b #d4a574]", classes="section-title")
+                with Vertical(id="philosophy-grid"):
                     yield Static(
-                        "It began as a simple [b]Excel sheet inventory[/b]. "
-                        "It was just boring, I wanted something fast, private, and fun to use—inside the terminal.\n"
-                        "So Hei-DataHub was born: a TUI that keeps data in your hands, syncs to Heibox for the team, and makes finding things instant. The goal is simple: less friction, more science.",
-                        classes="section-content"
+                        "  [b #a78bfa]Privacy First[/b #a78bfa]      Your data belongs to you.\n"
+                        "  [b #a78bfa]Speed Matters[/b #a78bfa]      Fuzzy search. Instant results.\n"
+                        "  [b #a78bfa]Simplicity[/b #a78bfa]         One thing, done well.\n"
+                        "  [b #a78bfa]Open Source[/b #a78bfa]        Transparent and hackable.",
+                        classes="section-content philosophy-items"
                     )
 
-                    yield Static("[b #d4a574]What is Hei-DataHub?[/b #d4a574]", classes="section-title")
-                    yield Static(
-                        "A terminal user interface designed for researchers and data scientists to "
-                        "catalog, organize, and manage datasets efficiently. Combines YAML metadata, "
-                        "SQLite full-text search, and seamless cloud integration.\n",
-                        classes="section-content"
-                    )
+                yield Static("─" * 60, classes="separator")
 
-                    yield Static("[b #d4a574]Github $ Docs[/b #d4a574]", classes="section-title")
-                    yield Static(
-                        "GitHub: [link]https://github.com/0xpix/Hei-DataHub[/link]\n"
-                        "Docs: [link]https://0xpix.github.io/Hei-DataHub/[/link]\n",
-                        classes="section-content"
-                    )
+                # Links
+                yield Static("[b #d4a574]Links[/b #d4a574]", classes="section-title")
+                yield Static(
+                    "  GitHub  [link]https://github.com/0xpix/Hei-DataHub[/link]\n"
+                    "  Docs    [link]https://docs.hei-datahub.app[/link]",
+                    classes="section-content"
+                )
 
-                # Footer hint
+                yield Static("", classes="spacer")
                 yield Static("Made with 󰋑 by PIX", id="footer-hint")
 
         footer = ContextualFooter()
         footer.set_context("about")
         yield footer
+        yield OpenFooter()
+
+    def on_key(self, event: events.Key) -> None:
+        """Handle key presses for open-link mode."""
+        # Open mode active — waiting for g or d
+        if self._open_mode:
+            if self._open_auto_cancel_timer:
+                self._open_auto_cancel_timer.stop()
+
+            if event.key == "escape":
+                self._exit_open_mode()
+                event.stop()
+                return
+
+            key = event.key.lower() if len(event.key) == 1 else event.key
+
+            if key == "g":
+                webbrowser.open(GITHUB_URL)
+                self.app.notify(f"Opened GitHub")
+                self._exit_open_mode()
+                event.stop()
+            elif key == "d":
+                webbrowser.open(DOCS_URL)
+                self.app.notify(f"Opened Docs")
+                self._exit_open_mode()
+                event.stop()
+            else:
+                self.app.notify("Open cancelled", severity="warning")
+                self._exit_open_mode()
+                event.stop()
+            return
+
+        # Normal mode — 'o' enters open mode
+        if event.key == "o":
+            self._enter_open_mode()
+            event.stop()
+
+    def _enter_open_mode(self) -> None:
+        """Activate open-link mode."""
+        self._open_mode = True
+        self.query_one(ContextualFooter).styles.display = "none"
+        self.query_one(OpenFooter).styles.display = "block"
+        self._open_auto_cancel_timer = self.set_timer(5.0, self._exit_open_mode)
+
+    def _exit_open_mode(self) -> None:
+        """Deactivate open-link mode."""
+        self._open_mode = False
+        if self._open_auto_cancel_timer:
+            self._open_auto_cancel_timer.stop()
+        try:
+            self.query_one(OpenFooter).styles.display = "none"
+            self.query_one(ContextualFooter).styles.display = "block"
+        except Exception:
+            pass
 
     def action_back(self) -> None:
         """Return to previous screen."""
