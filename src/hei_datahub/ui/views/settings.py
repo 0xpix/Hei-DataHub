@@ -252,12 +252,12 @@ class SettingsScreen(Screen):
             with open(config_path, "wb") as f:
                 tomli_w.dump(config, f)
 
-            # Refresh connection status
-            self.app.refresh_heibox_status()
+            # Reload configuration, re-check connection, and re-index so data appears immediately
+            self.app.reload_configuration()
 
             if saved_credential:
                 status_label.update("[green]✓ Settings saved! Credentials stored securely.[/green]")
-                self.app.notify("WebDAV settings saved successfully!", timeout=5)
+                self.app.notify("WebDAV settings saved — syncing data...", timeout=5)
             else:
                 status_label.update("[green]✓ Configuration saved![/green]")
                 self.app.notify("WebDAV configuration saved!", timeout=3)
