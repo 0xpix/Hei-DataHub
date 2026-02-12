@@ -268,16 +268,26 @@ class SuggestionService:
         Returns:
             List of ranked suggestions
         """
-        if key == "size":
-            return self._get_size_suggestions(typed, max_suggestions)
-        elif key == "project":
-            return self._get_field_suggestions("project", typed, max_suggestions)
+        if key == "project":
+            return self._get_field_suggestions("project", typed, max_suggestions, tag_alias="project")
         elif key == "source":
-            return self._get_field_suggestions("source", typed, max_suggestions)
-        elif key == "tag":
-            return self._get_tag_suggestions(typed, max_suggestions)
-        elif key == "owner":
-            return self._get_field_suggestions("project", typed, max_suggestions)  # Using project as owner for now
+            return self._get_field_suggestions("source", typed, max_suggestions, tag_alias="source")
+        elif key == "category":
+            return self._get_field_suggestions("category", typed, max_suggestions, tag_alias="category")
+        elif key == "method":
+            return self._get_field_suggestions("access_method", typed, max_suggestions, tag_alias="method")
+        elif key == "format":
+            return self._get_field_suggestions("format", typed, max_suggestions, tag_alias="format")
+        elif key == "size":
+            return self._get_size_suggestions(typed, max_suggestions)
+        elif key == "sr":
+            return self._get_field_suggestions("spatial_resolution", typed, max_suggestions, tag_alias="sr")
+        elif key == "sc":
+            return self._get_field_suggestions("spatial_coverage", typed, max_suggestions, tag_alias="sc")
+        elif key == "tr":
+            return self._get_field_suggestions("temporal_resolution", typed, max_suggestions, tag_alias="tr")
+        elif key == "tc":
+            return self._get_field_suggestions("temporal_coverage", typed, max_suggestions, tag_alias="tc")
         else:
             return self._get_free_text_suggestions(typed, max_suggestions)
 
@@ -338,8 +348,9 @@ class SuggestionService:
         suggestions.sort(key=lambda s: s.score, reverse=True)
         return suggestions[:max_suggestions]
 
-    def _get_field_suggestions(self, field: str, typed: str, max_suggestions: int) -> list[Suggestion]:
+    def _get_field_suggestions(self, field: str, typed: str, max_suggestions: int, tag_alias: Optional[str] = None) -> list[Suggestion]:
         """Get suggestions for a specific field (project, source, owner)."""
+        display_key = tag_alias or field
         all_values = self._get_cached_or_fetch(field, lambda: self._get_distinct_values(field))
 
         # Filter by typed prefix
@@ -361,11 +372,23 @@ class SuggestionService:
             count, last_used = self._get_usage_stats(field, value)
             score = self._calculate_score(value, typed, count, last_used, max_count, max_last_used)
 
+            # For access_method, strip the prefix before ':'
+            # e.g. "FILE: CSV" -> "CSV", "API: REST" -> "REST"
+            display_value = value
+            if field == "access_method" and ":" in value:
+                display_value = value.split(":", 1)[1].strip()
+
+            # Quote multi-word values so the parser keeps them as one token
+            if " " in display_value:
+                fmt_value = f'"{display_value}"'
+            else:
+                fmt_value = display_value
+
             suggestions.append(Suggestion(
-                key=field,
+                key=display_key,
                 value=value,
-                display=f"{field}:{value}",
-                insert_text=f"{field}:{value} ",
+                display=f"{display_key}:{fmt_value}",
+                insert_text=f"{display_key}:{fmt_value} ",
                 meta=f"used {count}x" if count > 0 else None,
                 score=score
             ))
