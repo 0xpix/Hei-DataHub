@@ -282,7 +282,10 @@ class DataHubApp(App):
             from hei_datahub.services.update_service import check_for_updates_silent
 
             logger.info("Starting silent update check on launch...")
-            result = check_for_updates_silent()
+            # force=True: always hit the network on app launch so a
+            # freshly-published release is detected immediately instead
+            # of being hidden behind the 8-hour throttle cache.
+            result = check_for_updates_silent(force=True)
 
             if result is None:
                 logger.debug("Update check skipped (throttled or failed)")
@@ -305,6 +308,9 @@ class DataHubApp(App):
                 self.update_available = False
                 self.latest_version = result.latest_version
 
+                # Hide badge if stale cache had shown one before this check
+                self._hide_home_screen_badge()
+
         except Exception as e:
             logger.error(f"Silent update check failed: {e}", exc_info=True)
             # Fail silently - no UI impact
@@ -318,6 +324,16 @@ class DataHubApp(App):
                         screen.show_update_badge(self.latest_version)
         except Exception as e:
             logger.debug(f"Could not update home screen badge: {e}")
+
+    def _hide_home_screen_badge(self) -> None:
+        """Hide update badge on home screen (e.g. stale cache was wrong)."""
+        try:
+            for screen in self.screen_stack:
+                if isinstance(screen, HomeScreen):
+                    if hasattr(screen, 'hide_update_badge'):
+                        screen.hide_update_badge()
+        except Exception as e:
+            logger.debug(f"Could not hide home screen badge: {e}")
 
     @work(exclusive=True, thread=True)
     def startup_pull_check(self) -> None:
