@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.64.25-beta"
-codename: "Badge Hotfix"
+version: "0.65.0-beta"
+codename: "Wide Search"
 release_date: "2026-02-12"
-compatibility: "Hei-DataHub v0.64.x (beta)"
-notes: "Hotfix: Update badge now always detected on launch by bypassing throttle cache."
+compatibility: "Hei-DataHub v0.65.x (beta)"
+notes: "Extended search tags, vim-style view navigation, table column consolidation, tag input and error handling fixes."
 
 # Additional metadata
 app_name: "Hei-DataHub"
