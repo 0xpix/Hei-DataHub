@@ -15,8 +15,18 @@ import requests
 from hei_datahub import UPDATE_CHECK_URL, __version__
 from hei_datahub.services.update_check import parse_version
 
-# GitHub releases asset pattern
+# GitHub releases asset pattern — match versioned or unversioned setup exe
 ASSET_NAME = "hei-datahub-setup.exe"
+
+
+def _match_setup_asset(name: str) -> bool:
+    """Check if an asset name is a Windows setup installer.
+
+    Matches both versioned (hei-datahub-0.64.20b-setup.exe) and
+    unversioned (hei-datahub-setup.exe) filenames.
+    """
+    n = name.lower()
+    return n.endswith("-setup.exe") and n.startswith("hei-datahub")
 
 
 def is_windows() -> bool:
@@ -46,19 +56,36 @@ def get_download_url() -> Optional[dict]:
         }
     """
     try:
+        # Try /releases/latest first, then fall back to /releases list
+        # (beta/pre-release tags don't show up on /latest)
         response = requests.get(
             UPDATE_CHECK_URL,
             timeout=10,
-            headers={"Accept": "application/vnd.github.v3+json"}
+            headers={"Accept": "application/vnd.github.v3+json",
+                     "User-Agent": f"Hei-DataHub/{__version__}"}
         )
 
-        if response.status_code == 404:
-            return {"error": "No releases found on GitHub yet"}
+        release_data = None
 
-        if response.status_code != 200:
-            return {"error": f"GitHub API error: {response.status_code}"}
+        if response.status_code == 200:
+            release_data = response.json()
+        else:
+            # Fallback: fetch releases list and pick the first one
+            list_url = UPDATE_CHECK_URL.rsplit("/", 1)[0]  # …/releases
+            resp2 = requests.get(
+                list_url,
+                timeout=10,
+                headers={"Accept": "application/vnd.github.v3+json",
+                         "User-Agent": f"Hei-DataHub/{__version__}"},
+                params={"per_page": 5},
+            )
+            if resp2.status_code == 200:
+                releases = resp2.json()
+                if releases:
+                    release_data = releases[0]
 
-        release_data = response.json()
+        if not release_data:
+            return {"error": "No releases found on GitHub"}
         latest_version = release_data.get("tag_name", "").lstrip('v')
 
         if not latest_version:
@@ -69,18 +96,20 @@ def get_download_url() -> Optional[dict]:
         latest_tuple = parse_version(latest_version)
         has_update = latest_tuple > current_tuple
 
-        # Find the setup.exe asset
+        # Find the setup.exe asset (versioned or unversioned)
         download_url = None
         file_size = 0
+        matched_name = None
 
         for asset in release_data.get("assets", []):
-            if asset.get("name") == ASSET_NAME:
+            if _match_setup_asset(asset.get("name", "")):
                 download_url = asset.get("browser_download_url")
                 file_size = asset.get("size", 0)
+                matched_name = asset.get("name")
                 break
 
         if not download_url:
-            return {"error": f"Release missing {ASSET_NAME} asset"}
+            return {"error": "Release has no Windows installer (.exe) asset"}
 
         return {
             "has_update": has_update,
@@ -123,7 +152,9 @@ def download_update(
         temp_dir = Path(tempfile.gettempdir()) / "hei-datahub-update"
         temp_dir.mkdir(exist_ok=True)
 
-        download_path = temp_dir / ASSET_NAME
+        # Derive filename from the download URL (handles versioned names)
+        filename = download_url.rsplit("/", 1)[-1] if "/" in download_url else ASSET_NAME
+        download_path = temp_dir / filename
         downloaded = 0
 
         with open(download_path, 'wb') as f:
