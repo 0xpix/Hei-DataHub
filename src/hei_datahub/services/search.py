@@ -96,10 +96,16 @@ def _simple_fts_search(query: str, limit: int) -> list[dict[str, Any]]:
             # Skip empty phrases
             if not phrase.strip():
                 continue
-            # Use exact phrase matching with FTS5 syntax
-            # Escape quotes in the phrase and use double quotes
-            escaped_phrase = phrase.replace('"', '""')
-            valid_tokens.append(f'"{escaped_phrase}"')
+            # Clean each word in the phrase of FTS5-breaking special chars,
+            # then reassemble as a quoted phrase
+            clean_words = []
+            for word in phrase.split():
+                clean_word = ''.join(c for c in word if c.isalnum() or c in ('-', '_', ' '))
+                if clean_word:
+                    clean_words.append(clean_word)
+            if clean_words:
+                cleaned_phrase = " ".join(clean_words)
+                valid_tokens.append(f'"{cleaned_phrase}"')
 
         if not valid_tokens:
             return []
