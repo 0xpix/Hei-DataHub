@@ -175,20 +175,18 @@ def _structured_search(parsed: ParsedQuery, limit: int) -> list[dict[str, Any]]:
             if term.is_free_text:
                 continue
 
-            # Map field names
+            # Map field names to JSON payload keys
             field_map = {
-                "source": "source",
-                "format": "file_format",
-                "type": "data_types",
-                "tag": "codes",
-                "tags": "codes",
-                "date_created": "date_created",
-                "date": "date_created",
-                "size": "size",
-                "name": "dataset_name",
-                "id": "id",
                 "project": "used_in_projects",
-
+                "source": "source",
+                "category": "category",
+                "method": "access_method",
+                "format": "file_format",
+                "size": "size",
+                "sr": "spatial_resolution",
+                "sc": "spatial_coverage",
+                "tr": "temporal_resolution",
+                "tc": "temporal_coverage",
             }
 
             json_field = field_map.get(term.field)
