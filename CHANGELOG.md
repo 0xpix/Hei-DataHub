@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.64.25-beta] - 2026-02-12 - Hotfix
+
+**Hotfix:** Fixes the update badge not appearing on app launch after a new release is published.
+
+### Fixed
+
+- Update badge no longer hidden by 8-hour throttle cache on startup — every app launch now performs a fresh network check (non-blocking)
+- Stale update badge is automatically hidden when a fresh check confirms no update is available
+
+---
+
 ## [0.64.24-beta] - 2026-02-12 - Hotfix
 
 **Hotfix:** Fixes Report Issue shortcut, update detection order, cross-platform URL opening, and redesigns the update overlay.
