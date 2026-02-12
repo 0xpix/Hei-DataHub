@@ -1,6 +1,5 @@
 /* ============================================================================
-   ABOUT SCREEN - Minimalistic Retro Design
-   Elegant, compact, and readable terminal interface
+   ABOUT SCREEN - Clean Minimalistic Design
    ============================================================================ */
 
 AboutScreen {
@@ -16,9 +15,9 @@ AboutScreen #about-container {
     align: center top;
 }
 
-/* Main card with subtle border */
+/* Main card */
 AboutScreen #about-card {
-    max-width: 80;
+    max-width: 72;
     min-height: 100%;
     height: auto;
     background: $surface;
@@ -28,84 +27,58 @@ AboutScreen #about-card {
 
 AboutScreen #version-badge {
     text-align: center;
-    color: #8b7355;  /* Muted amber */
-    text-style: italic;
+    color: #8b7355;
+    text-style: bold;
     margin-top: 1;
+    margin-bottom: 0;
 }
 
-/* Separators - thin retro lines */
+/* Separators */
 AboutScreen .separator {
     width: 100%;
     height: auto;
     text-align: center;
-    color: $primary 30%;
+    color: $primary 20%;
     margin: 1 0;
 }
 
-/* Tagline */
-AboutScreen #tagline {
-    width: 100%;
-    text-align: center;
-    color: $text-muted;
-    text-style: italic;
-    padding: 0 2;
-    margin: 1 0;
-}
-
-/* Feature badges row */
-AboutScreen #features-row {
-    width: 100%;
-    height: auto;
-    align-horizontal: center;
-    padding: 1 0;
-}
-
-AboutScreen .feature-badge {
-    width: auto;
-    padding: 0 2;
-    text-align: center;
-    color: #a78bfa;  /* Soft purple */
-    text-style: bold;
-}
-
-/* Content section */
-AboutScreen #content-section {
-    width: 100%;
-    height: auto;
-    padding: 1 0;
-}
-
+/* Section titles */
 AboutScreen .section-title {
     width: 100%;
     text-align: left;
-    padding: 1 0 0 0;
+    padding: 0 0 0 0;
     margin-top: 1;
 }
 
+/* Section content */
 AboutScreen .section-content {
     width: 100%;
     padding: 0 0 0 2;
-    margin: 0 0 1 0;
-    color: $text 85%;
-}
-
-AboutScreen .compact-list {
     margin: 0 0 0 0;
+    color: $text 80%;
 }
 
-AboutScreen .tech-stack {
-    text-align: center;
-    color: #60a5fa;  /* Soft blue */
-    text-style: italic;
+/* Philosophy grid */
+AboutScreen #philosophy-grid {
+    width: 100%;
+    height: auto;
+    padding: 0;
+}
+
+AboutScreen .philosophy-items {
+    padding: 0 0 0 2;
+}
+
+/* Spacer */
+AboutScreen .spacer {
+    height: 2;
 }
 
 /* Footer hint */
 AboutScreen #footer-hint {
     width: 100%;
-    dock: bottom;
     text-align: center;
-    color: $text-muted 60%;
+    color: $text-muted 50%;
     text-style: italic;
-    margin-top: 2;
-    padding: 1 0;
+    padding: 0 0 1 0;
 }
