@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.0-beta] - 2026-02-12 - Wide Search
+
+**Extended Search & UX Improvements!** This release brings a powerful structured-tag search system with 10 filter tags, smart autocomplete, AND-accumulation for multiple filters, a redesigned About screen, and many bug fixes.
+
+### Added
+
+- **Structured search tags** — 10 short tags: `project`, `source`, `category`, `method`, `format`, `size`, `sr`, `sc`, `tr`, `tc`
+- **Search autocomplete** — context-aware field name + field value suggestions ranked by frequency/recency
+- **Tags help overlay** (`F3` in search mode) — shows all tag names, aliases, and descriptions
+- **`all` keyword** — type `all` to list every dataset (no colon needed)
+- **FTS fallback** — when structured tag filters return no results, falls back to free-text search
+- `h`/`l` vim-style horizontal scroll in DataTable
+- Operator-pending open-link mode in About screen (`o` → `g`:GitHub / `d`:Docs)
+- Redesigned About screen — new origin/philosophy/links layout
+- Version control for data backups (read-only unless modified directly in Heibox)
+
+### Changed
+
+- Tags help shortcut changed from `?` to `F3` (printable chars can't be intercepted in Input widget)
+- `all` changed from `all:*` syntax to plain `all` keyword
+- Tag generator deduplicated into shared `tag_generator.py` — keeps hyphenated words (e.g. ERA5-Land), extracts from source/access_method/temporal, caps description to 3 words, broad stop-word list
+- Autocomplete suggests first word only for cleaner values (e.g. `sr:500` not `sr:"500 m"`)
+- Multiple same-field tags are now AND-accumulated — `sr:0.5 sr:500` narrows results progressively instead of only using the last value
+
+### Fixed
+
+- **Critical:** Data not appearing after setting up auth until restart — settings save now calls `reload_configuration()` to trigger re-index
+- Incremental sync wiping spatial_resolution, temporal_resolution, access_method, storage_location, reference
+- Tag suggestions using DB column names (`spatial_resolution:500`) instead of short aliases (`sr:500`)
+- `access_method` prefix not stripped in suggestions (`FILE: CSV` → `method:CSV`)
+- Mode indicator stuck on "Normal" — now syncs with Input focus
+- Tag comma handling — edit screen now lowercases tags consistently with add screen
+
+### KNOWN ISSUES
+
+- FTS5 syntax errors from special characters (`: / | , "`) — quoted phrases now cleaned
+
+---
+
 ## [0.64.25-beta] - 2026-02-12 - Hotfix
 
 **Hotfix:** Fixes the update badge not appearing on app launch after a new release is published.
