@@ -165,47 +165,78 @@ class IndexService:
         conn.row_factory = sqlite3.Row
         return conn
 
+    @staticmethod
+    def _normalise_filter(value) -> Optional[list[str]]:
+        """Accept str, list[str], or None and return list[str] or None."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return [value]
+        if isinstance(value, list) and value:
+            return value
+        return None
+
     def search(
         self,
         query_text: str,
-        project_filter: Optional[str] = None,
-        source_filter: Optional[str] = None,
-        format_filter: Optional[str] = None,
-        category_filter: Optional[str] = None,
-        method_filter: Optional[str] = None,
-        size_filter: Optional[str] = None,
-        sr_filter: Optional[str] = None,
-        sc_filter: Optional[str] = None,
-        tr_filter: Optional[str] = None,
-        tc_filter: Optional[str] = None,
+        project_filter=None,
+        source_filter=None,
+        format_filter=None,
+        category_filter=None,
+        method_filter=None,
+        size_filter=None,
+        sr_filter=None,
+        sc_filter=None,
+        tr_filter=None,
+        tc_filter=None,
         limit: int = INDEX_MAX_RESULTS,
         offset: int = 0
     ) -> list[dict[str, Any]]:
         """
         Fast local search using FTS5 index.
 
+        Each filter accepts a single string or a list of strings.
+        Multiple values for the same field are AND-ed (all must match).
+
         Args:
             query_text: Free text query (will be tokenized for FTS)
-            project_filter: Optional project prefix filter
-            source_filter: Optional source filter
-            format_filter: Optional format filter
-            category_filter: Optional category filter
-            method_filter: Optional access method filter
-            size_filter: Optional size filter
-            sr_filter: Optional spatial resolution filter
-            sc_filter: Optional spatial coverage filter
-            tr_filter: Optional temporal resolution filter
-            tc_filter: Optional temporal coverage filter
+            project_filter: Optional project filter (str or list[str])
+            source_filter: Optional source filter (str or list[str])
+            format_filter: Optional format filter (str or list[str])
+            category_filter: Optional category filter (str or list[str])
+            method_filter: Optional access method filter (str or list[str])
+            size_filter: Optional size filter (str or list[str])
+            sr_filter: Optional spatial resolution filter (str or list[str])
+            sc_filter: Optional spatial coverage filter (str or list[str])
+            tr_filter: Optional temporal resolution filter (str or list[str])
+            tc_filter: Optional temporal coverage filter (str or list[str])
             limit: Maximum results to return
             offset: Offset for pagination
 
         Returns:
             List of matching items with metadata
         """
-        # Check cache first
-        cache_key = (query_text, project_filter, source_filter, format_filter,
-                     category_filter, method_filter, size_filter,
-                     sr_filter, sc_filter, tr_filter, tc_filter)
+        # Normalise all filters to list[str] | None
+        project_filter = self._normalise_filter(project_filter)
+        source_filter = self._normalise_filter(source_filter)
+        format_filter = self._normalise_filter(format_filter)
+        category_filter = self._normalise_filter(category_filter)
+        method_filter = self._normalise_filter(method_filter)
+        size_filter = self._normalise_filter(size_filter)
+        sr_filter = self._normalise_filter(sr_filter)
+        sc_filter = self._normalise_filter(sc_filter)
+        tr_filter = self._normalise_filter(tr_filter)
+        tc_filter = self._normalise_filter(tc_filter)
+
+        # Check cache first — freeze lists so they're hashable
+        def _freeze(v):
+            return tuple(v) if v else None
+        cache_key = (query_text,
+                     _freeze(project_filter), _freeze(source_filter),
+                     _freeze(format_filter), _freeze(category_filter),
+                     _freeze(method_filter), _freeze(size_filter),
+                     _freeze(sr_filter), _freeze(sc_filter),
+                     _freeze(tr_filter), _freeze(tc_filter))
         if cache_key in self._query_cache:
             timestamp = self._cache_timestamps.get(cache_key, 0)
             if time.time() - timestamp < self._cache_timeout:
@@ -235,47 +266,26 @@ class IndexService:
                 fts_query = " ".join(fts_tokens) if fts_tokens else query_text
 
                 # Build WHERE clauses for filters (applied to items table, not FTS)
+                # Each filter is a list; every value adds its own AND clause
                 where_clauses: list[str] = []
 
-                if project_filter:
-                    where_clauses.append("items.project LIKE ?")
-                    params.append(f"{project_filter}%")
-
-                if source_filter:
-                    where_clauses.append("items.source LIKE ?")
-                    params.append(f"%{source_filter}%")
-
-                if format_filter:
-                    where_clauses.append("items.format LIKE ?")
-                    params.append(f"%{format_filter}%")
-
-                if category_filter:
-                    where_clauses.append("items.category LIKE ?")
-                    params.append(f"%{category_filter}%")
-
-                if method_filter:
-                    where_clauses.append("items.access_method LIKE ?")
-                    params.append(f"%{method_filter}%")
-
-                if size_filter:
-                    where_clauses.append("items.size LIKE ?")
-                    params.append(f"%{size_filter}%")
-
-                if sr_filter:
-                    where_clauses.append("items.spatial_resolution LIKE ?")
-                    params.append(f"%{sr_filter}%")
-
-                if sc_filter:
-                    where_clauses.append("items.spatial_coverage LIKE ?")
-                    params.append(f"%{sc_filter}%")
-
-                if tr_filter:
-                    where_clauses.append("items.temporal_resolution LIKE ?")
-                    params.append(f"%{tr_filter}%")
-
-                if tc_filter:
-                    where_clauses.append("items.temporal_coverage LIKE ?")
-                    params.append(f"%{tc_filter}%")
+                _filter_map = [
+                    (project_filter, "items.project LIKE ?", True),
+                    (source_filter, "items.source LIKE ?", False),
+                    (format_filter, "items.format LIKE ?", False),
+                    (category_filter, "items.category LIKE ?", False),
+                    (method_filter, "items.access_method LIKE ?", False),
+                    (size_filter, "items.size LIKE ?", False),
+                    (sr_filter, "items.spatial_resolution LIKE ?", False),
+                    (sc_filter, "items.spatial_coverage LIKE ?", False),
+                    (tr_filter, "items.temporal_resolution LIKE ?", False),
+                    (tc_filter, "items.temporal_coverage LIKE ?", False),
+                ]
+                for values, clause, prefix_only in _filter_map:
+                    if values:
+                        for v in values:
+                            where_clauses.append(clause)
+                            params.append(f"{v}%" if prefix_only else f"%{v}%")
 
                 sql = """
                     SELECT
@@ -316,45 +326,23 @@ class IndexService:
                 # No text query, just apply filters
                 where_clauses: list[str] = []
 
-                if project_filter:
-                    where_clauses.append("items.project LIKE ?")
-                    params.append(f"{project_filter}%")
-
-                if source_filter:
-                    where_clauses.append("items.source LIKE ?")
-                    params.append(f"%{source_filter}%")
-
-                if format_filter:
-                    where_clauses.append("items.format LIKE ?")
-                    params.append(f"%{format_filter}%")
-
-                if category_filter:
-                    where_clauses.append("items.category LIKE ?")
-                    params.append(f"%{category_filter}%")
-
-                if method_filter:
-                    where_clauses.append("items.access_method LIKE ?")
-                    params.append(f"%{method_filter}%")
-
-                if size_filter:
-                    where_clauses.append("items.size LIKE ?")
-                    params.append(f"%{size_filter}%")
-
-                if sr_filter:
-                    where_clauses.append("items.spatial_resolution LIKE ?")
-                    params.append(f"%{sr_filter}%")
-
-                if sc_filter:
-                    where_clauses.append("items.spatial_coverage LIKE ?")
-                    params.append(f"%{sc_filter}%")
-
-                if tr_filter:
-                    where_clauses.append("items.temporal_resolution LIKE ?")
-                    params.append(f"%{tr_filter}%")
-
-                if tc_filter:
-                    where_clauses.append("items.temporal_coverage LIKE ?")
-                    params.append(f"%{tc_filter}%")
+                _filter_map = [
+                    (project_filter, "items.project LIKE ?", True),
+                    (source_filter, "items.source LIKE ?", False),
+                    (format_filter, "items.format LIKE ?", False),
+                    (category_filter, "items.category LIKE ?", False),
+                    (method_filter, "items.access_method LIKE ?", False),
+                    (size_filter, "items.size LIKE ?", False),
+                    (sr_filter, "items.spatial_resolution LIKE ?", False),
+                    (sc_filter, "items.spatial_coverage LIKE ?", False),
+                    (tr_filter, "items.temporal_resolution LIKE ?", False),
+                    (tc_filter, "items.temporal_coverage LIKE ?", False),
+                ]
+                for values, clause, prefix_only in _filter_map:
+                    if values:
+                        for v in values:
+                            where_clauses.append(clause)
+                            params.append(f"{v}%" if prefix_only else f"%{v}%")
 
                 sql = """
                     SELECT
