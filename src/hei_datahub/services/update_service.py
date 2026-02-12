@@ -516,37 +516,43 @@ def _fetch_latest_from_tags(state) -> Optional[str]:
     return None
 
 
-def check_for_updates_silent() -> Optional[UpdateCheckResult]:
+def check_for_updates_silent(force: bool = False) -> Optional[UpdateCheckResult]:
     """
     Perform a silent (non-blocking) update check.
 
     Uses caching to avoid excessive API calls.
     Does not show any UI - just returns the result.
 
+    Args:
+        force: Bypass the throttle cache and always fetch from network.
+               Use on app startup so a freshly-published release is
+               detected immediately.
+
     Returns:
         UpdateCheckResult or None if check was skipped/failed
     """
     state = get_state_manager()
 
-    # Check if we should skip (throttling)
-    last_check = state.get_last_update_check()
-    if last_check:
-        age = datetime.now() - last_check
-        if age < timedelta(hours=UPDATE_CHECK_INTERVAL_HOURS):
-            # Use cached result
-            cached_available = state.get_preference("last_known_update_available")
-            cached_tag = state.get_preference("last_known_latest_tag")
+    # Check if we should skip (throttling) — skipped when force=True
+    if not force:
+        last_check = state.get_last_update_check()
+        if last_check:
+            age = datetime.now() - last_check
+            if age < timedelta(hours=UPDATE_CHECK_INTERVAL_HOURS):
+                # Use cached result
+                cached_available = state.get_preference("last_known_update_available")
+                cached_tag = state.get_preference("last_known_latest_tag")
 
-            if cached_tag:
-                logger.debug(f"Using cached update check (age: {age})")
-                return UpdateCheckResult(
-                    has_update=bool(cached_available),
-                    current_version=__version__,
-                    latest_version=cached_tag,
-                    from_cache=True
-                )
-            # No cache, but within throttle window - skip
-            return None
+                if cached_tag:
+                    logger.debug(f"Using cached update check (age: {age})")
+                    return UpdateCheckResult(
+                        has_update=bool(cached_available),
+                        current_version=__version__,
+                        latest_version=cached_tag,
+                        from_cache=True
+                    )
+                # No cache, but within throttle window - skip
+                return None
 
     # Perform fresh check
     _debug("Performing silent update check…")
