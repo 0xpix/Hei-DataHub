@@ -30,7 +30,7 @@ MANIFEST
 
 # --- Project Specific ---
 # Internal development notes & logs
-devs/
+DEV/
 logs/
 
 # SQLite Databases
