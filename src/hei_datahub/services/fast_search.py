@@ -78,46 +78,47 @@ def search_indexed(query: str, limit: int = 50) -> list[dict[str, Any]]:
     if query.strip().lower() == "all":
         return _search_all(limit)
 
-    # Parse query
-    project_filter = None
-    source_filter = None
-    format_filter = None
-    category_filter = None
-    method_filter = None
-    size_filter = None
-    sr_filter = None
-    sc_filter = None
-    tr_filter = None
-    tc_filter = None
+    # Parse query — collect ALL values per field so multiple tags
+    # for the same field act as AND filters (narrowing results)
+    project_filters: list[str] = []
+    source_filters: list[str] = []
+    format_filters: list[str] = []
+    category_filters: list[str] = []
+    method_filters: list[str] = []
+    size_filters: list[str] = []
+    sr_filters: list[str] = []
+    sc_filters: list[str] = []
+    tr_filters: list[str] = []
+    tc_filters: list[str] = []
     query_text = query
 
     try:
         parser = QueryParser()
         parsed = parser.parse(query)
 
-        # Extract all field filters
+        # Collect all field filter values (multiple values = AND)
         for term in parsed.terms:
             if not term.is_free_text:
                 if term.field == "project":
-                    project_filter = term.value
+                    project_filters.append(term.value)
                 elif term.field == "source":
-                    source_filter = term.value
+                    source_filters.append(term.value)
                 elif term.field == "format":
-                    format_filter = term.value
+                    format_filters.append(term.value)
                 elif term.field == "category":
-                    category_filter = term.value
+                    category_filters.append(term.value)
                 elif term.field == "method":
-                    method_filter = term.value
+                    method_filters.append(term.value)
                 elif term.field == "size":
-                    size_filter = term.value
+                    size_filters.append(term.value)
                 elif term.field == "sr":
-                    sr_filter = term.value
+                    sr_filters.append(term.value)
                 elif term.field == "sc":
-                    sc_filter = term.value
+                    sc_filters.append(term.value)
                 elif term.field == "tr":
-                    tr_filter = term.value
+                    tr_filters.append(term.value)
                 elif term.field == "tc":
-                    tc_filter = term.value
+                    tc_filters.append(term.value)
 
         # Get free text part
         query_text = parsed.free_text_query or ""
@@ -125,31 +126,31 @@ def search_indexed(query: str, limit: int = 50) -> list[dict[str, Any]]:
     except Exception as e:
         logger.debug(f"Query parse error (using simple search): {e}")
         # Fall back to simple text search
-        project_filter = None
-        source_filter = None
-        format_filter = None
-        category_filter = None
-        method_filter = None
-        size_filter = None
-        sr_filter = None
-        sc_filter = None
-        tr_filter = None
-        tc_filter = None
+        project_filters = []
+        source_filters = []
+        format_filters = []
+        category_filters = []
+        method_filters = []
+        size_filters = []
+        sr_filters = []
+        sc_filters = []
+        tr_filters = []
+        tc_filters = []
 
     # Search the index
     index_service = get_index_service()
     results = index_service.search(
         query_text=query_text,
-        project_filter=project_filter,
-        source_filter=source_filter,
-        format_filter=format_filter,
-        category_filter=category_filter,
-        method_filter=method_filter,
-        size_filter=size_filter,
-        sr_filter=sr_filter,
-        sc_filter=sc_filter,
-        tr_filter=tr_filter,
-        tc_filter=tc_filter,
+        project_filter=project_filters or None,
+        source_filter=source_filters or None,
+        format_filter=format_filters or None,
+        category_filter=category_filters or None,
+        method_filter=method_filters or None,
+        size_filter=size_filters or None,
+        sr_filter=sr_filters or None,
+        sc_filter=sc_filters or None,
+        tr_filter=tr_filters or None,
+        tc_filter=tc_filters or None,
         limit=limit
     )
 
@@ -157,13 +158,13 @@ def search_indexed(query: str, limit: int = 50) -> list[dict[str, Any]]:
     # values as free-text search (catches cases where metadata columns
     # are empty but the value appears in name/description/tags)
     if not results and not query_text:
-        fallback_terms = [v for v in [
-            project_filter, source_filter, format_filter,
-            category_filter, method_filter, size_filter,
-            sr_filter, sc_filter, tr_filter, tc_filter,
-        ] if v]
-        if fallback_terms:
-            fallback_text = " ".join(fallback_terms)
+        all_filter_values = (
+            project_filters + source_filters + format_filters +
+            category_filters + method_filters + size_filters +
+            sr_filters + sc_filters + tr_filters + tc_filters
+        )
+        if all_filter_values:
+            fallback_text = " ".join(all_filter_values)
             logger.debug(f"Structured search empty, FTS fallback: '{fallback_text}'")
             results = index_service.search(
                 query_text=fallback_text,
