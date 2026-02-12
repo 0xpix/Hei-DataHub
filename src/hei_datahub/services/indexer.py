@@ -249,12 +249,19 @@ class BackgroundIndexer:
                         # Support both 'tags' and 'keywords' for backwards compatibility
                         tags_list = metadata.get("tags") or metadata.get("keywords", [])
                         tags = " ".join(tags_list) if isinstance(tags_list, list) else str(tags_list)
-                        project = metadata.get("project")
+                        # Extract project from used_in_projects list (first one if exists)
+                        used_in_projects = metadata.get("used_in_projects", [])
+                        project = used_in_projects[0] if used_in_projects else None
                         file_format = metadata.get("file_format")
                         source = metadata.get("source")
                         category = metadata.get("category")
                         spatial_coverage = metadata.get("spatial_coverage")
                         temporal_coverage = metadata.get("temporal_coverage")
+                        access_method = metadata.get("access_method")
+                        storage_location = metadata.get("storage_location")
+                        reference = metadata.get("reference")
+                        spatial_resolution = metadata.get("spatial_resolution")
+                        temporal_resolution = metadata.get("temporal_resolution")
                         size = metadata.get("size")
                     else:
                         name = entry.name
@@ -266,6 +273,11 @@ class BackgroundIndexer:
                         category = None
                         spatial_coverage = None
                         temporal_coverage = None
+                        access_method = None
+                        storage_location = None
+                        reference = None
+                        spatial_resolution = None
+                        temporal_resolution = None
                         size = None
 
                     # is_remote is always True in cloud-only mode
@@ -283,6 +295,11 @@ class BackgroundIndexer:
                         "category": category,
                         "spatial_coverage": spatial_coverage,
                         "temporal_coverage": temporal_coverage,
+                        "access_method": access_method,
+                        "storage_location": storage_location,
+                        "reference": reference,
+                        "spatial_resolution": spatial_resolution,
+                        "temporal_resolution": temporal_resolution,
                     })
 
                 except Exception as e:
