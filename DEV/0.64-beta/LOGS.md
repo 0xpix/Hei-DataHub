@@ -1,14 +1,13 @@
 # 0.64-beta
 
 ## TO ADD
-- [ ] Add shortcut to naviguate to the left/right h/l
+- None
 
 ## TO CHANGE
-- [!] Combine Spatial coverage and resolution into "spatial info" and temporal coverage and resolution into "temporal info" in the data table only, when i add/show/edit the dataset i want to add them seperatly.
+- None
 
 ## TO FIX
-- [ ] Data won't appear after setting up auth, it will apear just after launching the app again
-- [!] Fix the scroll, it feels weird and not smooth - (wasn't fixed, it added the scrollbar back)
+- None
 
 ## ADDED/CHANGED/FIXED
 - [x] Add support for MacOS - Added the howmebrew-tap for now (will do the homebrew later)
@@ -33,3 +32,4 @@
 - [x] Fix the issue where I press `esc` after searching it will take me to the main page (i want to click `esc` it will take me to the search above and then when i click `esc` again it will take me to the home page)
 - [x] Fix the issue where you press `Ctrl+T`(not just theme, but when i press `esc` and i get the prompt to close the app or not, I press `esc` again and it takes me to home without the focus on search) on the home page for theme selection and when you select, the focus on the search bar will disapear, so basicaly there are `home` and `search` with the same layout and different footer, one it focues on the search bar, and the other doesn't
 - [x] Fix the issue where when i search and click on the dataset and i go back the search will undo (it will give me all the data)
+- [x] Fix the update UI and the update functionality

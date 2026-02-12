@@ -1,10 +1,13 @@
 # 0.62-beta
 
 ## TO ADD
+- None
 
 ## TO CHANGE
+- None
 
 ## TO FIX
+- None
 
 ## ADDED/CHANGED/FIXED
 - [x] Add a command for different shortcuts
