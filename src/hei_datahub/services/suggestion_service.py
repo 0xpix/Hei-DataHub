@@ -367,7 +367,8 @@ class SuggestionService:
             max_count = max(max_count, count)
             max_last_used = max(max_last_used, last_used)
 
-        # Create suggestions with scores
+        # Create suggestions with scores, deduplicating after extracting short values
+        seen_short: set[str] = set()
         for value in matching_values:
             count, last_used = self._get_usage_stats(field, value)
             score = self._calculate_score(value, typed, count, last_used, max_count, max_last_used)
@@ -378,17 +379,24 @@ class SuggestionService:
             if field == "access_method" and ":" in value:
                 display_value = value.split(":", 1)[1].strip()
 
-            # Quote multi-word values so the parser keeps them as one token
-            if " " in display_value:
-                fmt_value = f'"{display_value}"'
-            else:
-                fmt_value = display_value
+            # Use only the first word for cleaner suggestions
+            # e.g. "500 m" -> "500", "CSV File" -> "CSV", "Daily" -> "Daily"
+            parts = display_value.split()
+            if parts:
+                display_value = parts[0]
+
+            # Skip duplicates that arise from first-word extraction
+            # e.g. "500 m" and "500 km" both become "500"
+            dedup_key = display_value.lower()
+            if dedup_key in seen_short:
+                continue
+            seen_short.add(dedup_key)
 
             suggestions.append(Suggestion(
                 key=display_key,
                 value=value,
-                display=f"{display_key}:{fmt_value}",
-                insert_text=f"{display_key}:{fmt_value} ",
+                display=f"{display_key}:{display_value}",
+                insert_text=f"{display_key}:{display_value} ",
                 meta=f"used {count}x" if count > 0 else None,
                 score=score
             ))
