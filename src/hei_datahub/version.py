@@ -105,7 +105,7 @@ RELEASE_NOTES = _VERSION_DATA.get("notes", "")
 GITHUB_REPO = _VERSION_DATA.get("github_repo", "0xpix/Hei-DataHub")
 GITHUB_URL = f"https://github.com/{GITHUB_REPO}"
 ISSUES_URL = f"{GITHUB_URL}/issues"
-DOCS_URL = "https://0xpix.github.io/Hei-DataHub"
+DOCS_URL = "https://docs.hei-datahub.app"
 
 # Update Check Configuration
 UPDATE_CHECK_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
