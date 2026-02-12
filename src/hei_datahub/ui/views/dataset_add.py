@@ -31,45 +31,9 @@ from hei_datahub.ui.widgets.contextual_footer import ContextualFooter
 from .dataset_detail import CloudDatasetDetailsScreen
 from .home import HomeScreen
 
+from hei_datahub.ui.utils.tag_generator import generate_tags
+
 logger = logging.getLogger(__name__)
-
-
-def generate_tags(metadata: dict) -> list:
-    """Auto-generate tags from metadata fields."""
-    tags = set()
-
-    # Extract words from name
-    name = metadata.get('name', metadata.get('dataset_name', ''))
-    if name:
-        for word in name.lower().split():
-            if len(word) > 2 and word.isalnum():
-                tags.add(word)
-
-    # Add category as tag
-    category = metadata.get('category', '')
-    if category:
-        tags.add(category.lower().replace(' ', '-'))
-
-    # Extract from description (first few significant words)
-    description = metadata.get('description', '')
-    if description:
-        words = description.lower().split()[:20]
-        for word in words:
-            word = ''.join(c for c in word if c.isalnum())
-            if len(word) > 3 and word not in ('the', 'and', 'for', 'from', 'with', 'this', 'that'):
-                tags.add(word)
-
-    # Add format as tag
-    file_format = metadata.get('file_format', '')
-    if file_format:
-        tags.add(file_format.lower())
-
-    # Add spatial coverage
-    spatial = metadata.get('spatial_coverage', '')
-    if spatial:
-        tags.add(spatial.lower().replace(' ', '-'))
-
-    return sorted(list(tags))[:10]  # Limit to 10 tags
 
 
 class AddDataScreen(Screen):
