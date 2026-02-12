@@ -239,7 +239,16 @@ class HomeScreen(Screen):
         self.call_later(self._update_footer_context)
 
     def on_descendant_focus(self, event) -> None:
-        """Update footer when focus changes."""
+        """Update footer when focus changes and sync search mode with focus."""
+        # Sync search_mode with which widget is focused
+        try:
+            search_input = self.query_one("#search-input", Input)
+            if search_input.has_focus:
+                self.search_mode = True
+            else:
+                self.search_mode = False
+        except Exception:
+            pass
         self._update_footer_context()
 
     def _update_footer_context(self) -> None:
@@ -1006,14 +1015,14 @@ class HomeScreen(Screen):
             if event.key == "h":
                 table = self.query_one("#results-table", DataTable)
                 if table.has_focus:
-                    table.scroll_left(animate=False)
+                    table.scroll_left(animate=True)
                     event.prevent_default()
                     event.stop()
                     return
             elif event.key == "l":
                 table = self.query_one("#results-table", DataTable)
                 if table.has_focus:
-                    table.scroll_right(animate=False)
+                    table.scroll_right(animate=True)
                     event.prevent_default()
                     event.stop()
                     return
