@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.12-beta] - 2026-02-16 - Wide Search (Hotfix)
+
+**Hotfix:** Fixes macOS Homebrew update not taking effect — app stayed on old version after `brew upgrade` and restart.
+
+### Fixed
+
+- **macOS update not applying** — the update overlay was missing `brew update` before `brew upgrade`, so Homebrew didn't know about the new formula and the upgrade was a silent no-op
+- **Restart launching old binary** — `_restart_app` used `os.execv(sys.executable, ...)` which re-launched the old Python/binary path cached in the current process; now resolves the entry-point via `shutil.which("hei-datahub")` to pick up the freshly-linked binary after upgrade
+- `os.execv` is now called before `app.exit()` (it replaces the process entirely, so exit was unreachable and could race on failure)
+
+---
+
 ## [0.65.11-beta] - 2026-02-16 - Wide Search (Hotfix)
 
 **Hotfix:** Fixes Windows update crashing with `'NoneType' object is not subscriptable` when the GitHub release has no description.
