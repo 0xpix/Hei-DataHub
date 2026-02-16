@@ -82,7 +82,7 @@ def check_for_updates(force: bool = False) -> Optional[dict]:
         release_data = response.json()
 
         # Extract version
-        latest_version = release_data.get("tag_name", "").lstrip('v')
+        latest_version = (release_data.get("tag_name") or "").lstrip('v')
         if not latest_version:
             # No version tag - treat as up to date
             return {
@@ -106,8 +106,8 @@ def check_for_updates(force: bool = False) -> Optional[dict]:
             "has_update": has_update,
             "current_version": __version__,
             "latest_version": latest_version,
-            "release_url": release_data.get("html_url", ""),
-            "release_notes": release_data.get("body", "")[:500]  # Truncate notes
+            "release_url": release_data.get("html_url") or "",
+            "release_notes": (release_data.get("body") or "")[:500]  # Truncate notes
         }
 
     except requests.exceptions.Timeout:
