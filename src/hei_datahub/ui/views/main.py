@@ -316,24 +316,38 @@ class DataHubApp(App):
             # Fail silently - no UI impact
 
     def _update_home_screen_badge(self) -> None:
-        """Notify home screen to show update badge."""
-        try:
-            for screen in self.screen_stack:
-                if isinstance(screen, HomeScreen):
-                    if hasattr(screen, 'show_update_badge'):
-                        screen.show_update_badge(self.latest_version)
-        except Exception as e:
-            logger.debug(f"Could not update home screen badge: {e}")
+        """Notify home screen to show update badge.
+
+        This is called from a @work(thread=True) context, so UI
+        mutations must be dispatched to the main thread.
+        """
+        def _do_update():
+            try:
+                for screen in self.screen_stack:
+                    if isinstance(screen, HomeScreen):
+                        if hasattr(screen, 'show_update_badge'):
+                            screen.show_update_badge(self.latest_version)
+            except Exception as e:
+                logger.debug(f"Could not update home screen badge: {e}")
+
+        self.call_from_thread(_do_update)
 
     def _hide_home_screen_badge(self) -> None:
-        """Hide update badge on home screen (e.g. stale cache was wrong)."""
-        try:
-            for screen in self.screen_stack:
-                if isinstance(screen, HomeScreen):
-                    if hasattr(screen, 'hide_update_badge'):
-                        screen.hide_update_badge()
-        except Exception as e:
-            logger.debug(f"Could not hide home screen badge: {e}")
+        """Hide update badge on home screen (e.g. stale cache was wrong).
+
+        This is called from a @work(thread=True) context, so UI
+        mutations must be dispatched to the main thread.
+        """
+        def _do_hide():
+            try:
+                for screen in self.screen_stack:
+                    if isinstance(screen, HomeScreen):
+                        if hasattr(screen, 'hide_update_badge'):
+                            screen.hide_update_badge()
+            except Exception as e:
+                logger.debug(f"Could not hide home screen badge: {e}")
+
+        self.call_from_thread(_do_hide)
 
     @work(exclusive=True, thread=True)
     def startup_pull_check(self) -> None:
