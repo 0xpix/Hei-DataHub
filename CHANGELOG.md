@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.1-beta] - 2026-02-16 - Wide Search (Hotfix)
+
+**Hotfix:** Fixes Windows auto-update failing to launch the installer due to missing UAC elevation.
+
+### Fixed
+
+- **Windows update installer not launching** — replaced `subprocess.Popen` with `ShellExecuteW` + `runas` verb so the NSIS installer correctly triggers the UAC elevation prompt instead of silently failing with `ERROR_ELEVATION_REQUIRED` (740)
+- Installer launch failure now shows actionable error message with UAC guidance and the downloaded installer path as manual fallback
+- Silent exception swallowing in `install_update` — errors are now logged with full traceback
+
+---
+
 ## [0.65.0-beta] - 2026-02-12 - Wide Search
 
 **Extended Search & UX Improvements!** This release brings a powerful structured-tag search system with 10 filter tags, smart autocomplete, AND-accumulation for multiple filters, a redesigned About screen, and many bug fixes.
