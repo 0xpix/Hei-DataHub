@@ -275,7 +275,10 @@ class UpdateOverlay(Container):
             commands = [[sys.executable, "-m", "pip", "install", "--upgrade", "hei-datahub"]]
         elif install_info.method == InstallMethod.HOMEBREW:
             method_name = "brew"
-            commands = [["brew", "upgrade", "hei-datahub"]]
+            commands = [
+                ["brew", "update"],
+                ["brew", "upgrade", "hei-datahub"],
+            ]
         else:
             self._show_manual_instructions(latest_version, install_info)
             return
