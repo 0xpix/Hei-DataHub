@@ -1254,28 +1254,45 @@ class HomeScreen(Screen):
     def _restart_app(self) -> None:
         """Restart the application after update."""
         import os
+        import shutil
         import sys
 
         logger.info("Restarting application after update...")
 
-        # Get the executable path
+        # Build the command to re-launch the app.
+        # After a package-manager upgrade (brew, uv, pip, …) the old
+        # Cellar/site-packages path may have been unlinked, so we must
+        # resolve the entry-point script from PATH to pick up the newly
+        # linked binary.
         if getattr(sys, 'frozen', False):
-            # Running as compiled binary
+            # Running as compiled binary (PyInstaller / Nuitka)
             executable = sys.executable
             args = sys.argv[:]
         else:
-            # Running from Python
-            executable = sys.executable
-            args = [sys.executable] + sys.argv[:]
+            # Running from Python — try to resolve the console-script
+            # (e.g. /opt/homebrew/bin/hei-datahub) so we exec the NEW
+            # binary, not the one cached in this process's sys.argv.
+            script = shutil.which("hei-datahub") or shutil.which("hdh")
+            if script:
+                executable = script
+                args = [script] + sys.argv[1:]
+            else:
+                # Fallback: re-run with the same Python + argv
+                executable = sys.executable
+                args = [sys.executable] + sys.argv[:]
 
-        # Exit and restart
-        self.app.exit()
+        logger.info(f"Restarting: execv({executable!r}, {args!r})")
 
-        # Use os.execv to replace current process with new one
+        # os.execv replaces the current process image entirely — if it
+        # succeeds, nothing after this line ever runs.
         try:
             os.execv(executable, args)
         except Exception as e:
-            logger.error(f"Failed to restart: {e}")
+            logger.error(f"os.execv failed: {e}")
+
+        # execv failed — fall back to a plain exit so the user can
+        # reopen the app manually.
+        self.app.exit()
 
 
     def action_refresh_data(self) -> None:
