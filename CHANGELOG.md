@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.13-beta] - 2026-02-16 - Wide Search (Hotfix)
+
+**Hotfix:** Fixes the update badge not appearing on any platform (Windows, Linux, macOS).
+
+### Fixed
+
+- **Update badge never showing** — `_update_home_screen_badge` and `_hide_home_screen_badge` were mutating the DOM from a `@work(thread=True)` background thread; Textual silently drops UI mutations from non-main threads. Wrapped both in `call_from_thread()` so the badge toggle is dispatched to the main event loop
+
+---
+
 ## [0.65.12-beta] - 2026-02-16 - Wide Search (Hotfix)
 
 **Hotfix:** Fixes macOS Homebrew update not taking effect — app stayed on old version after `brew upgrade` and restart.
