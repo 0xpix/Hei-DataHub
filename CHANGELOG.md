@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.11-beta] - 2026-02-16 - Wide Search (Hotfix)
+
+**Hotfix:** Fixes Windows update crashing with `'NoneType' object is not subscriptable` when the GitHub release has no description.
+
+### Fixed
+
+- **Windows update crash** — `release_data.get("body", "")[:500]` returns `None` (not `""`) when the GitHub release body is `null`, causing `TypeError: 'NoneType' object is not subscriptable`. Changed all `.get(key, "")` patterns to `(x.get(key) or "")` to correctly coalesce `null` values
+- Same `None` safety applied to `tag_name`, `html_url`, and `body` fields across `windows_updater.py`, `update_check.py`, and `update_service.py`
+
+---
+
 ## [0.65.1-beta] - 2026-02-16 - Wide Search (Hotfix)
 
 **Hotfix:** Fixes Windows auto-update failing to launch the installer due to missing UAC elevation.
