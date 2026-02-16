@@ -3,12 +3,15 @@ Windows auto-updater for Hei-DataHub.
 
 Downloads and installs new versions from GitHub releases.
 """
+import logging
 import os
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from typing import Callable, Optional
+
+logger = logging.getLogger(__name__)
 
 import requests
 
@@ -175,6 +178,11 @@ def install_update(installer_path: Path) -> bool:
     """
     Run the installer and exit the current application.
 
+    Uses ShellExecuteW with 'runas' verb on Windows to properly trigger
+    UAC elevation, since the NSIS installer requires admin privileges.
+    subprocess.Popen cannot launch elevated processes and fails with
+    ERROR_ELEVATION_REQUIRED (740).
+
     Args:
         installer_path: Path to the downloaded installer
 
@@ -182,27 +190,38 @@ def install_update(installer_path: Path) -> bool:
         True if installer started successfully
     """
     if not installer_path.exists():
+        logger.error(f"Installer not found: {installer_path}")
         return False
 
     try:
-        # Start installer in a new process (detached)
         if is_windows():
-            # Use DETACHED_PROCESS flag on Windows
-            CREATE_NEW_PROCESS_GROUP = 0x00000200
-            DETACHED_PROCESS = 0x00000008
+            import ctypes
 
-            subprocess.Popen(
-                [str(installer_path)],
-                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
-                close_fds=True
+            # ShellExecuteW with 'runas' triggers the UAC elevation prompt
+            # Returns value > 32 on success, <= 32 on failure
+            result = ctypes.windll.shell32.ShellExecuteW(
+                None,                   # hwnd (no parent window)
+                "runas",                # verb — request admin elevation
+                str(installer_path),    # file to execute
+                None,                   # parameters
+                None,                   # working directory
+                1,                      # SW_SHOWNORMAL
             )
+
+            if result <= 32:
+                logger.error(
+                    f"ShellExecuteW failed with code {result} "
+                    f"for installer: {installer_path}"
+                )
+                return False
         else:
             # On Unix, just run normally (shouldn't be called)
             subprocess.Popen([str(installer_path)])
 
         return True
 
-    except Exception:
+    except Exception as e:
+        logger.error(f"Failed to start installer: {e}", exc_info=True)
         return False
 
 
