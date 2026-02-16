@@ -619,7 +619,12 @@ class UpdateOverlay(Container):
         self._set_progress("Starting installer...", 95)
 
         if not install_update(installer_path):
-            self._show_error("Failed to start installer")
+            self._show_error(
+                "Failed to start installer. "
+                "Please approve the admin prompt (UAC) or "
+                "try running the installer manually from: "
+                f"{installer_path}"
+            )
             return
 
         self._set_progress("Update ready!", 100, "Installer started, app will close...")
