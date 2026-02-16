@@ -1259,27 +1259,31 @@ class HomeScreen(Screen):
 
         logger.info("Restarting application after update...")
 
-        # Build the command to re-launch the app.
-        # After a package-manager upgrade (brew, uv, pip, …) the old
-        # Cellar/site-packages path may have been unlinked, so we must
-        # resolve the entry-point script from PATH to pick up the newly
-        # linked binary.
-        if getattr(sys, 'frozen', False):
-            # Running as compiled binary (PyInstaller / Nuitka)
+        # After a package-manager upgrade (brew, uv, pip, …) the binary
+        # at the path stored in sys.executable / sys.argv[0] may have
+        # been deleted (e.g. Homebrew removes the old Cellar version).
+        # We must resolve the entry-point from PATH to pick up the
+        # newly-linked binary.
+        #
+        # This applies to BOTH frozen (PyInstaller) and non-frozen
+        # (Python script) installs — Homebrew on macOS uses a frozen
+        # binary whose Cellar path changes on every version bump.
+
+        # 1. Try to resolve the console-script / binary from PATH
+        script = shutil.which("hei-datahub") or shutil.which("hdh")
+
+        if script:
+            executable = script
+            args = [script] + sys.argv[1:]
+        elif getattr(sys, 'frozen', False):
+            # Frozen binary not found on PATH — last resort, use the
+            # path baked into this process (may have been deleted).
             executable = sys.executable
             args = sys.argv[:]
         else:
-            # Running from Python — try to resolve the console-script
-            # (e.g. /opt/homebrew/bin/hei-datahub) so we exec the NEW
-            # binary, not the one cached in this process's sys.argv.
-            script = shutil.which("hei-datahub") or shutil.which("hdh")
-            if script:
-                executable = script
-                args = [script] + sys.argv[1:]
-            else:
-                # Fallback: re-run with the same Python + argv
-                executable = sys.executable
-                args = [sys.executable] + sys.argv[:]
+            # Non-frozen Python — re-run with the same interpreter
+            executable = sys.executable
+            args = [sys.executable] + sys.argv[:]
 
         logger.info(f"Restarting: execv({executable!r}, {args!r})")
 
