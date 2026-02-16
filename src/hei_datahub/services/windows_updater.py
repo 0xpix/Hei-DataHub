@@ -89,7 +89,7 @@ def get_download_url() -> Optional[dict]:
 
         if not release_data:
             return {"error": "No releases found on GitHub"}
-        latest_version = release_data.get("tag_name", "").lstrip('v')
+        latest_version = (release_data.get("tag_name") or "").lstrip('v')
 
         if not latest_version:
             return {"error": "Release has no version tag"}
@@ -120,7 +120,7 @@ def get_download_url() -> Optional[dict]:
             "latest_version": latest_version,
             "download_url": download_url,
             "file_size": file_size,
-            "release_notes": release_data.get("body", "")[:500]
+            "release_notes": (release_data.get("body") or "")[:500]
         }
 
     except requests.exceptions.Timeout:
