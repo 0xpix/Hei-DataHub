@@ -342,7 +342,7 @@ def fetch_latest_tag(force: bool = False) -> Optional[str]:
 
         if response.status_code == 200:
             data = response.json()
-            tag = data.get("tag_name", "").lstrip('v')
+            tag = (data.get("tag_name") or "").lstrip('v')
 
             if tag:
                 state.set_preference("last_known_latest_tag", tag)
@@ -406,7 +406,7 @@ def _fetch_latest_from_releases_list(state) -> Optional[str]:
         for rel in releases:
             if rel.get("draft", False):
                 continue
-            tag = rel.get("tag_name", "").lstrip('v').strip()
+            tag = (rel.get("tag_name") or "").lstrip('v').strip()
             if tag:
                 tag_names.append(tag)
 
