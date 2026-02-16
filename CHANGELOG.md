@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.14-beta] - 2026-02-16 - Wide Search (Hotfix)
+
+**Hotfix:** Fixes macOS restart after update — app closed but relaunched with old version.
+
+### Fixed
+
+- **macOS restart after Homebrew update launching old binary** — `_restart_app` used `sys.executable` directly for frozen (PyInstaller) builds, which points to the old Cellar path (e.g. `.../Cellar/hei-datahub/0.65.12/bin/hei-datahub`) that Homebrew deletes during upgrade. Now resolves `shutil.which("hei-datahub")` first for all install types (frozen and non-frozen), which follows the updated `/opt/homebrew/bin/hei-datahub` symlink to the new version
+
+---
+
 ## [0.65.13-beta] - 2026-02-16 - Wide Search (Hotfix)
 
 **Hotfix:** Fixes the update badge not appearing on any platform (Windows, Linux, macOS).
