@@ -1,9 +1,9 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.65.0-beta"
+version: "0.65.1-beta"
 codename: "Wide Search"
-release_date: "2026-02-12"
+release_date: "2026-02-16"
 compatibility: "Hei-DataHub v0.65.x (beta)"
 notes: "Extended search tags, vim-style view navigation, table column consolidation, tag input and error handling fixes."
 
