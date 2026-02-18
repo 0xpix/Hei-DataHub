@@ -591,7 +591,7 @@ class UpdateOverlay(Container):
             return
 
         latest = result.latest_version
-        win_info = get_download_url()
+        win_info = get_download_url(target_version=latest)
 
         if not win_info or "error" in win_info:
             self._show_error(win_info.get("error", "Failed to get download info") if win_info else "Unknown error")
