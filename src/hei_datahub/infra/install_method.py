@@ -179,19 +179,17 @@ def detect_install_method() -> InstallInfo:
     Detect how Hei-DataHub was installed and return update instructions.
 
     Detection priority is based on specificity:
-    1. Frozen exe (PyInstaller) — definitive, from sys.frozen
+    1. Frozen exe (PyInstaller) on Windows — definitive, from sys.frozen
     2. Dev mode — definitive, from file path in repo
     3. AppImage — definitive, from $APPIMAGE env var
-    4. UV tool — definitive, from file path in uv/tools/
-    5. pipx — definitive, from file path in pipx/venvs/
-    6. AUR (pacman) — system package manager check
-    7. Homebrew — system package manager check
-    8. pip (site-packages) — broad fallback
-    9. Unknown
-
-    Path-based checks (4-5) come BEFORE package-manager checks (6-7)
-    because the file path is proof of how the *running* code was
-    installed, whereas pacman/brew may list an old/parallel install.
+    4. Frozen exe (PyInstaller) on Linux — check pacman first, then
+       treat as generic AppImage-like binary
+    5. UV tool — definitive, from file path in uv/tools/
+    6. pipx — definitive, from file path in pipx/venvs/
+    7. AUR (pacman) — system package manager check (non-frozen)
+    8. Homebrew — system package manager check
+    9. pip (site-packages) — broad fallback
+    10. Unknown
 
     Returns:
         InstallInfo with method, update command, and instructions
@@ -249,7 +247,37 @@ def detect_install_method() -> InstallInfo:
                 )
             )
 
-    # 4. Check for UV tool installation (path-based — definitive)
+    # 4. Frozen binary on Linux (not AppImage) — check pacman/AUR
+    #    This handles cases where the PyInstaller binary is run directly
+    #    (e.g. via AUR wrapper script) without the AppImage layer.
+    if _is_frozen() and sys.platform == "linux":
+        if _check_pacman_installed():
+            return InstallInfo(
+                method=InstallMethod.AUR,
+                update_command="yay -Syu hei-datahub",
+                update_instructions=(
+                    "Installed via AUR package.\n\n"
+                    "To update, run:\n"
+                    "  yay -Syu hei-datahub\n\n"
+                    "Or with your preferred AUR helper:\n"
+                    "  paru -Syu hei-datahub"
+                )
+            )
+        else:
+            # Frozen Linux binary not from AppImage or AUR — standalone
+            return InstallInfo(
+                method=InstallMethod.APPIMAGE,
+                update_command="",
+                update_instructions=(
+                    "Running from standalone binary.\n\n"
+                    "To update, download the latest release from:\n"
+                    "  https://github.com/0xpix/Hei-DataHub/releases\n\n"
+                    "Or install via AUR for automatic updates:\n"
+                    "  yay -S hei-datahub"
+                )
+            )
+
+    # 5. Check for UV tool installation (path-based — definitive)
     if _check_uv_installed():
         return InstallInfo(
             method=InstallMethod.UV_TOOL,
@@ -261,7 +289,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 5. Check for pipx installation (path-based — definitive)
+    # 6. Check for pipx installation (path-based — definitive)
     if _check_pipx_installed():
         return InstallInfo(
             method=InstallMethod.PIPX,
@@ -273,7 +301,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 6. Check for AUR (pacman) on Linux (non-AppImage)
+    # 7. Check for AUR (pacman) on Linux (non-AppImage, non-frozen)
     if _check_pacman_installed():
         return InstallInfo(
             method=InstallMethod.AUR,
@@ -287,7 +315,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 7. Check for Homebrew on macOS
+    # 8. Check for Homebrew on macOS
     if _check_homebrew_installed():
         return InstallInfo(
             method=InstallMethod.HOMEBREW,
@@ -300,7 +328,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 8. Check if in site-packages (pip install)
+    # 9. Check if in site-packages (pip install)
     package_path = Path(__file__).resolve()
     if "site-packages" in str(package_path):
         return InstallInfo(
@@ -313,7 +341,7 @@ def detect_install_method() -> InstallInfo:
             )
         )
 
-    # 9. Unknown installation method
+    # 10. Unknown installation method
     return InstallInfo(
         method=InstallMethod.UNKNOWN,
         update_command="",
