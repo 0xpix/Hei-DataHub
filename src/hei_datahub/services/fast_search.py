@@ -190,6 +190,9 @@ def search_indexed(query: str, limit: int = 50) -> list[dict[str, Any]]:
                 "category": item.get("category"),
                 "spatial_coverage": item.get("spatial_coverage"),
                 "temporal_coverage": item.get("temporal_coverage"),
+                "spatial_resolution": item.get("spatial_resolution"),
+                "temporal_resolution": item.get("temporal_resolution"),
+                "access_method": item.get("access_method"),
                 "is_remote": item.get("is_remote", False),
             },
         })
@@ -232,6 +235,9 @@ def get_all_indexed(limit: int = 200) -> list[dict[str, Any]]:
                 "category": item.get("category"),
                 "spatial_coverage": item.get("spatial_coverage"),
                 "temporal_coverage": item.get("temporal_coverage"),
+                "spatial_resolution": item.get("spatial_resolution"),
+                "temporal_resolution": item.get("temporal_resolution"),
+                "access_method": item.get("access_method"),
                 "is_remote": item.get("is_remote", False),
             },
         })
