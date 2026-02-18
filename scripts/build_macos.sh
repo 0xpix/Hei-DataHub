@@ -160,6 +160,9 @@ log_info "Creating tarball: $TARBALL_NAME"
 PKG_TMP="$(mktemp -d)"
 cp "$DIST_DIR/hei-datahub" "$PKG_TMP/hei-datahub"
 
+# Create hdh symlink so both 'hei-datahub' and 'hdh' work
+ln -sf hei-datahub "$PKG_TMP/hdh"
+
 # Verify executable
 # Note: This might fail on cross-compilation if we were doing that,
 # but we expect to run on native runner.
@@ -169,12 +172,12 @@ cp "$DIST_DIR/hei-datahub" "$PKG_TMP/hei-datahub"
 
 # Tar it up
 # -C changes to directory before adding files
-tar -czf "$TARBALL_PATH" -C "$PKG_TMP" hei-datahub
+tar -czf "$TARBALL_PATH" -C "$PKG_TMP" hei-datahub hdh
 
 rm -rf "$PKG_TMP"
 
 # Verify tarball structure
-if tar -tzf "$TARBALL_PATH" | head -n 1 | grep -q "^hei-datahub$"; then
+if tar -tzf "$TARBALL_PATH" | grep -q "^hei-datahub$"; then
     log_success "Tarball structure verified."
     tar -tzf "$TARBALL_PATH"
 else
