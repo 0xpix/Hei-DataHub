@@ -69,15 +69,18 @@ banner() {
 # ==============================================================================
 
 get_version() {
-    # Try to get version from git tag first (strip leading 'v')
+    local ver
+    # Try to get version from git tag first
     if [[ -n "${GITHUB_REF_NAME:-}" && "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
-        echo "${GITHUB_REF_NAME#v}"
+        ver="${GITHUB_REF_NAME##*/}"  # strip path prefix (e.g. release/0.65-beta -> 0.65-beta)
+        echo "${ver#v}"               # strip leading 'v'
         return
     fi
 
-    # Try git describe (strip leading 'v')
+    # Try git describe (strip path prefix and leading 'v')
     if tag=$(git describe --tags --exact-match 2>/dev/null); then
-        echo "${tag#v}"
+        ver="${tag##*/}"
+        echo "${ver#v}"
         return
     fi
 
