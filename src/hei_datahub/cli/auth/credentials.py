@@ -50,44 +50,77 @@ class KeyringAuthStore(AuthStore):
     SERVICE_NAME = "hei-datahub"
 
     def __init__(self):
-        """Initialize keyring store."""
+        """Initialize keyring store.
+
+        On macOS, avoids calling keyring.get_password() during init to
+        prevent a Keychain password prompt just for an availability check.
+        Instead, checks that the keyring backend is not a fail/null backend.
+        """
         if platform.system() not in ["Linux", "Windows", "Darwin"]:
             raise RuntimeError(f"KeyringAuthStore is only supported on Linux, Windows, and macOS (current: {platform.system()})")
+
+        self._secret_cache: dict[str, str] = {}  # in-memory cache
 
         try:
             import keyring
             self._keyring = keyring
-            # Test if keyring is actually available
-            try:
-                # Try to get a non-existent key to verify backend works
-                self._keyring.get_password(self.SERVICE_NAME, "test_availability")
-                self._available = True
-            except Exception as e:
-                logger.warning(f"Keyring backend test failed: {e}")
-                self._available = False
+
+            if platform.system() == "Darwin":
+                # On macOS, do NOT call get_password() just to test — it
+                # triggers a Keychain password dialog every time.  Instead,
+                # check the backend class: if keyring resolved to a real
+                # backend (not Fail/null) we assume it works.
+                backend = keyring.get_keyring()
+                backend_name = type(backend).__name__
+                # keyring.backends.fail.Keyring or chainer with no backends
+                if "Fail" in backend_name or "Null" in backend_name:
+                    logger.warning(f"Keyring backend is {backend_name}, not usable")
+                    self._available = False
+                else:
+                    logger.info(f"Keyring backend on macOS: {backend_name} (skipping probe)")
+                    self._available = True
+            else:
+                # On Linux/Windows the probe is cheap and doesn't show a dialog
+                try:
+                    self._keyring.get_password(self.SERVICE_NAME, "test_availability")
+                    self._available = True
+                except Exception as e:
+                    logger.warning(f"Keyring backend test failed: {e}")
+                    self._available = False
         except ImportError:
             logger.warning("keyring module not available")
             self._available = False
 
     def store_secret(self, key_id: str, value: str) -> None:
-        """Store secret in Linux keyring."""
+        """Store secret in system keyring and update in-memory cache."""
         if not self._available:
             raise RuntimeError("Keyring backend not available")
 
         try:
             self._keyring.set_password(self.SERVICE_NAME, key_id, value)
+            self._secret_cache[key_id] = value  # keep cache in sync
             logger.info(f"Stored secret in keyring: {key_id}")
         except Exception as e:
             raise RuntimeError(f"Failed to store secret in keyring: {e}")
 
     def load_secret(self, key_id: str) -> Optional[str]:
-        """Load secret from Linux keyring."""
+        """Load secret from system keyring (cached after first read).
+
+        On macOS this avoids repeated Keychain password prompts by
+        returning the cached value for subsequent calls.
+        """
         if not self._available:
             raise RuntimeError("Keyring backend not available")
+
+        # Return from in-memory cache if we already fetched it
+        if key_id in self._secret_cache:
+            logger.debug(f"Loaded secret from cache: {key_id}")
+            return self._secret_cache[key_id]
 
         try:
             secret = self._keyring.get_password(self.SERVICE_NAME, key_id)
             if secret:
+                self._secret_cache[key_id] = secret  # cache for future calls
                 logger.debug(f"Loaded secret from keyring: {key_id}")
             return secret
         except Exception as e:
@@ -161,9 +194,18 @@ class EnvAuthStore(AuthStore):
             return f"HEIDATAHUB_{key_id.upper().replace(':', '_').replace('@', '_AT_').replace('.', '_')}"
 
 
+# Module-level singleton for KeyringAuthStore to avoid repeated
+# initialisation (which on macOS triggers a Keychain prompt).
+_keyring_store_cache: Optional[KeyringAuthStore] = None
+
+
 def get_auth_store(prefer_keyring: bool = True) -> AuthStore:
     """
     Get the best available auth store for this platform.
+
+    The KeyringAuthStore instance is cached as a module-level singleton
+    so that repeated calls (e.g. during startup, settings screen, sync)
+    do not trigger multiple Keychain / credential-manager prompts on macOS.
 
     Args:
         prefer_keyring: If True, try keyring first, fallback to ENV
@@ -171,13 +213,21 @@ def get_auth_store(prefer_keyring: bool = True) -> AuthStore:
     Returns:
         AuthStore instance
     """
+    global _keyring_store_cache
+
     if platform.system() not in ["Linux", "Windows", "Darwin"]:
         raise RuntimeError(f"Only Linux, Windows, and macOS are supported for auth setup (current: {platform.system()})")
 
     if prefer_keyring:
+        # Re-use cached instance if it exists and is still usable
+        if _keyring_store_cache is not None and _keyring_store_cache.available():
+            logger.debug("Returning cached keyring auth store")
+            return _keyring_store_cache
+
         try:
             store = KeyringAuthStore()
             if store.available():
+                _keyring_store_cache = store
                 logger.info("Using keyring auth store")
                 return store
             else:
