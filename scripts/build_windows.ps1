@@ -130,6 +130,16 @@ $BuildVersion = $AppVersion.Replace("-beta", "b")
 $PortableName = "hei-datahub-$BuildVersion-portable.exe"
 $SetupName = "hei-datahub-$BuildVersion-setup.exe"
 
+# Stamp version into version.yaml so PyInstaller bundles the correct version
+# (version.yaml is the runtime source of truth for the app)
+foreach ($vf in @("version.yaml", "src/hei_datahub/version.yaml")) {
+    if (Test-Path $vf) {
+        (Get-Content $vf) -replace '^version:.*', "version: `"$AppVersion`"" |
+            Set-Content $vf
+        Write-Host "  Stamped $vf with version $AppVersion" -ForegroundColor DarkGray
+    }
+}
+
 Write-Host "  Project: " -NoNewline -ForegroundColor Gray
 Write-Host "Hei-DataHub" -ForegroundColor White
 Write-Host "  Version: " -NoNewline -ForegroundColor Gray
