@@ -23,7 +23,9 @@ if [ "$#" -ne 2 ]; then
 fi
 
 TARGET_ARCH="$1"
-VERSION="$2"
+# Strip any path prefix (e.g. "release/0.65-beta" -> "0.65-beta") and leading 'v'
+VERSION="${2##*/}"
+VERSION="${VERSION#v}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
