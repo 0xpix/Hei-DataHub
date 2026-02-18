@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.2b] - 2026-02-18 - Wide Search
+
+**Bug fixes & UX improvements** — macOS Keychain, FTS5 robustness, search completeness, and mode indicator.
+
+### Fixed
+
+- **macOS Keychain password prompt on every launch** — skipped the `get_password()` availability probe on macOS (it triggered a Keychain dialog just to test), cached the `KeyringAuthStore` as a singleton, and added in-memory secret caching so the Keychain is accessed at most once per session
+- **FTS5 syntax errors from special characters** (`: / | , "`) — all FTS-breaking characters are now stripped from search tokens before building the MATCH query; if cleaning removes all content, falls through to filter-only search instead of crashing
+- **Spatial/temporal info missing in search results** — `search_indexed()` and `get_all_indexed()` were missing `spatial_resolution`, `temporal_resolution`, and `access_method` in their metadata dicts (only `_search_all()` had them), so tag searches and free-text searches showed incomplete spatial/temporal info
+- **`hdh` command not working on macOS** — the Homebrew build tarball only contained the `hei-datahub` binary; added an `hdh` symlink to the macOS build script so both commands work after `brew install`
+- **Special-character-only queries showing all data** — typing `.`, `?`, `>`, etc. now immediately shows a helpful hint ("Type a keyword to search…") instead of triggering the indexer timer that refilled the table with all datasets
+- **Mode indicator stuck on Normal while typing** — set `search_mode = True` on mount and on every input change so the indicator correctly shows "Insert" from the moment the app starts and while actively typing
+
+---
+
 ## [0.65.14-beta] - 2026-02-16 - Wide Search (Hotfix)
 
 **Hotfix:** Fixes macOS restart after update — app closed but relaunched with old version.
