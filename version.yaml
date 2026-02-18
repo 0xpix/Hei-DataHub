@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.65.20b"
+version: "0.65.21b"
 codename: "Wide Search"
 release_date: "2026-02-18"
 compatibility: "Hei-DataHub v0.65.x (beta)"
-notes: "macOS Keychain fix, FTS5 special character handling, spatial info completeness, hdh alias, search UX improvements."
+notes: "Build pipeline fixes: version parsing, artifact naming, path-safe tags."
 
 # Additional metadata
 app_name: "Hei-DataHub"
