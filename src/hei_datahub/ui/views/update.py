@@ -305,14 +305,11 @@ class UpdateScreen(Screen):
         success = True
 
         for i, cmd in enumerate(commands):
-            cmd_str = " ".join(cmd)
-            self._log(f"$ {cmd_str}")
-
             # Update progress
             base_progress = 30
             progress_per_cmd = 60 // total_commands
             current_progress = base_progress + (i * progress_per_cmd)
-            self._update_ui(f"Running: {cmd[0]}...", current_progress)
+            self._update_ui(f"Updating to v{latest_version}...", current_progress)
 
             try:
                 # Run command and capture output in real-time
@@ -337,10 +334,10 @@ class UpdateScreen(Screen):
                     success = False
                     break
                 else:
-                    self._log(f"✓ {cmd[0]} completed")
+                    self._log(f"✓ Step {i + 1}/{total_commands} completed")
 
             except FileNotFoundError:
-                self._log(f"✗ Command not found: {cmd[0]}")
+                self._log("✗ Required tool not found")
                 success = False
                 break
             except Exception as e:

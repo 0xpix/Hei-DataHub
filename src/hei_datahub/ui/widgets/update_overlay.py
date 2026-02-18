@@ -46,6 +46,7 @@ class UpdateOverlay(Container):
         padding: 1 3;
         background: $surface;
         border: round $primary 50%;
+        align: center middle;
     }
 
     #update-overlay-title {
@@ -295,7 +296,7 @@ class UpdateOverlay(Container):
             base_progress = 30
             progress_per_cmd = 60 // total_commands
             current_progress = base_progress + (i * progress_per_cmd)
-            self._set_progress(f"Running: {' '.join(cmd[:3])}…", current_progress)
+            self._set_progress(f"Updating to v{latest_version}…", current_progress)
 
             try:
                 # Run command
@@ -328,11 +329,11 @@ class UpdateOverlay(Container):
 
             except subprocess.TimeoutExpired:
                 logger.error(f"Command timed out: {' '.join(cmd)}")
-                self._show_error(f"Update timed out running: {' '.join(cmd[:3])}")
+                self._show_error("Update timed out")
                 return
             except FileNotFoundError:
                 logger.error(f"Command not found: {cmd[0]}")
-                self._show_error(f"Command not found: {cmd[0]}")
+                self._show_error("Update failed — required tool not found")
                 return
             except Exception as e:
                 logger.error(f"Error running update: {e}")
@@ -343,7 +344,7 @@ class UpdateOverlay(Container):
             self._show_success(latest_version)
         else:
             short_err = last_stderr.strip().split('\n')[-1][:80] if last_stderr.strip() else ""
-            msg = f"Update via {method_name} failed."
+            msg = "Update failed."
             if short_err:
                 msg += f"\n{short_err}"
             msg += f"\nTry: {install_info.update_command}"
@@ -436,15 +437,15 @@ class UpdateOverlay(Container):
                     self._show_error("Incorrect password")
                 else:
                     short_err = stderr.strip().split("\n")[-1][:80] if stderr.strip() else ""
-                    msg = f"Update via {method_name} failed."
+                    msg = "Update failed."
                     if short_err:
                         msg += f"\n{short_err}"
                     self._show_error(msg)
 
         except subprocess.TimeoutExpired:
-            self._show_error(f"Update timed out ({method_name})")
+            self._show_error("Update timed out")
         except FileNotFoundError:
-            self._show_error(f"Command not found: {sudo_cmd[0]}")
+            self._show_error("Update failed — required tool not found")
         except Exception as e:
             logger.error(f"Sudo update error: {e}")
             self._show_error(str(e))
