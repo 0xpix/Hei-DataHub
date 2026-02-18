@@ -298,7 +298,7 @@ class UpdateScreen(Screen):
         # Run the update command(s)
         self._log("")
         self._log("─" * 40)
-        self._log(f"📦 Updating via {method_name}...", "info")
+        self._log(f"📦 Updating to v{latest_version}...", "info")
         self._log("")
 
         total_commands = len(commands)
