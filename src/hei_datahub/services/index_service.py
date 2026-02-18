@@ -247,7 +247,8 @@ class IndexService:
         try:
             params: list[Any] = []
 
-            # Build FTS query
+            # Build FTS query from free-text, sanitising special chars
+            fts_query = None
             if query_text and query_text.strip():
                 # Tokenize and add prefix matching, but escape special characters
                 tokens = query_text.strip().split()
@@ -255,16 +256,24 @@ class IndexService:
                 fts_tokens = []
                 for token in tokens:
                     if len(token) >= 2:
-                        # Escape special FTS5 characters: " * ( ) - +
-                        escaped = token.replace('"', '""')
-                        # Only add * if token doesn't already have special chars
-                        if escaped.isalnum():
-                            fts_tokens.append(f"{escaped}*")
+                        # Strip ALL FTS5-breaking special chars: : / | , " * ( ) - +
+                        cleaned = ''.join(
+                            c for c in token
+                            if c.isalnum() or c in ('_', '.')
+                        )
+                        if not cleaned or len(cleaned) < 2:
+                            continue
+                        # Pure alphanumeric tokens get prefix wildcard
+                        if cleaned.isalnum():
+                            fts_tokens.append(f"{cleaned}*")
                         else:
-                            fts_tokens.append(f'"{escaped}"')
+                            # Tokens with dots/underscores — quote them
+                            fts_tokens.append(f'"{cleaned}"')
 
-                fts_query = " ".join(fts_tokens) if fts_tokens else query_text
+                fts_query = " ".join(fts_tokens) if fts_tokens else None
 
+            # Decide: use FTS+filters or filters-only
+            if query_text and query_text.strip() and fts_query:
                 # Build WHERE clauses for filters (applied to items table, not FTS)
                 # Each filter is a list; every value adds its own AND clause
                 where_clauses: list[str] = []
