@@ -27,6 +27,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Stamp version from tag
+        if: github.ref_type == 'tag'
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "Stamping version: $TAG_VERSION"
+          for f in version.yaml src/hei_datahub/version.yaml; do
+            if [ -f "$f" ]; then
+              sed -i '' "s/^version:.*/version: \"$TAG_VERSION\"/" "$f"
+              echo "Updated $f"
+            fi
+          done
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
