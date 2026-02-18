@@ -41,7 +41,10 @@ jobs:
 
       - name: Extract Version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: |
+          # Strip path prefix (e.g. release/0.65-beta -> 0.65-beta) and leading 'v'
+          RAW_REF="${GITHUB_REF_NAME##*/}"
+          echo "VERSION=${RAW_REF#v}" >> $GITHUB_OUTPUT
 
       - name: Build
         run: |
@@ -118,7 +121,10 @@ jobs:
 
       - name: Extract Version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: |
+          # Strip path prefix (e.g. release/0.65-beta -> 0.65-beta) and leading 'v'
+          RAW_REF="${GITHUB_REF_NAME##*/}"
+          echo "VERSION=${RAW_REF#v}" >> $GITHUB_OUTPUT
 
       - name: Update Formula
         run: |
