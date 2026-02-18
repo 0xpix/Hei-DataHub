@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.28b] - 2026-02-18 - Wide Search
+
+**Windows update fix, CI version stamping, cleaner update UX.**
+
+### Fixed
+
+- **Windows update installing wrong version** — `get_download_url()` in `windows_updater.py` was doing its own release lookup via `/releases/latest` (which skips pre-releases) or `releases[0]` (chronological, not highest version), so the downloaded installer could be an older version than what the UI displayed. Now accepts a `target_version` parameter and searches for the exact matching release tag
+- **Built binaries reporting stale version** — PyInstaller bundled whatever was in `version.yaml` at commit time, not the git tag version. Added version stamping in all three CI workflows (Windows, Linux, macOS) and all three build scripts to write the tag into `version.yaml` before building
+- **Windows CI checkout failing on tag push** — `fetch-tags: true` with `depth=1` caused git to try fetching the same SHA as both a commit and a tag ref, which newer Git versions reject. Fixed by using `ref: ${{ github.sha }}` instead
+- **Windows CI extracting wrong version for artifacts** — the "Get version info" step only read `version.yaml` (which could be stale). Now prefers `github.ref_name` (the git tag) and falls back to `version.yaml` only for `workflow_dispatch` runs
+
+### Added
+
+- **Automatic version.yaml sync from tags** — new `version-stamp.yml` workflow commits the tag version back to `main` so the repo always reflects the latest release
+- **Stale installer cleanup** — `download_update()` now deletes old setup executables from the temp directory before downloading a new one
+- **Update logging** — `get_download_url()` and `download_update()` now log the requested version, resolved version, matched asset name, download URL, and byte count for easier debugging
+
+### Changed
+
+- **Update progress text** — replaced "Updating via uv/brew/pip…" with generic "Updating to v{version}…" so the update method is not exposed to the user (still logged internally for debugging)
+
+---
+
 ## [0.65.23b] - 2026-02-18 - Wide Search
 
 **Bug fixes & UX improvements** — macOS Keychain, FTS5 robustness, search completeness, and mode indicator.
