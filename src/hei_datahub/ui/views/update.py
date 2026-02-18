@@ -402,7 +402,7 @@ class UpdateScreen(Screen):
         # Get download info from windows updater
         latest = update_info.get("latest_version", "?")
         self._log("Fetching download URL...")
-        win_info = get_download_url()
+        win_info = get_download_url(target_version=latest)
 
         if not win_info or "error" in win_info:
             error_msg = win_info.get("error", "Unknown error") if win_info else "Failed to get download info"
