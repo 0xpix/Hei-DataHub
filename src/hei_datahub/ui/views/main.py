@@ -162,8 +162,8 @@ class DataHubApp(App):
         except Exception as e:
             logger.warning(f"Failed to start background indexer: {e}")
 
-        # Check WebDAV/Heibox connection status
-        self.check_heibox_connection()
+        # Check WebDAV/Heibox connection status (async — avoids blocking on_mount)
+        self.check_heibox_connection_async()
 
         # Apply theme from config (safely)
         try:
@@ -183,14 +183,20 @@ class DataHubApp(App):
         self.push_screen(HomeScreen())
 
         # Check for updates (async) - after screen is mounted
+        logger.info(f"auto_check_updates={config.auto_check_updates}")
         if config.auto_check_updates:
             self.check_for_updates_async()
 
         # Startup pull prompt (async) - after screen is mounted
         self.startup_pull_check()
 
-    def check_heibox_connection(self) -> None:
-        """Check WebDAV/Heibox connection status on startup."""
+    @work(thread=True)
+    def check_heibox_connection_async(self) -> None:
+        """Check WebDAV/Heibox connection status in background thread."""
+        self._do_heibox_check()
+
+    def _do_heibox_check(self) -> None:
+        """Check WebDAV/Heibox connection status (actual logic)."""
         try:
             from hei_datahub.infra.config_paths import get_config_path
 
@@ -260,7 +266,7 @@ class DataHubApp(App):
 
     def refresh_heibox_status(self) -> None:
         """Refresh Heibox connection status (called after auth setup)."""
-        self.check_heibox_connection()
+        self._do_heibox_check()
 
         # Update home screen if it exists
         try:
@@ -278,17 +284,22 @@ class DataHubApp(App):
         Uses the new update_service with proper version comparison
         supporting tags like 0.64.11b.
         """
+        logger.info("Starting silent update check on launch...")
+
         try:
             from hei_datahub.services.update_service import check_for_updates_silent
+        except Exception as e:
+            logger.error(f"Failed to import update_service: {e}", exc_info=True)
+            return
 
-            logger.info("Starting silent update check on launch...")
+        try:
             # force=True: always hit the network on app launch so a
             # freshly-published release is detected immediately instead
             # of being hidden behind the 8-hour throttle cache.
             result = check_for_updates_silent(force=True)
 
             if result is None:
-                logger.debug("Update check skipped (throttled or failed)")
+                logger.warning("Update check returned None (throttled or failed)")
                 return
 
             if result.error:
