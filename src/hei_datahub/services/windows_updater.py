@@ -42,9 +42,16 @@ def is_frozen() -> bool:
     return getattr(sys, 'frozen', False)
 
 
-def get_download_url() -> Optional[dict]:
+def get_download_url(target_version: Optional[str] = None) -> Optional[dict]:
     """
-    Get the download URL for the latest release.
+    Get the download URL for a specific or the latest release.
+
+    Args:
+        target_version: If provided, search releases for this exact version
+                        tag (e.g. "0.65.23b"). This avoids the mismatch where
+                        /releases/latest skips pre-releases and returns an
+                        older version than the one the update check found.
+                        If None, falls back to /releases/latest.
 
     Returns:
         Dict with update info or None if no update available.
@@ -59,33 +66,57 @@ def get_download_url() -> Optional[dict]:
         }
     """
     try:
-        # Try /releases/latest first, then fall back to /releases list
-        # (beta/pre-release tags don't show up on /latest)
-        response = requests.get(
-            UPDATE_CHECK_URL,
-            timeout=10,
-            headers={"Accept": "application/vnd.github.v3+json",
-                     "User-Agent": f"Hei-DataHub/{__version__}"}
-        )
-
         release_data = None
+        list_url = UPDATE_CHECK_URL.rsplit("/", 1)[0]  # …/releases
 
-        if response.status_code == 200:
-            release_data = response.json()
-        else:
-            # Fallback: fetch releases list and pick the first one
-            list_url = UPDATE_CHECK_URL.rsplit("/", 1)[0]  # …/releases
-            resp2 = requests.get(
+        if target_version:
+            # Fetch releases list and find the one matching target_version
+            # This is necessary because /releases/latest skips pre-releases
+            # and we need to download from the exact version the user was shown.
+            resp = requests.get(
                 list_url,
                 timeout=10,
                 headers={"Accept": "application/vnd.github.v3+json",
                          "User-Agent": f"Hei-DataHub/{__version__}"},
-                params={"per_page": 5},
+                params={"per_page": 30},
             )
-            if resp2.status_code == 200:
-                releases = resp2.json()
-                if releases:
-                    release_data = releases[0]
+            if resp.status_code == 200:
+                releases = resp.json()
+                for rel in releases:
+                    tag = (rel.get("tag_name") or "").lstrip('v').strip()
+                    if tag == target_version:
+                        release_data = rel
+                        break
+
+            if not release_data:
+                logger.warning(
+                    f"Target version {target_version} not found in releases, "
+                    f"falling back to latest"
+                )
+
+        # Fallback: /releases/latest, then first item in /releases list
+        if not release_data:
+            response = requests.get(
+                UPDATE_CHECK_URL,
+                timeout=10,
+                headers={"Accept": "application/vnd.github.v3+json",
+                         "User-Agent": f"Hei-DataHub/{__version__}"}
+            )
+
+            if response.status_code == 200:
+                release_data = response.json()
+            else:
+                resp2 = requests.get(
+                    list_url,
+                    timeout=10,
+                    headers={"Accept": "application/vnd.github.v3+json",
+                             "User-Agent": f"Hei-DataHub/{__version__}"},
+                    params={"per_page": 5},
+                )
+                if resp2.status_code == 200:
+                    releases = resp2.json()
+                    if releases:
+                        release_data = releases[0]
 
         if not release_data:
             return {"error": "No releases found on GitHub"}
@@ -113,6 +144,11 @@ def get_download_url() -> Optional[dict]:
 
         if not download_url:
             return {"error": "Release has no Windows installer (.exe) asset"}
+
+        logger.info(
+            f"get_download_url: requested={target_version}, "
+            f"resolved={latest_version}, asset={matched_name}"
+        )
 
         return {
             "has_update": has_update,
@@ -146,6 +182,7 @@ def download_update(
         Path to downloaded file or None on failure
     """
     try:
+        logger.info(f"Downloading update from: {download_url}")
         response = requests.get(download_url, stream=True, timeout=300)
         response.raise_for_status()
 
@@ -154,6 +191,13 @@ def download_update(
         # Create temp directory for download
         temp_dir = Path(tempfile.gettempdir()) / "hei-datahub-update"
         temp_dir.mkdir(exist_ok=True)
+
+        # Clean up old installers from previous updates to avoid confusion
+        for old_file in temp_dir.glob("hei-datahub-*-setup.exe"):
+            try:
+                old_file.unlink()
+            except OSError:
+                pass
 
         # Derive filename from the download URL (handles versioned names)
         filename = download_url.rsplit("/", 1)[-1] if "/" in download_url else ASSET_NAME
@@ -168,9 +212,11 @@ def download_update(
                     if progress_callback:
                         progress_callback(downloaded, total_size)
 
+        logger.info(f"Downloaded installer to: {download_path} ({downloaded} bytes)")
         return download_path
 
-    except Exception:
+    except Exception as e:
+        logger.error(f"Download failed: {e}", exc_info=True)
         return None
 
 
