@@ -5,6 +5,7 @@ This module reads version data directly from version.yaml at runtime.
 For version updates, simply edit version.yaml - no sync step needed!
 """
 from pathlib import Path
+import re
 import sys
 
 import yaml
@@ -75,18 +76,37 @@ def _load_version_data() -> dict:
 _VERSION_DATA = _load_version_data()
 
 
+def _strip_suffix(part: str) -> int:
+    """Strip trailing alpha suffix (b, a, rc, etc.) and return the numeric value."""
+    m = re.match(r'^(\d+)', part)
+    return int(m.group(1)) if m else 0
+
+
 def _parse_version(version_str: str) -> tuple[int, ...]:
-    """Parse version string into tuple."""
+    """Parse version string into tuple, handling PEP 440 suffixes like '2b'."""
     parts = version_str.split("-")[0].split(".")
     try:
-        return tuple(int(p) for p in parts)
-    except ValueError:
+        return tuple(_strip_suffix(p) for p in parts)
+    except (ValueError, AttributeError):
         return (0, 0, 0)
+
+
+def _extract_suffix(version_str: str) -> str:
+    """Extract pre-release suffix from version string.
+
+    Handles both '0.65.2-beta' (hyphenated) and '0.65.2b' (inline PEP 440) styles.
+    """
+    if "-" in version_str:
+        return version_str.split("-", 1)[1]
+    # Check last segment for inline suffix like '2b', '11rc2'
+    last = version_str.split(".")[-1]
+    m = re.search(r'[a-zA-Z]+\d*$', last)
+    return m.group(0) if m else ""
 
 
 # Version Components
 __version__ = _VERSION_DATA.get("version", "0.0.0-dev")
-__version_info__ = _parse_version(__version__) + (_VERSION_DATA.get("version", "").split("-")[1] if "-" in _VERSION_DATA.get("version", "") else "",)
+__version_info__ = _parse_version(__version__) + (_extract_suffix(__version__),)
 
 # Application Metadata
 __app_name__ = _VERSION_DATA.get("app_name", "Hei-DataHub")
@@ -95,7 +115,7 @@ __description__ = "A local-first TUI for managing datasets with consistent metad
 
 # Build Information
 _version_parts = __version__.split("-")[0].split(".")
-BUILD_NUMBER = "".join(f"{int(p):02d}" for p in _version_parts[:3])
+BUILD_NUMBER = "".join(f"{_strip_suffix(p):02d}" for p in _version_parts[:3])
 RELEASE_DATE = _VERSION_DATA.get("release_date", "Unknown")
 CODENAME = _VERSION_DATA.get("codename", "Unknown")
 COMPATIBILITY = _VERSION_DATA.get("compatibility", "Unknown")
