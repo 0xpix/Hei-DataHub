@@ -283,7 +283,7 @@ class UpdateOverlay(Container):
             self._show_manual_instructions(latest_version, install_info)
             return
 
-        self._set_progress(f"Updating via {method_name}…", 30)
+        self._set_progress(f"Updating to v{latest_version}…", 30)
         logger.info(f"Auto-update via {method_name}: {commands}")
 
         total_commands = len(commands)
@@ -407,7 +407,7 @@ class UpdateOverlay(Container):
         if "--noconfirm" not in sudo_cmd:
             sudo_cmd.insert(2, "--noconfirm") if method_name in ("yay", "paru", "pacman") else None
 
-        self._set_progress(f"Updating via {method_name}…", 30)
+        self._set_progress(f"Updating to v{latest_version}…", 30)
         logger.info(f"Sudo update: {' '.join(sudo_cmd)}")
 
         try:
