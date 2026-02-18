@@ -48,6 +48,15 @@ cd "$PROJECT_ROOT"
 
 log_info "Starting build for $TARGET_ARCH version $VERSION..."
 
+# Stamp version into version.yaml so PyInstaller bundles the correct version
+# (version.yaml is the runtime source of truth for the app)
+for vf in version.yaml src/hei_datahub/version.yaml; do
+    if [ -f "$PROJECT_ROOT/$vf" ]; then
+        sed -i '' "s/^version:.*/version: \"$VERSION\"/" "$PROJECT_ROOT/$vf"
+        log_info "Stamped $vf with version $VERSION"
+    fi
+done
+
 # ==============================================================================
 # VERIFY ENVIRONMENT
 # ==============================================================================
