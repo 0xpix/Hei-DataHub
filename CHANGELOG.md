@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.65.20b] - 2026-02-18 - Wide Search
+## [0.65.21b] - 2026-02-18 - Wide Search
 
 **Bug fixes & UX improvements** — macOS Keychain, FTS5 robustness, search completeness, and mode indicator.
 
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`hdh` command not working on macOS** — the Homebrew build tarball only contained the `hei-datahub` binary; added an `hdh` symlink to the macOS build script so both commands work after `brew install`
 - **Special-character-only queries showing all data** — typing `.`, `?`, `>`, etc. now immediately shows a helpful hint ("Type a keyword to search…") instead of triggering the indexer timer that refilled the table with all datasets
 - **Mode indicator stuck on Normal while typing** — set `search_mode = True` on mount and on every input change so the indicator correctly shows "Insert" from the moment the app starts and while actively typing
+- CI changes — Fix Linux artifact naming inconsistent with other platforms.
 
 ---
 
