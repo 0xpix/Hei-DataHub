@@ -72,7 +72,7 @@ jobs:
     needs: build-macos
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Main Repo (for script)
         uses: actions/checkout@v4
@@ -98,7 +98,7 @@ jobs:
           # Pattern: <sha>  <filename>
           ARM_SHA=$(cat artifacts/arm/sha256-macos-arm64.txt | awk '{print $1}')
           INTEL_SHA=$(cat artifacts/intel/sha256-macos-x86_64.txt | awk '{print $1}')
-          
+
           echo "ARM_SHA=$ARM_SHA" >> $GITHUB_OUTPUT
           echo "INTEL_SHA=$INTEL_SHA" >> $GITHUB_OUTPUT
           echo "Extracted SHAs - ARM: $ARM_SHA, Intel: $INTEL_SHA"
@@ -139,7 +139,7 @@ jobs:
           cd tap
           git config user.name "hei-datahub-tap-bot"
           git config user.email "tap-bot@users.noreply.github.com"
-          
+
           # Check for changes
           if [[ -n $(git status -s) ]]; then
             git add Formula/hei-datahub.rb
