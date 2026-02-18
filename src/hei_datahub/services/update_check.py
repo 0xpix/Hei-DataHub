@@ -21,12 +21,17 @@ def parse_version(version_str: str) -> tuple[int, ...]:
     Returns:
         Version tuple (e.g., (3, 0, 0))
     """
+    import re
+
     # Strip leading 'v' if present
     clean = version_str.lstrip('v')
 
+    # Strip trailing suffixes like -beta, -rc1, etc.
+    clean = clean.split('-')[0]
+
     try:
         parts = clean.split('.')
-        return tuple(int(p) for p in parts)
+        return tuple(int(re.match(r'^(\d+)', p).group(1)) if re.match(r'^(\d+)', p) else 0 for p in parts)
     except Exception:
         return (0, 0, 0)
 
