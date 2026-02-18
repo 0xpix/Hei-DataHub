@@ -104,6 +104,7 @@ class HomeScreen(Screen):
 
         # Focus search input on start
         self.query_one("#search-input").focus()
+        self.search_mode = True
 
         # Set initial footer context (home = no shortcuts)
         self._update_footer_context()
@@ -280,7 +281,7 @@ class HomeScreen(Screen):
         """
         # Get current search query to check if we're in search mode
         search_input = self.query_one("#search-input", Input)
-        if search_input.value and len(search_input.value.strip()) >= 2:
+        if search_input.value and search_input.value.strip():
             # We're in search mode - DO NOT add datasets
             logger.debug("Timer skipped: in search mode")
             return
@@ -607,6 +608,10 @@ class HomeScreen(Screen):
     @on(Input.Changed, "#search-input")
     def on_search_input(self, event: Input.Changed) -> None:
         """Handle search input changes with debouncing."""
+        # Ensure mode indicator reflects Insert while typing
+        if not self.search_mode:
+            self.search_mode = True
+
         # Cancel existing timer
         if self._debounce_timer:
             self._debounce_timer.stop()
@@ -646,6 +651,20 @@ class HomeScreen(Screen):
         # If query is empty or very short, we effectively clear results (hide view)
         if not has_query:
             self._update_filter_badges("")
+            return
+
+        # If query is only special characters (no usable search terms),
+        # show a helpful hint instead of running a search that would fail
+        import re
+        stripped = re.sub(r'[^a-zA-Z0-9]', '', query)
+        if not stripped:
+            # Stop indexer timer so it doesn't refill the table behind the tip
+            try:
+                self.remove_timer("indexer_check")
+            except Exception:
+                pass
+            label = self.query_one("#results-label", Label)
+            label.update("💡 Type a keyword to search (e.g. dataset name, tag, or use [italic]`all`[/italic] to list everything)")
             return
 
         try:
