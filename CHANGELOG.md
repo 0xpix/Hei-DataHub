@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.65.22b] - 2026-02-18 - Wide Search
+## [0.65.23b] - 2026-02-18 - Wide Search
 
 **Bug fixes & UX improvements** — macOS Keychain, FTS5 robustness, search completeness, and mode indicator.
 
