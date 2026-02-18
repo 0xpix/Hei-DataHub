@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.65.2b] - 2026-02-18 - Wide Search
+## [0.65.20b] - 2026-02-18 - Wide Search
 
 **Bug fixes & UX improvements** — macOS Keychain, FTS5 robustness, search completeness, and mode indicator.
 
@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.65.1-beta] - 2026-02-16 - Wide Search (Hotfix)
+## [0.65.10-beta] - 2026-02-16 - Wide Search (Hotfix)
 
 **Hotfix:** Fixes Windows auto-update failing to launch the installer due to missing UAC elevation.
 
