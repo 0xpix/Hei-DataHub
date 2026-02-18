@@ -27,6 +27,9 @@ jobs:
             TAG="${{ github.ref_name }}"
           fi
 
+          # Strip path prefix (e.g. release/0.65-beta -> 0.65-beta) and leading 'v'
+          TAG="${TAG##*/}"
+
           # Strip leading 'v' for package version and filename
           CLEAN_VERSION="${TAG#v}"
 
@@ -54,9 +57,8 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
-          # URL pattern: .../download/<VERSION>/HeiDataHub-<VERSION>-x86_64.AppImage
-          # Using clean VERSION for the tag part of URL as requested, assuming release slug matches version
-          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
+          # URL pattern: .../download/<VERSION>/hei-datahub-<VERSION>-linux-x86_64.AppImage
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/hei-datahub-${VERSION}-linux-x86_64.AppImage"
 
           echo "Waiting for AppImage to be available at:"
           echo "$APPIMAGE_URL"
@@ -80,7 +82,7 @@ jobs:
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.clean_version }}"
           # Using VERSION in URL to match the expected link format
-          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/HeiDataHub-${VERSION}-x86_64.AppImage"
+          APPIMAGE_URL="https://github.com/0xpix/Hei-DataHub/releases/download/${VERSION}/hei-datahub-${VERSION}-linux-x86_64.AppImage"
 
           echo "Downloading AppImage..."
           curl -L -o "HeiDataHub.AppImage" "$APPIMAGE_URL"
@@ -138,7 +140,7 @@ jobs:
           options=('!strip')
           _realver=${VERSION}
           source=(
-              "HeiDataHub-\${_realver}-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG_PREFIX}\${_realver}/HeiDataHub-\${_realver}-x86_64.AppImage"
+              "hei-datahub-\${_realver}-linux-x86_64.AppImage::https://github.com/0xpix/Hei-DataHub/releases/download/${TAG_PREFIX}\${_realver}/hei-datahub-\${_realver}-linux-x86_64.AppImage"
               "hei-datahub.desktop"
               "hei-datahub.png::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/assets/png/icon_1024.png"
               "LICENSE::https://raw.githubusercontent.com/0xpix/Hei-DataHub/main/LICENSE"
@@ -159,13 +161,13 @@ jobs:
               install -dm755 "\${pkgdir}/usr/share/licenses/\${pkgname}"
 
               # Install AppImage
-              install -Dm755 "HeiDataHub-\${_realver}-x86_64.AppImage" "\${pkgdir}/opt/\${pkgname}/HeiDataHub.AppImage"
+              install -Dm755 "hei-datahub-\${_realver}-linux-x86_64.AppImage" "\${pkgdir}/opt/\${pkgname}/hei-datahub.AppImage"
 
               # Create wrapper script
               cat > "\${pkgdir}/usr/bin/\${pkgname}" << 'WRAPPER'
           #!/bin/bash
           # Wrapper script for Hei-DataHub AppImage
-          exec /opt/hei-datahub/HeiDataHub.AppImage "\$@"
+          exec /opt/hei-datahub/hei-datahub.AppImage "\$@"
           WRAPPER
               chmod 755 "\${pkgdir}/usr/bin/\${pkgname}"
 
@@ -197,7 +199,7 @@ jobs:
           # Prepare files for validation (to avoid re-downloading)
           # We place the downloaded assets where makepkg expects them so makepkg -o verifies them
           # Note: Using VERSION (original) since _realver in PKGBUILD references the original version
-          cp "HeiDataHub.AppImage" "aur/HeiDataHub-${VERSION}-x86_64.AppImage"
+          cp "HeiDataHub.AppImage" "aur/hei-datahub-${VERSION}-linux-x86_64.AppImage"
           cp "icon.png" "aur/hei-datahub.png"
           cp "LICENSE" "aur/LICENSE"
 
