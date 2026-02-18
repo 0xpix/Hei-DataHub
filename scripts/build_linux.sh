@@ -121,6 +121,15 @@ FILE_VERSION=${VERSION/-beta/b}
 DEB_VERSION=$(get_deb_version "$VERSION")
 log_info "Version: $VERSION (File: $FILE_VERSION, Deb: $DEB_VERSION)"
 
+# Stamp version into version.yaml so PyInstaller bundles the correct version
+# (version.yaml is the runtime source of truth for the app)
+for vf in version.yaml src/hei_datahub/version.yaml; do
+    if [ -f "$PROJECT_ROOT/$vf" ]; then
+        sed -i "s/^version:.*/version: \"$VERSION\"/" "$PROJECT_ROOT/$vf"
+        log_info "Stamped $vf with version $VERSION"
+    fi
+done
+
 # Determine architecture
 ARCH=$(uname -m)
 DEB_ARCH="amd64"
