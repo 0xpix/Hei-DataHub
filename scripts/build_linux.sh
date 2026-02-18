@@ -268,6 +268,7 @@ PYINSTALLER_ARGS=(
     --hidden-import "hei_datahub.ui.views.home"
     --hidden-import "hei_datahub.ui.views.main"
     --hidden-import "hei_datahub.services.update_check"
+    --hidden-import "hei_datahub.services.update_service"
     --hidden-import "hei_datahub.infra.sql"
     "${DATA_ARGS[@]}"
 )
