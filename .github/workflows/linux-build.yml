@@ -108,7 +108,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: HeiDataHub-linux-${{ steps.artifact.outputs.ref_name }}-${{ steps.artifact.outputs.short_sha }}
+          name: hei-datahub-linux-${{ steps.artifact.outputs.ref_name }}-${{ steps.artifact.outputs.short_sha }}
           path: release/*
           if-no-files-found: error
           retention-days: 30
