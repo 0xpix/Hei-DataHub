@@ -15,6 +15,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Stamp version from tag
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          $tagVersion = "${{ github.ref_name }}".TrimStart("v").Trim()
+          Write-Host "Stamping version: $tagVersion"
+
+          # Update both version.yaml files so PyInstaller bundles the correct version
+          foreach ($file in @("version.yaml", "src/hei_datahub/version.yaml")) {
+            if (Test-Path $file) {
+              (Get-Content $file) -replace '^version:.*', "version: `"$tagVersion`"" |
+                Set-Content $file
+              Write-Host "Updated $file"
+            }
+          }
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -99,16 +117,33 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          # Extract version from version.yaml
-          $versionFile = "version.yaml"
-          if (Test-Path $versionFile) {
-            $content = Get-Content $versionFile -Raw
-            if ($content -match 'version:\s*[''"]?([0-9]+\.[0-9]+[^''"]*)[''"]?') {
-              $version = $matches[1]
-              Write-Host "Version: $version"
-              echo "version=$version" >> $env:GITHUB_OUTPUT
+          $version = $null
+
+          # Prefer git tag (available on tag-triggered builds)
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $version = "${{ github.ref_name }}".TrimStart("v").Trim()
+            Write-Host "Version from git tag: $version"
+          }
+
+          # Fallback to version.yaml (workflow_dispatch or missing tag)
+          if (-not $version) {
+            $versionFile = "version.yaml"
+            if (Test-Path $versionFile) {
+              $content = Get-Content $versionFile -Raw
+              if ($content -match 'version:\s*[''"]?([0-9]+\.[0-9]+\.[0-9]+[^''"]*)[''"]?') {
+                $version = $matches[1]
+                Write-Host "Version from version.yaml: $version"
+              }
             }
           }
+
+          if (-not $version) {
+            Write-Host "WARNING: Could not determine version" -ForegroundColor Yellow
+            $version = "unknown"
+          }
+
+          Write-Host "Using version: $version"
+          echo "version=$version" >> $env:GITHUB_OUTPUT
 
           # Get short SHA
           $shortSha = "${{ github.sha }}".Substring(0, 7)
