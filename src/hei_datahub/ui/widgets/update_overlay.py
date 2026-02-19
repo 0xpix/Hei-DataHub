@@ -397,31 +397,83 @@ class UpdateOverlay(Container):
     def _run_sudo_update(
         self, password: str, cmd: list[str], latest_version: str, install_info
     ) -> None:
-        """Run an update command via sudo, piping the password to stdin."""
+        """Run an update command, handling sudo as needed."""
         self._updating = True
         _debug = os.environ.get("HEI_DEBUG_UPDATER", "").strip() in ("1", "true", "yes")
 
-        method_name = cmd[0]  # e.g. "yay" or "paru"
-        # Wrap in sudo -S so password is read from stdin.
-        # --noconfirm avoids interactive prompts from pacman/yay.
-        sudo_cmd = ["sudo", "-S"] + cmd
-        if "--noconfirm" not in sudo_cmd:
-            sudo_cmd.insert(2, "--noconfirm") if method_name in ("yay", "paru", "pacman") else None
+        method_name = cmd[0]  # e.g. "yay" or "paru" or "pacman"
 
-        self._set_progress(f"Updating to v{latest_version}…", 30)
-        logger.info(f"Sudo update: {' '.join(sudo_cmd)}")
+        # AUR helpers (yay, paru) must NOT be wrapped in sudo — they handle
+        # privilege escalation internally.  We cache sudo credentials first
+        # (sudo -S -v) so that yay's internal sudo calls succeed without
+        # prompting.  For plain pacman we still wrap in sudo -S.
+        is_aur_helper = method_name in ("yay", "paru")
+
+        if is_aur_helper:
+            # 1. Cache sudo credentials
+            self._set_progress(f"Authenticating…", 25)
+            # Clean AppImage env vars so sudo/pacman work correctly
+            auth_env = {k: v for k, v in os.environ.items()
+                        if not k.startswith(("APPIMAGE", "APPDIR", "OWD"))
+                        and k not in ("LD_LIBRARY_PATH", "LD_PRELOAD")}
+            try:
+                validate = subprocess.Popen(
+                    ["sudo", "-S", "-v"],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    env=auth_env,
+                )
+                _, v_err = validate.communicate(input=password + "\n", timeout=15)
+                if validate.returncode != 0:
+                    lower_err = v_err.lower()
+                    if "incorrect password" in lower_err or "sorry" in lower_err:
+                        self._show_error("Incorrect password")
+                    else:
+                        self._show_error("Authentication failed")
+                    return
+            except subprocess.TimeoutExpired:
+                self._show_error("Authentication timed out")
+                return
+            except Exception as e:
+                self._show_error(str(e))
+                return
+
+            # 2. Run the AUR helper directly (it will use cached sudo)
+            if "--noconfirm" not in cmd:
+                cmd.insert(1, "--noconfirm")
+            run_cmd = cmd
+        else:
+            # Plain pacman or other tools — wrap in sudo -S
+            run_cmd = ["sudo", "-S"] + cmd
+            if "--noconfirm" not in run_cmd:
+                # Insert after sudo -S for pacman
+                idx = run_cmd.index(cmd[0])
+                run_cmd.insert(idx + 1, "--noconfirm")
+
+        self._set_progress(f"Updating to version {latest_version}…", 30)
+        logger.info(f"Update command: {' '.join(run_cmd)}")
+
+        # Clean AppImage env vars so host tools (pacman, yay) work correctly
+        clean_env = {k: v for k, v in os.environ.items()
+                     if not k.startswith(("APPIMAGE", "APPDIR", "OWD"))
+                     and k not in ("LD_LIBRARY_PATH", "LD_PRELOAD")}
 
         try:
             process = subprocess.Popen(
-                sudo_cmd,
+                run_cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                env={**os.environ},
+                env=clean_env,
             )
+            # For non-AUR-helper (sudo -S), pipe the password; otherwise
+            # no stdin needed since sudo is already cached.
+            stdin_data = None if is_aur_helper else password + "\n"
             stdout, stderr = process.communicate(
-                input=password + "\n", timeout=300
+                input=stdin_data, timeout=300
             )
 
             if _debug:
@@ -548,12 +600,23 @@ class UpdateOverlay(Container):
                     backup_path.unlink()
                 appimage_file.rename(backup_path)
             except PermissionError:
-                # May need sudo to replace system-installed AppImage
-                self._show_error(
-                    f"Permission denied replacing {appimage_path}\n"
-                    "Try running with sudo or move the AppImage."
-                )
                 tmp_file.unlink(missing_ok=True)
+                # If installed in /opt/hei-datahub/, this is likely an AUR
+                # install that was misdetected.  Redirect to AUR update.
+                if str(appimage_file).startswith("/opt/hei-datahub/"):
+                    logger.info("AppImage in /opt — redirecting to AUR update")
+                    from hei_datahub.infra.install_method import InstallInfo, InstallMethod
+                    aur_info = InstallInfo(
+                        method=InstallMethod.AUR,
+                        update_command="yay -Syu hei-datahub",
+                        update_instructions="Run: yay -Syu hei-datahub",
+                    )
+                    self._prompt_sudo_update(latest_version, aur_info)
+                else:
+                    self._show_error(
+                        f"Permission denied replacing {appimage_path}\n"
+                        "Try running with sudo or move the AppImage."
+                    )
                 return
 
             # Move new AppImage into place
