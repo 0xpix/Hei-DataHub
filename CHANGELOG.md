@@ -9,37 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.65.32b] - 2026-02-19 - Wide Search
 
-**Bug fix** — AUR update no longer fails with "permission denied" inside AppImage.
-
 ### Fixed
 
-- **AUR install detection inside AppImage** — cleaned AppImage env vars (`LD_LIBRARY_PATH`, `LD_PRELOAD`, `APPIMAGE*`, `APPDIR*`) from `pacman` subprocess calls so host-system pacman works correctly; added path-based AUR fallback (`/opt/hei-datahub/`)
-- **yay not wrapped in sudo** — AUR helpers (`yay`, `paru`) must not be run under `sudo -S`; they handle privilege escalation internally. Now caches sudo credentials first (`sudo -S -v`), then runs yay directly with `--noconfirm`
-- **AppImage → AUR fallback** — if the AppImage self-replace path hits `PermissionError` at `/opt/hei-datahub/`, automatically redirects to the AUR password-prompt update flow instead of showing a dead-end error
-
----
-
-## [0.65.31b] - 2026-02-19 - Wide Search
-
-**Maintenance** — cleaner update messages.
+- **AUR update inside AppImage** — cleaned AppImage env vars from subprocess calls so pacman detection works; added `/opt/hei-datahub/` path-based AUR fallback; AUR helpers (yay/paru) no longer wrapped in `sudo` (credentials cached via `sudo -v` instead); AppImage `PermissionError` at `/opt/` now redirects to AUR update flow
+- **`auth doctor` false write failure** — write test was hitting WebDAV root (`/seafdav/`) instead of inside the library; now uses correct path
+- **Deleted datasets reappearing in search** — `_DELETED_DATASETS` folder excluded from indexer via `SKIP_FOLDERS` filter
+- **Delete notification** — now mentions recovery via Heibox
 
 ### Changed
 
-- **Update progress messages cleaned up** — removed tool-specific references (uv, pip) from user-facing update messages; all install methods now show generic "Updating to version X…" style text
-- Dev-mode update hint no longer mentions `uv sync`
-- Unknown install method fallback no longer lists `uv` as an option
-
----
-
-## [0.65.30b] - 2026-02-19 - Wide Search
-
-**Bug fixes** — auth doctor false failure, deleted datasets reappearing in search.
-
-### Fixed
-
-- **`auth doctor` reporting false write failure (PUT 403)** — the write permission test was PUTting to the WebDAV root (`/seafdav/`) instead of inside the library (`/seafdav/<library>/`). Seafile returns 403 for writes to the DAV root. Now includes the `library` path from config in the test URL
-- **Deleted datasets reappearing in search index** — the `_DELETED_DATASETS` backup folder (used for soft-delete/recovery) was inside the main library and got re-indexed by both full and incremental sync. Added a `SKIP_FOLDERS` filter to the indexer to exclude internal folders like `_DELETED_DATASETS`
-- **Delete notification unclear** — updated the delete success message to mention recovery via Heibox
+- Update progress messages cleaned up — removed tool-specific references; generic wording for all install methods
 
 ---
 
