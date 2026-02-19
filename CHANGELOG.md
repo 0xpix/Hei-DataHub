@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.31b] - 2026-02-19 - Wide Search
+
+**Maintenance** — cleaner update messages.
+
+### Changed
+
+- **Update progress messages cleaned up** — removed tool-specific references (uv, pip) from user-facing update messages; all install methods now show generic "Updating to version X…" style text
+- Dev-mode update hint no longer mentions `uv sync`
+- Unknown install method fallback no longer lists `uv` as an option
+
+---
+
 ## [0.65.30b] - 2026-02-19 - Wide Search
 
 **Bug fixes** — auth doctor false failure, deleted datasets reappearing in search.
