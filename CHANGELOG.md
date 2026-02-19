@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.65.32b] - 2026-02-19 - Wide Search
+
+**Bug fix** — AUR update no longer fails with "permission denied" inside AppImage.
+
+### Fixed
+
+- **AUR install detection inside AppImage** — cleaned AppImage env vars (`LD_LIBRARY_PATH`, `LD_PRELOAD`, `APPIMAGE*`, `APPDIR*`) from `pacman` subprocess calls so host-system pacman works correctly; added path-based AUR fallback (`/opt/hei-datahub/`)
+- **yay not wrapped in sudo** — AUR helpers (`yay`, `paru`) must not be run under `sudo -S`; they handle privilege escalation internally. Now caches sudo credentials first (`sudo -S -v`), then runs yay directly with `--noconfirm`
+- **AppImage → AUR fallback** — if the AppImage self-replace path hits `PermissionError` at `/opt/hei-datahub/`, automatically redirects to the AUR password-prompt update flow instead of showing a dead-end error
+
+---
+
 ## [0.65.31b] - 2026-02-19 - Wide Search
 
 **Maintenance** — cleaner update messages.
