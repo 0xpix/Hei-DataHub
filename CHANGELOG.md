@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.66.0-beta] - 2026-02-19
+
+**Major update.**
+
+### Added
+
+- *(to be documented)*
+
+### Changed
+
+- *(to be documented)*
+
+### Fixed
+
+- *(to be documented)*
+
+---
+
 ## [0.65.32b] - 2026-02-19 - Wide Search
 
 ### Fixed
