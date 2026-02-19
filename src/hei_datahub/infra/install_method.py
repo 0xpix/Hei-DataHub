@@ -86,12 +86,19 @@ def _check_pacman_installed() -> bool:
         if not Path(pacman_path).exists():
             return False
 
+        # Clean environment for subprocess — AppImage sets LD_LIBRARY_PATH,
+        # LD_PRELOAD, etc. that can break host system binaries like pacman.
+        clean_env = {k: v for k, v in os.environ.items()
+                     if not k.startswith(("APPIMAGE", "APPDIR", "OWD"))
+                     and k not in ("LD_LIBRARY_PATH", "LD_PRELOAD")}
+
         # Check if hei-datahub is installed via pacman
         result = subprocess.run(
             [pacman_path, "-Qq", "hei-datahub"],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=5,
+            env=clean_env,
         )
         return result.returncode == 0
     except Exception:
@@ -220,7 +227,11 @@ def detect_install_method() -> InstallInfo:
     # 3. Check for AppImage on Linux - then determine how it was installed
     if _is_appimage():
         # AppImage running - check if installed via AUR/pacman
-        if _check_pacman_installed():
+        # Also detect AUR by install path: AUR puts the AppImage in /opt/hei-datahub/
+        appimage_path = os.environ.get("APPIMAGE", "")
+        is_aur = _check_pacman_installed() or appimage_path.startswith("/opt/hei-datahub/")
+
+        if is_aur:
             return InstallInfo(
                 method=InstallMethod.AUR,
                 update_command="yay -Syu hei-datahub",
