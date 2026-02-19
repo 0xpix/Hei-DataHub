@@ -453,6 +453,7 @@ class AuthDoctor:
 
         url = self._config.get("url", "")
         username = self._config.get("username")
+        library = self._config.get("library", "")
 
         if not url:
             self.results.append(
@@ -472,10 +473,13 @@ class AuthDoctor:
             else:
                 session.auth = ("", self._credential)
 
-            # Create a test file path
+            # Create a test file path inside the library (Seafile requires writing into a library)
             import uuid
             test_filename = f".hei-datahub-doctor-{uuid.uuid4().hex[:8]}.txt"
-            test_url = url.rstrip("/") + "/" + test_filename
+            base = url.rstrip("/")
+            if library:
+                base = f"{base}/{library.strip('/')}"
+            test_url = base + "/" + test_filename
             test_content = b"hei-datahub doctor test"
 
             # Try PUT

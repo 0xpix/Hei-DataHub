@@ -510,7 +510,7 @@ class CloudDatasetDetailsScreen(NavActionsMixin, UrlActionsMixin, Screen):
                 logger.info(f"Moved dataset folder to backup: {backup_path}")
 
                 self.app.call_from_thread(
-                    lambda: self.app.notify(f"Dataset moved to {backup_path}", timeout=5)
+                    lambda: self.app.notify(f"Dataset moved to {backup_path} (recover via Heibox)", timeout=5)
                 )
 
             except Exception as e:

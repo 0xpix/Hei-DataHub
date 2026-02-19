@@ -7,7 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.65.28b] - 2026-02-18 - Wide Search
+## [0.65.30b] - 2026-02-19 - Wide Search
+
+**Bug fixes** — auth doctor false failure, deleted datasets reappearing in search.
+
+### Fixed
+
+- **`auth doctor` reporting false write failure (PUT 403)** — the write permission test was PUTting to the WebDAV root (`/seafdav/`) instead of inside the library (`/seafdav/<library>/`). Seafile returns 403 for writes to the DAV root. Now includes the `library` path from config in the test URL
+- **Deleted datasets reappearing in search index** — the `_DELETED_DATASETS` backup folder (used for soft-delete/recovery) was inside the main library and got re-indexed by both full and incremental sync. Added a `SKIP_FOLDERS` filter to the indexer to exclude internal folders like `_DELETED_DATASETS`
+- **Delete notification unclear** — updated the delete success message to mention recovery via Heibox
+
+---
+
+## [0.65.29b] - 2026-02-19 - Wide Search (HotFix)
+
+**Bug fixes** — schema validation and keybinding conflict.
+
+### Fixed
+
+- **JSON Schema validation rejecting `access_method`, `category`, `reference`, `tags`** — a stale `schema.json` copy in `~/.local/share/Hei-DataHub/` was missing these properties (added after initial install). Fixed schema loader to always prefer the packaged schema over user-data copies, preventing stale schemas from blocking dataset creation
+- **`Ctrl+S` opening Settings instead of saving on Add/Edit screens** — the app-level `ctrl+s → settings` binding had `priority=True`, which intercepted the key before screen-level `ctrl+s → submit/save_edits` bindings could fire. Removed `priority=True` from the global binding so screen-level bindings take precedence when active
+- **`required` fields in `schema.json` out of sync with Pydantic model** — added `category` and `access_method` to the JSON Schema `required` array to match `DatasetMetadata` where they are non-optional
+
+---
+
+## [0.65.28b] - 2026-02-18 - Wide Search (Bug Fixes)
 
 **Bug fixes & UX improvements** — macOS Keychain, FTS5 robustness, search completeness, and mode indicator.
 

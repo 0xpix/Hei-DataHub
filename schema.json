@@ -6,8 +6,10 @@
   "required": [
     "id",
     "dataset_name",
+    "category",
     "description",
     "source",
+    "access_method",
     "date_created",
     "storage_location"
   ],

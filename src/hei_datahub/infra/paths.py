@@ -94,13 +94,12 @@ def get_data_dir() -> Path:
 
 # Schema paths
 def _get_schema_path() -> Path:
-    """Get schema.json path."""
-    if _is_installed_package():
-        # Installed: Use packaged schema, copy to data dir if needed
-        user_schema = PROJECT_ROOT / "schema.json"
-        if user_schema.exists():
-            return user_schema
+    """Get schema.json path.
 
+    Always prefer the packaged schema (shipped with the code) to avoid
+    stale copies in user-data directories causing validation errors.
+    """
+    if _is_installed_package():
         # Check if PyInstaller bundled
         if getattr(sys, 'frozen', False):
              # sys._MEIPASS is the temp folder where PyInstaller extracts files
@@ -112,8 +111,17 @@ def _get_schema_path() -> Path:
              if bundled_schema_root.exists():
                  return bundled_schema_root
 
-        # Return packaged schema path
-        return Path(__file__).parent.parent / "schema.json"
+        # Installed: always use the packaged schema (stays in sync with code)
+        packaged_schema = Path(__file__).parent.parent / "schema.json"
+        if packaged_schema.exists():
+            return packaged_schema
+
+        # Fallback: user-data directory (legacy)
+        user_schema = PROJECT_ROOT / "schema.json"
+        if user_schema.exists():
+            return user_schema
+
+        return packaged_schema
     else:
         # Dev mode: Use repo schema
         return PROJECT_ROOT / "schema.json"

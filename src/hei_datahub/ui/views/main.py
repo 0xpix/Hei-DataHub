@@ -25,7 +25,7 @@ class DataHubApp(App):
     BINDINGS = [
         Binding("ctrl+p", "commands", "Open Command Palette", priority=True),
         Binding("ctrl+t", "theme_palette", "Change Theme", priority=True),
-        Binding("ctrl+s", "settings", "Settings", priority=True),
+        Binding("ctrl+s", "settings", "Settings"),
     ]
 
     # Track WebDAV/Heibox connection status

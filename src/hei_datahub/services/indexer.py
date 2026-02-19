@@ -16,6 +16,9 @@ from hei_datahub.services.index_service import SYNC_INTERVAL_SEC, get_index_serv
 
 logger = logging.getLogger(__name__)
 
+# Folders to exclude from indexing (internal/system folders)
+SKIP_FOLDERS = frozenset({"_DELETED_DATASETS"})
+
 
 class BackgroundIndexer:
     """Background indexer that scans cloud datasets from WebDAV."""
@@ -106,7 +109,7 @@ class BackgroundIndexer:
 
             # List top-level directories (datasets)
             entries = await asyncio.to_thread(storage.listdir, "")
-            datasets = [e for e in entries if e.is_dir]
+            datasets = [e for e in entries if e.is_dir and e.name not in SKIP_FOLDERS]
 
             count = 0
             for entry in datasets:
@@ -233,7 +236,7 @@ class BackgroundIndexer:
 
             # Get current cloud entries
             entries = await asyncio.to_thread(storage.listdir, "")
-            datasets = [e for e in entries if e.is_dir]
+            datasets = [e for e in entries if e.is_dir and e.name not in SKIP_FOLDERS]
 
             # Fetch metadata for each dataset (same as full index)
             items = []

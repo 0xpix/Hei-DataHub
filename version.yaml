@@ -1,11 +1,11 @@
 # Hei-DataHub Version Configuration
 # Single source of truth for all version metadata
 
-version: "0.65.28b"
+version: "0.65.30b"
 codename: "Wide Search"
-release_date: "2026-02-18"
+release_date: "2026-02-19"
 compatibility: "Hei-DataHub v0.65.x (beta)"
-notes: "Windows update fix, CI version stamping, cleaner update UX."
+notes: "Auth doctor write test fix, exclude deleted datasets from indexer."
 
 # Additional metadata
 app_name: "Hei-DataHub"
