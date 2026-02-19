@@ -213,8 +213,7 @@ def detect_install_method() -> InstallInfo:
             update_instructions=(
                 "Running from source code.\n\n"
                 "To update, run in the repository:\n"
-                "  git pull origin main\n"
-                "  uv sync"
+                "  git pull origin main"
             )
         )
 
@@ -350,8 +349,7 @@ def detect_install_method() -> InstallInfo:
             "Try one of these commands:\n"
             "  - AUR (Arch): yay -Syu hei-datahub\n"
             "  - Homebrew (macOS): brew upgrade hei-datahub\n"
-            "  - pip: pip install --upgrade hei-datahub\n"
-            "  - uv: uv tool upgrade hei-datahub"
+            "  - pip: pip install --upgrade hei-datahub"
         )
     )
 

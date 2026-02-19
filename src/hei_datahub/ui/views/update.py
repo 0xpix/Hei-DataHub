@@ -262,9 +262,8 @@ class UpdateScreen(Screen):
             self._log("─" * 40)
             self._log("🔧 Running from source (dev mode)", "info")
             self._log("")
-            self._log("To update, run in the repo:")
+            self._log("To update, pull the latest changes:")
             self._log("  git pull origin main")
-            self._log("  uv sync")
             self._log("─" * 40)
             self._show_result_manual(latest_version, install_info)
             return
@@ -298,7 +297,7 @@ class UpdateScreen(Screen):
         # Run the update command(s)
         self._log("")
         self._log("─" * 40)
-        self._log(f"📦 Updating to v{latest_version}...", "info")
+        self._log(f"📦 Updating to version {latest_version}…", "info")
         self._log("")
 
         total_commands = len(commands)
@@ -309,7 +308,7 @@ class UpdateScreen(Screen):
             base_progress = 30
             progress_per_cmd = 60 // total_commands
             current_progress = base_progress + (i * progress_per_cmd)
-            self._update_ui(f"Updating to v{latest_version}...", current_progress)
+            self._update_ui(f"Updating to version {latest_version}…", current_progress)
 
             try:
                 # Run command and capture output in real-time

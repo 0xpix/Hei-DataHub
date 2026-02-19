@@ -285,7 +285,7 @@ class UpdateOverlay(Container):
             return
 
         self._set_progress(f"Updating to v{latest_version}…", 30)
-        logger.info(f"Auto-update via {method_name}: {commands}")
+        logger.info(f"Updating to v{latest_version} via {method_name}")
 
         total_commands = len(commands)
         success = True
@@ -687,7 +687,7 @@ class UpdateOverlay(Container):
 
         def update_ui():
             self.query_one("#update-overlay-title", Static).update("Development Mode")
-            self._update_progress("Running from source", 100, "git pull && uv sync")
+            self._update_progress("Running from source", 100, "Pull latest changes to update")
             self.set_timer(3.0, self.hide)
 
         self.app.call_from_thread(update_ui)
